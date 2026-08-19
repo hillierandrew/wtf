@@ -1,3 +1,11 @@
+Here is the updated code.
+
+### Key Adjustments:
+
+1. **Footer Badge Lifted & Styled:** Changed the phase watermark to bright, solid white text with a dark backdrop box and lifted it slightly higher (`bottom: 30px`) with a high `z-index` so scanlines and vignettes can't obscure it. It initializes at **`PHASE NO. 0`** and updates automatically.
+2. **Strict Position Lock:** Completely removed the DVD screensaver movement engine and any position-altering transforms from all 60 phases. `DREW.WTF` is locked dead-center in the viewport at all times.
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -439,3 +447,5 @@
   </script>
 </body>
 </html>
+
+```
