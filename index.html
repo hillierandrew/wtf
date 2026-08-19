@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>DREW.WTF</title>
   
-  <!-- BRAND WEBFONTS -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@900&family=Comic+Neue:wght@700&family=Courier+Prime:wght@700&family=Fira+Code:wght@700&family=Noto+Sans+SC:wght@900&family=Noto+Sans+Devanagari:wght@900&family=Orbitron:wght@900&family=Permanent+Marker&family=Press+Start+2P&family=Russo+One&family=VT323&display=swap" rel="stylesheet">
@@ -43,36 +43,6 @@
       flex-direction: column;
     }
 
-    /* Mute Button (Top Left) */
-    .audio-btn {
-      position: fixed;
-      top: max(16px, env(safe-area-inset-top, 16px));
-      left: max(16px, env(safe-area-inset-left, 16px));
-      z-index: 999999;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-      font-size: 13px;
-      font-weight: 800;
-      color: #ffffff !important;
-      -webkit-text-fill-color: #ffffff !important;
-      letter-spacing: 0.08em;
-      user-select: none;
-      -webkit-user-select: none;
-      padding: 8px 16px;
-      border-radius: 20px;
-      background-color: rgba(15, 15, 15, 0.95);
-      border: 2px solid rgba(255, 255, 255, 0.8);
-      -webkit-backdrop-filter: blur(12px);
-      backdrop-filter: blur(12px);
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.9);
-      cursor: pointer;
-    }
-
-    .audio-btn:active {
-      transform: scale(0.92);
-      background-color: rgba(255, 255, 255, 0.3);
-    }
-
-    /* Starfield Canvas Background */
     #starfield {
       position: fixed;
       top: 0; left: 0;
@@ -87,7 +57,6 @@
 
     #starfield.active { opacity: 1; }
 
-    /* Screen Curvature & Vignette Overlay */
     body::before {
       content: " ";
       display: block;
@@ -98,7 +67,6 @@
       z-index: 10;
     }
 
-    /* Scanlines Overlay */
     body::after {
       content: " ";
       display: block;
@@ -110,7 +78,6 @@
       z-index: 11;
     }
 
-    /* Centered Container */
     .container {
       text-align: center;
       z-index: 50;
@@ -122,7 +89,6 @@
       pointer-events: none;
     }
 
-    /* Main Title Styling */
     .title {
       font-size: clamp(1.2rem, 6vw, 4.5rem);
       font-weight: bold;
@@ -153,33 +119,63 @@
       100% { opacity: 0.97; }
     }
 
-    /* Safari / iPhone Phase Badge */
-    .phase-watermark {
+    .bottom-ui-container {
       position: fixed;
       bottom: max(24px, env(safe-area-inset-bottom, 24px));
       left: 50%;
       transform: translateX(-50%);
       z-index: 999999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      pointer-events: auto;
+    }
+
+    .audio-btn {
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-      font-size: 15px;
+      font-size: 18px;
       font-weight: 800;
+      color: #ffffff !important;
+      -webkit-text-fill-color: #ffffff !important;
+      user-select: none;
+      -webkit-user-select: none;
+      padding: 10px 22px;
+      border-radius: 25px;
+      background-color: rgba(15, 15, 15, 0.95);
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.9);
+      cursor: pointer;
+    }
+
+    .audio-btn:active {
+      transform: scale(0.92);
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .phase-watermark {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+      font-size: 45px;
+      font-weight: 900;
       color: #ffffff !important;
       -webkit-text-fill-color: #ffffff !important;
       letter-spacing: 0.1em;
       user-select: none;
       -webkit-user-select: none;
-      padding: 12px 26px;
-      border-radius: 30px;
+      padding: 20px 48px;
+      border-radius: 50px;
       background-color: rgba(15, 15, 15, 0.95);
-      border: 2px solid rgba(255, 255, 255, 0.8);
+      border: 4px solid rgba(255, 255, 255, 0.85);
       -webkit-backdrop-filter: blur(12px);
       backdrop-filter: blur(12px);
-      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.95), 0 0 15px rgba(255, 255, 255, 0.3);
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.95), 0 0 25px rgba(255, 255, 255, 0.4);
       pointer-events: none;
       transition: background-color 0.2s ease, transform 0.2s ease;
+      white-space: nowrap;
     }
 
-    /* Dynamic Animations */
     .spin { animation: spin-hue 3s linear infinite !important; }
     @keyframes spin-hue { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
 
@@ -202,33 +198,31 @@
 </head>
 <body>
 
-  <!-- Mute / Unmute Audio Toggle -->
-  <button id="audio-toggle" class="audio-btn" onclick="toggleAudio(event)">🔊 MUTE</button>
-
-  <!-- Canvas Background -->
   <canvas id="starfield"></canvas>
 
-  <!-- Locked Center Container -->
   <div id="main-container" class="container">
     <div id="scramble-text" class="title">
       <span id="word-drew" class="clickable-word" onclick="handleDrewClick(event)">DREW</span><span id="word-dot" class="clickable-word" onclick="handleDotClick(event)">.</span><span id="word-wtf" class="clickable-word" onclick="handleWtfClick(event)">WTF</span>
     </div>
   </div>
 
-  <!-- Phase Badge -->
-  <div id="phase-badge" class="phase-watermark">
-    PHASE NO. 0
+  <div class="bottom-ui-container">
+    <button id="audio-toggle" class="audio-btn" onclick="toggleAudio(event)">🔊 UNMUTE MUSIC</button>
+    <div id="phase-badge" class="phase-watermark">
+      PHASE NO. 0
+    </div>
   </div>
 
   <script>
-    /* --- 8-BIT LAVENDER TOWN WEB AUDIO ENGINE --- */
     let audioCtx = null;
-    let isAudioMuted = false;
+    let isAudioMuted = true;
     let isAudioInitialized = false;
 
     function initAudioEngine() {
       if (isAudioInitialized) return;
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return;
+      audioCtx = new AudioContextClass();
       isAudioInitialized = true;
 
       const tempo = 126;
@@ -275,16 +269,16 @@
       }
 
       function scheduleLoop() {
-        if (audioCtx && audioCtx.state === 'suspended') {
+        if (audioCtx && audioCtx.state === 'suspended' && !isAudioMuted) {
           audioCtx.resume();
         }
 
         const arpNote = arpeggio[noteIdx % arpeggio.length];
         const bassNote = bassline[Math.floor(noteIdx / 2) % bassline.length];
 
-        playSquareNote(notes[arpNote], noteTime, 0.06);
+        playSquareNote(notes[arpNote], noteTime, 0.08);
         if (noteIdx % 2 === 0) {
-          playSquareNote(notes[bassNote], noteTime * 1.8, 0.04);
+          playSquareNote(notes[bassNote], noteTime * 1.8, 0.05);
         }
 
         noteIdx++;
@@ -296,20 +290,26 @@
 
     function toggleAudio(e) {
       if (e) e.stopPropagation();
-      initAudioEngine();
-      isAudioMuted = !isAudioMuted;
-      const btn = document.getElementById("audio-toggle");
-      btn.textContent = isAudioMuted ? "🔇 UNMUTE" : "🔊 MUTE";
-    }
-
-    window.addEventListener('pointerdown', () => {
-      initAudioEngine();
+      if (!isAudioInitialized) {
+        initAudioEngine();
+      }
       if (audioCtx && audioCtx.state === 'suspended') {
         audioCtx.resume();
       }
-    });
+      isAudioMuted = !isAudioMuted;
+      const btn = document.getElementById("audio-toggle");
+      btn.textContent = isAudioMuted ? "🔇 UNMUTE MUSIC" : "🔊 MUTE MUSIC";
+    }
 
-    /* --- BRAND WEBFONTS --- */
+    window.addEventListener('pointerdown', (e) => {
+      if (!isAudioInitialized) {
+        initAudioEngine();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }, { once: true });
+
     const companyFonts = [
       { font: "'Press Start 2P', monospace" },
       { font: "'Orbitron', sans-serif" },
@@ -325,7 +325,6 @@
       { font: "'Courier New', Courier, monospace" }
     ];
 
-    /* --- CANVAS ENGINE --- */
     const canvas = document.getElementById("starfield");
     const ctx = canvas.getContext("2d");
 
@@ -435,13 +434,11 @@
     window.addEventListener("orientationchange", resizeCanvas);
     initParticles();
 
-    /* --- DARK NON-WHITE BACKGROUND COLOR PALETTE --- */
     const darkColors = [
       "#000000", "#120000", "#00051a", "#10001a", 
       "#001a0a", "#1a1200", "#12001a", "#051015"
     ];
 
-    /* --- 200+ PROCEDURAL & DEMONIC PHASE ENGINE --- */
     let currentPhase = 0;
     let phaseTimer = null;
     let activeWordLeft = "DREW";
@@ -466,7 +463,6 @@
       const randomFont = companyFonts[Math.floor(Math.random() * companyFonts.length)];
       el.style.fontFamily = randomFont.font;
 
-      // Ensure background stays strictly dark (no white backgrounds)
       const themeBg = darkColors[currentPhase % darkColors.length];
       document.body.style.backgroundColor = themeBg;
       document.body.style.filter = "none";
@@ -541,7 +537,6 @@
       }, 5000);
     }
 
-    /* --- CLICK / TAP EVENT HANDLERS --- */
     function handleDrewClick(e) {
       if (e) e.stopPropagation();
       prevPhase();
@@ -568,7 +563,6 @@
       }
     });
 
-    /* --- KEYBOARD CONTROLS --- */
     window.addEventListener("keydown", (e) => {
       if (e.key === "ArrowUp" || e.key === "ArrowRight") {
         nextPhase();
@@ -577,7 +571,6 @@
       }
     });
 
-    /* --- INTERNATIONAL & EMOJI GLITCH ENGINE --- */
     const wordDrewEl = document.getElementById("word-drew");
     const wordWtfEl = document.getElementById("word-wtf");
 
@@ -612,7 +605,6 @@
       }, 1800);
     }
 
-    // Startup Execution
     setPhase(0);
     resetPhaseTimer();
     animateParticles();
@@ -620,3 +612,5 @@
   </script>
 </body>
 </html>
+
+```
