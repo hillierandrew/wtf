@@ -5,10 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>DREW.WTF</title>
   
-  <!-- BRAND & INTERNATIONAL WEBFONTS -->
+  <!-- BRAND WEBFONTS (Google Fonts & CDN Fonts) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@900&family=Comic+Neue:wght@700&family=Courier+Prime:wght@700&family=Fira+Code:wght@700&family=Noto+Sans+SC:wght@900&family=Noto+Sans+Devanagari:wght@900&family=Orbitron:wght@900&family=Permanent+Marker&family=Press+Start+2P&family=Russo+One&family=VT323&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Comic+Neue:wght@700&family=Courier+Prime:wght@700&family=Fira+Code:wght@700&family=Orbitron:wght@800;900&family=Permanent+Marker&family=Press+Start+2P&family=Russo+One&family=VT323&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cyberpunk-font@1.0.0/cyberpunk.css">
 
   <style>
     :root {
@@ -43,7 +44,26 @@
       flex-direction: column;
     }
 
-    /* Canvas Background */
+    /* Invisible Screen Touch Control Zones (Top = Prev Phase, Bottom = Next Phase) */
+    .touch-zone {
+      position: fixed;
+      left: 0;
+      width: 100vw;
+      height: 50vh;
+      height: 50dvh;
+      z-index: 9999;
+      cursor: pointer;
+    }
+
+    #touch-top {
+      top: 0;
+    }
+
+    #touch-bottom {
+      bottom: 0;
+    }
+
+    /* Starfield Canvas Background */
     #starfield {
       position: fixed;
       top: 0; left: 0;
@@ -58,7 +78,7 @@
 
     #starfield.active { opacity: 1; }
 
-    /* Screen Curvature & Vignette Overlay */
+    /* Vignette & Scanlines Overlays */
     body::before {
       content: " ";
       display: block;
@@ -69,7 +89,6 @@
       z-index: 10;
     }
 
-    /* Scanlines Overlay */
     body::after {
       content: " ";
       display: block;
@@ -90,7 +109,7 @@
       user-select: none;
       -webkit-user-select: none;
       position: relative;
-      pointer-events: none;
+      pointer-events: none; /* Allows clicks to pass through to the touch zones */
     }
 
     /* Main Title Styling */
@@ -103,7 +122,7 @@
       min-height: 1.2em;
       display: inline-block;
       white-space: nowrap;
-      transition: filter 0.3s ease, color 0.3s ease, text-shadow 0.3s ease, font-family 0.2s ease;
+      transition: filter 0.4s ease, color 0.4s ease, text-shadow 0.4s ease, font-family 0.2s ease;
     }
 
     @keyframes flicker {
@@ -112,14 +131,14 @@
       100% { opacity: 0.97; }
     }
 
-    /* Large Interactive Safari/iPhone Phase Watermark Badge */
+    /* Interactive Safari/iPhone Phase Badge */
     .phase-watermark {
       position: fixed;
       bottom: max(24px, env(safe-area-inset-bottom, 24px));
       left: 50%;
       transform: translateX(-50%);
       z-index: 999999;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       font-size: 15px;
       font-weight: 800;
       color: #ffffff !important;
@@ -127,6 +146,7 @@
       letter-spacing: 0.1em;
       user-select: none;
       -webkit-user-select: none;
+      cursor: pointer;
       padding: 12px 26px;
       border-radius: 30px;
       background-color: rgba(15, 15, 15, 0.95);
@@ -134,11 +154,16 @@
       -webkit-backdrop-filter: blur(12px);
       backdrop-filter: blur(12px);
       box-shadow: 0 6px 25px rgba(0, 0, 0, 0.95), 0 0 15px rgba(255, 255, 255, 0.3);
-      pointer-events: none;
+      pointer-events: auto;
       transition: background-color 0.2s ease, transform 0.2s ease;
     }
 
-    /* Dynamic Visual Animation Classes */
+    .phase-watermark:active {
+      background-color: rgba(255, 255, 255, 0.4);
+      transform: translateX(-50%) scale(0.95);
+    }
+
+    /* Dynamic Phase Effect Classes */
     .spin { animation: spin-hue 3s linear infinite !important; }
     @keyframes spin-hue { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
 
@@ -161,6 +186,10 @@
 </head>
 <body>
 
+  <!-- Screen Tap Zones (Top half = Previous, Bottom half = Next) -->
+  <div id="touch-top" class="touch-zone" onclick="prevPhase(event)"></div>
+  <div id="touch-bottom" class="touch-zone" onclick="nextPhase(event)"></div>
+
   <!-- Canvas Background -->
   <canvas id="starfield"></canvas>
 
@@ -170,25 +199,23 @@
   </div>
 
   <!-- Interactive Phase Badge -->
-  <div id="phase-badge" class="phase-watermark">
+  <div id="phase-badge" class="phase-watermark" onclick="nextPhase(event)">
     PHASE NO. 0
   </div>
 
   <script>
-    /* --- BRAND FONTS --- */
+    /* --- COMPANY & BRAND FONTS LIST --- */
     const companyFonts = [
-      { font: "'Press Start 2P', monospace" },
-      { font: "'Orbitron', sans-serif" },
-      { font: "'Russo One', sans-serif" },
-      { font: "'Permanent Marker', cursive" },
-      { font: "'Cinzel', serif" },
-      { font: "'Comic Neue', cursive" },
-      { font: "'VT323', monospace" },
-      { font: "'Fira Code', monospace" },
-      { font: "'Courier Prime', monospace" },
-      { font: "'Noto Sans SC', sans-serif" },
-      { font: "'Noto Sans Devanagari', sans-serif" },
-      { font: "'Courier New', Courier, monospace" }
+      { name: "Sega / Arcade", font: "'Press Start 2P', monospace" },
+      { name: "Cyberpunk 2077", font: "'Orbitron', sans-serif" },
+      { name: "PlayStation / Sci-Fi", font: "'Russo One', sans-serif" },
+      { name: "Coca-Cola / Vintage", font: "'Permanent Marker', cursive" },
+      { name: "Disney / Storybook", font: "'Cinzel', serif" },
+      { name: "Nintendo / Fun", font: "'Comic Neue', cursive" },
+      { name: "Retro CRT Terminal", font: "'VT323', monospace" },
+      { name: "Matrix Code", font: "'Fira Code', monospace" },
+      { name: "Classic Typewriter", font: "'Courier Prime', monospace" },
+      { name: "Default CRT", font: "'Courier New', Courier, monospace" }
     ];
 
     /* --- CANVAS ENGINE --- */
@@ -301,32 +328,25 @@
     window.addEventListener("orientationchange", resizeCanvas);
     initParticles();
 
-    /* --- 200+ PROCEDURAL & DEMONIC PHASE ENGINE --- */
+    /* --- 125+ PHASE SYSTEM WITH RANDOM BRAND FONTS --- */
     let currentPhase = 0;
     let phaseTimer = null;
     let activeTargetText = "DREW.WTF";
 
-    const customTextVariants = [
-      "DREW.WTF", "DREW.666", "DR3W.W7F", "666.666.666", "DREW_NULL", 
-      "HELL_WTF", "TRIP.WTF", "UFO.DREW", "RICH.WTF", "CYBER_DREW", 
-      "VOID.WTF", "ACID_DREW", "4NNDR3W", "DEAD_WTF", "DEMON_MODE"
-    ];
-
     function setPhase(p) {
       currentPhase = p;
-      if (currentPhase > 200) currentPhase = 0;
-      if (currentPhase < 0) currentPhase = 200;
+      if (currentPhase > 125) currentPhase = 0;
+      if (currentPhase < 0) currentPhase = 125;
 
       const el = document.getElementById("scramble-text");
       const badge = document.getElementById("phase-badge");
       
       badge.textContent = `PHASE NO. ${currentPhase}`;
 
-      // Random font assignment
+      // Pick random brand font per phase shift
       const randomFont = companyFonts[Math.floor(Math.random() * companyFonts.length)];
       el.style.fontFamily = randomFont.font;
 
-      // Base style resets
       document.body.style.backgroundColor = "#000";
       document.body.style.filter = "none";
       el.className = "title";
@@ -337,49 +357,145 @@
       reverseWarp = false;
       canvas.classList.add("active");
 
-      if (currentPhase === 0) {
-        activeTargetText = "DREW.WTF";
-        canvas.classList.remove("active");
-        return;
-      }
-
-      // Procedural generation for 200 distinct phases
-      activeTargetText = customTextVariants[currentPhase % customTextVariants.length];
-      warpSpeed = (currentPhase % 25) + 2;
-
-      // Dynamic visual effects based on phase modulo
-      if (currentPhase % 10 === 0) {
-        renderMode = "devils";
-        el.style.color = "#ff0000";
-      } else if (currentPhase % 8 === 0) {
-        renderMode = "mushrooms";
-        el.style.color = "#00ffff";
-        el.classList.add("liquid-wave");
-      } else if (currentPhase % 6 === 0) {
-        renderMode = "skulls";
-        el.style.color = "#00ff66";
-      } else if (currentPhase % 5 === 0) {
-        document.body.style.backgroundColor = "#fff";
-        document.body.style.filter = "invert(100%)";
-      } else if (currentPhase % 4 === 0) {
-        renderMode = "aliens";
-        el.classList.add("spin");
-      } else if (currentPhase % 3 === 0) {
-        el.classList.add("slice-glitch");
-        el.style.textShadow = "-10px 0 20px #ff00ff, 10px 0 20px #00ffff";
-      } else if (currentPhase % 2 === 0) {
-        reverseWarp = true;
-        el.classList.add("pulse-glow");
+      switch(currentPhase) {
+        case 0: activeTargetText = "DREW.WTF"; canvas.classList.remove("active"); break;
+        case 1: activeTargetText = "DREW.WTF"; warpSpeed = 4; break;
+        case 2: warpSpeed = 6; el.style.filter = "hue-rotate(180deg)"; break;
+        case 3: el.style.textShadow = "-10px -5px 20px #ff0000, 10px 5px 20px #00ffff"; break;
+        case 4: warpSpeed = 12; el.style.filter = "drop-shadow(0 0 30px #ff0000)"; break;
+        case 5: renderMode = "mushrooms"; warpSpeed = 5; break;
+        case 6: activeTargetText = "DREW.WTF"; el.classList.add("spin"); el.style.color = "#ffff00"; break;
+        case 7: activeTargetText = "DREW.WTF"; el.classList.add("liquid-wave"); el.style.filter = "hue-rotate(270deg)"; break;
+        case 8: document.body.style.backgroundColor = "#fff"; document.body.style.filter = "invert(100%)"; break;
+        case 9: renderMode = "devils"; warpSpeed = 6; break;
+        case 10: renderMode = "devils"; activeTargetText = "DREW.666"; el.style.color = "#ff0000"; break;
+        case 11: renderMode = "devils"; activeTargetText = "666.666"; el.classList.add("pulse-glow"); break;
+        case 12: renderMode = "devils"; activeTargetText = "666.666.666"; warpSpeed = 16; break;
+        case 13: activeTargetText = "DREW.WTF"; el.style.filter = "blur(2px) contrast(300%)"; break;
+        case 14: document.body.style.backgroundColor = "#1a0022"; el.style.color = "#ff00ff"; el.style.textShadow = "0 0 30px #00ffff"; break;
+        case 15: activeTargetText = "DR3W.W7F"; el.style.color = "#ffffff"; break;
+        case 16: el.style.color = "#00ffff"; el.style.textShadow = "0 0 30px #00ffff, 0 0 60px #0088ff"; warpSpeed = 10; break;
+        case 17: el.style.color = "#00ff33"; el.style.textShadow = "0 0 30px #00ff33"; break;
+        case 18: el.style.color = "#ccff00"; el.classList.add("pulse-glow"); break;
+        case 19: renderMode = "mushrooms"; el.classList.add("liquid-wave"); break;
+        case 20: warpSpeed = 1; el.style.filter = "brightness(0.7)"; break;
+        case 21: document.body.style.filter = "hue-rotate(90deg) contrast(200%)"; break;
+        case 22: el.style.filter = "blur(1px) drop-shadow(0 0 20px #ff0000)"; break;
+        case 23: renderMode = "devils"; activeTargetText = "DREW.666"; warpSpeed = 20; break;
+        case 24: el.style.filter = "hue-rotate(180deg) saturate(1000%)"; warpSpeed = 30; break;
+        case 25: reverseWarp = true; warpSpeed = 8; break;
+        case 26: el.style.color = "#88ffff"; el.style.textShadow = "0 0 20px #ffffff, 0 0 40px #00ffff"; break;
+        case 27: warpSpeed = 14; break;
+        case 28: document.body.style.filter = "invert(50%)"; break;
+        case 29: activeTargetText = "DREW.WTF"; warpSpeed = 2; el.style.color = "#ff3333"; break;
+        case 30: el.style.color = "#ff3300"; break;
+        case 31: el.classList.add("liquid-wave"); el.style.color = "#e0e0e0"; el.style.textShadow = "0 0 20px #ffffff"; break;
+        case 32: document.body.style.backgroundColor = "#8b956d"; el.style.color = "#0f380f"; break;
+        case 33: el.style.color = "#ff007f"; el.style.textShadow = "0 0 30px #ff007f, 0 0 60px #ffffff"; break;
+        case 34: renderMode = "skulls"; el.style.color = "#00ff66"; break;
+        case 35: warpSpeed = 15; el.classList.add("spin"); break;
+        case 36: document.body.style.backgroundColor = "#ffff00"; el.style.color = "#000000"; break;
+        case 37: el.style.textShadow = "-15px 0 0 #ff0000, 15px 0 0 #0000ff"; break;
+        case 38: el.style.color = "#ffd700"; el.style.textShadow = "0 0 30px #ffd700"; break;
+        case 39: activeTargetText = "DREvv_vvTF"; break;
+        case 40: el.style.filter = "contrast(300%)"; break;
+        case 41: document.body.style.filter = "invert(100%)"; break;
+        case 42: document.body.style.backgroundColor = "#10002b"; el.style.color = "#ff5500"; el.style.textShadow = "0 0 30px #ff00ff"; break;
+        case 43: renderMode = "money"; activeTargetText = "$DREW.WTF$"; el.style.color = "#ffd700"; break;
+        case 44: el.classList.add("slice-glitch"); break;
+        case 45: el.classList.add("liquid-wave"); el.style.filter = "hue-rotate(120deg) saturate(500%)"; break;
+        case 46: el.style.color = "#00ffff"; break;
+        case 47: el.classList.add("pulse-glow"); warpSpeed = 8; break;
+        case 48: document.body.style.backgroundColor = "#000033"; el.style.color = "#ff0055"; break;
+        case 49: activeTargetText = "DR3W_666"; el.style.color = "#00ff33"; break;
+        case 50: el.style.color = "#ffffcc"; el.style.textShadow = "0 0 40px #ffff00"; warpSpeed = 22; break;
+        case 51: document.body.style.filter = "invert(100%)"; break;
+        case 52: el.style.filter = "hue-rotate(200deg)"; break;
+        case 53: renderMode = "devils"; activeTargetText = "666_WTF"; break;
+        case 54: warpSpeed = 18; break;
+        case 55: el.style.color = "#ffffff"; el.style.textShadow = "0 0 40px #ffffff"; break;
+        case 56: reverseWarp = true; warpSpeed = 28; break;
+        case 57: renderMode = "all"; activeTargetText = "WTF.DREW"; break;
+        case 58: document.body.style.filter = "contrast(500%) blur(2px)"; break;
+        case 59: activeTargetText = "DREW.WTF"; warpSpeed = 2; el.style.color = "#ff1111"; break;
+        case 60: activeTargetText = "DREW.WTF"; warpSpeed = 1; el.style.color = "#ff1111"; break;
+        case 61: renderMode = "aliens"; activeTargetText = "UFO.DREW"; el.style.color = "#00ff88"; break;
+        case 62: document.body.style.backgroundColor = "#220000"; el.style.color = "#ffaa00"; break;
+        case 63: el.style.filter = "drop-shadow(0 0 25px #00ffff) invert(100%)"; break;
+        case 64: activeTargetText = "D13W.W7F"; warpSpeed = 11; break;
+        case 65: document.body.style.backgroundColor = "#001122"; el.style.color = "#00ffff"; break;
+        case 66: renderMode = "mushrooms"; activeTargetText = "TRIP.WTF"; el.style.color = "#ff00aa"; break;
+        case 67: el.classList.add("slice-glitch"); el.style.filter = "hue-rotate(90deg)"; break;
+        case 68: document.body.style.backgroundColor = "#ffffff"; el.style.color = "#000000"; break;
+        case 69: activeTargetText = "666_999"; renderMode = "devils"; break;
+        case 70: el.style.textShadow = "-20px 0 30px #ff00ff, 20px 0 30px #00ffff"; break;
+        case 71: warpSpeed = 25; reverseWarp = true; break;
+        case 72: document.body.style.filter = "invert(100%) contrast(300%)"; break;
+        case 73: activeTargetText = "DREW_DREW"; el.style.color = "#ffff00"; break;
+        case 74: renderMode = "skulls"; warpSpeed = 15; break;
+        case 75: document.body.style.backgroundColor = "#330000"; el.style.color = "#ff3300"; break;
+        case 76: activeTargetText = "W.T.F"; el.classList.add("spin"); break;
+        case 77: el.style.filter = "blur(3px) brightness(200%)"; break;
+        case 78: renderMode = "money"; activeTargetText = "RICH.WTF"; el.style.color = "#00ff66"; break;
+        case 79: el.classList.add("liquid-wave"); document.body.style.backgroundColor = "#050015"; break;
+        case 80: activeTargetText = "DREW.WTF"; el.style.color = "#ffffff"; el.style.textShadow = "0 0 50px #ff00ff"; break;
+        case 81: document.body.style.filter = "hue-rotate(300deg) saturate(800%)"; break;
+        case 82: renderMode = "aliens"; warpSpeed = 19; break;
+        case 83: activeTargetText = "ACID_DREW"; el.style.color = "#ff00ff"; break;
+        case 84: el.classList.add("pulse-glow"); document.body.style.backgroundColor = "#002211"; break;
+        case 85: activeTargetText = "4NNDR3W"; el.style.color = "#00ffff"; break;
+        case 86: renderMode = "all"; warpSpeed = 22; break;
+        case 87: document.body.style.backgroundColor = "#ff0055"; el.style.color = "#ffffff"; break;
+        case 88: activeTargetText = "DREW.666.WTF"; el.style.color = "#ff0000"; break;
+        case 89: el.style.filter = "invert(100%) sepia(100%)"; break;
+        case 90: activeTargetText = "DREW.WTF"; warpSpeed = 3; break;
+        case 91: renderMode = "mushrooms"; activeTargetText = "420_DREW"; el.style.color = "#00ff33"; break;
+        case 92: el.classList.add("slice-glitch"); document.body.style.backgroundColor = "#110011"; break;
+        case 93: document.body.style.filter = "contrast(400%)"; break;
+        case 94: activeTargetText = "HELL_WTF"; renderMode = "devils"; break;
+        case 95: el.style.textShadow = "0 0 20px #ff0000, 0 0 40px #ffff00, 0 0 60px #ff00ff"; break;
+        case 96: warpSpeed = 30; reverseWarp = false; break;
+        case 97: document.body.style.backgroundColor = "#003333"; el.style.color = "#00ffff"; break;
+        case 98: activeTargetText = "DREW_NULL"; el.style.color = "#aaaaaa"; break;
+        case 99: renderMode = "skulls"; activeTargetText = "DEAD_WTF"; break;
+        case 100: document.body.style.filter = "invert(100%) hue-rotate(180deg)"; break;
+        case 101: activeTargetText = "DREW.WTF"; el.classList.add("spin"); el.style.color = "#ff0055"; break;
+        case 102: document.body.style.backgroundColor = "#222200"; el.style.color = "#ffff00"; break;
+        case 103: renderMode = "money"; warpSpeed = 16; break;
+        case 104: activeTargetText = "333_666_999"; el.style.color = "#ffffff"; break;
+        case 105: el.classList.add("liquid-wave"); el.style.filter = "hue-rotate(45deg)"; break;
+        case 106: activeTargetText = "CYBER_DREW"; el.style.color = "#00ffcc"; break;
+        case 107: document.body.style.backgroundColor = "#1a0000"; el.style.color = "#ff4444"; break;
+        case 108: renderMode = "aliens"; activeTargetText = "VOID.WTF"; break;
+        case 109: el.style.filter = "brightness(250%) contrast(200%)"; break;
+        case 110: activeTargetText = "DREW.WTF"; warpSpeed = 2; el.style.color = "#ffffff"; break;
+        case 111: document.body.style.filter = "invert(100%)"; break;
+        case 112: activeTargetText = "DREW.WTF"; el.style.color = "#ff00ff"; break;
+        case 113: renderMode = "all"; warpSpeed = 26; break;
+        case 114: document.body.style.backgroundColor = "#000000"; el.style.color = "#00ff00"; break;
+        case 115: activeTargetText = "DREW.666"; el.style.color = "#ff0000"; break;
+        case 116: el.classList.add("slice-glitch"); break;
+        case 117: activeTargetText = "RESET_WTF"; el.style.color = "#ffff00"; break;
+        case 118: warpSpeed = 1; el.style.filter = "blur(1px)"; break;
+        case 119: activeTargetText = "DREW.WTF"; el.style.color = "#ff3333"; break;
+        case 120: activeTargetText = "DREW.WTF"; warpSpeed = 1; el.style.color = "#ff1111"; break;
+        case 121: activeTargetText = "DEMON_MODE"; renderMode = "devils"; el.style.color = "#ff0000"; break;
+        case 122: activeTargetText = "HYPER_TRIP"; renderMode = "mushrooms"; el.style.color = "#00ffff"; break;
+        case 123: activeTargetText = "ALIEN_WTF"; renderMode = "aliens"; el.style.color = "#00ff66"; break;
+        case 124: activeTargetText = "BASS_BOOST"; el.classList.add("pulse-glow"); break;
+        case 125: activeTargetText = "FINAL_RESET"; warpSpeed = 1; el.style.color = "#ffffff"; break;
       }
     }
 
-    function prevPhase() {
+    function prevPhase(e) {
+      if (e) e.stopPropagation();
       currentPhase--;
       setPhase(currentPhase);
       resetPhaseTimer();
     }
 
-    function nextPhase() {
+    function nextPhase(e) {
+      if (e) e.stopPropagation();
       currentPhase++;
       setPhase(currentPhase);
       resetPhaseTimer();
@@ -393,17 +509,7 @@
       }, 5000);
     }
 
-    /* --- RELIABLE IPHONE & DESKTOP TOUCH/CLICK ENGINE --- */
-    window.addEventListener("pointerdown", (e) => {
-      const centerY = window.innerHeight / 2;
-      if (e.clientY < centerY) {
-        prevPhase();
-      } else {
-        nextPhase();
-      }
-    });
-
-    /* --- KEYBOARD CONTROLS --- */
+    /* --- KEYBOARD NAVIGATION (Up / Down / Left / Right) --- */
     window.addEventListener("keydown", (e) => {
       if (e.key === "ArrowUp" || e.key === "ArrowRight") {
         nextPhase();
@@ -412,15 +518,8 @@
       }
     });
 
-    /* --- INTERNATIONAL & EMOJI GLITCH ENGINE --- */
     const el = document.getElementById("scramble-text");
-    const intlGlitchChars = [
-      "0","1","3","7","_","/#","\\|","@","$","%","*","!",
-      "中","文","鬼","魔","神","龍","悟", // Chinese/Kanji
-      "अ","आ","इ","उ","ऋ","क","ख", // Hindi
-      "Д","Р","Е","В","У","Ш","К", // Cyrillic
-      "🔥","💀","😈","☣️","🟢","🛸","👽" // Emojis
-    ];
+    const glitchChars = "0137_/#\\|@$%&*!?";
 
     function runScrambleCycle() {
       el.textContent = activeTargetText;
@@ -428,7 +527,7 @@
         let frame = 0;
         const interval = setInterval(() => {
           el.textContent = activeTargetText.split('').map(c => 
-            Math.random() < 0.4 ? intlGlitchChars[Math.floor(Math.random() * intlGlitchChars.length)] : c
+            Math.random() < 0.4 ? glitchChars[Math.floor(Math.random() * glitchChars.length)] : c
           ).join('');
           frame++;
           if (frame >= 15) {
@@ -440,7 +539,6 @@
       }, 1800);
     }
 
-    // Startup Execution
     setPhase(0);
     resetPhaseTimer();
     animateParticles();
