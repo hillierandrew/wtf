@@ -1,15 +1,10 @@
-Here is the complete, single-file HTML code with all requested changes implemented:
+The issue in your screenshot is overflowing content and text clipping caused by horizontal layout constraints:
 
-### What Was Updated:
+1. **`white-space: nowrap` on `.container`:** Prevents long text (like `666.666.666`) from wrapping, pushing it past the right edge on mobile or smaller screens.
+2. **`clamp()` sizing range:** On wide desktop screens, `clamp(2.2rem, 7.5vw, 6rem)` scales the text up to `6rem`, making longer phase strings overflow the viewport width.
+3. **Scanline / Vignette Pseudo-elements blocking clicks:** `body::before` and `body::after` overlay the entire screen and can intercept touch/click events on mobile Safari if pointer events aren't strictly disabled.
 
-* **Completely Removed ASCII Fire:** The bottom fire element and its corresponding loops/classes have been completely removed.
-* **iPhone & Safari Compatibility Fixes:**
-* Replaced CSS fixed dynamic viewports with `-webkit-fill-available` fallback bounds to resolve Safari address-bar scrolling bugs.
-* Rebuilt the bottom phase badge with `-webkit-backdrop-filter` support, explicit high `z-index` layering, and fixed pixel padding so **`PHASE NO. X`** renders cleanly on mobile Safari/iOS.
-
-
-* **Keyboard Control Added:** Pressing the **Up Arrow ($\uparrow$)** or **Right Arrow ($\rightarrow$)** key on a keyboard skips to the next phase immediately. Pressing the **Down Arrow ($\downarrow$)** or **Left Arrow ($\leftarrow$)** steps back to the previous phase. Tapping the screen or bottom badge still advances phases.
-* **Expanded 120-Phase Roadmap:** The system now loops through **120 unique 5-second phases** (10 minutes total before repeating), packed with concert-grade visual variations that remain locked in the center of the screen.
+Here is the updated single-file HTML code with these CSS layout and sizing bugs resolved:
 
 ```html
 <!DOCTYPE html>
@@ -59,6 +54,7 @@ Here is the complete, single-file HTML code with all requested changes implement
       z-index: 1;
       display: block;
       opacity: 0;
+      pointer-events: none;
       transition: opacity 1.5s ease;
     }
 
@@ -71,7 +67,7 @@ Here is the complete, single-file HTML code with all requested changes implement
       position: fixed;
       top: 0; left: 0; bottom: 0; right: 0;
       background: radial-gradient(circle at center, transparent 35%, rgba(0, 0, 0, 0.92) 100%);
-      pointer-events: none;
+      pointer-events: none !important;
       z-index: 10;
     }
 
@@ -83,31 +79,32 @@ Here is the complete, single-file HTML code with all requested changes implement
       top: 0; left: 0; bottom: 0; right: 0;
       background: linear-gradient(rgba(20, 0, 0, 0) 50%, rgba(0, 0, 0, 0.45) 50%);
       background-size: 100% 4px;
-      pointer-events: none;
+      pointer-events: none !important;
       z-index: 11;
     }
 
     /* Centered Fixed Content Container */
     .container {
       text-align: center;
-      z-index: 15;
+      z-index: 50;
       padding: 10px;
+      max-width: 95vw;
       user-select: none;
       -webkit-user-select: none;
-      white-space: nowrap;
       cursor: pointer;
       position: relative;
     }
 
-    /* Main Title Styling - Locked Center */
+    /* Main Title Styling - Responsive Fluid Fit */
     .title {
-      font-size: clamp(2.2rem, 7.5vw, 6rem);
+      font-size: clamp(1.8rem, 5.5vw, 4.5rem);
       font-weight: bold;
-      letter-spacing: 0.15em;
+      letter-spacing: 0.12em;
       text-shadow: 0 0 10px var(--crt-red), 0 0 25px var(--crt-dim), 0 0 40px #ff0000;
       animation: flicker 0.12s infinite;
       min-height: 1.2em;
       display: inline-block;
+      word-break: break-word;
       transition: filter 0.4s ease, color 0.4s ease, text-shadow 0.4s ease;
     }
 
@@ -117,13 +114,13 @@ Here is the complete, single-file HTML code with all requested changes implement
       100% { opacity: 0.97; }
     }
 
-    /* Safari / iPhone Compatible White Watermark Badge */
+    /* iOS Safari Compatible White Watermark Badge */
     .phase-watermark {
       position: fixed;
-      bottom: calc(20px + env(safe-area-inset-bottom));
+      bottom: calc(24px + env(safe-area-inset-bottom));
       left: 50%;
       transform: translateX(-50%);
-      z-index: 999;
+      z-index: 9999;
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       font-size: 13px;
       font-weight: 700;
@@ -145,14 +142,14 @@ Here is the complete, single-file HTML code with all requested changes implement
       background-color: rgba(255, 255, 255, 0.3);
     }
 
-    /* Stationary Animations Only */
+    /* Stationary Animations */
     .spin { animation: spin-hue 3s linear infinite !important; }
     @keyframes spin-hue { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
 
     .liquid-wave { animation: flicker 0.12s infinite, liquid 1.8s ease-in-out infinite alternate !important; }
     @keyframes liquid {
-      0% { letter-spacing: 0.15em; }
-      100% { letter-spacing: 0.38em; filter: blur(1px); }
+      0% { letter-spacing: 0.12em; }
+      100% { letter-spacing: 0.3em; filter: blur(1px); }
     }
 
     .pulse-glow { animation: flicker 0.12s infinite, glow 0.8s ease-in-out infinite alternate !important; }
@@ -382,7 +379,7 @@ Here is the complete, single-file HTML code with all requested changes implement
         case 59: activeTargetText = "DREW.WTF"; warpSpeed = 2; el.style.color = "#ff1111"; break;
         case 60: activeTargetText = "DREW.WTF"; warpSpeed = 1; el.style.color = "#ff1111"; break;
 
-        // NEW 61 to 120 PHASES
+        // 61 to 120 PHASES
         case 61: renderMode = "aliens"; activeTargetText = "UFO.DREW"; el.style.color = "#00ff88"; break;
         case 62: document.body.style.backgroundColor = "#220000"; el.style.color = "#ffaa00"; break;
         case 63: el.style.filter = "drop-shadow(0 0 25px #00ffff) invert(100%)"; break;
@@ -463,7 +460,7 @@ Here is the complete, single-file HTML code with all requested changes implement
       phaseTimer = setInterval(() => {
         currentPhase++;
         setPhase(currentPhase);
-      }, 5000); // 5 seconds per phase
+      }, 5000);
     }
 
     /* --- KEYBOARD NAVIGATION CONTROLS --- */
