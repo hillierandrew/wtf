@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DREW.WTF</title>
+  <style>
+    :root {
+      --crt-red: #ff1111;
+      --crt-dim: #660000;
+      --crt-bg: #0a0202;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #000;
+      color: var(--crt-red);
+      font-family: 'Courier New', Courier, monospace;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Starfield Canvas Background */
+    #starfield {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      display: block;
+    }
+
+    /* Screen Curvature & Vignette */
+    body::before {
+      content: " ";
+      display: block;
+      position: absolute;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: radial-gradient(circle at center, transparent 35%, rgba(0, 0, 0, 0.92) 100%);
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* Scanlines */
+    body::after {
+      content: " ";
+      display: block;
+      position: absolute;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(20, 0, 0, 0) 50%, rgba(0, 0, 0, 0.45) 50%);
+      background-size: 100% 4px;
+      pointer-events: none;
+      z-index: 11;
+    }
+
+    .container {
+      text-align: center;
+      z-index: 15;
+      padding: 20px;
+    }
+
+    /* Penitent Tangent Red Phosphor Glow & Flicker */
+    .title {
+      font-size: clamp(2.5rem, 8vw, 6rem);
+      font-weight: bold;
+      letter-spacing: 0.18em;
+      text-shadow: 0 0 10px var(--crt-red), 0 0 25px var(--crt-dim), 0 0 40px #ff0000;
+      animation: flicker 0.12s infinite;
+      min-height: 1.2em;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    @keyframes flicker {
+      0% { opacity: 0.95; }
+      50% { opacity: 1; }
+      100% { opacity: 0.97; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Starfield Canvas -->
+  <canvas id="starfield"></canvas>
+
+  <div class="container">
+    <div id="scramble-text" class="title">DREW.WTF</div>
+  </div>
+
+  <script>
+    /* --- STARFIELD ANIMATION ENGINE --- */
+    const canvas = document.getElementById("starfield");
+    const ctx = canvas.getContext("2d");
+
+    let stars = [];
+    const numStars = 1000; // Increased star density
+    let width, height, cx, cy;
+
+    function resizeCanvas() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+      cx = width / 2;
+      cy = height / 2;
+    }
+
+    class Star {
+      constructor() {
+        this.reset(true);
+      }
+
+      reset(initial = false) {
+        this.x = (Math.random() - 0.5) * width * 2;
+        this.y = (Math.random() - 0.5) * height * 2;
+        this.z = initial ? Math.random() * width : width;
+        this.pz = this.z;
+      }
+
+      update() {
+        this.pz = this.z;
+        this.z -= 5; // Faster warp travel
+
+        if (this.z <= 0) {
+          this.reset(false);
+        }
+      }
+
+      draw() {
+        const sx = (this.x / this.z) * cx + cx;
+        const sy = (this.y / this.z) * cy + cy;
+
+        const px = (this.x / this.pz) * cx + cx;
+        const py = (this.y / this.pz) * cy + cy;
+
+        if (sx >= 0 && sx <= width && sy >= 0 && sy <= height) {
+          const alpha = Math.min(1, (1 - this.z / width) * 1.8);
+          const size = (1 - this.z / width) * 2.8;
+
+          ctx.strokeStyle = `rgba(255, 17, 17, ${alpha})`; // Penitent Tangent Red
+          ctx.lineWidth = Math.max(0.5, size);
+          ctx.beginPath();
+          ctx.moveTo(px, py);
+          ctx.lineTo(sx, sy);
+          ctx.stroke();
+        }
+      }
+    }
+
+    function initStars() {
+      resizeCanvas();
+      stars = [];
+      for (let i = 0; i < numStars; i++) {
+        stars.push(new Star());
+      }
+    }
+
+    function animateStars() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.28)";
+      ctx.fillRect(0, 0, width, height);
+
+      for (let i = 0; i < stars.length; i++) {
+        stars[i].update();
+        stars[i].draw();
+      }
+
+      requestAnimationFrame(animateStars);
+    }
+
+    window.addEventListener("resize", () => {
+      resizeCanvas();
+    });
+
+    initStars();
+    animateStars();
+
+    /* --- TEXT SCRAMBLE ENGINE --- */
+    const targetText = "DREW.WTF";
+    const el = document.getElementById("scramble-text");
+
+    const leetMap = { 
+      'D': ['D', 'd', '|)'], 
+      'R': ['R', 'r', '12'], 
+      'E': ['3', '&', '€'], 
+      'W': ['W', 'w', '\\/\\/'], 
+      'T': ['7', '+'], 
+      'F': ['F', 'f', '|='] 
+    };
+    const glitchChars = "0137_/#\\|@$%&*!?";
+
+    const presets = [
+      "DREW.WTF", "DR3W.WTF", "dr3w.wtf", "4REW.WTF",
+      "DR3W.W7F", "@REW.WTF", "DREW.W7F", "DR3W.W7F_",
+      "DRE_W.WTF", "DR3W.W7F!", "dr3w.w7f", "DR3W.WTF",
+      "DREW.W7F", "DR3W.WTF", "dr3w.WTF", "DR3W.W7F",
+      "DREW_WTF", "DR3W.WTF", "dr3w.w7f", "DR3W.WTF"
+    ];
+
+    function generateAlgorithmicGlitch() {
+      return targetText.split('').map(char => {
+        if (char === '.') return '.';
+        const rand = Math.random();
+        if (rand < 0.35 && leetMap[char]) {
+          const options = leetMap[char];
+          return options[Math.floor(Math.random() * options.length)];
+        } else if (rand < 0.55) {
+          return glitchChars[Math.floor(Math.random() * glitchChars.length)];
+        }
+        return Math.random() < 0.5 ? char.toLowerCase() : char;
+      }).join('');
+    }
+
+    function runScrambleCycle() {
+      el.textContent = targetText;
+      
+      setTimeout(() => {
+        let frame = 0;
+        const totalFrames = 25 + Math.floor(Math.random() * 20);
+        
+        const interval = setInterval(() => {
+          if (Math.random() < 0.5) {
+            el.textContent = presets[Math.floor(Math.random() * presets.length)];
+          } else {
+            el.textContent = generateAlgorithmicGlitch();
+          }
+          
+          frame++;
+          if (frame >= totalFrames) {
+            clearInterval(interval);
+            el.textContent = targetText;
+            runScrambleCycle();
+          }
+        }, 50);
+      }, 2200);
+    }
+
+    runScrambleCycle();
+  </script>
+</body>
+</html>
