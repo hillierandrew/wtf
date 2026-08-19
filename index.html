@@ -1,3 +1,9 @@
+Here is the complete single-file HTML code with the **Grok-generated 8-bit sequence and scheduler audio engine** fully integrated.
+### What Has Been Updated:
+ 1. **Grok Audio Engine Integration:** Replaced the previous Web Audio implementation with the exact freqs, sequence, and scheduling logic from your Grok snippet.
+ 2. **Muted by Default:** The audio is strictly muted and inactive on page load.
+ 3. **Restart on Unmute:** Clicking the **🔊 UNMUTE MUSIC** button resets currentNoteIndex = 0 and restarts the song sequence cleanly from beat 1 every time it is toggled on.
+ 4. **Interactive Controls Preserved:** Keeps the enlarged **PHASE NO. X** badge, dark background palette, and **DREW**, **WTF**, and **(.)** click/tap navigation.
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -214,102 +220,121 @@
   </div>
 
   <script>
+    /* --- INTEGRATED GROK 8-BIT AUDIO ENGINE --- */
     let audioCtx = null;
-    let isAudioMuted = true;
-    let isAudioInitialized = false;
+    let isPlaying = false;
+    let nextNoteTime = 0;
+    let timerID = null;
+    let currentNoteIndex = 0;
 
-    function initAudioEngine() {
-      if (isAudioInitialized) return;
-      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContextClass) return;
-      audioCtx = new AudioContextClass();
-      isAudioInitialized = true;
+    const freqs = {
+        'C3': 130.81, 'C#3': 138.59, 'D3': 146.83, 'D#3': 155.56, 'E3': 164.81, 'F3': 174.61,
+        'F#3': 185.00, 'G3': 196.00, 'G#3': 207.65, 'A3': 220.00, 'A#3': 233.08, 'B3': 246.94,
+        'C4': 261.63, 'C#4': 277.18, 'D4': 293.66, 'D#4': 311.13, 'E4': 329.63, 'F4': 349.23,
+        'F#4': 369.99, 'G4': 392.00, 'G#4': 415.30, 'A4': 440.00, 'A#4': 466.16, 'B4': 493.88,
+        'C5': 523.25, 'C#5': 554.37, 'D5': 587.33, 'D#5': 622.25, 'E5': 659.25, 'F5': 698.46,
+        'F#5': 739.99, 'G5': 783.99, 'G#5': 830.61, 'A5': 880.00, 'A#5': 932.33, 'B5': 987.77,
+        'C6': 1046.50, 'C#6': 1108.73, 'D6': 1174.66, 'D#6': 1244.51, 'E6': 1318.51, 'F6': 1396.91,
+        'F#6': 1479.98, 'G6': 1567.98, 'G#6': 1661.22, 'A6': 1760.00
+    };
 
-      const tempo = 126;
-      const noteTime = (60 / tempo) / 2;
+    const sequence = [
+        ['C6', 0.5], ['G#5', 0.5], ['C6', 0.5], ['G#5', 0.5],
+        ['C6', 0.5], ['G#5', 0.5], ['C6', 0.5], ['G#5', 0.5],
+        ['C6', 0.5], ['G#5', 0.5], ['C6', 0.5], ['G#5', 0.5],
+        ['C6', 0.5], ['G#5', 0.5], ['C6', 0.5], ['G#5', 0.5],
 
-      const notes = {
-        'B5': 987.77, 'C6': 1046.50, 'G6': 1567.98, 'B6': 1975.53,
-        'F#6': 1479.98, 'D6': 1174.66, 'E6': 1318.51, 'A5': 880.00,
-        'C5': 523.25, 'G5': 783.99, 'D5': 587.33, 'E5': 659.25, 'REST': 0
-      };
+        ['C6', 0.5], ['G#5', 0.5], ['C6', 0.5], ['G#5', 0.5],
+        ['E4', 0.5], ['C#4', 0.5], ['E4', 0.5], ['C#4', 0.5],
+        ['C6', 0.5], ['G#5', 0.5], ['C6', 0.5], ['G#5', 0.5],
+        ['G#3', 0.5], ['E3', 0.5], ['G#3', 0.5], ['E3', 0.5],
 
-      const arpeggio = [
-        'B5', 'G6', 'F#6', 'B6', 'B5', 'G6', 'F#6', 'B6',
-        'C6', 'G6', 'F#6', 'B6', 'C6', 'G6', 'F#6', 'B6',
-        'B5', 'G6', 'F#6', 'B6', 'B5', 'G6', 'F#6', 'B6',
-        'C6', 'G6', 'F#6', 'B6', 'C6', 'G6', 'F#6', 'B6'
-      ];
+        ['C6', 0.5], ['G#5', 0.5], ['C6', 0.5], ['G#5', 0.5],
+        ['C4', 0.5], ['G#3', 0.5], ['C4', 0.5], ['G#3', 0.5],
+        ['C6', 0.5], ['G#5', 0.5], ['C6', 0.5], ['G#5', 0.5],
+        ['E3', 0.5], ['C#3', 0.5], ['E3', 0.5], ['C#3', 0.5],
 
-      const bassline = [
-        'C5', 'REST', 'C5', 'REST', 'G5', 'REST', 'G5', 'REST',
-        'D5', 'REST', 'D5', 'REST', 'E5', 'REST', 'E5', 'REST'
-      ];
+        ['C6', 0.5], ['G#5', 0.5], ['C6', 0.5], ['G#5', 0.5],
+        ['G#3', 0.5], ['E3', 0.5], ['C#3', 0.5], ['E3', 0.5],
+        ['C6', 0.5], ['G#5', 0.5], ['C6', 0.5], ['G#5', 0.5],
+        ['C4', 1.0], ['G#3', 1.0],
 
-      let noteIdx = 0;
+        ['C6', 0.5], ['G#5', 0.5], ['C6', 0.5], ['G#5', 0.5],
+        ['E3', 0.5], ['C3', 0.5], ['G#2', 0.5], ['E3', 0.5],
+        ['C6', 0.5], ['G#5', 0.5], ['C6', 0.5], ['G#5', 0.5],
+        ['C4', 2.0]
+    ];
 
-      function playSquareNote(freq, duration, gainVal = 0.08) {
-        if (!freq || freq === 0 || isAudioMuted || !audioCtx) return;
-        
-        try {
-          const osc = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          osc.type = 'square';
-          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-          
-          gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration - 0.02);
+    function playTone(freq, startTime, duration) {
+        if (!audioCtx) return;
 
-          osc.connect(gain);
-          gain.connect(audioCtx.destination);
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
 
-          osc.start();
-          osc.stop(audioCtx.currentTime + duration);
-        } catch(e) {}
-      }
+        osc.type = 'square';
+        osc.frequency.value = freq;
 
-      function scheduleLoop() {
-        if (audioCtx && audioCtx.state === 'suspended' && !isAudioMuted) {
-          audioCtx.resume();
+        gain.gain.setValueAtTime(0.08, startTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(startTime);
+        osc.stop(startTime + duration);
+    }
+
+    function scheduleNotes() {
+        if (!isPlaying) return;
+        const lookAhead = 0.1;
+        const scheduleAheadTime = 0.2;
+        const secondsPerBeat = 60.0 / 120;
+
+        while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
+            const [noteName, beats] = sequence[currentNoteIndex];
+            const freq = freqs[noteName] || 440;
+            const duration = beats * secondsPerBeat;
+
+            playTone(freq, nextNoteTime, duration * 0.9);
+
+            if (noteName.includes('6') || noteName.includes('5')) {
+                const lower = noteName.replace('6','5').replace('5','4');
+                if (freqs[lower]) {
+                    playTone(freqs[lower], nextNoteTime, duration * 0.9);
+                }
+            }
+
+            nextNoteTime += duration;
+            currentNoteIndex = (currentNoteIndex + 1) % sequence.length;
         }
-
-        const arpNote = arpeggio[noteIdx % arpeggio.length];
-        const bassNote = bassline[Math.floor(noteIdx / 2) % bassline.length];
-
-        playSquareNote(notes[arpNote], noteTime, 0.08);
-        if (noteIdx % 2 === 0) {
-          playSquareNote(notes[bassNote], noteTime * 1.8, 0.05);
-        }
-
-        noteIdx++;
-        setTimeout(scheduleLoop, noteTime * 1000);
-      }
-
-      scheduleLoop();
+        timerID = setTimeout(scheduleNotes, lookAhead * 1000);
     }
 
     function toggleAudio(e) {
       if (e) e.stopPropagation();
-      if (!isAudioInitialized) {
-        initAudioEngine();
-      }
-      if (audioCtx && audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
-      isAudioMuted = !isAudioMuted;
       const btn = document.getElementById("audio-toggle");
-      btn.textContent = isAudioMuted ? "🔇 UNMUTE MUSIC" : "🔊 MUTE MUSIC";
+
+      if (!isPlaying) {
+          if (!audioCtx) {
+              audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          }
+          if (audioCtx.state === 'suspended') {
+              audioCtx.resume();
+          }
+          // Starts from the very beginning when unmuted
+          nextNoteTime = audioCtx.currentTime + 0.05;
+          currentNoteIndex = 0;
+          isPlaying = true;
+          btn.textContent = '🔊 MUTE MUSIC';
+          scheduleNotes();
+      } else {
+          isPlaying = false;
+          clearTimeout(timerID);
+          btn.textContent = '🔇 UNMUTE MUSIC';
+      }
     }
 
-    window.addEventListener('pointerdown', (e) => {
-      if (!isAudioInitialized) {
-        initAudioEngine();
-      }
-      if (audioCtx && audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
-    }, { once: true });
-
+    /* --- BRAND WEBFONTS --- */
     const companyFonts = [
       { font: "'Press Start 2P', monospace" },
       { font: "'Orbitron', sans-serif" },
@@ -325,6 +350,7 @@
       { font: "'Courier New', Courier, monospace" }
     ];
 
+    /* --- CANVAS ENGINE --- */
     const canvas = document.getElementById("starfield");
     const ctx = canvas.getContext("2d");
 
