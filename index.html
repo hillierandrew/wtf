@@ -1,16 +1,22 @@
-Here is the updated code.
+Here is the complete, single-file HTML code with all requested changes implemented:
 
-### Key Adjustments:
+### What Was Updated:
 
-1. **Footer Badge Lifted & Styled:** Changed the phase watermark to bright, solid white text with a dark backdrop box and lifted it slightly higher (`bottom: 30px`) with a high `z-index` so scanlines and vignettes can't obscure it. It initializes at **`PHASE NO. 0`** and updates automatically.
-2. **Strict Position Lock:** Completely removed the DVD screensaver movement engine and any position-altering transforms from all 60 phases. `DREW.WTF` is locked dead-center in the viewport at all times.
+* **Completely Removed ASCII Fire:** The bottom fire element and its corresponding loops/classes have been completely removed.
+* **iPhone & Safari Compatibility Fixes:**
+* Replaced CSS fixed dynamic viewports with `-webkit-fill-available` fallback bounds to resolve Safari address-bar scrolling bugs.
+* Rebuilt the bottom phase badge with `-webkit-backdrop-filter` support, explicit high `z-index` layering, and fixed pixel padding so **`PHASE NO. X`** renders cleanly on mobile Safari/iOS.
+
+
+* **Keyboard Control Added:** Pressing the **Up Arrow ($\uparrow$)** or **Right Arrow ($\rightarrow$)** key on a keyboard skips to the next phase immediately. Pressing the **Down Arrow ($\downarrow$)** or **Left Arrow ($\leftarrow$)** steps back to the previous phase. Tapping the screen or bottom badge still advances phases.
+* **Expanded 120-Phase Roadmap:** The system now loops through **120 unique 5-second phases** (10 minutes total before repeating), packed with concert-grade visual variations that remain locked in the center of the screen.
 
 ```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>DREW.WTF</title>
   <style>
     :root {
@@ -22,19 +28,26 @@ Here is the updated code.
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    body {
+    html, body {
+      width: 100%;
+      height: 100%;
+      height: -webkit-fill-available;
       background-color: #000;
       color: var(--crt-red);
       font-family: 'Courier New', Courier, monospace;
-      min-height: 100vh;
+      overflow: hidden;
+      position: relative;
+      touch-action: manipulation;
+      transition: background-color 0.4s ease, filter 0.4s ease;
+    }
+
+    body {
       display: flex;
       justify-content: center;
       align-items: center;
-      overflow: hidden;
-      position: relative;
-      transition: background-color 0.4s ease, filter 0.4s ease;
     }
 
     /* Starfield Canvas Background */
@@ -42,6 +55,7 @@ Here is the updated code.
       position: fixed;
       top: 0; left: 0;
       width: 100vw; height: 100vh;
+      height: -webkit-fill-available;
       z-index: 1;
       display: block;
       opacity: 0;
@@ -54,7 +68,7 @@ Here is the updated code.
     body::before {
       content: " ";
       display: block;
-      position: absolute;
+      position: fixed;
       top: 0; left: 0; bottom: 0; right: 0;
       background: radial-gradient(circle at center, transparent 35%, rgba(0, 0, 0, 0.92) 100%);
       pointer-events: none;
@@ -65,7 +79,7 @@ Here is the updated code.
     body::after {
       content: " ";
       display: block;
-      position: absolute;
+      position: fixed;
       top: 0; left: 0; bottom: 0; right: 0;
       background: linear-gradient(rgba(20, 0, 0, 0) 50%, rgba(0, 0, 0, 0.45) 50%);
       background-size: 100% 4px;
@@ -77,8 +91,9 @@ Here is the updated code.
     .container {
       text-align: center;
       z-index: 15;
-      padding: 20px;
+      padding: 10px;
       user-select: none;
+      -webkit-user-select: none;
       white-space: nowrap;
       cursor: pointer;
       position: relative;
@@ -86,9 +101,9 @@ Here is the updated code.
 
     /* Main Title Styling - Locked Center */
     .title {
-      font-size: clamp(2.5rem, 8vw, 6rem);
+      font-size: clamp(2.2rem, 7.5vw, 6rem);
       font-weight: bold;
-      letter-spacing: 0.18em;
+      letter-spacing: 0.15em;
       text-shadow: 0 0 10px var(--crt-red), 0 0 25px var(--crt-dim), 0 0 40px #ff0000;
       animation: flicker 0.12s infinite;
       min-height: 1.2em;
@@ -102,60 +117,42 @@ Here is the updated code.
       100% { opacity: 0.97; }
     }
 
-    /* Prominent White Phase Badge (Bottom Center) */
+    /* Safari / iPhone Compatible White Watermark Badge */
     .phase-watermark {
       position: fixed;
-      bottom: 30px;
+      bottom: calc(20px + env(safe-area-inset-bottom));
       left: 50%;
       transform: translateX(-50%);
-      z-index: 99;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      z-index: 999;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       font-size: 13px;
       font-weight: 700;
-      color: #ffffff;
+      color: #ffffff !important;
       letter-spacing: 0.08em;
       user-select: none;
+      -webkit-user-select: none;
       cursor: pointer;
       padding: 8px 18px;
       border-radius: 20px;
-      background: rgba(0, 0, 0, 0.75);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.9);
-      transition: background-color 0.2s ease, border-color 0.2s ease;
+      background-color: rgba(0, 0, 0, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
     }
 
-    .phase-watermark:hover {
-      background: rgba(255, 255, 255, 0.25);
-      border-color: rgba(255, 255, 255, 0.8);
+    .phase-watermark:active {
+      background-color: rgba(255, 255, 255, 0.3);
     }
 
-    /* ASCII Fire Overlay */
-    #ascii-fire {
-      position: fixed;
-      bottom: 0; left: 0;
-      width: 100vw;
-      text-align: center;
-      color: #ff3300;
-      font-family: monospace;
-      font-weight: bold;
-      font-size: 1.2rem;
-      line-height: 1rem;
-      z-index: 12;
-      opacity: 0;
-      pointer-events: none;
-      text-shadow: 0 0 10px #ff0000, 0 0 20px #ff6600;
-      white-space: pre;
-      transition: opacity 1s ease;
-    }
-
-    /* Stationary Animations Only (No Motion Shifts) */
+    /* Stationary Animations Only */
     .spin { animation: spin-hue 3s linear infinite !important; }
     @keyframes spin-hue { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
 
     .liquid-wave { animation: flicker 0.12s infinite, liquid 1.8s ease-in-out infinite alternate !important; }
     @keyframes liquid {
-      0% { letter-spacing: 0.18em; }
-      100% { letter-spacing: 0.4em; filter: blur(1px); }
+      0% { letter-spacing: 0.15em; }
+      100% { letter-spacing: 0.38em; filter: blur(1px); }
     }
 
     .pulse-glow { animation: flicker 0.12s infinite, glow 0.8s ease-in-out infinite alternate !important; }
@@ -173,16 +170,13 @@ Here is the updated code.
 
   <!-- Starfield Canvas -->
   <canvas id="starfield"></canvas>
-  
-  <!-- ASCII Fire Layer -->
-  <div id="ascii-fire"></div>
 
-  <!-- Locked Centered Container -->
+  <!-- Centered Clickable Text Container -->
   <div id="main-container" class="container" onclick="nextPhase()">
     <div id="scramble-text" class="title">DREW.WTF</div>
   </div>
 
-  <!-- Clickable Bottom White Phase Indicator -->
+  <!-- iOS Safari Compatible Bottom White Phase Badge -->
   <div id="phase-badge" class="phase-watermark" onclick="nextPhase()">
     PHASE NO. 0
   </div>
@@ -193,7 +187,7 @@ Here is the updated code.
     const ctx = canvas.getContext("2d");
 
     let particles = [];
-    const numParticles = 800;
+    const numParticles = 700;
     let width, height, cx, cy;
     let warpSpeed = 4;
     let renderMode = "stars";
@@ -203,6 +197,7 @@ Here is the updated code.
     const dEmojis = ["😈", "👿", "🔥", "⚡"];
     const sEmojis = ["💀", "☠️", "☣️", "🟢"];
     const $Emojis = ["💸", "💰", "💵", "✨"];
+    const alienEmojis = ["👽", "🛸", "👾", "🌌"];
 
     function resizeCanvas() {
       width = window.innerWidth;
@@ -225,6 +220,7 @@ Here is the updated code.
         this.dE = dEmojis[Math.floor(Math.random() * dEmojis.length)];
         this.sE = sEmojis[Math.floor(Math.random() * sEmojis.length)];
         this.$E = $Emojis[Math.floor(Math.random() * $Emojis.length)];
+        this.aE = alienEmojis[Math.floor(Math.random() * alienEmojis.length)];
       }
 
       update() {
@@ -241,24 +237,25 @@ Here is the updated code.
       draw() {
         const sx = (this.x / this.z) * cx + cx;
         const sy = (this.y / this.z) * cy + cy;
-        const px = (this.x / this.pz) * cx + cx;
-        const py = (this.y / this.pz) * cy + cy;
 
         if (sx >= 0 && sx <= width && sy >= 0 && sy <= height) {
           if (renderMode === "mushrooms") {
-            ctx.font = `${Math.max(10, (1 - this.z / width) * 40)}px serif`;
+            ctx.font = `${Math.max(10, (1 - this.z / width) * 36)}px serif`;
             ctx.fillText(this.mE, sx, sy);
           } else if (renderMode === "devils") {
-            ctx.font = `${Math.max(10, (1 - this.z / width) * 44)}px serif`;
+            ctx.font = `${Math.max(10, (1 - this.z / width) * 38)}px serif`;
             ctx.fillText(this.dE, sx, sy);
           } else if (renderMode === "skulls") {
-            ctx.font = `${Math.max(10, (1 - this.z / width) * 42)}px serif`;
+            ctx.font = `${Math.max(10, (1 - this.z / width) * 36)}px serif`;
             ctx.fillText(this.sE, sx, sy);
           } else if (renderMode === "money") {
-            ctx.font = `${Math.max(10, (1 - this.z / width) * 42)}px serif`;
+            ctx.font = `${Math.max(10, (1 - this.z / width) * 36)}px serif`;
             ctx.fillText(this.$E, sx, sy);
+          } else if (renderMode === "aliens") {
+            ctx.font = `${Math.max(10, (1 - this.z / width) * 38)}px serif`;
+            ctx.fillText(this.aE, sx, sy);
           } else if (renderMode === "all") {
-            ctx.font = `${Math.max(10, (1 - this.z / width) * 45)}px serif`;
+            ctx.font = `${Math.max(10, (1 - this.z / width) * 40)}px serif`;
             ctx.fillText(this.dE, sx, sy);
           } else {
             const alpha = Math.min(1, (1 - this.z / width) * 1.8);
@@ -266,7 +263,7 @@ Here is the updated code.
             ctx.strokeStyle = `rgba(255, 17, 17, ${alpha})`;
             ctx.lineWidth = Math.max(0.5, size);
             ctx.beginPath();
-            ctx.moveTo(px, py);
+            ctx.moveTo((this.x / this.pz) * cx + cx, (this.y / this.pz) * cy + cy);
             ctx.lineTo(sx, sy);
             ctx.stroke();
           }
@@ -294,46 +291,28 @@ Here is the updated code.
     window.addEventListener("resize", resizeCanvas);
     initParticles();
 
-    /* --- ASCII FIRE ENGINE --- */
-    const fireContainer = document.getElementById("ascii-fire");
-    const fireChars = [" ", ".", ":", "^", "*", "s", "S", "#", "$", "█"];
-    
-    function generateFire() {
-      let lines = [];
-      for (let r = 0; r < 5; r++) {
-        let line = "";
-        for (let c = 0; c < 60; c++) {
-          line += fireChars[Math.floor(Math.random() * fireChars.length)];
-        }
-        lines.push(line);
-      }
-      fireContainer.textContent = lines.join("\n");
-    }
-    setInterval(generateFire, 80);
-
-    /* --- 60 PHASE ENGINE (5 SECONDS PER PHASE) --- */
+    /* --- 120 PHASE ENGINE (5 SECONDS PER PHASE) --- */
     let currentPhase = 0;
     let phaseTimer = null;
     let activeTargetText = "DREW.WTF";
 
     function setPhase(p) {
       currentPhase = p;
-      if (currentPhase > 60) currentPhase = 0;
+      if (currentPhase > 120) currentPhase = 0;
+      if (currentPhase < 0) currentPhase = 120;
 
       const el = document.getElementById("scramble-text");
       const badge = document.getElementById("phase-badge");
       
-      // Update Bottom Watermark Text
       badge.textContent = `PHASE NO. ${currentPhase}`;
 
-      // Reset default configurations
+      // Reset Defaults
       document.body.style.backgroundColor = "#000";
       document.body.style.filter = "none";
       el.className = "title";
       el.style.color = "";
       el.style.filter = "";
       el.style.textShadow = "";
-      fireContainer.style.opacity = "0";
       renderMode = "stars";
       reverseWarp = false;
       canvas.classList.add("active");
@@ -348,10 +327,10 @@ Here is the updated code.
         case 6: activeTargetText = "FTW.WRED"; el.classList.add("spin"); el.style.color = "#ffff00"; break;
         case 7: activeTargetText = "DREW.WTF"; el.classList.add("liquid-wave"); el.style.filter = "hue-rotate(270deg)"; break;
         case 8: document.body.style.backgroundColor = "#fff"; document.body.style.filter = "invert(100%)"; break;
-        case 9: renderMode = "devils"; fireContainer.style.opacity = "1"; warpSpeed = 6; break;
-        case 10: renderMode = "devils"; fireContainer.style.opacity = "1"; activeTargetText = "DREW.666"; el.style.color = "#ff0000"; break;
-        case 11: renderMode = "devils"; fireContainer.style.opacity = "1"; activeTargetText = "666.666"; el.classList.add("pulse-glow"); break;
-        case 12: renderMode = "devils"; fireContainer.style.opacity = "1"; activeTargetText = "666.666.666"; warpSpeed = 16; break;
+        case 9: renderMode = "devils"; warpSpeed = 6; break;
+        case 10: renderMode = "devils"; activeTargetText = "DREW.666"; el.style.color = "#ff0000"; break;
+        case 11: renderMode = "devils"; activeTargetText = "666.666"; el.classList.add("pulse-glow"); break;
+        case 12: renderMode = "devils"; activeTargetText = "666.666.666"; warpSpeed = 16; break;
         case 13: activeTargetText = "DREW.WTF"; el.style.filter = "blur(2px) contrast(300%)"; break;
         case 14: document.body.style.backgroundColor = "#1a0022"; el.style.color = "#ff00ff"; el.style.textShadow = "0 0 30px #00ffff"; break;
         case 15: activeTargetText = "DR3W.W7F"; el.style.color = "#ffffff"; break;
@@ -362,13 +341,15 @@ Here is the updated code.
         case 20: warpSpeed = 1; el.style.filter = "brightness(0.7)"; break;
         case 21: document.body.style.filter = "hue-rotate(90deg) contrast(200%)"; break;
         case 22: el.style.filter = "blur(1px) drop-shadow(0 0 20px #ff0000)"; break;
-        case 23: fireContainer.style.opacity = "1"; renderMode = "devils"; activeTargetText = "DREW.666"; warpSpeed = 20; break;
+        case 23: renderMode = "devils"; activeTargetText = "DREW.666"; warpSpeed = 20; break;
         case 24: el.style.filter = "hue-rotate(180deg) saturate(1000%)"; warpSpeed = 30; break;
         case 25: reverseWarp = true; warpSpeed = 8; break;
         case 26: el.style.color = "#88ffff"; el.style.textShadow = "0 0 20px #ffffff, 0 0 40px #00ffff"; break;
         case 27: warpSpeed = 14; break;
         case 28: document.body.style.filter = "invert(50%)"; break;
         case 29: activeTargetText = "DREW.WTF"; warpSpeed = 2; el.style.color = "#ff3333"; break;
+
+        // 30 to 60
         case 30: el.style.color = "#ff3300"; break;
         case 31: el.classList.add("liquid-wave"); el.style.color = "#e0e0e0"; el.style.textShadow = "0 0 20px #ffffff"; break;
         case 32: document.body.style.backgroundColor = "#8b956d"; el.style.color = "#0f380f"; break;
@@ -392,7 +373,7 @@ Here is the updated code.
         case 50: el.style.color = "#ffffcc"; el.style.textShadow = "0 0 40px #ffff00"; warpSpeed = 22; break;
         case 51: document.body.style.filter = "invert(100%)"; break;
         case 52: el.style.filter = "hue-rotate(200deg)"; break;
-        case 53: fireContainer.style.opacity = "1"; renderMode = "devils"; activeTargetText = "666_WTF"; break;
+        case 53: renderMode = "devils"; activeTargetText = "666_WTF"; break;
         case 54: warpSpeed = 18; break;
         case 55: el.style.color = "#ffffff"; el.style.textShadow = "0 0 40px #ffffff"; break;
         case 56: reverseWarp = true; warpSpeed = 28; break;
@@ -400,7 +381,75 @@ Here is the updated code.
         case 58: document.body.style.filter = "contrast(500%) blur(2px)"; break;
         case 59: activeTargetText = "DREW.WTF"; warpSpeed = 2; el.style.color = "#ff1111"; break;
         case 60: activeTargetText = "DREW.WTF"; warpSpeed = 1; el.style.color = "#ff1111"; break;
+
+        // NEW 61 to 120 PHASES
+        case 61: renderMode = "aliens"; activeTargetText = "UFO.DREW"; el.style.color = "#00ff88"; break;
+        case 62: document.body.style.backgroundColor = "#220000"; el.style.color = "#ffaa00"; break;
+        case 63: el.style.filter = "drop-shadow(0 0 25px #00ffff) invert(100%)"; break;
+        case 64: activeTargetText = "D13W.W7F"; warpSpeed = 11; break;
+        case 65: document.body.style.backgroundColor = "#001122"; el.style.color = "#00ffff"; break;
+        case 66: renderMode = "mushrooms"; activeTargetText = "TRIP.WTF"; el.style.color = "#ff00aa"; break;
+        case 67: el.classList.add("slice-glitch"); el.style.filter = "hue-rotate(90deg)"; break;
+        case 68: document.body.style.backgroundColor = "#ffffff"; el.style.color = "#000000"; break;
+        case 69: activeTargetText = "666_999"; renderMode = "devils"; break;
+        case 70: el.style.textShadow = "-20px 0 30px #ff00ff, 20px 0 30px #00ffff"; break;
+        case 71: warpSpeed = 25; reverseWarp = true; break;
+        case 72: document.body.style.filter = "invert(100%) contrast(300%)"; break;
+        case 73: activeTargetText = "DREW_DREW"; el.style.color = "#ffff00"; break;
+        case 74: renderMode = "skulls"; warpSpeed = 15; break;
+        case 75: document.body.style.backgroundColor = "#330000"; el.style.color = "#ff3300"; break;
+        case 76: activeTargetText = "W.T.F"; el.classList.add("spin"); break;
+        case 77: el.style.filter = "blur(3px) brightness(200%)"; break;
+        case 78: renderMode = "money"; activeTargetText = "RICH.WTF"; el.style.color = "#00ff66"; break;
+        case 79: el.classList.add("liquid-wave"); document.body.style.backgroundColor = "#050015"; break;
+        case 80: activeTargetText = "DREW.WTF"; el.style.color = "#ffffff"; el.style.textShadow = "0 0 50px #ff00ff"; break;
+        case 81: document.body.style.filter = "hue-rotate(300deg) saturate(800%)"; break;
+        case 82: renderMode = "aliens"; warpSpeed = 19; break;
+        case 83: activeTargetText = "ACID_DREW"; el.style.color = "#ff00ff"; break;
+        case 84: el.classList.add("pulse-glow"); document.body.style.backgroundColor = "#002211"; break;
+        case 85: activeTargetText = "4NNDR3W"; el.style.color = "#00ffff"; break;
+        case 86: renderMode = "all"; warpSpeed = 22; break;
+        case 87: document.body.style.backgroundColor = "#ff0055"; el.style.color = "#ffffff"; break;
+        case 88: activeTargetText = "DREW.666.WTF"; el.style.color = "#ff0000"; break;
+        case 89: el.style.filter = "invert(100%) sepia(100%)"; break;
+        case 90: activeTargetText = "DREW.WTF"; warpSpeed = 3; break;
+        case 91: renderMode = "mushrooms"; activeTargetText = "420_DREW"; el.style.color = "#00ff33"; break;
+        case 92: el.classList.add("slice-glitch"); document.body.style.backgroundColor = "#110011"; break;
+        case 93: document.body.style.filter = "contrast(400%)"; break;
+        case 94: activeTargetText = "HELL_WTF"; renderMode = "devils"; break;
+        case 95: el.style.textShadow = "0 0 20px #ff0000, 0 0 40px #ffff00, 0 0 60px #ff00ff"; break;
+        case 96: warpSpeed = 30; reverseWarp = false; break;
+        case 97: document.body.style.backgroundColor = "#003333"; el.style.color = "#00ffff"; break;
+        case 98: activeTargetText = "DREW_NULL"; el.style.color = "#aaaaaa"; break;
+        case 99: renderMode = "skulls"; activeTargetText = "DEAD_WTF"; break;
+        case 100: document.body.style.filter = "invert(100%) hue-rotate(180deg)"; break;
+        case 101: activeTargetText = "DREW.WTF"; el.classList.add("spin"); el.style.color = "#ff0055"; break;
+        case 102: document.body.style.backgroundColor = "#222200"; el.style.color = "#ffff00"; break;
+        case 103: renderMode = "money"; warpSpeed = 16; break;
+        case 104: activeTargetText = "333_666_999"; el.style.color = "#ffffff"; break;
+        case 105: el.classList.add("liquid-wave"); el.style.filter = "hue-rotate(45deg)"; break;
+        case 106: activeTargetText = "CYBER_DREW"; el.style.color = "#00ffcc"; break;
+        case 107: document.body.style.backgroundColor = "#1a0000"; el.style.color = "#ff4444"; break;
+        case 108: renderMode = "aliens"; activeTargetText = "VOID.WTF"; break;
+        case 109: el.style.filter = "brightness(250%) contrast(200%)"; break;
+        case 110: activeTargetText = "DREW.WTF"; warpSpeed = 2; el.style.color = "#ffffff"; break;
+        case 111: document.body.style.filter = "invert(100%)"; break;
+        case 112: activeTargetText = "FTW_WTF"; el.style.color = "#ff00ff"; break;
+        case 113: renderMode = "all"; warpSpeed = 26; break;
+        case 114: document.body.style.backgroundColor = "#000000"; el.style.color = "#00ff00"; break;
+        case 115: activeTargetText = "DREW.666"; el.style.color = "#ff0000"; break;
+        case 116: el.classList.add("slice-glitch"); break;
+        case 117: activeTargetText = "RESET_WTF"; el.style.color = "#ffff00"; break;
+        case 118: warpSpeed = 1; el.style.filter = "blur(1px)"; break;
+        case 119: activeTargetText = "DREW.WTF"; el.style.color = "#ff3333"; break;
+        case 120: activeTargetText = "DREW.WTF"; warpSpeed = 1; el.style.color = "#ff1111"; break;
       }
+    }
+
+    function prevPhase() {
+      currentPhase--;
+      setPhase(currentPhase);
+      resetPhaseTimer();
     }
 
     function nextPhase() {
@@ -416,6 +465,15 @@ Here is the updated code.
         setPhase(currentPhase);
       }, 5000); // 5 seconds per phase
     }
+
+    /* --- KEYBOARD NAVIGATION CONTROLS --- */
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowUp" || e.key === "ArrowRight") {
+        nextPhase();
+      } else if (e.key === "ArrowDown" || e.key === "ArrowLeft") {
+        prevPhase();
+      }
+    });
 
     /* --- CHARACTER SCRAMBLE ENGINE --- */
     const el = document.getElementById("scramble-text");
