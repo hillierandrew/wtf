@@ -1,3 +1,15 @@
+Here is the updated single-file HTML code.
+
+### What Was Updated:
+
+1. **Vertical Tap Controls for Mobile/iPhone:**
+* **Tapping ABOVE `DREW.WTF**` (the top half of your screen) moves **BACK** to the previous phase (`prevPhase`).
+* **Tapping BELOW `DREW.WTF**` (the bottom half of your screen, or tapping the phase badge itself) advances to the **NEXT** phase (`nextPhase`).
+
+
+2. **Removed `FTW.WRED`:** Phase 6 has been updated so it no longer changes the text to `FTW.WRED`.
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42,6 +54,25 @@
       justify-content: center;
       align-items: center;
       flex-direction: column;
+    }
+
+    /* Screen Touch Control Zones (Top = Prev, Bottom = Next) */
+    .touch-zone {
+      position: fixed;
+      left: 0;
+      width: 100vw;
+      height: 50vh;
+      height: 50dvh;
+      z-index: 40;
+      cursor: pointer;
+    }
+
+    #touch-top {
+      top: 0;
+    }
+
+    #touch-bottom {
+      bottom: 0;
     }
 
     /* Starfield Canvas Background */
@@ -89,9 +120,8 @@
       max-width: 92vw;
       user-select: none;
       -webkit-user-select: none;
-      cursor: pointer;
       position: relative;
-      pointer-events: auto;
+      pointer-events: none; /* Passes clicks through to top/bottom touch zones */
     }
 
     /* Main Title Styling */
@@ -168,11 +198,15 @@
 </head>
 <body>
 
+  <!-- Screen Tap Zones -->
+  <div id="touch-top" class="touch-zone" onclick="prevPhase(event)"></div>
+  <div id="touch-bottom" class="touch-zone" onclick="nextPhase(event)"></div>
+
   <!-- Canvas Background -->
   <canvas id="starfield"></canvas>
 
   <!-- Locked Center Container -->
-  <div id="main-container" class="container" onclick="nextPhase(event)">
+  <div id="main-container" class="container">
     <div id="scramble-text" class="title">DREW.WTF</div>
   </div>
 
@@ -342,7 +376,7 @@
         case 3: el.style.textShadow = "-10px -5px 20px #ff0000, 10px 5px 20px #00ffff"; break;
         case 4: warpSpeed = 12; el.style.filter = "drop-shadow(0 0 30px #ff0000)"; break;
         case 5: renderMode = "mushrooms"; warpSpeed = 5; break;
-        case 6: activeTargetText = "FTW.WRED"; el.classList.add("spin"); el.style.color = "#ffff00"; break;
+        case 6: activeTargetText = "DREW.WTF"; el.classList.add("spin"); el.style.color = "#ffff00"; break;
         case 7: activeTargetText = "DREW.WTF"; el.classList.add("liquid-wave"); el.style.filter = "hue-rotate(270deg)"; break;
         case 8: document.body.style.backgroundColor = "#fff"; document.body.style.filter = "invert(100%)"; break;
         case 9: renderMode = "devils"; warpSpeed = 6; break;
@@ -448,7 +482,7 @@
         case 109: el.style.filter = "brightness(250%) contrast(200%)"; break;
         case 110: activeTargetText = "DREW.WTF"; warpSpeed = 2; el.style.color = "#ffffff"; break;
         case 111: document.body.style.filter = "invert(100%)"; break;
-        case 112: activeTargetText = "FTW_WTF"; el.style.color = "#ff00ff"; break;
+        case 112: activeTargetText = "DREW.WTF"; el.style.color = "#ff00ff"; break;
         case 113: renderMode = "all"; warpSpeed = 26; break;
         case 114: document.body.style.backgroundColor = "#000000"; el.style.color = "#00ff00"; break;
         case 115: activeTargetText = "DREW.666"; el.style.color = "#ff0000"; break;
@@ -465,7 +499,8 @@
       }
     }
 
-    function prevPhase() {
+    function prevPhase(e) {
+      if (e) e.stopPropagation();
       currentPhase--;
       setPhase(currentPhase);
       resetPhaseTimer();
@@ -523,3 +558,5 @@
   </script>
 </body>
 </html>
+
+```
