@@ -1,1 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>DREW.WTF</title>
+  <style>
+    :root {
+      --crt-red: #ff1111;
+      --crt-dim: #660000;
+    }
 
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      height: -webkit-fill-available;
+      background-color: #000;
+      color: var(--crt-red);
+      font-family: 'Courier New', Courier, monospace;
+      overflow: hidden;
+      position: relative;
+      touch-action: manipulation;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #starfield {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      height: -webkit-fill-available;
+      z-index: 1;
+      display: block;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1.5s ease;
+    }
+
+    #starfield.active { opacity: 1; }
+
+    body::before {
+      content: " ";
+      display: block;
+      position: fixed;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: radial-gradient(circle at center, transparent 35%, rgba(0, 0, 0, 0.92) 100%);
+      pointer-events: none !important;
+      z-index: 10;
+    }
+
+    body::after {
+      content: " ";
+      display: block;
+      position: fixed;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(20, 0, 0, 0) 50%, rgba(0, 0, 0, 0.45) 50%);
+      background-size: 100% 4px;
+      pointer-events: none !important;
+      z-index: 11;
+    }
+
+    .container {
+      text-align: center;
+      z-index: 50;
+      padding: 10px;
+      max-width: 95vw;
+      user-select: none;
+      -webkit-user-select: none;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .title {
+      font-size: clamp(2rem, 7vw, 5rem);
+      font-weight: bold;
+      letter-spacing: 0.12em;
+      text-shadow: 0 0 10px var(--crt-red), 0 0 25px var(--crt-dim), 0 0 40px #ff0000;
+      animation: flicker 0.12s infinite;
+      min-height: 1.2em;
+      display: inline-block;
+      white-space: nowrap;
+      transition: filter 0.4s ease, color 0.4s ease, text-shadow 0.4s ease;
+    }
+
+    @keyframes flicker {
+      0% { opacity: 0.95; }
+      50% { opacity: 1; }
+      100% { opacity: 0.97; }
+    }
+
+    .phase-watermark {
+      position: fixed;
+      bottom: calc(24px + env(safe-area-inset-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: #ffffff !important;
+      letter-spacing: 0.08em;
+      user-select: none;
+      -webkit-user-select: none;
+      cursor: pointer;
+      padding: 8px 18px;
+      border-radius: 20px;
+      background-color: rgba(0, 0, 0, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
+    }
+
+    .spin { animation: spin-hue 3s linear infinite !important; }
+    @keyframes spin-hue { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
+
+    .liquid-wave { animation: flicker 0.12s infinite, liquid 1.8s ease-in-out infinite alternate !important; }
+    @keyframes liquid {
+      0% { letter-spacing: 0.12em; }
+      100% { letter-spacing: 0.3em; filter: blur(1px); }
+    }
+
+    .pulse-glow { animation: flicker 0.12s infinite, glow 0.8s ease-in-out infinite alternate !important; }
+    @keyframes glow { 0% { filter: brightness(1); } 100% { filter: brightness(2) drop-shadow(0 0 30px #ffffff); } }
+
+    .slice-glitch { animation: slice 0.2s steps(2) infinite !important; }
+    @keyframes slice {
+      0% { clip-path: inset(0 0 0 0); }
+      50% { clip-path: inset(20% 0 30% 0); }
+      100% { clip-path: inset(60% 0 10% 0); }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="starfield"></canvas>
+
+  <div id="main-container" class="container" onclick="nextPhase()">
+    <div id="scramble-text" class="title">DREW.WTF</div>
+  </div>
+
+  <div id="phase-badge" class="phase-watermark" onclick="nextPhase()">
+    PHASE NO. 0
+  </div>
+
+  <script>
+    const canvas = document.getElementById("starfield");
+    const ctx = canvas.getContext("2d");
+
+    let particles = [];
+    const numParticles = 700;
+    let width, height, cx, cy;
+    let warpSpeed = 4;
+    let renderMode = "stars";
+    let reverseWarp = false;
+
+    const mEmojis = ["🍄", "🍆", "✨", "💫"];
+    const dEmojis = ["😈", "👿", "🔥", "⚡"];
+    const sEmojis = ["💀", "☠️", "☣️", "🟢"];
+    const $Emojis = ["💸", "💰", "💵", "✨"];
+    const alienEmojis = ["👽", "🛸", "👾", "🌌"];
+
+    function resizeCanvas() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+      cx = width / 2;
+      cy = height / 2;
+    }
+
+    class Particle {
+      constructor() { this.reset(true); }
+
+      reset(initial = false) {
+        this.x = (Math.random() - 0.5) * width * 2;
+        this.y = (Math.random() - 0.5) * height * 2;
+        this.z = initial ? Math.random() * width : width;
+        this.pz = this.z;
+        this.mE = mEmojis[Math.floor(Math.random() * mEmojis.length)];
+        this.dE = dEmojis[Math.floor(Math.random() * dEmojis.length)];
+        this.sE = sEmojis[Math.floor(Math.random() * sEmojis.length)];
+        this.$E = $Emojis[Math.floor(Math.random() * $Emojis.length)];
+        this.aE = alienEmojis[Math.floor(Math.random() * alienEmojis.length)];
+      }
+
+      update() {
+        this.pz = this.z;
+        if (reverseWarp) {
+          this.z += warpSpeed;
+          if (this.z >= width) this.reset(false);
+        } else {
+          this.z -= warpSpeed;
+          if (this.z <= 0) this.reset(false);
+        }
+      }
+
+      draw() {
+        const sx = (this.x / this.z) * cx + cx;
+        const sy = (this.y / this.z) * cy + cy;
+
+        if (sx >= 0 && sx <= width && sy >= 0 && sy <= height) {
+          if (renderMode === "mushrooms") {
+            ctx.font = `${Math.max(10, (1 - this.z / width) * 36)}px serif`;
+            ctx.fillText(this.mE, sx, sy);
+          } else if (renderMode === "devils") {
+            ctx.font = `${Math.max(10, (1 - this.z / width) * 38)}px serif`;
+            ctx.fillText(this.dE, sx, sy);
+          } else if (renderMode === "skulls") {
+            ctx.font = `${Math.max(10, (1 - this.z / width) * 36)}px serif`;
+            ctx.fillText(this.sE, sx, sy);
+          } else if (renderMode === "money") {
+            ctx.font = `${Math.max(10, (1 - this.z / width) * 36)}px serif`;
+            ctx.fillText(this.$E, sx, sy);
+          } else if (renderMode === "aliens") {
+            ctx.font = `${Math.max(10, (1 - this.z / width) * 38)}px serif`;
+            ctx.fillText(this.aE, sx, sy);
+          } else if (renderMode === "all") {
+            ctx.font = `${Math.max(10, (1 - this.z / width) * 40)}px serif`;
+            ctx.fillText(this.dE, sx, sy);
+          } else {
+            const alpha = Math.min(1, (1 - this.z / width) * 1.8);
+            const size = (1 - this.z / width) * 3;
+            ctx.strokeStyle = `rgba(255, 17, 17, ${alpha})`;
+            ctx.lineWidth = Math.max(0.5, size);
+            ctx.beginPath();
+            ctx.moveTo((this.x / this.pz) * cx + cx, (this.y / this.pz) * cy + cy);
+            ctx.lineTo(sx, sy);
+            ctx.stroke();
+          }
+        }
+      }
+    }
+
+    function initParticles() {
+      resizeCanvas();
+      particles = [];
+      for (let i = 0; i < numParticles; i++) particles.push(new Particle());
+    }
+
+    function animateParticles() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
+      ctx.fillRect(0, 0, width, height);
+
+      for (let p of particles) {
+        p.update();
+        p.draw();
+      }
+      requestAnimationFrame(animateParticles);
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+    initParticles();
+
+    let currentPhase = 0;
+    let phaseTimer = null;
+    let activeTargetText = "DREW.WTF";
+
+    function setPhase(p) {
+      currentPhase = p;
+      if (currentPhase > 120) currentPhase = 0;
+      if (currentPhase < 0) currentPhase = 120;
+
+      const el = document.getElementById("scramble-text");
+      const badge = document.getElementById("phase-badge");
+      
+      badge.textContent = `PHASE NO. ${currentPhase}`;
+
+      document.body.style.backgroundColor = "#000";
+      document.body.style.filter = "none";
+      el.className = "title";
+      el.style.color = "";
+      el.style.filter = "";
+      el.style.textShadow = "";
+      renderMode = "stars";
+      reverseWarp = false;
+      canvas.classList.add("active");
+
+      switch(currentPhase) {
+        case 0: activeTargetText = "DREW.WTF"; canvas.classList.remove("active"); break;
+        case 1: activeTargetText = "DREW.WTF"; warpSpeed = 4; break;
+        case 2: warpSpeed = 6; el.style.filter = "hue-rotate(180deg)"; break;
+        case 3: el.style.textShadow = "-10px -5px 20px #ff0000, 10px 5px 20px #00ffff"; break;
+        case 4: warpSpeed = 12; el.style.filter = "drop-shadow(0 0 30px #ff0000)"; break;
+        case 5: renderMode = "mushrooms"; warpSpeed = 5; break;
+        case 6: activeTargetText = "FTW.WRED"; el.classList.add("spin"); el.style.color = "#ffff00"; break;
+        case 7: activeTargetText = "DREW.WTF"; el.classList.add("liquid-wave"); el.style.filter = "hue-rotate(270deg)"; break;
+        case 8: document.body.style.backgroundColor = "#fff"; document.body.style.filter = "invert(100%)"; break;
+        case 9: renderMode = "devils"; warpSpeed = 6; break;
+        case 10: renderMode = "devils"; activeTargetText = "DREW.666"; el.style.color = "#ff0000"; break;
+        case 11: renderMode = "devils"; activeTargetText = "666.666"; el.classList.add("pulse-glow"); break;
+        case 12: renderMode = "devils"; activeTargetText = "666.666.666"; warpSpeed = 16; break;
+        case 13: activeTargetText = "DREW.WTF"; el.style.filter = "blur(2px) contrast(300%)"; break;
+        case 14: document.body.style.backgroundColor = "#1a0022"; el.style.color = "#ff00ff"; el.style.textShadow = "0 0 30px #00ffff"; break;
+        case 15: activeTargetText = "DR3W.W7F"; el.style.color = "#ffffff"; break;
+        case 16: el.style.color = "#00ffff"; el.style.textShadow = "0 0 30px #00ffff, 0 0 60px #0088ff"; warpSpeed = 10; break;
+        case 17: el.style.color = "#00ff33"; el.style.textShadow = "0 0 30px #00ff33"; break;
+        case 18: el.style.color = "#ccff00"; el.classList.add("pulse-glow"); break;
+        case 19: renderMode = "mushrooms"; el.classList.add("liquid-wave"); break;
+        case 20: warpSpeed = 1; el.style.filter = "brightness(0.7)"; break;
+        case 21: document.body.style.filter = "hue-rotate(90deg) contrast(200%)"; break;
+        case 22: el.style.filter = "blur(1px) drop-shadow(0 0 20px #ff0000)"; break;
+        case 23: renderMode = "devils"; activeTargetText = "DREW.666"; warpSpeed = 20; break;
+        case 24: el.style.filter = "hue-rotate(180deg) saturate(1000%)"; warpSpeed = 30; break;
+        case 25: reverseWarp = true; warpSpeed = 8; break;
+        case 26: el.style.color = "#88ffff"; el.style.textShadow = "0 0 20px #ffffff, 0 0 40px #00ffff"; break;
+        case 27: warpSpeed = 14; break;
+        case 28: document.body.style.filter = "invert(50%)"; break;
+        case 29: activeTargetText = "DREW.WTF"; warpSpeed = 2; el.style.color = "#ff3333"; break;
+        case 30: el.style.color = "#ff3300"; break;
+        case 31: el.classList.add("liquid-wave"); el.style.color = "#e0e0e0"; el.style.textShadow = "0 0 20px #ffffff"; break;
+        case 32: document.body.style.backgroundColor = "#8b956d"; el.style.color = "#0f380f"; break;
+        case 33: el.style.color = "#ff007f"; el.style.textShadow = "0 0 30px #ff007f, 0 0 60px #ffffff"; break;
+        case 34: renderMode = "skulls"; el.style.color = "#00ff66"; break;
+        case 35: warpSpeed = 15; el.classList.add("spin"); break;
+        case 36: document.body.style.backgroundColor = "#ffff00"; el.style.color = "#000000"; break;
+        case 37: el.style.textShadow = "-15px 0 0 #ff0000, 15px 0 0 #0000ff"; break;
+        case 38: el.style.color = "#ffd700"; el.style.textShadow = "0 0 30px #ffd700"; break;
+        case 39: activeTargetText = "DREvv_vvTF"; break;
+        case 40: el.style.filter = "contrast(300%)"; break;
+        case 41: document.body.style.filter = "invert(100%)"; break;
+        case 42: document.body.style.backgroundColor = "#10002b"; el.style.color = "#ff5500"; el.style.textShadow = "0 0 30px #ff00ff"; break;
+        case 43: renderMode = "money"; activeTargetText = "$DREW.WTF$"; el.style.color = "#ffd700"; break;
+        case 44: el.classList.add("slice-glitch"); break;
+        case 45: el.classList.add("liquid-wave"); el.style.filter = "hue-rotate(120deg) saturate(500%)"; break;
+        case 46: el.style.color = "#00ffff"; break;
+        case 47: el.classList.add("pulse-glow"); warpSpeed = 8; break;
+        case 48: document.body.style.backgroundColor = "#000033"; el.style.color = "#ff0055"; break;
+        case 49: activeTargetText = "DR3W_666"; el.style.color = "#00ff33"; break;
+        case 50: el.style.color = "#ffffcc"; el.style.textShadow = "0 0 40px #ffff00"; warpSpeed = 22; break;
+        case 51: document.body.style.filter = "invert(100%)"; break;
+        case 52: el.style.filter = "hue-rotate(200deg)"; break;
+        case 53: renderMode = "devils"; activeTargetText = "666_WTF"; break;
+        case 54: warpSpeed = 18; break;
+        case 55: el.style.color = "#ffffff"; el.style.textShadow = "0 0 40px #ffffff"; break;
+        case 56: reverseWarp = true; warpSpeed = 28; break;
+        case 57: renderMode = "all"; activeTargetText = "WTF.DREW"; break;
+        case 58: document.body.style.filter = "contrast(500%) blur(2px)"; break;
+        case 59: activeTargetText = "DREW.WTF"; warpSpeed = 2; el.style.color = "#ff1111"; break;
+        case 60: activeTargetText = "DREW.WTF"; warpSpeed = 1; el.style.color = "#ff1111"; break;
+        case 61: renderMode = "aliens"; activeTargetText = "UFO.DREW"; el.style.color = "#00ff88"; break;
+        case 62: document.body.style.backgroundColor = "#220000"; el.style.color = "#ffaa00"; break;
+        case 63: el.style.filter = "drop-shadow(0 0 25px #00ffff) invert(100%)"; break;
+        case 64: activeTargetText = "D13W.W7F"; warpSpeed = 11; break;
+        case 65: document.body.style.backgroundColor = "#001122"; el.style.color = "#00ffff"; break;
+        case 66: renderMode = "mushrooms"; activeTargetText = "TRIP.WTF"; el.style.color = "#ff00aa"; break;
+        case 67: el.classList.add("slice-glitch"); el.style.filter = "hue-rotate(90deg)"; break;
+        case 68: document.body.style.backgroundColor = "#ffffff"; el.style.color = "#000000"; break;
+        case 69: activeTargetText = "666_999"; renderMode = "devils"; break;
+        case 70: el.style.textShadow = "-20px 0 30px #ff00ff, 20px 0 30px #00ffff"; break;
+        case 71: warpSpeed = 25; reverseWarp = true; break;
+        case 72: document.body.style.filter = "invert(100%) contrast(300%)"; break;
+        case 73: activeTargetText = "DREW_DREW"; el.style.color = "#ffff00"; break;
+        case 74: renderMode = "skulls"; warpSpeed = 15; break;
+        case 75: document.body.style.backgroundColor = "#330000"; el.style.color = "#ff3300"; break;
+        case 76: activeTargetText = "W.T.F"; el.classList.add("spin"); break;
+        case 77: el.style.filter = "blur(3px) brightness(200%)"; break;
+        case 78: renderMode = "money"; activeTargetText = "RICH.WTF"; el.style.color = "#00ff66"; break;
+        case 79: el.classList.add("liquid-wave"); document.body.style.backgroundColor = "#050015"; break;
+        case 80: activeTargetText = "DREW.WTF"; el.style.color = "#ffffff"; el.style.textShadow = "0 0 50px #ff00ff"; break;
+        case 81: document.body.style.filter = "hue-rotate(300deg) saturate(800%)"; break;
+        case 82: renderMode = "aliens"; warpSpeed = 19; break;
+        case 83: activeTargetText = "ACID_DREW"; el.style.color = "#ff00ff"; break;
+        case 84: el.classList.add("pulse-glow"); document.body.style.backgroundColor = "#002211"; break;
+        case 85: activeTargetText = "4NNDR3W"; el.style.color = "#00ffff"; break;
+        case 86: renderMode = "all"; warpSpeed = 22; break;
+        case 87: document.body.style.backgroundColor = "#ff0055"; el.style.color = "#ffffff"; break;
+        case 88: activeTargetText = "DREW.666.WTF"; el.style.color = "#ff0000"; break;
+        case 89: el.style.filter = "invert(100%) sepia(100%)"; break;
+        case 90: activeTargetText = "DREW.WTF"; warpSpeed = 3; break;
+        case 91: renderMode = "mushrooms"; activeTargetText = "420_DREW"; el.style.color = "#00ff33"; break;
+        case 92: el.classList.add("slice-glitch"); document.body.style.backgroundColor = "#110011"; break;
+        case 93: document.body.style.filter = "contrast(400%)"; break;
+        case 94: activeTargetText = "HELL_WTF"; renderMode = "devils"; break;
+        case 95: el.style.textShadow = "0 0 20px #ff0000, 0 0 40px #ffff00, 0 0 60px #ff00ff"; break;
+        case 96: warpSpeed = 30; reverseWarp = false; break;
+        case 97: document.body.style.backgroundColor = "#003333"; el.style.color = "#00ffff"; break;
+        case 98: activeTargetText = "DREW_NULL"; el.style.color = "#aaaaaa"; break;
+        case 99: renderMode = "skulls"; activeTargetText = "DEAD_WTF"; break;
+        case 100: document.body.style.filter = "invert(100%) hue-rotate(180deg)"; break;
+        case 101: activeTargetText = "DREW.WTF"; el.classList.add("spin"); el.style.color = "#ff0055"; break;
+        case 102: document.body.style.backgroundColor = "#222200"; el.style.color = "#ffff00"; break;
+        case 103: renderMode = "money"; warpSpeed = 16; break;
+        case 104: activeTargetText = "333_666_999"; el.style.color = "#ffffff"; break;
+        case 105: el.classList.add("liquid-wave"); el.style.filter = "hue-rotate(45deg)"; break;
+        case 106: activeTargetText = "CYBER_DREW"; el.style.color = "#00ffcc"; break;
+        case 107: document.body.style.backgroundColor = "#1a0000"; el.style.color = "#ff4444"; break;
+        case 108: renderMode = "aliens"; activeTargetText = "VOID.WTF"; break;
+        case 109: el.style.filter = "brightness(250%) contrast(200%)"; break;
+        case 110: activeTargetText = "DREW.WTF"; warpSpeed = 2; el.style.color = "#ffffff"; break;
+        case 111: document.body.style.filter = "invert(100%)"; break;
+        case 112: activeTargetText = "FTW_WTF"; el.style.color = "#ff00ff"; break;
+        case 113: renderMode = "all"; warpSpeed = 26; break;
+        case 114: document.body.style.backgroundColor = "#000000"; el.style.color = "#00ff00"; break;
+        case 115: activeTargetText = "DREW.666"; el.style.color = "#ff0000"; break;
+        case 116: el.classList.add("slice-glitch"); break;
+        case 117: activeTargetText = "RESET_WTF"; el.style.color = "#ffff00"; break;
+        case 118: warpSpeed = 1; el.style.filter = "blur(1px)"; break;
+        case 119: activeTargetText = "DREW.WTF"; el.style.color = "#ff3333"; break;
+        case 120: activeTargetText = "DREW.WTF"; warpSpeed = 1; el.style.color = "#ff1111"; break;
+      }
+    }
+
+    function prevPhase() {
+      currentPhase--;
+      setPhase(currentPhase);
+      resetPhaseTimer();
+    }
+
+    function nextPhase() {
+      currentPhase++;
+      setPhase(currentPhase);
+      resetPhaseTimer();
+    }
+
+    function resetPhaseTimer() {
+      if (phaseTimer) clearInterval(phaseTimer);
+      phaseTimer = setInterval(() => {
+        currentPhase++;
+        setPhase(currentPhase);
+      }, 5000);
+    }
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowUp" || e.key === "ArrowRight") {
+        nextPhase();
+      } else if (e.key === "ArrowDown" || e.key === "ArrowLeft") {
+        prevPhase();
+      }
+    });
+
+    const el = document.getElementById("scramble-text");
+    const glitchChars = "0137_/#\\|@$%&*!?";
+
+    function runScrambleCycle() {
+      el.textContent = activeTargetText;
+      setTimeout(() => {
+        let frame = 0;
+        const interval = setInterval(() => {
+          el.textContent = activeTargetText.split('').map(c => 
+            Math.random() < 0.4 ? glitchChars[Math.floor(Math.random() * glitchChars.length)] : c
+          ).join('');
+          frame++;
+          if (frame >= 15) {
+            clearInterval(interval);
+            el.textContent = activeTargetText;
+            runScrambleCycle();
+          }
+        }, 40);
+      }, 1800);
+    }
+
+    setPhase(0);
+    resetPhaseTimer();
+    animateParticles();
+    runScrambleCycle();
+  </script>
+</body>
+</html>
