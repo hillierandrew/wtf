@@ -1,9 +1,3 @@
-Here is the complete single-file HTML code with the **Grok-generated 8-bit sequence and scheduler audio engine** fully integrated.
-### What Has Been Updated:
- 1. **Grok Audio Engine Integration:** Replaced the previous Web Audio implementation with the exact freqs, sequence, and scheduling logic from your Grok snippet.
- 2. **Muted by Default:** The audio is strictly muted and inactive on page load.
- 3. **Restart on Unmute:** Clicking the **🔊 UNMUTE MUSIC** button resets currentNoteIndex = 0 and restarts the song sequence cleanly from beat 1 every time it is toggled on.
- 4. **Interactive Controls Preserved:** Keeps the enlarged **PHASE NO. X** badge, dark background palette, and **DREW**, **WTF**, and **(.)** click/tap navigation.
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -213,101 +207,93 @@ Here is the complete single-file HTML code with the **Grok-generated 8-bit seque
   </div>
 
   <div class="bottom-ui-container">
-    <button id="audio-toggle" class="audio-btn" onclick="toggleAudio(event)">🔊 UNMUTE MUSIC</button>
+    <button id="audio-toggle" class="audio-btn" onclick="toggleAudio(event)">🔇 UNMUTE MUSIC</button>
     <div id="phase-badge" class="phase-watermark">
       PHASE NO. 0
     </div>
   </div>
 
   <script>
-    /* --- INTEGRATED GROK 8-BIT AUDIO ENGINE --- */
+    /* --- EXACT SHEET MUSIC 8-BIT LAVENDER TOWN AUDIO ENGINE --- */
     let audioCtx = null;
     let isPlaying = false;
     let nextNoteTime = 0;
     let timerID = null;
-    let currentNoteIndex = 0;
+    let currentStep = 0;
 
     const freqs = {
-        'C3': 130.81, 'C#3': 138.59, 'D3': 146.83, 'D#3': 155.56, 'E3': 164.81, 'F3': 174.61,
-        'F#3': 185.00, 'G3': 196.00, 'G#3': 207.65, 'A3': 220.00, 'A#3': 233.08, 'B3': 246.94,
-        'C4': 261.63, 'C#4': 277.18, 'D4': 293.66, 'D#4': 311.13, 'E4': 329.63, 'F4': 349.23,
-        'F#4': 369.99, 'G4': 392.00, 'G#4': 415.30, 'A4': 440.00, 'A#4': 466.16, 'B4': 493.88,
-        'C5': 523.25, 'C#5': 554.37, 'D5': 587.33, 'D#5': 622.25, 'E5': 659.25, 'F5': 698.46,
-        'F#5': 739.99, 'G5': 783.99, 'G#5': 830.61, 'A5': 880.00, 'A#5': 932.33, 'B5': 987.77,
-        'C6': 1046.50, 'C#6': 1108.73, 'D6': 1174.66, 'D#6': 1244.51, 'E6': 1318.51, 'F6': 1396.91,
-        'F#6': 1479.98, 'G6': 1567.98, 'G#6': 1661.22, 'A6': 1760.00
+      'C3': 130.81, 'C#3': 138.59, 'D3': 146.83, 'D#3': 155.56, 'E3': 164.81, 'F3': 174.61, 'F#3': 185.00, 'G3': 196.00, 'G#3': 207.65, 'A3': 220.00, 'A#3': 233.08, 'B3': 246.94,
+      'C4': 261.63, 'C#4': 277.18, 'D4': 293.66, 'D#4': 311.13, 'E4': 329.63, 'F4': 349.23, 'F#4': 369.99, 'G4': 392.00, 'G#4': 415.30, 'A4': 440.00, 'A#4': 466.16, 'B4': 493.88,
+      'C5': 523.25, 'C#5': 554.37, 'D5': 587.33, 'D#5': 622.25, 'E5': 659.25, 'F5': 698.46, 'F#5': 739.99, 'G5': 783.99, 'G#5': 830.61, 'A5': 880.00, 'A#5': 932.33, 'B5': 987.77,
+      'C6': 1046.50, 'C#6': 1108.73, 'D6': 1174.66, 'D#6': 1244.51, 'E6': 1318.51, 'F6': 1396.91, 'F#6': 1479.98, 'G6': 1567.98, 'G#6': 1661.22, 'A6': 1760.00, 'B6': 1975.53
     };
 
-    const sequence = [
-        ['C6', 0.5], ['G#5', 0.5], ['C6', 0.5], ['G#5', 0.5],
-        ['C6', 0.5], ['G#5', 0.5], ['C6', 0.5], ['G#5', 0.5],
-        ['C6', 0.5], ['G#5', 0.5], ['C6', 0.5], ['G#5', 0.5],
-        ['C6', 0.5], ['G#5', 0.5], ['C6', 0.5], ['G#5', 0.5],
+    // Right-Hand Ostinato (8va: C6, G5, B5, F#5 repeating loop)
+    const rhOstinato = ['C6', 'G5', 'B5', 'F#5'];
 
-        ['C6', 0.5], ['G#5', 0.5], ['C6', 0.5], ['G#5', 0.5],
-        ['E4', 0.5], ['C#4', 0.5], ['E4', 0.5], ['C#4', 0.5],
-        ['C6', 0.5], ['G#5', 0.5], ['C6', 0.5], ['G#5', 0.5],
-        ['G#3', 0.5], ['E3', 0.5], ['G#3', 0.5], ['E3', 0.5],
-
-        ['C6', 0.5], ['G#5', 0.5], ['C6', 0.5], ['G#5', 0.5],
-        ['C4', 0.5], ['G#3', 0.5], ['C4', 0.5], ['G#3', 0.5],
-        ['C6', 0.5], ['G#5', 0.5], ['C6', 0.5], ['G#5', 0.5],
-        ['E3', 0.5], ['C#3', 0.5], ['E3', 0.5], ['C#3', 0.5],
-
-        ['C6', 0.5], ['G#5', 0.5], ['C6', 0.5], ['G#5', 0.5],
-        ['G#3', 0.5], ['E3', 0.5], ['C#3', 0.5], ['E3', 0.5],
-        ['C6', 0.5], ['G#5', 0.5], ['C6', 0.5], ['G#5', 0.5],
-        ['C4', 1.0], ['G#3', 1.0],
-
-        ['C6', 0.5], ['G#5', 0.5], ['C6', 0.5], ['G#5', 0.5],
-        ['E3', 0.5], ['C3', 0.5], ['G#2', 0.5], ['E3', 0.5],
-        ['C6', 0.5], ['G#5', 0.5], ['C6', 0.5], ['G#5', 0.5],
-        ['C4', 2.0]
+    // Left-Hand Bassline directly transcribed from Maestro Aamir sheet
+    // Measure 1-4: Rest
+    // Measure 5-12: Melody (C4, G3, F#3, B3 / C4, G3, F#3, B3 / C4, G3, B3, F#3 / C4, B3, G3, C4...)
+    const lhMelody = [
+      // M1 - M4 (Silence / Rests)
+      null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+      // M5 - M8
+      'C4', 'G3', 'F#3', 'B3',  'C4', 'G3', 'F#3', 'B3',  'C4', 'G3', 'B3', 'F#3',  'C4', 'B3', 'G3', 'C4',
+      // M9 - M12
+      'C4', 'G3', 'F#3', 'B3',  'C4', 'G3', 'F#3', 'B3',  'C4', 'G3', 'B3', 'F#3',  'C4', 'B3', 'G3', 'C4',
+      // M13 - M16
+      'G3', 'F#3', 'B3', 'C4',  'G3', 'F#3', 'B3', 'C4',  'G3', 'B3', 'F#3', 'C4',  'G3', 'B3', 'F#3', 'C4',
+      // M17 - M20
+      'C4', 'G3', 'F#3', 'B3',  'C4', 'G3', 'F#3', 'B3',  'C4', 'G3', 'B3', 'F#3',  'C4', 'B3', 'G3', 'C4'
     ];
 
-    function playTone(freq, startTime, duration) {
-        if (!audioCtx) return;
+    function playPulseNote(freq, startTime, duration, gainValue = 0.06) {
+      if (!freq || !audioCtx) return;
 
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
 
-        osc.type = 'square';
-        osc.frequency.value = freq;
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(freq, startTime);
 
-        gain.gain.setValueAtTime(0.08, startTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+      gain.gain.setValueAtTime(gainValue, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
 
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
 
-        osc.start(startTime);
-        osc.stop(startTime + duration);
+      osc.start(startTime);
+      osc.stop(startTime + duration);
     }
 
     function scheduleNotes() {
-        if (!isPlaying) return;
-        const lookAhead = 0.1;
-        const scheduleAheadTime = 0.2;
-        const secondsPerBeat = 60.0 / 120;
+      if (!isPlaying) return;
 
-        while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
-            const [noteName, beats] = sequence[currentNoteIndex];
-            const freq = freqs[noteName] || 440;
-            const duration = beats * secondsPerBeat;
+      const lookAhead = 0.1;
+      const scheduleAheadTime = 0.2;
+      const stepDuration = 0.25; // Quarter note beat at 120 BPM = 0.25s per eighth note
 
-            playTone(freq, nextNoteTime, duration * 0.9);
-
-            if (noteName.includes('6') || noteName.includes('5')) {
-                const lower = noteName.replace('6','5').replace('5','4');
-                if (freqs[lower]) {
-                    playTone(freqs[lower], nextNoteTime, duration * 0.9);
-                }
-            }
-
-            nextNoteTime += duration;
-            currentNoteIndex = (currentNoteIndex + 1) % sequence.length;
+      while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
+        // RH Ostinato Note
+        const rhNote = rhOstinato[currentStep % rhOstinato.length];
+        if (freqs[rhNote]) {
+          playPulseNote(freqs[rhNote], nextNoteTime, stepDuration * 0.85, 0.05);
         }
-        timerID = setTimeout(scheduleNotes, lookAhead * 1000);
+
+        // LH Melody Note (Plays every 2 steps = quarter note length)
+        if (currentStep % 2 === 0) {
+          const lhIndex = Math.floor(currentStep / 2) % lhMelody.length;
+          const lhNote = lhMelody[lhIndex];
+          if (lhNote && freqs[lhNote]) {
+            playPulseNote(freqs[lhNote], nextNoteTime, stepDuration * 1.8, 0.08);
+          }
+        }
+
+        nextNoteTime += stepDuration;
+        currentStep++;
+      }
+
+      timerID = setTimeout(scheduleNotes, lookAhead * 1000);
     }
 
     function toggleAudio(e) {
@@ -315,22 +301,21 @@ Here is the complete single-file HTML code with the **Grok-generated 8-bit seque
       const btn = document.getElementById("audio-toggle");
 
       if (!isPlaying) {
-          if (!audioCtx) {
-              audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-          }
-          if (audioCtx.state === 'suspended') {
-              audioCtx.resume();
-          }
-          // Starts from the very beginning when unmuted
-          nextNoteTime = audioCtx.currentTime + 0.05;
-          currentNoteIndex = 0;
-          isPlaying = true;
-          btn.textContent = '🔊 MUTE MUSIC';
-          scheduleNotes();
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        nextNoteTime = audioCtx.currentTime + 0.05;
+        currentStep = 0;
+        isPlaying = true;
+        btn.textContent = '🔊 MUTE MUSIC';
+        scheduleNotes();
       } else {
-          isPlaying = false;
-          clearTimeout(timerID);
-          btn.textContent = '🔇 UNMUTE MUSIC';
+        isPlaying = false;
+        clearTimeout(timerID);
+        btn.textContent = '🔇 UNMUTE MUSIC';
       }
     }
 
