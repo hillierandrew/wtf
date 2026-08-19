@@ -28,7 +28,7 @@
       position: relative;
     }
 
-    /* Starfield Canvas (Hidden until 10s) */
+    /* Starfield Canvas */
     #starfield {
       position: fixed;
       top: 0;
@@ -71,10 +71,12 @@
     .container {
       text-align: center;
       z-index: 15;
-      padding: 20px;
+      padding: 10px;
+      user-select: none;
+      white-space: nowrap;
     }
 
-    /* Penitent Tangent Red Phosphor Glow */
+    /* Base CRT Phosphor Title */
     .title {
       font-size: clamp(2.5rem, 8vw, 6rem);
       font-weight: bold;
@@ -82,9 +84,7 @@
       text-shadow: 0 0 10px var(--crt-red), 0 0 25px var(--crt-dim), 0 0 40px #ff0000;
       animation: flicker 0.12s infinite;
       min-height: 1.2em;
-      user-select: none;
-      white-space: nowrap;
-      transition: transform 3s ease, letter-spacing 3s ease, text-shadow 3s ease;
+      display: inline-block;
     }
 
     @keyframes flicker {
@@ -93,48 +93,79 @@
       100% { opacity: 0.97; }
     }
 
-    /* --- PSYCHEDELIC TRIP PHASE (Triggers at 15 seconds) --- */
-    body.psychedelic .title {
-      animation: 
-        flicker 0.12s infinite, 
-        melt 7s ease-in-out infinite alternate, 
-        spectrum 14s linear infinite;
+    /* --- STAGE 1 (15s): Mild Trip --- */
+    body.psy-1 .title {
+      animation: flicker 0.12s infinite, melt-1 6s ease-in-out infinite alternate, spectrum-1 10s linear infinite;
     }
 
-    @keyframes spectrum {
-      0%   { filter: hue-rotate(0deg) drop-shadow(0 0 20px #ff0000); }
-      25%  { filter: hue-rotate(90deg) drop-shadow(0 0 30px #00ffff); }
-      50%  { filter: hue-rotate(180deg) drop-shadow(0 0 45px #ff00ff); }
-      75%  { filter: hue-rotate(270deg) drop-shadow(0 0 30px #ffff00); }
+    @keyframes spectrum-1 {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(360deg); }
+    }
+
+    @keyframes melt-1 {
+      0% { transform: scale(1) rotate(0deg); letter-spacing: 0.18em; }
+      100% { transform: scale(1.1, 0.9) rotate(-2deg); letter-spacing: 0.3em; }
+    }
+
+    /* --- STAGE 2 (20s): Faster & Harder Wave --- */
+    body.psy-2 .title {
+      animation: flicker 0.08s infinite, melt-2 3.5s ease-in-out infinite alternate, spectrum-2 4s linear infinite;
+    }
+
+    @keyframes spectrum-2 {
+      0% { filter: hue-rotate(0deg) drop-shadow(0 0 20px #ff0000); }
+      50% { filter: hue-rotate(180deg) drop-shadow(0 0 40px #00ffff); }
       100% { filter: hue-rotate(360deg) drop-shadow(0 0 20px #ff0000); }
     }
 
-    @keyframes melt {
-      0% {
-        transform: scale(1) rotate(0deg) skewX(0deg);
-        letter-spacing: 0.18em;
-        text-shadow: -4px -2px 15px #ff0000, 4px 2px 15px #00ffff, 0 0 30px #ff00ff;
-      }
-      25% {
-        transform: scale(1.12, 0.92) rotate(-2deg) skewX(4deg);
-        letter-spacing: 0.3em;
-        text-shadow: 8px -4px 25px #ff00ff, -8px 4px 25px #00ff66, 0 0 50px #ffff00;
-      }
-      50% {
-        transform: scale(0.92, 1.15) rotate(2.5deg) skewY(-3deg);
-        letter-spacing: 0.1em;
-        text-shadow: -10px 6px 30px #00ffff, 10px -4px 30px #ff0055, 0 0 70px #9900ff;
-      }
-      75% {
-        transform: scale(1.08, 1.02) rotate(-1.5deg) skewX(-4deg);
-        letter-spacing: 0.35em;
-        text-shadow: 6px 6px 20px #ffff00, -6px -6px 20px #00ffff, 0 0 50px #ff0000;
-      }
-      100% {
-        transform: scale(0.98, 1.08) rotate(1deg) skewY(2deg);
-        letter-spacing: 0.15em;
-        text-shadow: -6px -4px 25px #ff00ff, 6px 4px 25px #00ffaa, 0 0 60px #ff00aa;
-      }
+    @keyframes melt-2 {
+      0% { transform: scale(1) skewX(0deg) rotate(0deg); letter-spacing: 0.18em; }
+      50% { transform: scale(1.25, 0.8) skewX(8deg) rotate(-4deg); letter-spacing: 0.4em; }
+      100% { transform: scale(0.85, 1.2) skewX(-8deg) rotate(4deg); letter-spacing: 0.1em; }
+    }
+
+    /* --- STAGE 3 (25s): Deep Liquid Distortion --- */
+    body.psy-3 .title {
+      animation: flicker 0.05s infinite, melt-3 2s ease-in-out infinite alternate, spectrum-3 2s linear infinite;
+    }
+
+    @keyframes spectrum-3 {
+      0% { filter: hue-rotate(0deg) contrast(200%) blur(0px); }
+      50% { filter: hue-rotate(180deg) contrast(300%) blur(1px); }
+      100% { filter: hue-rotate(360deg) contrast(200%) blur(0px); }
+    }
+
+    @keyframes melt-3 {
+      0% { transform: scale(1) skew(0deg, 0deg) rotate(0deg); text-shadow: -10px -5px 20px #ff0000, 10px 5px 20px #00ffff; }
+      50% { transform: scale(1.4, 0.7) skew(15deg, -5deg) rotate(-6deg); text-shadow: 15px -10px 30px #00ff00, -15px 10px 30px #ff00ff; }
+      100% { transform: scale(0.7, 1.4) skew(-15deg, 5deg) rotate(6deg); text-shadow: -15px 15px 40px #ffff00, 15px -15px 40px #0000ff; }
+    }
+
+    /* --- STAGE 4 (30s): FULL ACID MODE --- */
+    body.psy-4 .title {
+      animation: flicker 0.03s infinite, acid-melt 0.8s ease-in-out infinite alternate, acid-spectrum 0.8s linear infinite;
+    }
+
+    @keyframes acid-spectrum {
+      0% { filter: hue-rotate(0deg) saturate(500%) contrast(300%) invert(0%); }
+      50% { filter: hue-rotate(180deg) saturate(1000%) contrast(500%) invert(15%); }
+      100% { filter: hue-rotate(360deg) saturate(500%) contrast(300%) invert(0%); }
+    }
+
+    @keyframes acid-melt {
+      0% { transform: scale(1.5, 0.6) skew(25deg, -10deg) rotate(-10deg); letter-spacing: 0.6em; }
+      50% { transform: scale(0.6, 1.6) skew(-25deg, 10deg) rotate(10deg); letter-spacing: -0.1em; }
+      100% { transform: scale(1.3, 1.1) skew(10deg, 20deg) rotate(-15deg); letter-spacing: 0.8em; }
+    }
+
+    /* --- DVD Screensaver Positioning (35s+) --- */
+    .container.dvd-mode {
+      position: fixed !important;
+      left: 0;
+      top: 0;
+      margin: 0;
+      transform: none;
     }
   </style>
 </head>
@@ -143,7 +174,7 @@
   <!-- Starfield Canvas -->
   <canvas id="starfield"></canvas>
 
-  <div class="container">
+  <div id="main-container" class="container">
     <div id="scramble-text" class="title">DREW.WTF</div>
   </div>
 
@@ -156,6 +187,8 @@
     const numStars = 1000;
     let width, height, cx, cy;
     let warpSpeed = 5;
+    let starHueShift = false;
+    let globalHue = 0;
 
     function resizeCanvas() {
       width = window.innerWidth;
@@ -196,9 +229,14 @@
 
         if (sx >= 0 && sx <= width && sy >= 0 && sy <= height) {
           const alpha = Math.min(1, (1 - this.z / width) * 1.8);
-          const size = (1 - this.z / width) * 2.8;
+          const size = (1 - this.z / width) * 3;
 
-          ctx.strokeStyle = `rgba(255, 17, 17, ${alpha})`;
+          if (starHueShift) {
+            ctx.strokeStyle = `hsla(${(globalHue + this.z * 0.2) % 360}, 100%, 50%, ${alpha})`;
+          } else {
+            ctx.strokeStyle = `rgba(255, 17, 17, ${alpha})`;
+          }
+
           ctx.lineWidth = Math.max(0.5, size);
           ctx.beginPath();
           ctx.moveTo(px, py);
@@ -217,8 +255,10 @@
     }
 
     function animateStars() {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.28)";
+      ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
       ctx.fillRect(0, 0, width, height);
+
+      if (starHueShift) globalHue = (globalHue + 2) % 360;
 
       for (let i = 0; i < stars.length; i++) {
         stars[i].update();
@@ -231,19 +271,102 @@
     window.addEventListener("resize", resizeCanvas);
     initStars();
 
-    /* --- TIMED TRIGGERS --- */
+    /* --- TIMED PROGRESSION ENGINE --- */
 
-    // 1. Start Starfield after 10 seconds
+    // 10s: Starfield appears
     setTimeout(() => {
       canvas.classList.add("active");
       animateStars();
     }, 10000);
 
-    // 2. Start Psychedelic Morphing after 15 seconds
+    // 15s: Stage 1 Trip Begins
     setTimeout(() => {
-      document.body.classList.add("psychedelic");
-      warpSpeed = 8; // Accelerate starwarp for trip intensity
+      document.body.classList.add("psy-1");
+      warpSpeed = 7;
     }, 15000);
+
+    // 20s: Stage 2 Escalation
+    setTimeout(() => {
+      document.body.classList.remove("psy-1");
+      document.body.classList.add("psy-2");
+      warpSpeed = 11;
+    }, 20000);
+
+    // 25s: Stage 3 Deep Trip (Stars go colorful)
+    setTimeout(() => {
+      document.body.classList.remove("psy-2");
+      document.body.classList.add("psy-3");
+      warpSpeed = 16;
+      starHueShift = true;
+    }, 25000);
+
+    // 30s: Stage 4 FULL ACID MODE
+    setTimeout(() => {
+      document.body.classList.remove("psy-3");
+      document.body.classList.add("psy-4");
+      warpSpeed = 26;
+    }, 30000);
+
+    // 35s: DVD SCREENSAVER MODE
+    setTimeout(() => {
+      startDvdBounce();
+    }, 35000);
+
+    /* --- DVD BOUNCE ENGINE (35s+) --- */
+    let dvdX = 0;
+    let dvdY = 0;
+    let dvdVX = 4.5;
+    let dvdVY = 3.5;
+    let isDvdActive = false;
+    const container = document.getElementById("main-container");
+
+    function startDvdBounce() {
+      isDvdActive = true;
+      container.classList.add("dvd-mode");
+      
+      // Center start position before initial vector push
+      const rect = container.getBoundingClientRect();
+      dvdX = (window.innerWidth - rect.width) / 2;
+      dvdY = (window.innerHeight - rect.height) / 2;
+      
+      updateDvdBounce();
+    }
+
+    function updateDvdBounce() {
+      if (!isDvdActive) return;
+
+      const rect = container.getBoundingClientRect();
+      const maxX = window.innerWidth - rect.width;
+      const maxY = window.innerHeight - rect.height;
+
+      dvdX += dvdVX;
+      dvdY += dvdVY;
+
+      // Bounce horizontal walls
+      if (dvdX <= 0 || dvdX >= maxX) {
+        dvdVX = -dvdVX;
+        dvdX = Math.max(0, Math.min(dvdX, maxX));
+        triggerImpactEffect();
+      }
+
+      // Bounce vertical walls
+      if (dvdY <= 0 || dvdY >= maxY) {
+        dvdVY = -dvdVY;
+        dvdY = Math.max(0, Math.min(dvdY, maxY));
+        triggerImpactEffect();
+      }
+
+      container.style.left = `${dvdX}px`;
+      container.style.top = `${dvdY}px`;
+
+      requestAnimationFrame(updateDvdBounce);
+    }
+
+    function triggerImpactEffect() {
+      // Flash dynamic color burst on wall bounce
+      globalHue = (globalHue + 90) % 360;
+      container.style.filter = `hue-rotate(${Math.floor(Math.random() * 360)}deg) saturate(1000%)`;
+    }
 
     /* --- TEXT SCRAMBLE ENGINE --- */
     const targetText = "DREW.WTF";
