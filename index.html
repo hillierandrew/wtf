@@ -1,6 +1,3 @@
-Here is the updated code. The text remains locked in the exact center of the screen across all phases so it is always easy to click, the footer badge starts at **`PHASE NO. 0`**, and the badge is styled in pure white font (`#ffffff`).
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -97,31 +94,31 @@ Here is the updated code. The text remains locked in the exact center of the scr
       100% { opacity: 0.97; }
     }
 
-    /* Gemini-Style Watermarked Footer - Pure White Font */
+    /* Prominent White Phase Badge (Bottom Center) */
     .phase-watermark {
       position: fixed;
-      bottom: 18px;
+      bottom: 30px;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 20;
+      z-index: 99;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 13px;
+      font-weight: 700;
       color: #ffffff;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.08em;
       user-select: none;
       cursor: pointer;
-      padding: 6px 14px;
-      border-radius: 12px;
-      background: rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(4px);
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-      transition: background-color 0.2s ease, transform 0.2s ease;
+      padding: 8px 18px;
+      border-radius: 20px;
+      background: rgba(0, 0, 0, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.9);
+      transition: background-color 0.2s ease, border-color 0.2s ease;
     }
 
     .phase-watermark:hover {
-      background: rgba(255, 255, 255, 0.2);
-      transform: translateX(-50%) scale(1.05);
+      background: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.8);
     }
 
     /* ASCII Fire Overlay */
@@ -143,7 +140,7 @@ Here is the updated code. The text remains locked in the exact center of the scr
       transition: opacity 1s ease;
     }
 
-    /* Stationed In-Place Animations (No Movement Transforms) */
+    /* Stationary Animations Only (No Motion Shifts) */
     .spin { animation: spin-hue 3s linear infinite !important; }
     @keyframes spin-hue { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
 
@@ -172,12 +169,12 @@ Here is the updated code. The text remains locked in the exact center of the scr
   <!-- ASCII Fire Layer -->
   <div id="ascii-fire"></div>
 
-  <!-- Centered Clickable Text Container -->
+  <!-- Locked Centered Container -->
   <div id="main-container" class="container" onclick="nextPhase()">
     <div id="scramble-text" class="title">DREW.WTF</div>
   </div>
 
-  <!-- Gemini-Style Watermarked Phase Indicator -->
+  <!-- Clickable Bottom White Phase Indicator -->
   <div id="phase-badge" class="phase-watermark" onclick="nextPhase()">
     PHASE NO. 0
   </div>
@@ -307,7 +304,7 @@ Here is the updated code. The text remains locked in the exact center of the scr
     setInterval(generateFire, 80);
 
     /* --- 60 PHASE ENGINE (5 SECONDS PER PHASE) --- */
-    let currentPhase = 0; // Starts at Phase 0
+    let currentPhase = 0;
     let phaseTimer = null;
     let activeTargetText = "DREW.WTF";
 
@@ -364,8 +361,6 @@ Here is the updated code. The text remains locked in the exact center of the scr
         case 27: warpSpeed = 14; break;
         case 28: document.body.style.filter = "invert(50%)"; break;
         case 29: activeTargetText = "DREW.WTF"; warpSpeed = 2; el.style.color = "#ff3333"; break;
-
-        // ACT IV, V & VI PHASES
         case 30: el.style.color = "#ff3300"; break;
         case 31: el.classList.add("liquid-wave"); el.style.color = "#e0e0e0"; el.style.textShadow = "0 0 20px #ffffff"; break;
         case 32: document.body.style.backgroundColor = "#8b956d"; el.style.color = "#0f380f"; break;
@@ -444,5 +439,3 @@ Here is the updated code. The text remains locked in the exact center of the scr
   </script>
 </body>
 </html>
-
-```
