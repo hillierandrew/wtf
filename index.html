@@ -119,9 +119,10 @@
       100% { opacity: 0.97; }
     }
 
+    /* UNIFIED BOTTOM UI CONTAINER & MATCHED SIZING */
     .bottom-ui-container {
       position: fixed;
-      bottom: max(24px, env(safe-area-inset-bottom, 24px));
+      bottom: max(20px, env(safe-area-inset-bottom, 20px));
       left: 50%;
       transform: translateX(-50%);
       z-index: 999999;
@@ -130,50 +131,46 @@
       align-items: center;
       gap: 12px;
       pointer-events: auto;
+      width: clamp(280px, 85vw, 420px);
+    }
+
+    .ui-box {
+      width: 100%;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+      font-size: 20px;
+      font-weight: 900;
+      color: #ffffff !important;
+      -webkit-text-fill-color: #ffffff !important;
+      letter-spacing: 0.08em;
+      user-select: none;
+      -webkit-user-select: none;
+      padding: 16px 24px;
+      border-radius: 40px;
+      background-color: rgba(15, 15, 15, 0.95);
+      border: 3px solid rgba(255, 255, 255, 0.85);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.95), 0 0 15px rgba(255, 255, 255, 0.3);
+      text-align: center;
+      white-space: nowrap;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .audio-btn {
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-      font-size: 18px;
-      font-weight: 800;
-      color: #ffffff !important;
-      -webkit-text-fill-color: #ffffff !important;
-      user-select: none;
-      -webkit-user-select: none;
-      padding: 10px 22px;
-      border-radius: 25px;
-      background-color: rgba(15, 15, 15, 0.95);
-      border: 2px solid rgba(255, 255, 255, 0.8);
-      -webkit-backdrop-filter: blur(12px);
-      backdrop-filter: blur(12px);
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.9);
       cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.2s ease;
     }
 
     .audio-btn:active {
-      transform: scale(0.92);
+      transform: scale(0.95);
       background-color: rgba(255, 255, 255, 0.3);
     }
 
     .phase-watermark {
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-      font-size: 45px;
-      font-weight: 900;
-      color: #ffffff !important;
-      -webkit-text-fill-color: #ffffff !important;
-      letter-spacing: 0.1em;
-      user-select: none;
-      -webkit-user-select: none;
-      padding: 20px 48px;
-      border-radius: 50px;
-      background-color: rgba(15, 15, 15, 0.95);
-      border: 4px solid rgba(255, 255, 255, 0.85);
-      -webkit-backdrop-filter: blur(12px);
-      backdrop-filter: blur(12px);
-      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.95), 0 0 25px rgba(255, 255, 255, 0.4);
       pointer-events: none;
-      transition: background-color 0.2s ease, transform 0.2s ease;
-      white-space: nowrap;
     }
 
     .spin { animation: spin-hue 3s linear infinite !important; }
@@ -207,14 +204,14 @@
   </div>
 
   <div class="bottom-ui-container">
-    <button id="audio-toggle" class="audio-btn" onclick="toggleAudio(event)">🔇 UNMUTE MUSIC</button>
-    <div id="phase-badge" class="phase-watermark">
+    <button id="audio-toggle" class="ui-box audio-btn" onclick="toggleAudio(event)">🔇 UNMUTE MUSIC</button>
+    <div id="phase-badge" class="ui-box phase-watermark">
       PHASE NO. 0
     </div>
   </div>
 
   <script>
-    /* --- EXACT SHEET MUSIC 8-BIT LAVENDER TOWN AUDIO ENGINE --- */
+    /* --- FULL SHEET MUSIC TRANSCRIBED WEB AUDIO ENGINE --- */
     let audioCtx = null;
     let isPlaying = false;
     let nextNoteTime = 0;
@@ -228,14 +225,16 @@
       'C6': 1046.50, 'C#6': 1108.73, 'D6': 1174.66, 'D#6': 1244.51, 'E6': 1318.51, 'F6': 1396.91, 'F#6': 1479.98, 'G6': 1567.98, 'G#6': 1661.22, 'A6': 1760.00, 'B6': 1975.53
     };
 
-    // Right-Hand Ostinato (8va: C6, G5, B5, F#5 repeating loop)
+    // Right Hand Ostinato (High 8va): C6 -> G5 -> B5 -> F#5
     const rhOstinato = ['C6', 'G5', 'B5', 'F#5'];
 
-    // Left-Hand Bassline directly transcribed from Maestro Aamir sheet
-    // Measure 1-4: Rest
-    // Measure 5-12: Melody (C4, G3, F#3, B3 / C4, G3, F#3, B3 / C4, G3, B3, F#3 / C4, B3, G3, C4...)
-    const lhMelody = [
-      // M1 - M4 (Silence / Rests)
+    // Left Hand Full Score Transcription (Arranged by Maestro Aamir)
+    // Measures 1-4: Intro Ostinato solo
+    // Measures 5-12: Main Theme
+    // Measures 13-20: Second Phrase
+    // Measures 21-26: Resolution & Outro
+    const lhTranscribedScore = [
+      // M1 - M4
       null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
       // M5 - M8
       'C4', 'G3', 'F#3', 'B3',  'C4', 'G3', 'F#3', 'B3',  'C4', 'G3', 'B3', 'F#3',  'C4', 'B3', 'G3', 'C4',
@@ -244,56 +243,60 @@
       // M13 - M16
       'G3', 'F#3', 'B3', 'C4',  'G3', 'F#3', 'B3', 'C4',  'G3', 'B3', 'F#3', 'C4',  'G3', 'B3', 'F#3', 'C4',
       // M17 - M20
-      'C4', 'G3', 'F#3', 'B3',  'C4', 'G3', 'F#3', 'B3',  'C4', 'G3', 'B3', 'F#3',  'C4', 'B3', 'G3', 'C4'
+      'C4', 'G3', 'F#3', 'B3',  'C4', 'G3', 'F#3', 'B3',  'C4', 'G3', 'B3', 'F#3',  'C4', 'B3', 'G3', 'C4',
+      // M21 - M26 (Ending Cadence)
+      'C4', 'G3', 'F#3', 'B3',  'C4', 'G3', 'F#3', 'B3',  'C3', 'G3', 'C4', null
     ];
 
-    function playPulseNote(freq, startTime, duration, gainValue = 0.06) {
+    function playPulseWave(freq, startTime, duration, gainVal = 0.08) {
       if (!freq || !audioCtx) return;
 
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
 
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(freq, startTime);
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(freq, startTime);
 
-      gain.gain.setValueAtTime(gainValue, startTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+        gain.gain.setValueAtTime(gainVal, startTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration - 0.01);
 
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
 
-      osc.start(startTime);
-      osc.stop(startTime + duration);
+        osc.start(startTime);
+        osc.stop(startTime + duration);
+      } catch(e) {}
     }
 
-    function scheduleNotes() {
-      if (!isPlaying) return;
+    function scheduleAudioLoop() {
+      if (!isPlaying || !audioCtx) return;
 
       const lookAhead = 0.1;
       const scheduleAheadTime = 0.2;
-      const stepDuration = 0.25; // Quarter note beat at 120 BPM = 0.25s per eighth note
+      const secondsPerEighth = (60.0 / 120) / 2; // 120 BPM 8-bit tempo
 
       while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
-        // RH Ostinato Note
+        // High 8va Ostinato
         const rhNote = rhOstinato[currentStep % rhOstinato.length];
         if (freqs[rhNote]) {
-          playPulseNote(freqs[rhNote], nextNoteTime, stepDuration * 0.85, 0.05);
+          playPulseWave(freqs[rhNote], nextNoteTime, secondsPerEighth * 0.85, 0.06);
         }
 
-        // LH Melody Note (Plays every 2 steps = quarter note length)
+        // Left-Hand Transcribed Melody
         if (currentStep % 2 === 0) {
-          const lhIndex = Math.floor(currentStep / 2) % lhMelody.length;
-          const lhNote = lhMelody[lhIndex];
+          const lhIndex = Math.floor(currentStep / 2) % lhTranscribedScore.length;
+          const lhNote = lhTranscribedScore[lhIndex];
           if (lhNote && freqs[lhNote]) {
-            playPulseNote(freqs[lhNote], nextNoteTime, stepDuration * 1.8, 0.08);
+            playPulseWave(freqs[lhNote], nextNoteTime, secondsPerEighth * 1.8, 0.09);
           }
         }
 
-        nextNoteTime += stepDuration;
+        nextNoteTime += secondsPerEighth;
         currentStep++;
       }
 
-      timerID = setTimeout(scheduleNotes, lookAhead * 1000);
+      timerID = setTimeout(scheduleAudioLoop, lookAhead * 1000);
     }
 
     function toggleAudio(e) {
@@ -307,14 +310,16 @@
         if (audioCtx.state === 'suspended') {
           audioCtx.resume();
         }
+        
+        // Reset and play immediately from measure 1
         nextNoteTime = audioCtx.currentTime + 0.05;
         currentStep = 0;
         isPlaying = true;
         btn.textContent = '🔊 MUTE MUSIC';
-        scheduleNotes();
+        scheduleAudioLoop();
       } else {
         isPlaying = false;
-        clearTimeout(timerID);
+        if (timerID) clearTimeout(timerID);
         btn.textContent = '🔇 UNMUTE MUSIC';
       }
     }
@@ -548,6 +553,7 @@
       }, 5000);
     }
 
+    /* --- WORD CLICK HANDLERS --- */
     function handleDrewClick(e) {
       if (e) e.stopPropagation();
       prevPhase();
