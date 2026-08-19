@@ -1,12 +1,3 @@
-The issue in your screenshot is overflowing content and text clipping caused by horizontal layout constraints:
-
-1. **`white-space: nowrap` on `.container`:** Prevents long text (like `666.666.666`) from wrapping, pushing it past the right edge on mobile or smaller screens.
-2. **`clamp()` sizing range:** On wide desktop screens, `clamp(2.2rem, 7.5vw, 6rem)` scales the text up to `6rem`, making longer phase strings overflow the viewport width.
-3. **Scanline / Vignette Pseudo-elements blocking clicks:** `body::before` and `body::after` overlay the entire screen and can intercept touch/click events on mobile Safari if pointer events aren't strictly disabled.
-
-Here is the updated single-file HTML code with these CSS layout and sizing bugs resolved:
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -36,7 +27,6 @@ Here is the updated single-file HTML code with these CSS layout and sizing bugs 
       overflow: hidden;
       position: relative;
       touch-action: manipulation;
-      transition: background-color 0.4s ease, filter 0.4s ease;
     }
 
     body {
@@ -45,7 +35,6 @@ Here is the updated single-file HTML code with these CSS layout and sizing bugs 
       align-items: center;
     }
 
-    /* Starfield Canvas Background */
     #starfield {
       position: fixed;
       top: 0; left: 0;
@@ -60,7 +49,6 @@ Here is the updated single-file HTML code with these CSS layout and sizing bugs 
 
     #starfield.active { opacity: 1; }
 
-    /* Screen Curvature & Vignette Overlay */
     body::before {
       content: " ";
       display: block;
@@ -71,7 +59,6 @@ Here is the updated single-file HTML code with these CSS layout and sizing bugs 
       z-index: 10;
     }
 
-    /* Scanlines Overlay */
     body::after {
       content: " ";
       display: block;
@@ -83,7 +70,6 @@ Here is the updated single-file HTML code with these CSS layout and sizing bugs 
       z-index: 11;
     }
 
-    /* Centered Fixed Content Container */
     .container {
       text-align: center;
       z-index: 50;
@@ -95,16 +81,15 @@ Here is the updated single-file HTML code with these CSS layout and sizing bugs 
       position: relative;
     }
 
-    /* Main Title Styling - Responsive Fluid Fit */
     .title {
-      font-size: clamp(1.8rem, 5.5vw, 4.5rem);
+      font-size: clamp(2rem, 7vw, 5rem);
       font-weight: bold;
       letter-spacing: 0.12em;
       text-shadow: 0 0 10px var(--crt-red), 0 0 25px var(--crt-dim), 0 0 40px #ff0000;
       animation: flicker 0.12s infinite;
       min-height: 1.2em;
       display: inline-block;
-      word-break: break-word;
+      white-space: nowrap;
       transition: filter 0.4s ease, color 0.4s ease, text-shadow 0.4s ease;
     }
 
@@ -114,7 +99,6 @@ Here is the updated single-file HTML code with these CSS layout and sizing bugs 
       100% { opacity: 0.97; }
     }
 
-    /* iOS Safari Compatible White Watermark Badge */
     .phase-watermark {
       position: fixed;
       bottom: calc(24px + env(safe-area-inset-bottom));
@@ -138,11 +122,6 @@ Here is the updated single-file HTML code with these CSS layout and sizing bugs 
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
     }
 
-    .phase-watermark:active {
-      background-color: rgba(255, 255, 255, 0.3);
-    }
-
-    /* Stationary Animations */
     .spin { animation: spin-hue 3s linear infinite !important; }
     @keyframes spin-hue { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
 
@@ -165,21 +144,17 @@ Here is the updated single-file HTML code with these CSS layout and sizing bugs 
 </head>
 <body>
 
-  <!-- Starfield Canvas -->
   <canvas id="starfield"></canvas>
 
-  <!-- Centered Clickable Text Container -->
   <div id="main-container" class="container" onclick="nextPhase()">
     <div id="scramble-text" class="title">DREW.WTF</div>
   </div>
 
-  <!-- iOS Safari Compatible Bottom White Phase Badge -->
   <div id="phase-badge" class="phase-watermark" onclick="nextPhase()">
     PHASE NO. 0
   </div>
 
   <script>
-    /* --- CANVAS & PARTICLE SYSTEM --- */
     const canvas = document.getElementById("starfield");
     const ctx = canvas.getContext("2d");
 
@@ -288,7 +263,6 @@ Here is the updated single-file HTML code with these CSS layout and sizing bugs 
     window.addEventListener("resize", resizeCanvas);
     initParticles();
 
-    /* --- 120 PHASE ENGINE (5 SECONDS PER PHASE) --- */
     let currentPhase = 0;
     let phaseTimer = null;
     let activeTargetText = "DREW.WTF";
@@ -303,7 +277,6 @@ Here is the updated single-file HTML code with these CSS layout and sizing bugs 
       
       badge.textContent = `PHASE NO. ${currentPhase}`;
 
-      // Reset Defaults
       document.body.style.backgroundColor = "#000";
       document.body.style.filter = "none";
       el.className = "title";
@@ -345,8 +318,6 @@ Here is the updated single-file HTML code with these CSS layout and sizing bugs 
         case 27: warpSpeed = 14; break;
         case 28: document.body.style.filter = "invert(50%)"; break;
         case 29: activeTargetText = "DREW.WTF"; warpSpeed = 2; el.style.color = "#ff3333"; break;
-
-        // 30 to 60
         case 30: el.style.color = "#ff3300"; break;
         case 31: el.classList.add("liquid-wave"); el.style.color = "#e0e0e0"; el.style.textShadow = "0 0 20px #ffffff"; break;
         case 32: document.body.style.backgroundColor = "#8b956d"; el.style.color = "#0f380f"; break;
@@ -378,8 +349,6 @@ Here is the updated single-file HTML code with these CSS layout and sizing bugs 
         case 58: document.body.style.filter = "contrast(500%) blur(2px)"; break;
         case 59: activeTargetText = "DREW.WTF"; warpSpeed = 2; el.style.color = "#ff1111"; break;
         case 60: activeTargetText = "DREW.WTF"; warpSpeed = 1; el.style.color = "#ff1111"; break;
-
-        // 61 to 120 PHASES
         case 61: renderMode = "aliens"; activeTargetText = "UFO.DREW"; el.style.color = "#00ff88"; break;
         case 62: document.body.style.backgroundColor = "#220000"; el.style.color = "#ffaa00"; break;
         case 63: el.style.filter = "drop-shadow(0 0 25px #00ffff) invert(100%)"; break;
@@ -463,7 +432,6 @@ Here is the updated single-file HTML code with these CSS layout and sizing bugs 
       }, 5000);
     }
 
-    /* --- KEYBOARD NAVIGATION CONTROLS --- */
     window.addEventListener("keydown", (e) => {
       if (e.key === "ArrowUp" || e.key === "ArrowRight") {
         nextPhase();
@@ -472,7 +440,6 @@ Here is the updated single-file HTML code with these CSS layout and sizing bugs 
       }
     });
 
-    /* --- CHARACTER SCRAMBLE ENGINE --- */
     const el = document.getElementById("scramble-text");
     const glitchChars = "0137_/#\\|@$%&*!?";
 
@@ -494,7 +461,6 @@ Here is the updated single-file HTML code with these CSS layout and sizing bugs 
       }, 1800);
     }
 
-    // Startup Execution
     setPhase(0);
     resetPhaseTimer();
     animateParticles();
@@ -502,5 +468,3 @@ Here is the updated single-file HTML code with these CSS layout and sizing bugs 
   </script>
 </body>
 </html>
-
-```
