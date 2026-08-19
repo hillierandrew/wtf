@@ -31,21 +31,17 @@
     /* Starfield Canvas */
     #starfield {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
       z-index: 1;
       display: block;
       opacity: 0;
-      transition: opacity 4s ease-in-out;
+      transition: opacity 2s ease;
     }
 
-    #starfield.active {
-      opacity: 1;
-    }
+    #starfield.active { opacity: 1; }
 
-    /* Screen Curvature & Vignette */
+    /* Vignette & Scanlines */
     body::before {
       content: " ";
       display: block;
@@ -56,7 +52,6 @@
       z-index: 10;
     }
 
-    /* Scanlines */
     body::after {
       content: " ";
       display: block;
@@ -74,9 +69,9 @@
       padding: 10px;
       user-select: none;
       white-space: nowrap;
+      cursor: pointer;
     }
 
-    /* Base CRT Phosphor Title */
     .title {
       font-size: clamp(2.5rem, 8vw, 6rem);
       font-weight: bold;
@@ -85,6 +80,7 @@
       animation: flicker 0.12s infinite;
       min-height: 1.2em;
       display: inline-block;
+      transition: all 0.5s ease;
     }
 
     @keyframes flicker {
@@ -93,102 +89,84 @@
       100% { opacity: 0.97; }
     }
 
-    /* --- STAGE 1 (15s): Mild Trip --- */
-    body.psy-1 .title {
-      animation: flicker 0.12s infinite, melt-1 6s ease-in-out infinite alternate, spectrum-1 10s linear infinite;
+    /* ASCII Fire Overlay */
+    #ascii-fire {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100vw;
+      text-align: center;
+      color: #ff3300;
+      font-family: monospace;
+      font-weight: bold;
+      font-size: 1.2rem;
+      line-height: 1rem;
+      z-index: 12;
+      opacity: 0;
+      pointer-events: none;
+      text-shadow: 0 0 10px #ff0000, 0 0 20px #ff6600;
+      white-space: pre;
     }
 
-    @keyframes spectrum-1 {
-      0% { filter: hue-rotate(0deg); }
-      100% { filter: hue-rotate(360deg); }
+    /* Devil Emoji Overlay */
+    #devil-overlay {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      font-size: 15rem;
+      z-index: 25;
+      pointer-events: none;
+      opacity: 0;
+      transition: transform 3s ease-in, opacity 2s ease;
+      filter: drop-shadow(0 0 50px #ff0000);
     }
 
-    @keyframes melt-1 {
-      0% { transform: scale(1) rotate(0deg); letter-spacing: 0.18em; }
-      100% { transform: scale(1.1, 0.9) rotate(-2deg); letter-spacing: 0.3em; }
+    #devil-overlay.grow {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(4);
     }
 
-    /* --- STAGE 2 (20s): Faster & Harder Wave --- */
-    body.psy-2 .title {
-      animation: flicker 0.08s infinite, melt-2 3.5s ease-in-out infinite alternate, spectrum-2 4s linear infinite;
-    }
-
-    @keyframes spectrum-2 {
-      0% { filter: hue-rotate(0deg) drop-shadow(0 0 20px #ff0000); }
-      50% { filter: hue-rotate(180deg) drop-shadow(0 0 40px #00ffff); }
-      100% { filter: hue-rotate(360deg) drop-shadow(0 0 20px #ff0000); }
-    }
-
-    @keyframes melt-2 {
-      0% { transform: scale(1) skewX(0deg) rotate(0deg); letter-spacing: 0.18em; }
-      50% { transform: scale(1.25, 0.8) skewX(8deg) rotate(-4deg); letter-spacing: 0.4em; }
-      100% { transform: scale(0.85, 1.2) skewX(-8deg) rotate(4deg); letter-spacing: 0.1em; }
-    }
-
-    /* --- STAGE 3 (25s): Deep Liquid Distortion --- */
-    body.psy-3 .title {
-      animation: flicker 0.05s infinite, melt-3 2s ease-in-out infinite alternate, spectrum-3 2s linear infinite;
-    }
-
-    @keyframes spectrum-3 {
-      0% { filter: hue-rotate(0deg) contrast(200%) blur(0px); }
-      50% { filter: hue-rotate(180deg) contrast(300%) blur(1px); }
-      100% { filter: hue-rotate(360deg) contrast(200%) blur(0px); }
-    }
-
-    @keyframes melt-3 {
-      0% { transform: scale(1) skew(0deg, 0deg) rotate(0deg); text-shadow: -10px -5px 20px #ff0000, 10px 5px 20px #00ffff; }
-      50% { transform: scale(1.4, 0.7) skew(15deg, -5deg) rotate(-6deg); text-shadow: 15px -10px 30px #00ff00, -15px 10px 30px #ff00ff; }
-      100% { transform: scale(0.7, 1.4) skew(-15deg, 5deg) rotate(6deg); text-shadow: -15px 15px 40px #ffff00, 15px -15px 40px #0000ff; }
-    }
-
-    /* --- STAGE 4 (30s): FULL ACID MODE --- */
-    body.psy-4 .title {
-      animation: flicker 0.03s infinite, acid-melt 0.8s ease-in-out infinite alternate, acid-spectrum 0.8s linear infinite;
-    }
-
-    @keyframes acid-spectrum {
-      0% { filter: hue-rotate(0deg) saturate(500%) contrast(300%) invert(0%); }
-      50% { filter: hue-rotate(180deg) saturate(1000%) contrast(500%) invert(15%); }
-      100% { filter: hue-rotate(360deg) saturate(500%) contrast(300%) invert(0%); }
-    }
-
-    @keyframes acid-melt {
-      0% { transform: scale(1.5, 0.6) skew(25deg, -10deg) rotate(-10deg); letter-spacing: 0.6em; }
-      50% { transform: scale(0.6, 1.6) skew(-25deg, 10deg) rotate(10deg); letter-spacing: -0.1em; }
-      100% { transform: scale(1.3, 1.1) skew(10deg, 20deg) rotate(-15deg); letter-spacing: 0.8em; }
-    }
-
-    /* --- DVD Screensaver Positioning (35s+) --- */
+    /* DVD Mode Positioning */
     .container.dvd-mode {
       position: fixed !important;
-      left: 0;
-      top: 0;
+      left: 0; top: 0;
       margin: 0;
       transform: none;
     }
+
+    /* Spinning and Glitter */
+    .spin { animation: spin-anim 4s linear infinite !important; }
+    @keyframes spin-anim {
+      0% { transform: rotate(0deg) scale(1); filter: hue-rotate(0deg); }
+      50% { transform: rotate(180deg) scale(1.3); filter: hue-rotate(180deg) drop-shadow(0 0 30px #ffff00); }
+      100% { transform: rotate(360deg) scale(1); filter: hue-rotate(360deg); }
+    }
+
+    /* Invert Color Mode */
+    body.invert-mode { filter: invert(100%); }
   </style>
 </head>
 <body>
 
-  <!-- Starfield Canvas -->
   <canvas id="starfield"></canvas>
+  <div id="ascii-fire"></div>
+  <div id="devil-overlay">😈</div>
 
-  <div id="main-container" class="container">
+  <div id="main-container" class="container" onclick="nextPhase()">
     <div id="scramble-text" class="title">DREW.WTF</div>
   </div>
 
   <script>
-    /* --- STARFIELD ANIMATION ENGINE --- */
+    /* --- STARFIELD & EMOJI ENGINE --- */
     const canvas = document.getElementById("starfield");
     const ctx = canvas.getContext("2d");
 
     let stars = [];
-    const numStars = 1000;
+    const numStars = 600;
     let width, height, cx, cy;
-    let warpSpeed = 5;
-    let starHueShift = false;
-    let globalHue = 0;
+    let warpSpeed = 4;
+    let renderMode = "stars"; // "stars" or "emojis"
+    const emojis = ["🍄", "🍆", "✨", "💫"];
 
     function resizeCanvas() {
       width = window.innerWidth;
@@ -199,49 +177,41 @@
       cy = height / 2;
     }
 
-    class Star {
-      constructor() {
-        this.reset(true);
-      }
-
+    class Particle {
+      constructor() { this.reset(true); }
       reset(initial = false) {
         this.x = (Math.random() - 0.5) * width * 2;
         this.y = (Math.random() - 0.5) * height * 2;
         this.z = initial ? Math.random() * width : width;
         this.pz = this.z;
+        this.emoji = emojis[Math.floor(Math.random() * emojis.length)];
       }
-
       update() {
         this.pz = this.z;
         this.z -= warpSpeed;
-
-        if (this.z <= 0) {
-          this.reset(false);
-        }
+        if (this.z <= 0) this.reset(false);
       }
-
       draw() {
         const sx = (this.x / this.z) * cx + cx;
         const sy = (this.y / this.z) * cy + cy;
-
         const px = (this.x / this.pz) * cx + cx;
         const py = (this.y / this.pz) * cy + cy;
 
         if (sx >= 0 && sx <= width && sy >= 0 && sy <= height) {
-          const alpha = Math.min(1, (1 - this.z / width) * 1.8);
-          const size = (1 - this.z / width) * 3;
-
-          if (starHueShift) {
-            ctx.strokeStyle = `hsla(${(globalHue + this.z * 0.2) % 360}, 100%, 50%, ${alpha})`;
+          if (renderMode === "emojis") {
+            const size = Math.max(12, (1 - this.z / width) * 48);
+            ctx.font = `${size}px serif`;
+            ctx.fillText(this.emoji, sx, sy);
           } else {
+            const alpha = Math.min(1, (1 - this.z / width) * 1.8);
+            const size = (1 - this.z / width) * 3;
             ctx.strokeStyle = `rgba(255, 17, 17, ${alpha})`;
+            ctx.lineWidth = Math.max(0.5, size);
+            ctx.beginPath();
+            ctx.moveTo(px, py);
+            ctx.lineTo(sx, sy);
+            ctx.stroke();
           }
-
-          ctx.lineWidth = Math.max(0.5, size);
-          ctx.beginPath();
-          ctx.moveTo(px, py);
-          ctx.lineTo(sx, sy);
-          ctx.stroke();
         }
       }
     }
@@ -249,185 +219,168 @@
     function initStars() {
       resizeCanvas();
       stars = [];
-      for (let i = 0; i < numStars; i++) {
-        stars.push(new Star());
-      }
+      for (let i = 0; i < numStars; i++) stars.push(new Particle());
     }
 
-    function animateStars() {
+    function animateParticles() {
       ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
       ctx.fillRect(0, 0, width, height);
-
-      if (starHueShift) globalHue = (globalHue + 2) % 360;
-
-      for (let i = 0; i < stars.length; i++) {
-        stars[i].update();
-        stars[i].draw();
-      }
-
-      requestAnimationFrame(animateStars);
+      for (let s of stars) { s.update(); s.draw(); }
+      requestAnimationFrame(animateParticles);
     }
 
     window.addEventListener("resize", resizeCanvas);
     initStars();
 
-    /* --- TIMED PROGRESSION ENGINE --- */
+    /* --- ASCII FIRE ENGINE --- */
+    const fireContainer = document.getElementById("ascii-fire");
+    const fireChars = [" ", ".", ":", "^", "*", "s", "S", "#", "$", "█"];
+    function generateFire() {
+      let lines = [];
+      for (let r = 0; r < 6; r++) {
+        let line = "";
+        for (let c = 0; c < 60; c++) {
+          line += fireChars[Math.floor(Math.random() * fireChars.length)];
+        }
+        lines.push(line);
+      }
+      fireContainer.textContent = lines.join("\n");
+    }
+    setInterval(generateFire, 80);
 
-    // 10s: Starfield appears
-    setTimeout(() => {
-      canvas.classList.add("active");
-      animateStars();
-    }, 10000);
+    /* --- 30 PHASE SYSTEM (10s EACH) --- */
+    let currentPhase = 1;
+    let phaseTimer = null;
+    let activeTargetText = "DREW.WTF";
 
-    // 15s: Stage 1 Trip Begins
-    setTimeout(() => {
-      document.body.classList.add("psy-1");
-      warpSpeed = 7;
-    }, 15000);
+    function setPhase(p) {
+      currentPhase = p;
+      const el = document.getElementById("scramble-text");
+      const container = document.getElementById("main-container");
+      const devil = document.getElementById("devil-overlay");
 
-    // 20s: Stage 2 Escalation
-    setTimeout(() => {
-      document.body.classList.remove("psy-1");
-      document.body.classList.add("psy-2");
-      warpSpeed = 11;
-    }, 20000);
+      // Reset state defaults
+      document.body.className = "";
+      el.className = "title";
+      devil.className = "";
+      fireContainer.style.opacity = "0";
 
-    // 25s: Stage 3 Deep Trip (Stars go colorful)
-    setTimeout(() => {
-      document.body.classList.remove("psy-2");
-      document.body.classList.add("psy-3");
-      warpSpeed = 16;
-      starHueShift = true;
-    }, 25000);
+      switch(p) {
+        case 1: // 0-10s: Standard CRT
+          activeTargetText = "DREW.WTF";
+          canvas.classList.remove("active");
+          stopDvdBounce();
+          break;
+        case 2: // 10-20s: Starfield
+          canvas.classList.add("active");
+          renderMode = "stars";
+          warpSpeed = 5;
+          break;
+        case 3: // 20-30s: Spectrum Wave
+          warpSpeed = 8;
+          el.style.filter = "hue-rotate(180deg)";
+          break;
+        case 4: // 30-40s: DVD Bounce
+          warpSpeed = 12;
+          startDvdBounce();
+          break;
+        case 5: // 40-50s: Mushroom & Eggplant Emojis + Spinning FTW.WRED
+          renderMode = "emojis";
+          activeTargetText = "FTW.WRED";
+          el.classList.add("spin");
+          break;
+        case 6: // 50-60s: Demonic / 666 / Fire / Growing Devil
+          renderMode = "stars";
+          fireContainer.style.opacity = "1";
+          activeTargetText = "DREW.666";
+          setTimeout(() => { activeTargetText = "666.666"; }, 3000);
+          setTimeout(() => { activeTargetText = "666.666.666"; }, 6000);
+          setTimeout(() => { devil.classList.add("grow"); }, 7000);
+          break;
+        case 7: // 60s: Reset Loop Back to Normal Clean State
+        default:
+          stopDvdBounce();
+          currentPhase = 1;
+          setPhase(1);
+          return;
+      }
+    }
 
-    // 30s: Stage 4 FULL ACID MODE
-    setTimeout(() => {
-      document.body.classList.remove("psy-3");
-      document.body.classList.add("psy-4");
-      warpSpeed = 26;
-    }, 30000);
+    function nextPhase() {
+      currentPhase++;
+      setPhase(currentPhase);
+      resetPhaseInterval();
+    }
 
-    // 35s: DVD SCREENSAVER MODE
-    setTimeout(() => {
-      startDvdBounce();
-    }, 35000);
+    function resetPhaseInterval() {
+      if (phaseTimer) clearInterval(phaseTimer);
+      phaseTimer = setInterval(() => {
+        currentPhase++;
+        setPhase(currentPhase);
+      }, 10000); // 10-second spacing per phase
+    }
 
-    /* --- DVD BOUNCE ENGINE (35s+) --- */
-    let dvdX = 0;
-    let dvdY = 0;
-    let dvdVX = 4.5;
-    let dvdVY = 3.5;
-    let isDvdActive = false;
+    /* --- DVD BOUNCE ENGINE --- */
+    let dvdX = 0, dvdY = 0, dvdVX = 5, dvdVY = 4, isDvd = false;
     const container = document.getElementById("main-container");
 
     function startDvdBounce() {
-      isDvdActive = true;
+      if (isDvd) return;
+      isDvd = true;
       container.classList.add("dvd-mode");
-      
-      // Center start position before initial vector push
-      const rect = container.getBoundingClientRect();
-      dvdX = (window.innerWidth - rect.width) / 2;
-      dvdY = (window.innerHeight - rect.height) / 2;
-      
-      updateDvdBounce();
+      dvdX = (window.innerWidth - 300) / 2;
+      dvdY = (window.innerHeight - 100) / 2;
+      updateDvd();
     }
 
-    function updateDvdBounce() {
-      if (!isDvdActive) return;
+    function stopDvdBounce() {
+      isDvd = false;
+      container.classList.remove("dvd-mode");
+      container.style.left = "";
+      container.style.top = "";
+    }
 
+    function updateDvd() {
+      if (!isDvd) return;
       const rect = container.getBoundingClientRect();
       const maxX = window.innerWidth - rect.width;
       const maxY = window.innerHeight - rect.height;
 
-      dvdX += dvdVX;
-      dvdY += dvdVY;
+      dvdX += dvdVX; dvdY += dvdVY;
+      if (dvdX <= 0 || dvdX >= maxX) dvdVX = -dvdVX;
+      if (dvdY <= 0 || dvdY >= maxY) dvdVY = -dvdVY;
 
-      // Bounce horizontal walls
-      if (dvdX <= 0 || dvdX >= maxX) {
-        dvdVX = -dvdVX;
-        dvdX = Math.max(0, Math.min(dvdX, maxX));
-        triggerImpactEffect();
-      }
-
-      // Bounce vertical walls
-      if (dvdY <= 0 || dvdY >= maxY) {
-        dvdVY = -dvdVY;
-        dvdY = Math.max(0, Math.min(dvdY, maxY));
-        triggerImpactEffect();
-      }
-
-      container.style.left = `${dvdX}px`;
-      container.style.top = `${dvdY}px`;
-
-      requestAnimationFrame(updateDvdBounce);
-    }
-
-    function triggerImpactEffect() {
-      // Flash dynamic color burst on wall bounce
-      globalHue = (globalHue + 90) % 360;
-      container.style.filter = `hue-rotate(${Math.floor(Math.random() * 360)}deg) saturate(1000%)`;
+      container.style.left = `${Math.max(0, Math.min(dvdX, maxX))}px`;
+      container.style.top = `${Math.max(0, Math.min(dvdY, maxY))}px`;
+      requestAnimationFrame(updateDvd);
     }
 
     /* --- TEXT SCRAMBLE ENGINE --- */
-    const targetText = "DREW.WTF";
     const el = document.getElementById("scramble-text");
-
-    const leetMap = { 
-      'D': ['D', 'd', '|)'], 
-      'R': ['R', 'r', '12'], 
-      'E': ['3', '&', '€'], 
-      'W': ['W', 'w', '\\/\\/'], 
-      'T': ['7', '+'], 
-      'F': ['F', 'f', '|='] 
-    };
     const glitchChars = "0137_/#\\|@$%&*!?";
 
-    const presets = [
-      "DREW.WTF", "DR3W.WTF", "dr3w.wtf", "4REW.WTF",
-      "DR3W.W7F", "@REW.WTF", "DREW.W7F", "DR3W.W7F_",
-      "DRE_W.WTF", "DR3W.W7F!", "dr3w.w7f", "DR3W.WTF",
-      "DREW.W7F", "DR3W.WTF", "dr3w.WTF", "DR3W.W7F",
-      "DREW_WTF", "DR3W.WTF", "dr3w.w7f", "DR3W.WTF"
-    ];
-
-    function generateAlgorithmicGlitch() {
-      return targetText.split('').map(char => {
-        if (char === '.') return '.';
-        const rand = Math.random();
-        if (rand < 0.35 && leetMap[char]) {
-          const options = leetMap[char];
-          return options[Math.floor(Math.random() * options.length)];
-        } else if (rand < 0.55) {
-          return glitchChars[Math.floor(Math.random() * glitchChars.length)];
-        }
-        return Math.random() < 0.5 ? char.toLowerCase() : char;
-      }).join('');
-    }
-
     function runScrambleCycle() {
-      el.textContent = targetText;
-      
+      el.textContent = activeTargetText;
       setTimeout(() => {
         let frame = 0;
-        const totalFrames = 25 + Math.floor(Math.random() * 20);
-        
         const interval = setInterval(() => {
-          if (Math.random() < 0.5) {
-            el.textContent = presets[Math.floor(Math.random() * presets.length)];
-          } else {
-            el.textContent = generateAlgorithmicGlitch();
-          }
-          
+          el.textContent = activeTargetText.split('').map(c => 
+            Math.random() < 0.4 ? glitchChars[Math.floor(Math.random() * glitchChars.length)] : c
+          ).join('');
           frame++;
-          if (frame >= totalFrames) {
+          if (frame >= 20) {
             clearInterval(interval);
-            el.textContent = targetText;
+            el.textContent = activeTargetText;
             runScrambleCycle();
           }
         }, 50);
-      }, 2200);
+      }, 2000);
     }
 
+    // Init Execution
+    setPhase(1);
+    resetPhaseInterval();
+    animateParticles();
     runScrambleCycle();
   </script>
 </body>
