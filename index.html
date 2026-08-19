@@ -8,7 +8,6 @@
     :root {
       --crt-red: #ff1111;
       --crt-dim: #660000;
-      --crt-bg: #0a0202;
     }
 
     * {
@@ -29,7 +28,7 @@
       position: relative;
     }
 
-    /* Starfield Canvas Background */
+    /* Starfield Canvas (Hidden until 10s) */
     #starfield {
       position: fixed;
       top: 0;
@@ -38,6 +37,12 @@
       height: 100vh;
       z-index: 1;
       display: block;
+      opacity: 0;
+      transition: opacity 4s ease-in-out;
+    }
+
+    #starfield.active {
+      opacity: 1;
     }
 
     /* Screen Curvature & Vignette */
@@ -69,7 +74,7 @@
       padding: 20px;
     }
 
-    /* Penitent Tangent Red Phosphor Glow & Flicker */
+    /* Penitent Tangent Red Phosphor Glow */
     .title {
       font-size: clamp(2.5rem, 8vw, 6rem);
       font-weight: bold;
@@ -79,12 +84,57 @@
       min-height: 1.2em;
       user-select: none;
       white-space: nowrap;
+      transition: transform 3s ease, letter-spacing 3s ease, text-shadow 3s ease;
     }
 
     @keyframes flicker {
       0% { opacity: 0.95; }
       50% { opacity: 1; }
       100% { opacity: 0.97; }
+    }
+
+    /* --- PSYCHEDELIC TRIP PHASE (Triggers at 15 seconds) --- */
+    body.psychedelic .title {
+      animation: 
+        flicker 0.12s infinite, 
+        melt 7s ease-in-out infinite alternate, 
+        spectrum 14s linear infinite;
+    }
+
+    @keyframes spectrum {
+      0%   { filter: hue-rotate(0deg) drop-shadow(0 0 20px #ff0000); }
+      25%  { filter: hue-rotate(90deg) drop-shadow(0 0 30px #00ffff); }
+      50%  { filter: hue-rotate(180deg) drop-shadow(0 0 45px #ff00ff); }
+      75%  { filter: hue-rotate(270deg) drop-shadow(0 0 30px #ffff00); }
+      100% { filter: hue-rotate(360deg) drop-shadow(0 0 20px #ff0000); }
+    }
+
+    @keyframes melt {
+      0% {
+        transform: scale(1) rotate(0deg) skewX(0deg);
+        letter-spacing: 0.18em;
+        text-shadow: -4px -2px 15px #ff0000, 4px 2px 15px #00ffff, 0 0 30px #ff00ff;
+      }
+      25% {
+        transform: scale(1.12, 0.92) rotate(-2deg) skewX(4deg);
+        letter-spacing: 0.3em;
+        text-shadow: 8px -4px 25px #ff00ff, -8px 4px 25px #00ff66, 0 0 50px #ffff00;
+      }
+      50% {
+        transform: scale(0.92, 1.15) rotate(2.5deg) skewY(-3deg);
+        letter-spacing: 0.1em;
+        text-shadow: -10px 6px 30px #00ffff, 10px -4px 30px #ff0055, 0 0 70px #9900ff;
+      }
+      75% {
+        transform: scale(1.08, 1.02) rotate(-1.5deg) skewX(-4deg);
+        letter-spacing: 0.35em;
+        text-shadow: 6px 6px 20px #ffff00, -6px -6px 20px #00ffff, 0 0 50px #ff0000;
+      }
+      100% {
+        transform: scale(0.98, 1.08) rotate(1deg) skewY(2deg);
+        letter-spacing: 0.15em;
+        text-shadow: -6px -4px 25px #ff00ff, 6px 4px 25px #00ffaa, 0 0 60px #ff00aa;
+      }
     }
   </style>
 </head>
@@ -103,8 +153,9 @@
     const ctx = canvas.getContext("2d");
 
     let stars = [];
-    const numStars = 1000; // Increased star density
+    const numStars = 1000;
     let width, height, cx, cy;
+    let warpSpeed = 5;
 
     function resizeCanvas() {
       width = window.innerWidth;
@@ -129,7 +180,7 @@
 
       update() {
         this.pz = this.z;
-        this.z -= 5; // Faster warp travel
+        this.z -= warpSpeed;
 
         if (this.z <= 0) {
           this.reset(false);
@@ -147,7 +198,7 @@
           const alpha = Math.min(1, (1 - this.z / width) * 1.8);
           const size = (1 - this.z / width) * 2.8;
 
-          ctx.strokeStyle = `rgba(255, 17, 17, ${alpha})`; // Penitent Tangent Red
+          ctx.strokeStyle = `rgba(255, 17, 17, ${alpha})`;
           ctx.lineWidth = Math.max(0.5, size);
           ctx.beginPath();
           ctx.moveTo(px, py);
@@ -177,12 +228,22 @@
       requestAnimationFrame(animateStars);
     }
 
-    window.addEventListener("resize", () => {
-      resizeCanvas();
-    });
-
+    window.addEventListener("resize", resizeCanvas);
     initStars();
-    animateStars();
+
+    /* --- TIMED TRIGGERS --- */
+
+    // 1. Start Starfield after 10 seconds
+    setTimeout(() => {
+      canvas.classList.add("active");
+      animateStars();
+    }, 10000);
+
+    // 2. Start Psychedelic Morphing after 15 seconds
+    setTimeout(() => {
+      document.body.classList.add("psychedelic");
+      warpSpeed = 8; // Accelerate starwarp for trip intensity
+    }, 15000);
 
     /* --- TEXT SCRAMBLE ENGINE --- */
     const targetText = "DREW.WTF";
