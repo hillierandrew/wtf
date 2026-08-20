@@ -1,10 +1,3 @@
-You are completely right, and I apologize—the audio toggle function was accidentally dropped in the last snippet, which broke the script flow and stopped both the music and animations from executing.
-
-Here is the fully restored, complete, and verified standalone HTML file. Every function (including `toggleAudio`, the 8-bit Magdalena Bay synth engine, and all canvas renderers) is fully intact.
-
-Save this exact code into your `index.html` file, open it in your browser, and **click the speaker button (`🔇`) in the top left** to start the music:
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -162,7 +155,7 @@ Save this exact code into your `index.html` file, open it in your browser, and *
   <div class="top-bar-ui">
     <div class="top-group">
       <button id="audio-toggle" class="top-btn" onclick="toggleAudio(event)">🔇</button>
-      <div id="phase-badge-top" class="phase-badge-top" onclick="nextPhase(event)">001: OUTRUN 198X</div>
+      <div id="phase-badge-top" class="phase-badge-top" onclick="nextPhase(event)">001: RDS INTRO EM7</div>
     </div>
     <div class="top-group">
       <div id="visitor-box" class="visitor-counter">V:00666</div>
@@ -205,7 +198,7 @@ Save this exact code into your `index.html` file, open it in your browser, and *
       }
     });
 
-    /* --- 8-BIT MAGDALENA BAY SYNTH-POP AUDIO ENGINE --- */
+    /* --- MAGDALENA BAY "RDS" SYNTH-POP AUDIO ENGINE --- */
     let audioCtx = null;
     let masterGain = null;
     let isPlaying = false;
@@ -213,17 +206,16 @@ Save this exact code into your `index.html` file, open it in your browser, and *
     let timerID = null;
     let currentStep = 0;
 
-    const mbFreqs = {
-      'C3': 130.81, 'Eb3': 155.56, 'G3': 196.00, 'Bb3': 233.08,
-      'C4': 261.63, 'D4': 293.66, 'Eb4': 311.13, 'F4': 349.23,
-      'G4': 392.00, 'Ab4': 415.30, 'Bb4': 466.16, 'C5': 523.25,
-      'Eb5': 622.25, 'F5': 698.46, 'G5': 783.99, 'Bb5': 932.33, 'C6': 1046.50
+    // Frequencies for RDS Chord Set (Em7, Dm7, Fm7, Gm7, Am7, Cm, Gm, Fm)
+    const rdsFreqs = {
+      'Em7': 164.81, 'Dm7': 146.83, 'Fm7': 174.61, 'Gm7': 196.00,
+      'Am7': 220.00, 'Cm': 261.63, 'Gm': 196.00, 'Fm': 174.61,
+      'C5': 523.25, 'Eb5': 622.25, 'G5': 783.99, 'Bb5': 932.33
     };
 
-    const mbLead = ['C5', 'Eb5', 'G5', 'Bb5', 'C6', 'Bb5', 'G5', 'Eb5', 'F5', 'Ab5', 'C6', 'Ab5', 'G5', 'Eb5', 'D4', 'C4'];
-    const mbBass = ['C3', 'C3', 'Eb3', 'Eb3', 'G3', 'G3', 'Bb3', 'Bb3'];
+    const rdsProgression = ['Em7', 'Dm7', 'Fm7', 'Fm7', 'Dm7', 'Em7', 'Fm7', 'Gm7', 'Am7', 'Cm', 'Gm', 'Fm', 'Gm', 'Fm'];
 
-    function play8BitSynth(freq, type, startTime, duration, vol) {
+    function playRdsSynth(freq, type, startTime, duration, vol) {
       if (!freq || !audioCtx || !masterGain) return;
       try {
         const osc = audioCtx.createOscillator();
@@ -237,41 +229,24 @@ Save this exact code into your `index.html` file, open it in your browser, and *
       } catch (e) {}
     }
 
-    function play8BitNoise(startTime) {
-       try {
-        const bufferSize = audioCtx.sampleRate * 0.08;
-        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-        const data = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
-        const noise = audioCtx.createBufferSource();
-        noise.buffer = buffer;
-        const gain = audioCtx.createGain();
-        gain.gain.setValueAtTime(0.08, startTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.08);
-        noise.connect(gain); gain.connect(masterGain);
-        noise.start(startTime);
-       } catch(e){}
-    }
-
-    function scheduleMagdalenaBay8Bit() {
+    function scheduleRdsMusic() {
       if (!isPlaying || !audioCtx || audioCtx.state !== 'running') return;
       const scheduleAheadTime = 0.2;
-      const noteTime = (60.0 / 130) / 4; 
+      const noteTime = (60.0 / 120) / 2; 
 
       while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
-        let step = currentStep % 16;
-        const leadNote = mbLead[step];
-        if (mbFreqs[leadNote]) play8BitSynth(mbFreqs[leadNote], 'square', nextNoteTime, noteTime * 1.1, 0.06);
-        if (step % 2 === 0) {
-          const bassNote = mbBass[Math.floor(step / 2) % mbBass.length];
-          if (mbFreqs[bassNote]) play8BitSynth(mbFreqs[bassNote], 'sawtooth', nextNoteTime, noteTime * 1.4, 0.2);
+        let chordName = rdsProgression[Math.floor(currentStep / 2) % rdsProgression.length];
+        let baseFreq = rdsFreqs[chordName] || 164.81;
+
+        playRdsSynth(baseFreq, 'sawtooth', nextNoteTime, noteTime * 1.5, 0.15);
+        if (currentStep % 4 === 0) {
+          playRdsSynth(baseFreq * 2, 'square', nextNoteTime, noteTime, 0.08);
         }
-        if (step === 4 || step === 12 || step % 4 === 2) play8BitNoise(nextNoteTime);
 
         nextNoteTime += noteTime;
         currentStep++;
       }
-      timerID = setTimeout(scheduleMagdalenaBay8Bit, 100);
+      timerID = setTimeout(scheduleRdsMusic, 100);
     }
 
     function toggleAudio(e) {
@@ -290,7 +265,7 @@ Save this exact code into your `index.html` file, open it in your browser, and *
           currentStep = 0; 
           isPlaying = true;
           btn.textContent = '🔊'; 
-          scheduleMagdalenaBay8Bit();
+          scheduleRdsMusic();
         });
       } else {
         isPlaying = false;
@@ -299,7 +274,7 @@ Save this exact code into your `index.html` file, open it in your browser, and *
       }
     }
 
-    /* --- CANVAS ANIMATION ENGINE WITH UNIQUE RENDERERS --- */
+    /* --- CANVAS ANIMATION ENGINE --- */
     const canvas = document.getElementById("bg-canvas");
     const ctx = canvas.getContext("2d");
     let width, height, cx, cy;
@@ -341,46 +316,6 @@ Save this exact code into your `index.html` file, open it in your browser, and *
         ctx.strokeRect(cx - 100, cy - 100, 200, 200);
         ctx.fillStyle = "#ff6600"; ctx.font = "bold 80px sans-serif";
         ctx.fillText("λ", cx - 30, cy + 30);
-      },
-      () => {
-        ctx.fillStyle = "rgba(20,0,30,0.3)"; ctx.fillRect(0,0,width,height);
-        ctx.font = "40px serif";
-        for(let i=0; i<8; i++) {
-           let x = (cx + Math.sin(globalAngle*2 + i)*250) % width;
-           let y = (cy + Math.cos(globalAngle*1.5 + i)*150) % height;
-           ctx.fillText(i%2===0 ? "💎" : "🪙", Math.abs(x), Math.abs(y));
-        }
-      },
-      () => {
-        ctx.fillStyle = "#e6f2ff"; ctx.fillRect(0,0,width,height);
-        ctx.strokeStyle = "#ff0000"; ctx.lineWidth = 6;
-        ctx.beginPath(); ctx.arc(cx, cy, 120, 0, Math.PI*2); ctx.stroke();
-        ctx.fillStyle = "#ff0000"; ctx.font = "50px serif"; ctx.fillText("🪽", cx - 25, cy + 15);
-      },
-      () => {
-        ctx.fillStyle = "rgba(30,0,0,0.3)"; ctx.fillRect(0,0,width,height);
-        ctx.font = "30px serif";
-        for(let i=0; i<15; i++) {
-           let x = (i * 80 + globalAngle*50) % width;
-           let y = (globalAngle*120 + i*60) % height;
-           ctx.fillText("🍁", x, y);
-        }
-      },
-      () => {
-        ctx.fillStyle = "rgba(0,0,10,0.3)"; ctx.fillRect(0,0,width,height);
-        ctx.fillStyle = "#555555"; ctx.fillRect(cx - 10, cy - 150, 20, 300);
-        ctx.fillStyle = "#ff0000"; ctx.fillRect(cx - 30, cy - 80, 60, 20);
-        ctx.beginPath(); ctx.arc(cx, cy - 150, 8, 0, Math.PI*2); ctx.fill();
-      },
-      () => {
-        ctx.fillStyle = "rgba(10,10,10,0.3)"; ctx.fillRect(0,0,width,height);
-        ctx.fillStyle = "#00ffcc"; ctx.font = "36px monospace";
-        const unown = ["👁️", "🔣", "🈲", "🈹", "🈺", "🌀"];
-        for(let i=0; i<10; i++) {
-           let x = (Math.sin(i*55 + globalAngle)*width*0.4) + cx;
-           let y = (Math.cos(i*33 + globalAngle)*height*0.4) + cy;
-           ctx.fillText(unown[i%unown.length], x, y);
-        }
       }
     ];
 
@@ -391,8 +326,8 @@ Save this exact code into your `index.html` file, open it in your browser, and *
       requestAnimationFrame(animateCanvas);
     }
 
-    /* --- 175 PHASES GENERATION --- */
-    const phaseNamesRaw = "OUTRUN 198X,SKYNET NEURAL NET,420 BLAZE IT,TYPEWRITER TERMINAL,PALLET TOWN (PKMN),DIGI-WORLD (DIGIMON),MOON PRISM (SAILOR),MEDABOTS ROBO-BATTLE,TRUE NORTH CANADA,THE 6IX (TORONTO),STAR OF DAVID,PHONK DRIFT ZONE,CASINO JACKPOT,SNAKE AUTOMATA,HOCKEY RINK,RABBIT HOLE,FRACTAL SHROOMS,TIME DILATION,CHECKERBOARD WARP,ACID RAIN,LSD PLASMA,DEMONIC REALM,ANGELIC LIGHTS,HYPERSPACE WARP,GEOCITIES 2000,PONG PROTOCOL,FIREWORKS DISPLAY,OFFLINE DINO,TRON GRID,HACKER TERMINAL,MARTHA STEWART BAKE,WINDOWS 98,MAC OS 9,MS-DOS PROMPT,COMMODORE 64,AMIGA GURU MEDITATION,DIAL-UP MODEM,FLOPPY DISK DRIVE,VHS TRACKING,CRT SCANLINES,DVD SCREENSAVER,WINAMP VISUALIZER,LIMEWIRE DOWNLOAD,MYSPACE LAYOUT,MSN MESSENGER,ICQ CHAT,NETSCAPE NAVIGATOR,AOL YOU'VE GOT MAIL,BLOCKBUSTER VIDEO,MTV IDENTS,SEGA GENESIS,SUPER NINTENDO,ARCAGE CARPET,LASER TAG MAZE,ROLLER RINK,BOWLING ALLEY STRIKE,MALLSOFT MUZAK,FRUTIGER AERO,Y2K BUG,MATRIX CONSTRUCT,EVENT HORIZON,QUANTUM REALM,SCHRODINGER'S CAT,STRING THEORY,DARK MATTER,NEBULA CLOUD,SUPERNOVA BURST,PULSAR BEACON,QUASAR JET,INTERSTELLAR TESSERACT,SUNSPOT FLARE,LUNAR ROVER,MARS ROVER,VOYAGER GOLDEN RECORD,CERN COLLIDER,VAPORWAVE PLAZA,EGYPTIAN TOMB,DEEP WEB,ALICE'S TEA PARTY,CHESHIRE GRIN,ZION MAINFRAME,ATLANTIS RUINS,VALHALLA GATES,TARTARUS ABYSS,AREA 51,CROP CIRCLES,SILENT HILL FOG,RAPTURE UNDERWATER,BLOOD MOON,SOLAR ECLIPSE,NEON TOKYO,SHIBUYA CROSSING,GHOST IN THE SHELL,AKIRA BIKE GANG,COWBOY BEBOP,EVANGELION LCL,GUNDAM HANGAR,TAMAGOTCHI PET,GAMEBOY CAMERA,N64 POLYGONS,PS1 MEMORY CARD,DREAMCAST SPIRAL,RED RING OF DEATH,WII MENU,MINECRAFT CAVES,DOOM E1M1 HELLSCAPE,HALO INSTALLATION 04,FALLOUT VAULT,SKYRIM BLIZZARD,DARK SOULS BONFIRE,TETRIS BLOCKS,PAC-MAN MAZE,SPACE INVADERS,GALAGA STARS,ASTEROIDS,DONKEY KONG BARRELS,STREET FIGHTER,MORTAL KOMBAT,SONIC RINGS,SUPER MARIO WORLD,ZELDA TRIFORCE,METROID LAVA,CASTLEVANIA GOTHIC,MEGAMAN PLASMA,CHRONO TRIGGER,FINAL FANTASY,KINGDOM HEARTS,PERSONA RED,SILENT HILL RUST,RESIDENT EVIL,METAL GEAR RADAR,TOMB RAIDER,CRASH BANDICOOT,SPYRO GEMS,TONY HAWK COMBO,GTA WASTED,MINESWEEPER,SOLITAIRE CASCADE,PINBALL BUMPER,JUNGLE CANOPY,ICE AGE TUNDRA,FLAPPY BIRD PIPES,ANGRY BIRD SLINGSHOT,ANIMAL CROSSING VILLAGE,OVERWATCH NEPAL,DIABLO TRISTRAM,ARCH LINUX PACMAN,DEATH METAL MOSH,SAHARA PHONK,MEGA LUCARIO AURA,TIMMIES DOUBLE-DOUBLE,TACTICAL NIGHT VISION,THE VOID,CANADA COMPUTERS RUN,SMILING FRIENDS GLITCH,SNORLAX ROADBLOCK,LAKE SHORE MIDNIGHT,SHEEPSKIN AUDIOPHILE,STRAWBERRY MUSIC PLAYER,FORTNITE TACTICAL DROP,POKEMON TCG HOLO,DUKE NUKEM RADIO,ETOBICOKE TRANSIT,GIGABYTE AORUS BOOT,SEPULTURA ROOTS,UBIQUITOUS SYNERGY,MAGDALENA BAY SYNTH,NTFS DISK RECOVERY,MISSISSAUGA MAYORAL,G2 ROAD TEST,TACTICAL BACK BLING";
+    /* --- RDS PHASES INTEGRATION --- */
+    const phaseNamesRaw = "RDS INTRO EM7,RDS INTRO DM7,RDS INTRO FM7,RDS VERSE COMMON SENSE,RDS CHORUS 22 MORE MINUTES,RDS BRAND NEW IMAGE,RDS 21 MORE MINUTES,RDS TWO-WAY MIRROR,RDS ONLY ONE MORE MINUTE,OUTRUN 198X,SKYNET NEURAL NET,420 BLAZE IT,TYPEWRITER TERMINAL,PALLET TOWN (PKMN),DIGI-WORLD (DIGIMON),MOON PRISM (SAILOR),MEDABOTS ROBO-BATTLE,TRUE NORTH CANADA,THE 6IX (TORONTO),STAR OF DAVID,PHONK DRIFT ZONE,CASINO JACKPOT,SNAKE AUTOMATA,HOCKEY RINK,RABBIT HOLE,FRACTAL SHROOMS,TIME DILATION,CHECKERBOARD WARP,ACID RAIN,LSD PLASMA,DEMONIC REALM,ANGELIC LIGHTS,HYPERSPACE WARP,GEOCITIES 2000,PONG PROTOCOL,FIREWORKS DISPLAY,OFFLINE DINO,TRON GRID,HACKER TERMINAL,MARTHA STEWART BAKE,WINDOWS 98,MAC OS 9,MS-DOS PROMPT,COMMODORE 64,AMIGA GURU MEDITATION,DIAL-UP MODEM,FLOPPY DISK DRIVE,VHS TRACKING,CRT SCANLINES,DVD SCREENSAVER,WINAMP VISUALIZER,LIMEWIRE DOWNLOAD,MYSPACE LAYOUT,MSN MESSENGER,ICQ CHAT,NETSCAPE NAVIGATOR,AOL YOU'VE GOT MAIL,BLOCKBUSTER VIDEO,MTV IDENTS,SEGA GENESIS,SUPER NINTENDO,ARCAGE CARPET,LASER TAG MAZE,ROLLER RINK,BOWLING ALLEY STRIKE,MALLSOFT MUZAK,FRUTIGER AERO,Y2K BUG,MATRIX CONSTRUCT,EVENT HORIZON,QUANTUM REALM,SCHRODINGER'S CAT,STRING THEORY,DARK MATTER,NEBULA CLOUD,SUPERNOVA BURST,PULSAR BEACON,QUASAR JET,INTERSTELLAR TESSERACT,SUNSPOT FLARE,LUNAR ROVER,MARS ROVER,VOYAGER GOLDEN RECORD,CERN COLLIDER,VAPORWAVE PLAZA,EGYPTIAN TOMB,DEEP WEB,ALICE'S TEA PARTY,CHESHIRE GRIN,ZION MAINFRAME,ATLANTIS RUINS,VALHALLA GATES,TARTARUS ABYSS,AREA 51,CROP CIRCLES,SILENT HILL FOG,RAPTURE UNDERWATER,BLOOD MOON,SOLAR ECLIPSE,NEON TOKYO,SHIBUYA CROSSING,GHOST IN THE SHELL,AKIRA BIKE GANG,COWBOY BEBOP,EVANGELION LCL,GUNDAM HANGAR,TAMAGOTCHI PET,GAMEBOY CAMERA,N64 POLYGONS,PS1 MEMORY CARD,DREAMCAST SPIRAL,RED RING OF DEATH,WII MENU,MINECRAFT CAVES,DOOM E1M1 HELLSCAPE,HALO INSTALLATION 04,FALLOUT VAULT,SKYRIM BLIZZARD,DARK SOULS BONFIRE,TETRIS BLOCKS,PAC-MAN MAZE,SPACE INVADERS,GALAGA STARS,ASTEROIDS,DONKEY KONG BARRELS,STREET FIGHTER,MORTAL KOMBAT,SONIC RINGS,SUPER MARIO WORLD,ZELDA TRIFORCE,METROID LAVA,CASTLEVANIA GOTHIC,MEGAMAN PLASMA,CHRONO TRIGGER,FINAL FANTASY,KINGDOM HEARTS,PERSONA RED,SILENT HILL RUST,RESIDENT EVIL,METAL GEAR RADAR,TOMB RAIDER,CRASH BANDICOOT,SPYRO GEMS,TONY HAWK COMBO,GTA WASTED,MINESWEEPER,SOLITAIRE CASCADE,PINBALL BUMPER,JUNGLE CANOPY,ICE AGE TUNDRA,FLAPPY BIRD PIPES,ANGRY BIRD SLINGSHOT,ANIMAL CROSSING VILLAGE,OVERWATCH NEPAL,DIABLO TRISTRAM,ARCH LINUX PACMAN,DEATH METAL MOSH,SAHARA PHONK,MEGA LUCARIO AURA,TIMMIES DOUBLE-DOUBLE,TACTICAL NIGHT VISION,THE VOID,CANADA COMPUTERS RUN,SMILING FRIENDS GLITCH,SNORLAX ROADBLOCK,LAKE SHORE MIDNIGHT,SHEEPSKIN AUDIOPHILE,STRAWBERRY MUSIC PLAYER,FORTNITE TACTICAL DROP,POKEMON TCG HOLO,DUKE NUKEM RADIO,ETOBICOKE TRANSIT,GIGABYTE AORUS BOOT,SEPULTURA ROOTS,UBIQUITOUS SYNERGY,MAGDALENA BAY SYNTH,NTFS DISK RECOVERY,MISSISSAUGA MAYORAL,G2 ROAD TEST,TACTICAL BACK BLING";
     const phaseNames = phaseNamesRaw.split(',');
     const phaseColors = ["#000000", "#1a0f00", "#0a0015", "#000a10", "#001005", "#1877f2", "#ffff00", "#00ffcc", "#ff007f", "#150022", "#330000", "#003300", "#000033", "#222222", "#440022"];
     
@@ -448,5 +383,3 @@ Save this exact code into your `index.html` file, open it in your browser, and *
   </script>
 </body>
 </html>
-
-```
