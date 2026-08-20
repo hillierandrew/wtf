@@ -1,15 +1,3 @@
-Here is the fully upgraded, highly-lucid code.
-
-### What's New:
-
-1. **Alice in Wonderland & Lucid Trip Backgrounds:** Introduced new wildly scaling renderers (`MAD HATTER TEACUPS`, `RABBIT HOLE`, `TIME DILATION`, `FRACTAL SHROOMS`, `CHECKERBOARD WARP`) that dynamically pulse from tiny specks to massive, screen-filling elements.
-2. **True Transparency Text (No Covering):** Applied an `exclusion` mix-blend mode to the `DREW.WTF` text. This means the text acts like a dynamic color filter—the animations completely pass *through* the text, never being blocked or covered by it.
-3. **Top/Bottom Navigation:** Tapping/clicking anywhere on the top half of the screen goes back a phase. Tapping the bottom half goes forward. (UI buttons are excluded so they still work normally).
-4. **Layout Updates:** The `[ CONTACT ]` button is significantly larger and bolder. The `MUTE` button has been moved to its own dedicated spot in the top-left corner.
-
-Copy and paste the entirety of this code into your file:
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,319 +18,142 @@ Copy and paste the entirety of this code into your file:
       --ui-border: #ff1111;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
     html, body {
-      width: 100%;
-      height: 100%;
-      height: 100dvh;
-      min-height: -webkit-fill-available;
-      background-color: #000000;
-      color: var(--crt-red);
-      font-family: 'Courier New', Courier, monospace;
-      overflow: hidden;
-      position: relative;
-      touch-action: manipulation;
+      width: 100%; height: 100%; height: 100dvh; min-height: -webkit-fill-available;
+      background-color: #000000; color: var(--crt-red);
+      font-family: 'Courier New', Courier, monospace; overflow: hidden;
+      position: relative; touch-action: manipulation;
     }
 
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-    }
+    body { display: flex; justify-content: center; align-items: center; flex-direction: column; }
 
     #bg-canvas {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      height: 100dvh;
-      z-index: 1;
-      display: block;
-      opacity: 1;
-      pointer-events: none;
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh;
+      z-index: 1; display: block; opacity: 1; pointer-events: none;
     }
 
     body::before {
-      content: " ";
-      display: block;
-      position: fixed;
-      top: 0; left: 0; bottom: 0; right: 0;
+      content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
       background: radial-gradient(circle at center, transparent 20%, rgba(0, 0, 0, 0.95) 100%);
-      pointer-events: none !important;
-      z-index: 10;
+      pointer-events: none !important; z-index: 10;
     }
 
     body::after {
-      content: " ";
-      display: block;
-      position: fixed;
-      top: 0; left: 0; bottom: 0; right: 0;
+      content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
       background: linear-gradient(rgba(20, 0, 0, 0) 50%, rgba(0, 0, 0, 0.5) 50%);
-      background-size: 100% 4px;
-      pointer-events: none !important;
-      z-index: 11;
+      background-size: 100% 4px; pointer-events: none !important; z-index: 11;
     }
 
     .container {
-      text-align: center;
-      z-index: 50;
-      padding: 10px;
-      max-width: 96vw;
-      user-select: none;
-      -webkit-user-select: none;
-      position: relative;
-      pointer-events: none;
+      text-align: center; z-index: 50; padding: 10px; max-width: 96vw;
+      user-select: none; -webkit-user-select: none; position: relative; pointer-events: none;
     }
 
-    /* TRI-BLEND TEXT - Animations pass entirely THROUGH this */
     .title {
-      font-size: clamp(1.8rem, 8vw, 5.5rem);
-      font-weight: bold;
-      letter-spacing: 0.1em;
-      color: #ffaaaa;
-      mix-blend-mode: exclusion;
+      font-size: clamp(1.8rem, 8vw, 5.5rem); font-weight: bold; letter-spacing: 0.1em;
+      color: #ffaaaa; mix-blend-mode: exclusion;
       text-shadow: 0 0 20px #ff0000, 0 0 40px #ff0000;
-      animation: flicker 0.15s infinite;
-      min-height: 1.2em;
-      display: inline-block;
-      white-space: nowrap;
-      transition: filter 0.3s ease, color 0.3s ease, font-family 0.2s ease;
+      animation: flicker 0.15s infinite; min-height: 1.2em; display: inline-block;
+      white-space: nowrap; transition: filter 0.3s ease, color 0.3s ease, font-family 0.2s ease;
     }
 
-    .clickable-word {
-      cursor: pointer;
-      display: inline-block;
-      pointer-events: auto;
-      padding: 0 6px;
-      position: relative;
-    }
+    .clickable-word { cursor: pointer; display: inline-block; pointer-events: auto; padding: 0 6px; position: relative; }
+    .clickable-word:active { transform: scale(0.85); filter: brightness(2); }
 
-    .clickable-word:active {
-      transform: scale(0.85);
-      filter: brightness(2);
-    }
+    @keyframes flicker { 0% { opacity: 0.92; } 50% { opacity: 1; } 100% { opacity: 0.96; } }
 
-    @keyframes flicker {
-      0% { opacity: 0.92; }
-      50% { opacity: 1; }
-      100% { opacity: 0.96; }
-    }
-
-    /* Top Left UI Controls */
     .top-left-ui {
-      position: fixed;
-      top: max(16px, env(safe-area-inset-top, 16px));
-      left: max(16px, env(safe-area-inset-left, 16px));
-      z-index: 999999;
-      display: flex;
-      gap: 8px;
-      user-select: none;
-      pointer-events: auto;
+      position: fixed; top: max(16px, env(safe-area-inset-top, 16px)); left: max(16px, env(safe-area-inset-left, 16px));
+      z-index: 999999; display: flex; gap: 8px; user-select: none; pointer-events: auto;
     }
 
-    /* Top Right Controls Overlay */
     .top-right-ui {
-      position: fixed;
-      top: max(16px, env(safe-area-inset-top, 16px));
-      right: max(16px, env(safe-area-inset-right, 16px));
-      z-index: 999999;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 8px;
-      user-select: none;
-      pointer-events: auto;
+      position: fixed; top: max(16px, env(safe-area-inset-top, 16px)); right: max(16px, env(safe-area-inset-right, 16px));
+      z-index: 999999; display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
+      user-select: none; pointer-events: auto;
     }
 
-    .top-row-controls {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
+    .top-row-controls { display: flex; gap: 8px; align-items: center; }
 
     .phase-badge-top {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 11px;
-      color: var(--ui-accent);
-      background: var(--ui-bg);
-      border: 2px solid var(--ui-border);
-      padding: 8px 12px;
-      border-radius: 8px;
-      box-shadow: 0 0 12px var(--ui-accent);
-      letter-spacing: 0.05em;
-      text-align: right;
-      cursor: pointer;
+      font-family: 'Press Start 2P', monospace; font-size: 11px; color: var(--ui-accent);
+      background: var(--ui-bg); border: 2px solid var(--ui-border); padding: 8px 12px;
+      border-radius: 8px; box-shadow: 0 0 12px var(--ui-accent); letter-spacing: 0.05em;
+      text-align: right; cursor: pointer;
     }
 
     .top-btn {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 10px;
-      color: #fff;
-      background: var(--ui-bg);
-      border: 2px solid var(--ui-border);
-      padding: 8px 12px;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 0 10px var(--ui-accent);
+      font-family: 'Press Start 2P', monospace; font-size: 10px; color: #fff;
+      background: var(--ui-bg); border: 2px solid var(--ui-border); padding: 8px 12px;
+      border-radius: 8px; cursor: pointer; box-shadow: 0 0 10px var(--ui-accent);
     }
 
-    .top-btn:active, .phase-badge-top:active {
-      transform: scale(0.92);
-      background: rgba(255, 255, 255, 0.25);
-    }
+    .top-btn:active, .phase-badge-top:active { transform: scale(0.92); background: rgba(255, 255, 255, 0.25); }
 
     .visitor-counter {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 9px;
-      color: var(--ui-accent);
-      background: var(--ui-bg);
-      border: 1px solid var(--ui-border);
-      padding: 5px 9px;
-      border-radius: 6px;
-      letter-spacing: 0.05em;
-      pointer-events: none;
+      font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--ui-accent);
+      background: var(--ui-bg); border: 1px solid var(--ui-border); padding: 5px 9px;
+      border-radius: 6px; letter-spacing: 0.05em; pointer-events: none;
     }
 
-    /* Massive Contact Button Container */
     .bottom-ui-container {
-      position: fixed;
-      bottom: max(50px, env(safe-area-inset-bottom, 50px));
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 999999;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 12px;
-      pointer-events: auto;
-      width: clamp(320px, 92vw, 600px);
+      position: fixed; bottom: max(50px, env(safe-area-inset-bottom, 50px)); left: 50%; transform: translateX(-50%);
+      z-index: 999999; display: flex; flex-direction: column; justify-content: center; align-items: center;
+      gap: 12px; pointer-events: auto; width: clamp(320px, 92vw, 600px);
     }
 
     .contact-btn {
-      width: 100%;
-      box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-      font-size: 22px;
-      font-weight: 900;
-      color: #ffffff !important;
-      -webkit-text-fill-color: #ffffff !important;
-      letter-spacing: 0.1em;
-      user-select: none;
-      -webkit-user-select: none;
-      padding: 24px 20px;
-      border-radius: 50px;
-      background-color: rgba(18, 18, 18, 0.95);
-      border: 3px solid rgba(255, 255, 255, 0.9);
-      -webkit-backdrop-filter: blur(12px);
-      backdrop-filter: blur(12px);
+      width: 100%; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      font-size: 22px; font-weight: 900; color: #ffffff !important; -webkit-text-fill-color: #ffffff !important;
+      letter-spacing: 0.1em; user-select: none; -webkit-user-select: none; padding: 24px 20px;
+      border-radius: 50px; background-color: rgba(18, 18, 18, 0.95); border: 3px solid rgba(255, 255, 255, 0.9);
+      -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9), 0 0 25px var(--ui-accent);
-      text-align: center;
-      white-space: nowrap;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      text-transform: uppercase;
-      transition: background-color 0.15s ease, transform 0.1s ease;
+      text-align: center; white-space: nowrap; display: flex; justify-content: center; align-items: center;
+      cursor: pointer; text-transform: uppercase; transition: background-color 0.15s ease, transform 0.1s ease;
     }
 
-    .contact-btn:active {
-      transform: scale(0.92);
-      background-color: rgba(255, 255, 255, 0.35);
-    }
+    .contact-btn:active { transform: scale(0.92); background-color: rgba(255, 255, 255, 0.35); }
 
     .phase-bottom-banner {
-      position: fixed;
-      bottom: max(140px, env(safe-area-inset-bottom, 140px));
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 99999;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 10px;
-      letter-spacing: 0.15em;
-      color: rgba(255, 255, 255, 0.95);
-      background: rgba(0, 0, 0, 0.85);
-      border: 2px solid rgba(255, 255, 255, 0.5);
-      padding: 10px 20px;
-      border-radius: 24px;
-      cursor: pointer;
-      user-select: none;
-      text-transform: uppercase;
-      pointer-events: auto;
+      position: fixed; bottom: max(140px, env(safe-area-inset-bottom, 140px)); left: 50%; transform: translateX(-50%);
+      z-index: 99999; font-family: 'Press Start 2P', monospace; font-size: 10px; letter-spacing: 0.15em;
+      color: rgba(255, 255, 255, 0.95); background: rgba(0, 0, 0, 0.85); border: 2px solid rgba(255, 255, 255, 0.5);
+      padding: 10px 20px; border-radius: 24px; cursor: pointer; user-select: none; text-transform: uppercase;
+      pointer-events: auto; white-space: nowrap; text-align: center;
     }
 
-    .phase-bottom-banner:active {
-      transform: translateX(-50%) scale(0.94);
-      background: rgba(255, 255, 255, 0.3);
-    }
+    .phase-bottom-banner:active { transform: translateX(-50%) scale(0.94); background: rgba(255, 255, 255, 0.3); }
 
     .watermark-footer {
-      position: fixed;
-      bottom: 12px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 999999;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.5);
-      letter-spacing: 0.05em;
-      pointer-events: none;
-      user-select: none;
-      white-space: nowrap;
+      position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); z-index: 999999;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; font-size: 11px;
+      color: rgba(255, 255, 255, 0.5); letter-spacing: 0.05em; pointer-events: none; user-select: none; white-space: nowrap;
     }
 
     .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.95);
-      z-index: 9999999;
-      justify-content: center;
-      align-items: center;
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95);
+      z-index: 9999999; justify-content: center; align-items: center;
     }
 
     .modal-content {
-      border: 2px solid var(--ui-border);
-      background: #050a05;
-      padding: 40px;
-      text-align: center;
-      box-shadow: 0 0 40px var(--ui-accent);
-      border-radius: 12px;
-      max-width: 90vw;
+      border: 2px solid var(--ui-border); background: #050a05; padding: 40px; text-align: center;
+      box-shadow: 0 0 40px var(--ui-accent); border-radius: 12px; max-width: 90vw;
     }
 
     .modal-content a {
-      color: var(--ui-accent);
-      text-decoration: none;
-      font-size: 1.4rem;
-      display: block;
-      margin: 24px 0;
-      text-shadow: 0 0 10px var(--ui-accent);
-      word-break: break-all;
+      color: var(--ui-accent); text-decoration: none; font-size: 1.4rem; display: block; margin: 24px 0;
+      text-shadow: 0 0 10px var(--ui-accent); word-break: break-all;
     }
 
     .close-btn {
-      background: transparent;
-      border: 2px solid var(--ui-border);
-      color: var(--ui-accent);
-      padding: 10px 24px;
-      font-family: inherit;
-      font-size: 1.1rem;
-      cursor: pointer;
-      border-radius: 6px;
+      background: transparent; border: 2px solid var(--ui-border); color: var(--ui-accent); padding: 10px 24px;
+      font-family: inherit; font-size: 1.1rem; cursor: pointer; border-radius: 6px;
     }
 
-    .close-btn:active {
-      background: var(--ui-accent);
-      color: #000;
-    }
+    .close-btn:active { background: var(--ui-accent); color: #000; }
   </style>
 </head>
 <body>
@@ -353,7 +164,7 @@ Copy and paste the entirety of this code into your file:
 
   <!-- Top Left UI (Mute) -->
   <div class="top-left-ui">
-    <button id="audio-toggle" class="top-btn" onclick="toggleAudio(event)">🔇 90S KEYGEN</button>
+    <button id="audio-toggle" class="top-btn" onclick="toggleAudio(event)">🔇 8-BIT PHONK</button>
   </div>
 
   <!-- Top Right UI Controls (Phase & Pause) -->
@@ -390,15 +201,16 @@ Copy and paste the entirety of this code into your file:
   </div>
 
   <script>
-    /* --- TAP NAVIGATION LOGIC --- */
-    document.getElementById('tap-prev').addEventListener('pointerdown', (e) => {
-      e.preventDefault(); prevPhase();
-    });
-    document.getElementById('tap-next').addEventListener('pointerdown', (e) => {
-      e.preventDefault(); nextPhase();
+    /* --- TAP & KEYBOARD NAVIGATION LOGIC --- */
+    document.getElementById('tap-prev').addEventListener('pointerdown', (e) => { e.preventDefault(); prevPhase(); });
+    document.getElementById('tap-next').addEventListener('pointerdown', (e) => { e.preventDefault(); nextPhase(); });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowUp" || e.key === "ArrowRight") nextPhase();
+      else if (e.key === "ArrowDown" || e.key === "ArrowLeft") prevPhase();
     });
 
-    /* --- FAST 90S KEYGEN CHIPTUNE SYNTHESIZER --- */
+    /* --- 8-BIT PHONK SYNTHESIZER --- */
     let audioCtx = null;
     let masterGain = null;
     let isPlaying = false;
@@ -406,61 +218,65 @@ Copy and paste the entirety of this code into your file:
     let timerID = null;
     let currentStep = 0;
 
-    const keygenNoteFreqs = {
-      'C4': 261.63, 'D4': 293.66, 'Eb4': 311.13, 'F4': 349.23, 'G4': 392.00, 'Ab4': 415.30, 'Bb4': 466.16,
-      'C5': 523.25, 'D5': 587.33, 'Eb5': 622.25, 'F5': 698.46, 'G5': 783.99, 'Ab5': 830.61, 'Bb5': 932.33,
-      'C6': 1046.50
-    };
-
-    const keygenLeadPattern = [
-      'C5', 'Eb5', 'G5', 'C6', 'Bb5', 'G5', 'Eb5', 'D5',
-      'C5', 'C5', 'Eb5', 'G5', 'F5', 'Eb5', 'D5', 'Bb4',
-      'C5', 'Eb5', 'G5', 'C6', 'D6', 'Eb6', 'D6', 'C6',
-      'G5', 'Ab5', 'G5', 'F5', 'Eb5', 'D5', 'C5', 'G4'
-    ];
-
-    const keygenBassPattern = [
-      'C4', 'C4', 'C4', 'C4', 'Ab4', 'Ab4', 'Bb4', 'Bb4',
-      'C4', 'C4', 'C4', 'C4', 'F4', 'F4', 'G4', 'G4'
-    ];
-
-    function playKeygenNote(freq, startTime, duration, waveType = 'square', gainLevel = 0.06) {
-      if (!freq || !audioCtx || !masterGain) return;
+    function playDrum(type, startTime) {
+      if (!audioCtx || !masterGain) return;
       try {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        osc.type = waveType;
-        osc.frequency.setValueAtTime(freq, startTime);
-        gain.gain.setValueAtTime(gainLevel, startTime);
-        gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
-        osc.connect(gain);
-        gain.connect(masterGain);
-        osc.start(startTime);
-        osc.stop(startTime + duration + 0.02);
+        osc.connect(gain); gain.connect(masterGain);
+        
+        if (type === 'kick') { // 808 Sub Bass
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(150, startTime);
+          osc.frequency.exponentialRampToValueAtTime(40, startTime + 0.1);
+          gain.gain.setValueAtTime(0.3, startTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.8);
+          osc.start(startTime); osc.stop(startTime + 0.9);
+        } else if (type === 'hat') { // Trap Hi-Hat
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(4000, startTime);
+          gain.gain.setValueAtTime(0.05, startTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.05);
+          osc.start(startTime); osc.stop(startTime + 0.1);
+        } else if (type === 'cowbell') { // Phonk Cowbell
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(800, startTime);
+          const osc2 = audioCtx.createOscillator();
+          osc2.type = 'square'; osc2.frequency.setValueAtTime(840, startTime);
+          osc2.connect(gain);
+          gain.gain.setValueAtTime(0.08, startTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.2);
+          osc.start(startTime); osc2.start(startTime);
+          osc.stop(startTime + 0.3); osc2.stop(startTime + 0.3);
+        }
       } catch (e) {}
     }
 
-    function scheduleKeygenTrack() {
+    function schedulePhonkBeat() {
       if (!isPlaying || !audioCtx || audioCtx.state !== 'running') return;
-      const lookAhead = 0.1;
       const scheduleAheadTime = 0.2;
-      const noteTime = (60.0 / 140) / 2;
+      const noteTime = (60.0 / 130) / 4; // 130 BPM, 16th notes
 
       while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
-        const leadNote = keygenLeadPattern[currentStep % keygenLeadPattern.length];
-        if (keygenNoteFreqs[leadNote]) {
-          playKeygenNote(keygenNoteFreqs[leadNote], nextNoteTime, noteTime * 0.8, 'square', 0.06);
+        let step = currentStep % 16;
+        
+        // Fast Hats
+        if (step % 2 === 0 || step === 13 || step === 14) playDrum('hat', nextNoteTime);
+        
+        // Phonk Cowbell Pattern
+        if (step === 2 || step === 5 || step === 8 || step === 11 || step === 14) {
+          playDrum('cowbell', nextNoteTime);
         }
-        if (currentStep % 2 === 0) {
-          const bassNote = keygenBassPattern[Math.floor(currentStep / 2) % keygenBassPattern.length];
-          if (keygenNoteFreqs[bassNote]) {
-            playKeygenNote(keygenNoteFreqs[bassNote] / 2, nextNoteTime, noteTime * 1.6, 'sawtooth', 0.09);
-          }
+
+        // Heavy Sub Kick Pattern
+        if (step === 0 || step === 6 || step === 10) {
+          playDrum('kick', nextNoteTime);
         }
+
         nextNoteTime += noteTime;
         currentStep++;
       }
-      timerID = setTimeout(scheduleKeygenTrack, lookAhead * 1000);
+      timerID = setTimeout(schedulePhonkBeat, 100);
     }
 
     function toggleAudio(e) {
@@ -478,22 +294,19 @@ Copy and paste the entirety of this code into your file:
           nextNoteTime = audioCtx.currentTime + 0.05;
           currentStep = 0;
           isPlaying = true;
-          btn.textContent = '🔊 MUTE KEYGEN';
-          scheduleKeygenTrack();
+          btn.textContent = '🔊 MUTE PHONK';
+          schedulePhonkBeat();
         };
-        if (audioCtx.state === 'suspended') {
-          audioCtx.resume().then(start).catch(start);
-        } else {
-          start();
-        }
+        if (audioCtx.state === 'suspended') audioCtx.resume().then(start).catch(start);
+        else start();
       } else {
         isPlaying = false;
         if (timerID) clearTimeout(timerID);
-        btn.textContent = '🔇 90S KEYGEN';
+        btn.textContent = '🔇 8-BIT PHONK';
       }
     }
 
-    /* --- EXPANDED CONTACT PHRASES --- */
+    /* --- EXPANDED CONTACT PHRASES (CYCLES EVERY 5 SECONDS EVERYWHERE) --- */
     const contactTexts = [
       "[ CONTACT ]", "[ CALL ]", "[ PING HOST ]", "[ TRANSMIT DATA ]",
       "[ INITIALIZE HANDSHAKE ]", "[ DIAL-UP (56K) ]", "[ SEND EMAIL ]", "[ EXECUTE TALK.EXE ]",
@@ -505,22 +318,35 @@ Copy and paste the entirety of this code into your file:
       "[ SEND POKE ]", "[ SLIDE IN DMs ]", "[ HONK HORN ]", "[ WHISTLE LOUDLY ]"
     ];
 
-    const companyFonts = [
-      { font: "'Press Start 2P', monospace" },
-      { font: "'Orbitron', sans-serif" },
-      { font: "'Russo One', sans-serif" },
-      { font: "'Permanent Marker', cursive" },
-      { font: "'Cinzel', serif" },
-      { font: "'Comic Neue', cursive" },
-      { font: "'VT323', monospace" },
-      { font: "'Fira Code', monospace" },
-      { font: "'Courier Prime', monospace" },
-      { font: "'Courier New', Courier, monospace" }
-    ];
+    const intlGlitchChars = ["0", "1", "3", "7", "_", "@", "$", "%", "*", "!", "中", "鬼", "魔", "龙", "अ", "Д", "ا", "א", "ก", "가", "あ", "🔥", "💀", "😈", "666"];
 
+    function glitchContactButtonText() {
+      const btn = document.getElementById("contact-btn");
+      const targetText = contactTexts[Math.floor(Math.random() * contactTexts.length)];
+      let frame = 0;
+      const interval = setInterval(() => {
+        btn.textContent = targetText.split('').map(c => Math.random() < 0.4 ? intlGlitchChars[Math.floor(Math.random() * intlGlitchChars.length)] : c).join('');
+        frame++;
+        if (frame >= 10) {
+          clearInterval(interval);
+          btn.textContent = targetText;
+        }
+      }, 40);
+    }
+    
+    // Globally mutate contact button every 5 seconds
+    setInterval(glitchContactButtonText, 5000);
+
+    const companyFonts = [
+      { font: "'Press Start 2P', monospace" }, { font: "'Orbitron', sans-serif" },
+      { font: "'Russo One', sans-serif" }, { font: "'Permanent Marker', cursive" },
+      { font: "'Cinzel', serif" }, { font: "'Comic Neue', cursive" },
+      { font: "'VT323', monospace" }, { font: "'Fira Code', monospace" },
+      { font: "'Courier Prime', monospace" }, { font: "'Courier New', Courier, monospace" }
+    ];
     const scrambleFontStack = "'Noto Sans Devanagari','Noto Sans Arabic','Noto Sans Hebrew','Noto Sans Thai','Noto Sans SC','Noto Sans JP','Noto Sans KR', sans-serif";
 
-    /* --- TRIPPY LUCID CANVAS ANIMATION ENGINE --- */
+    /* --- CANVAS ANIMATION ENGINE --- */
     const canvas = document.getElementById("bg-canvas");
     const ctx = canvas.getContext("2d");
     let width, height, cx, cy;
@@ -528,58 +354,103 @@ Copy and paste the entirety of this code into your file:
     let autoAdvancePaused = false;
 
     function resizeCanvas() {
-      width = window.innerWidth;
-      height = window.innerHeight;
-      canvas.width = width;
-      canvas.height = height;
-      cx = width / 2;
-      cy = height / 2;
+      width = window.innerWidth; height = window.innerHeight;
+      canvas.width = width; canvas.height = height;
+      cx = width / 2; cy = height / 2;
     }
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
 
     let snake = [{x: 10, y: 10}, {x: 9, y: 10}, {x: 8, y: 10}];
-    let snakeDir = {x: 1, y: 0};
-    let snakeFood = {x: 15, y: 15};
-    let dinoY = 0, dinoVY = 0, cactusX = width;
-    let matrixCols = [];
-    let particles = [];
+    let snakeDir = {x: 1, y: 0}; let snakeFood = {x: 15, y: 15};
+    let matrixCols = []; let particles = [];
     for (let i = 0; i < 200; i++) particles.push({ x: Math.random() * width, y: Math.random() * height, z: Math.random() * width });
 
     const renderers = {
+      outrun: () => {
+        ctx.fillStyle = "rgba(10,0,20,0.3)"; ctx.fillRect(0,0,width,height);
+        ctx.fillStyle = "#ff00aa";
+        ctx.beginPath(); ctx.arc(cx, cy, 150, 0, Math.PI, true); ctx.fill();
+        ctx.strokeStyle = "#00ffff"; ctx.lineWidth = 2;
+        for(let i=0; i<20; i++) {
+            let y = cy + Math.pow((globalAngle*2 + i)%20, 2);
+            if(y < height) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke(); }
+        }
+      },
+      skynet: () => {
+        ctx.fillStyle = "rgba(20,0,0,0.3)"; ctx.fillRect(0,0,width,height);
+        ctx.strokeStyle = "#ff0000"; ctx.lineWidth = 1;
+        let scanY = (globalAngle*300) % height;
+        ctx.beginPath(); ctx.moveTo(0, scanY); ctx.lineTo(width, scanY); ctx.stroke();
+        ctx.fillStyle = "#ff0000"; ctx.font = "14px monospace";
+        ctx.fillText("TARGET ACQUIRED // TERMINATION IMMINENT", cx-150, scanY - 10);
+      },
+      marijuana_420: () => {
+        ctx.fillStyle = "rgba(0,15,0,0.2)"; ctx.fillRect(0,0,width,height);
+        for(let i=0; i<15; i++) {
+            let scale = Math.abs(Math.sin(globalAngle*0.5 + i)) * 100 + 20;
+            let x = (cx + Math.sin(globalAngle + i)*200) % width;
+            let y = (height - ((globalAngle*100 + i*50) % height));
+            ctx.font = `${scale}px serif`;
+            ctx.fillText("🌿", x, y);
+        }
+      },
+      typewriter: () => {
+        ctx.fillStyle = "rgba(240,240,240,0.2)"; ctx.fillRect(0,0,width,height);
+        ctx.fillStyle = "#000"; ctx.font = "24px 'Courier New', monospace";
+        let str = "All work and no play makes Drew a dull boy. ";
+        let disp = str.repeat(10).substring(0, Math.floor(globalAngle*20) % 200);
+        ctx.fillText(disp, 20, cy);
+      },
+      pokemon: () => {
+        ctx.fillStyle = "rgba(10,50,10,0.3)"; ctx.fillRect(0,0,width,height);
+        ctx.font = "60px serif";
+        ctx.fillText("🔴", cx + Math.sin(globalAngle*4)*150, cy + Math.cos(globalAngle*4)*150);
+        ctx.fillText("⚡", cx + Math.sin(globalAngle*3 + Math.PI)*150, cy + Math.cos(globalAngle*3 + Math.PI)*150);
+      },
+      digimon: () => {
+        ctx.fillStyle = "rgba(0,10,20,0.3)"; ctx.fillRect(0,0,width,height);
+        ctx.fillStyle = "#0088ff"; ctx.font = "20px monospace";
+        for(let i=0; i<10; i++) {
+            ctx.fillText(Math.random().toString(2).substr(2,8), Math.random()*width, Math.random()*height);
+        }
+      },
+      sailor_moon: () => {
+        ctx.fillStyle = "rgba(20,0,20,0.2)"; ctx.fillRect(0,0,width,height);
+        ctx.font = "40px serif";
+        for(let i=0; i<8; i++) {
+            let x = cx + Math.sin(globalAngle*2 + i)*150;
+            let y = cy + Math.cos(globalAngle*1.5 + i)*150;
+            ctx.fillText(i%2==0 ? "🌙" : "✨", x, y);
+        }
+      },
+      canada_toronto: () => {
+        ctx.fillStyle = "rgba(20,0,0,0.2)"; ctx.fillRect(0,0,width,height);
+        ctx.fillStyle = "#ff0000"; ctx.font = "30px serif";
+        for(let i=0; i<10; i++) {
+            let x = (globalAngle*50 + i*100) % width;
+            let y = (globalAngle*100 + i*80) % height;
+            ctx.fillText("🍁", x, y);
+        }
+        ctx.fillStyle = "#fff"; ctx.fillRect(cx-5, cy-100, 10, 200); // CN Tower abstract
+        ctx.beginPath(); ctx.arc(cx, cy-100, 15, 0, Math.PI*2); ctx.fill();
+      },
+      star_of_david: () => {
+        ctx.fillStyle = "rgba(0,5,20,0.3)"; ctx.fillRect(0,0,width,height);
+        ctx.strokeStyle = "#00aaff"; ctx.lineWidth = 4;
+        let s = Math.abs(Math.sin(globalAngle))*100 + 50;
+        ctx.save(); ctx.translate(cx, cy); ctx.rotate(globalAngle);
+        ctx.beginPath(); ctx.moveTo(0, -s); ctx.lineTo(s*0.866, s*0.5); ctx.lineTo(-s*0.866, s*0.5); ctx.closePath(); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, s); ctx.lineTo(s*0.866, -s*0.5); ctx.lineTo(-s*0.866, -s*0.5); ctx.closePath(); ctx.stroke();
+        ctx.restore();
+      },
       rabbit_hole: () => {
         ctx.fillStyle = "rgba(0,0,0,0.15)"; ctx.fillRect(0,0,width,height);
         for(let i=15; i>0; i--) {
            let radius = ((globalAngle * 60 + i * 40) % 600) * Math.max(0.1, Math.abs(Math.sin(globalAngle*0.5)+1.5));
-           ctx.beginPath();
-           ctx.arc(cx, cy, radius, 0, Math.PI*2);
+           ctx.beginPath(); ctx.arc(cx, cy, radius, 0, Math.PI*2);
            ctx.strokeStyle = `hsl(${(globalAngle*150 + i*15)%360}, 100%, 50%)`;
-           ctx.lineWidth = 4 + (i%3);
-           ctx.stroke();
-        }
-      },
-      mad_hatter_teacups: () => {
-        ctx.fillStyle = "rgba(10,0,25,0.3)"; ctx.fillRect(0,0,width,height);
-        const icons = ["☕", "🍄", "🎩", "🕰️", "🐇", "🫖", "🃏"];
-        for(let i=0; i<icons.length; i++) {
-            let scale = Math.abs(Math.sin(globalAngle*2 + i)) * (Math.min(width,height)*0.8) + 20; 
-            let x = cx + Math.sin(globalAngle*1.5 + i*Math.PI/3) * (cx*0.7);
-            let y = cy + Math.cos(globalAngle*2.2 + i*Math.PI/3) * (cy*0.7);
-            ctx.font = `${scale}px serif`;
-            ctx.save();
-            ctx.translate(x,y);
-            ctx.rotate(globalAngle*(i%2==0?1:-1) + i);
-            ctx.fillText(icons[i], -scale/2, scale/2);
-            ctx.restore();
-        }
-      },
-      time_dilation: () => {
-        ctx.fillStyle = `hsla(${(globalAngle*30)%360}, 80%, 15%, 0.2)`; ctx.fillRect(0,0,width,height);
-        for(let i=0; i<8; i++) {
-            let lineY = cy + Math.sin(globalAngle*3 + i)*cy;
-            let thick = Math.abs(Math.cos(globalAngle + i))*100 + 2;
-            ctx.fillStyle = `hsl(${(globalAngle*100 + i*40)%360}, 100%, 60%)`;
-            ctx.fillRect(0, lineY - thick/2, width, thick);
+           ctx.lineWidth = 4 + (i%3); ctx.stroke();
         }
       },
       fractal_shrooms: () => {
@@ -589,34 +460,8 @@ Copy and paste the entirety of this code into your file:
             let x = cx + Math.sin(globalAngle*3 + i)*Math.tan(globalAngle*0.5 + i)*150;
             let y = cy + Math.cos(globalAngle*2 + i)*Math.sin(globalAngle*1.5)*150;
             ctx.font = `${scale}px serif`;
-            ctx.fillText("🍄", x % width, (y + height) % height);
+            ctx.fillText("🍄", Math.abs(x % width), Math.abs((y + height) % height));
         }
-      },
-      checkerboard_warp: () => {
-        let size = Math.abs(Math.sin(globalAngle*0.8))*150 + 40;
-        for(let x=0; x<width; x+=size) {
-            for(let y=0; y<height; y+=size) {
-                let colorFlip = (Math.floor(x/size) + Math.floor(y/size) + Math.floor(globalAngle*5)) % 2;
-                ctx.fillStyle = colorFlip === 0 ? "#ff00aa" : "#00ffcc";
-                ctx.fillRect(x, y + Math.sin(globalAngle*4 + x)*30, size, size);
-            }
-        }
-      },
-      hackery: () => {
-        ctx.fillStyle = "rgba(0, 10, 0, 0.2)"; ctx.fillRect(0, 0, width, height);
-        ctx.fillStyle = "#00ff66"; ctx.font = "clamp(14px, 4vw, 32px) 'Fira Code', monospace";
-        for (let i = 0; i < 15; i++) {
-          let y = (globalAngle * 300 + i * 50) % height;
-          ctx.fillText(`[ROOT@DREW-WTF]# sudo inject_payload_0x${Math.floor((i+globalAngle)*1000).toString(16)}`, 20, y);
-        }
-      },
-      phonk_drift: () => {
-        ctx.fillStyle = "rgba(10, 0, 15, 0.3)"; ctx.fillRect(0, 0, width, height);
-        ctx.strokeStyle = "#ff0055"; ctx.lineWidth = 6;
-        ctx.beginPath(); ctx.moveTo(0, height * 0.8); ctx.lineTo(width, height * 0.8); ctx.stroke();
-        let scale = Math.abs(Math.sin(globalAngle*8))*50 + 50;
-        let carX = (globalAngle * 800) % (width + 200) - 100;
-        ctx.font = `${scale}px serif`; ctx.fillText("🏎️💨", carX, height * 0.8 - scale/4);
       },
       cyberpunk_matrix: () => {
         ctx.fillStyle = "rgba(0,0,0,0.15)"; ctx.fillRect(0,0,width,height);
@@ -633,7 +478,7 @@ Copy and paste the entirety of this code into your file:
       },
       snake: () => {
         ctx.fillStyle = "rgba(0, 20, 0, 0.3)"; ctx.fillRect(0, 0, width, height);
-        const gs = 30; // Bigger grid
+        const gs = 30;
         if (Math.random() < 0.15) {
           const dirs = [{x:1,y:0},{x:-1,y:0},{x:0,y:1},{x:0,y:-1}];
           snakeDir = dirs[Math.floor(Math.random()*dirs.length)];
@@ -657,17 +502,14 @@ Copy and paste the entirety of this code into your file:
           ctx.fillText(sym, cx - (scale*1.5) + i*(scale*1.2), cy + scale/3);
         }
       },
-      lsd_plasma: () => {
-        ctx.fillStyle = `hsl(${(globalAngle*80)%360}, 100%, 50%)`; ctx.fillRect(0,0,width,height);
-      },
-      acid_rain: () => {
-        ctx.fillStyle = "rgba(0,5,15,0.3)"; ctx.fillRect(0,0,width,height);
-        ctx.strokeStyle = "#00ffff"; ctx.lineWidth = 3;
-        for(let i=0;i<40;i++) {
-          let scale = Math.abs(Math.sin(i+globalAngle))*100 + 10;
-          let x = (Math.sin(i*99)+1)*width/2, y = (globalAngle*800 + i*80)%height;
-          ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x,y+scale); ctx.stroke();
-        }
+      lsd_plasma: () => { ctx.fillStyle = `hsl(${(globalAngle*80)%360}, 100%, 50%)`; ctx.fillRect(0,0,width,height); },
+      stars: () => {
+        ctx.fillStyle = "rgba(0,0,0,0.3)"; ctx.fillRect(0,0,width,height);
+        particles.forEach(p => {
+          p.z -= 6; if(p.z <= 0) p.z = width;
+          let sx = (p.x - cx) * (width/p.z) + cx, sy = (p.y - cy) * (width/p.z) + cy;
+          ctx.fillStyle = "#ffffff"; ctx.fillRect(sx, sy, 2, 2);
+        });
       }
     };
 
@@ -675,61 +517,41 @@ Copy and paste the entirety of this code into your file:
 
     function animateCanvas() {
       globalAngle += 0.015;
-      let currentRendererKey = rendererKeys[(currentPhase - 1) % rendererKeys.length];
+      // Procedurally assign a renderer based on phase to spread the 16 renders across 150 phases
+      let currentRendererKey = rendererKeys[(currentPhase * 7) % rendererKeys.length]; 
       if(renderers[currentRendererKey]) renderers[currentRendererKey]();
       requestAnimationFrame(animateCanvas);
     }
 
-    /* --- 300 PROCEDURAL PHASES SYSTEM --- */
-    const phaseNames = [
-      "MAD HATTER TEACUPS", "RABBIT HOLE", "FRACTAL SHROOMS", "TIME DILATION",
-      "CHECKERBOARD WARP", "HACKER TERMINAL", "PHONK DRIFT ZONE", "CYBERPUNK MATRIX",
-      "SNAKE AUTOMATA", "CASINO JACKPOT", "LSD PLASMA", "ACID RAIN"
-    ];
+    /* --- 150 PHASES GENERATION --- */
+    const phaseNamesRaw = "OUTRUN 198X,SKYNET NEURAL NET,420 BLAZE IT,TYPEWRITER TERMINAL,PALLET TOWN (PKMN),DIGI-WORLD (DIGIMON),MOON PRISM (SAILOR),MEDABOTS ROBO-BATTLE,TRUE NORTH CANADA,THE 6IX (TORONTO),STAR OF DAVID,PHONK DRIFT ZONE,CASINO JACKPOT,SNAKE AUTOMATA,HOCKEY RINK,RABBIT HOLE,FRACTAL SHROOMS,TIME DILATION,CHECKERBOARD WARP,ACID RAIN,LSD PLASMA,DEMONIC REALM,ANGELIC LIGHTS,HYPERSPACE WARP,GEOCITIES 2000,PONG PROTOCOL,FIREWORKS DISPLAY,OFFLINE DINO,TRON GRID,HACKER TERMINAL,MARTHA STEWART BAKE,WINDOWS 98,MAC OS 9,MS-DOS PROMPT,COMMODORE 64,AMIGA GURU MEDITATION,DIAL-UP MODEM,FLOPPY DISK DRIVE,VHS TRACKING,CRT SCANLINES,DVD SCREENSAVER,WINAMP VISUALIZER,LIMEWIRE DOWNLOAD,MYSPACE LAYOUT,MSN MESSENGER,ICQ CHAT,NETSCAPE NAVIGATOR,AOL YOU'VE GOT MAIL,BLOCKBUSTER VIDEO,MTV IDENTS,SEGA GENESIS,SUPER NINTENDO,ARCAGE CARPET,LASER TAG MAZE,ROLLER RINK,BOWLING ALLEY STRIKE,MALLSOFT MUZAK,FRUTIGER AERO,Y2K BUG,MATRIX CONSTRUCT,EVENT HORIZON,QUANTUM REALM,SCHRODINGER'S CAT,STRING THEORY,DARK MATTER,NEBULA CLOUD,SUPERNOVA BURST,PULSAR BEACON,QUASAR JET,INTERSTELLAR TESSERACT,SUNSPOT FLARE,LUNAR ROVER,MARS ROVER,VOYAGER GOLDEN RECORD,CERN COLLIDER,VAPORWAVE PLAZA,EGYPTIAN TOMB,DEEP WEB,ALICE'S TEA PARTY,CHESHIRE GRIN,ZION MAINFRAME,ATLANTIS RUINS,VALHALLA GATES,TARTARUS ABYSS,AREA 51,CROP CIRCLES,SILENT HILL FOG,RAPTURE UNDERWATER,BLOOD MOON,SOLAR ECLIPSE,NEON TOKYO,SHIBUYA CROSSING,GHOST IN THE SHELL,AKIRA BIKE GANG,COWBOY BEBOP,EVANGELION LCL,GUNDAM HANGAR,TAMAGOTCHI PET,GAMEBOY CAMERA,N64 POLYGONS,PS1 MEMORY CARD,DREAMCAST SPIRAL,RED RING OF DEATH,WII MENU,MINECRAFT CAVES,DOOM E1M1,HALO RING,FALLOUT VAULT,SKYRIM BLIZZARD,DARK SOULS BONFIRE,TETRIS BLOCKS,PAC-MAN MAZE,SPACE INVADERS,GALAGA STARS,ASTEROIDS,DONKEY KONG BARRELS,STREET FIGHTER,MORTAL KOMBAT,SONIC RINGS,MARIO STARS,ZELDA TRIFORCE,METROID LAVA,CASTLEVANIA GOTHIC,MEGAMAN PLASMA,CHRONO TRIGGER,FINAL FANTASY,KINGDOM HEARTS,PERSONA RED,SILENT HILL RUST,RESIDENT EVIL,METAL GEAR RADAR,TOMB RAIDER,CRASH BANDICOOT,SPYRO GEMS,TONY HAWK COMBO,GTA WASTED,MINESWEEPER,SOLITAIRE CASCADE,PINBALL BUMPER,TAMOTSU ROBO,SHINIGAMI EYES,DEATH NOTE,NARUTO KUNAI,DRAGON BALL RADAR,ONE PIECE BOUNTY,BLEACH HOLLOW,JOJO MENACING,BERSERK BRAND,JUJUTSU DOMAIN,DREW.WTF SINGULARITY";
+    const phaseNames = phaseNamesRaw.split(',');
 
-    const phaseColors = [
-      "#000000", "#1a0f00", "#0a0015", "#000a10", "#001005",
-      "#1877f2", "#ffff00", "#00ffcc", "#ff007f", "#150022"
-    ];
+    const phaseColors = ["#000000", "#1a0f00", "#0a0015", "#000a10", "#001005", "#1877f2", "#ffff00", "#00ffcc", "#ff007f", "#150022", "#330000", "#003300", "#000033", "#222222", "#440022"];
 
     let currentPhase = 1;
     let phaseTimer = null;
 
     function setPhase(p) {
       currentPhase = p;
-      if (currentPhase > 300) currentPhase = 1;
-      if (currentPhase < 1) currentPhase = 300;
+      if (currentPhase > 150) currentPhase = 1;
+      if (currentPhase < 1) currentPhase = 150;
 
-      const pName = phaseNames[(currentPhase - 1) % phaseNames.length];
+      const pName = phaseNames[currentPhase - 1] || "SYSTEM GLITCH";
       document.getElementById("phase-badge-top").textContent = `PHASE ${String(currentPhase).padStart(3, '0')}`;
       document.getElementById("phase-bottom-banner").textContent = pName;
 
-      const themeBg = phaseColors[(currentPhase - 1) % phaseColors.length];
+      const themeBg = phaseColors[(currentPhase * 3) % phaseColors.length];
       document.body.style.backgroundColor = themeBg;
 
       const randomFont = companyFonts[Math.floor(Math.random() * companyFonts.length)];
       document.getElementById("scramble-text").style.fontFamily = randomFont.font;
 
-      glitchContactButtonText();
       runScrambleCycle();
     }
 
-    function glitchContactButtonText() {
-      const btn = document.getElementById("contact-btn");
-      const targetText = contactTexts[(currentPhase - 1) % contactTexts.length];
-      let frame = 0;
-      const interval = setInterval(() => {
-        btn.textContent = targetText.split('').map(c => Math.random() < 0.4 ? intlGlitchChars[Math.floor(Math.random() * intlGlitchChars.length)] : c).join('');
-        frame++;
-        if (frame >= 10) {
-          clearInterval(interval);
-          btn.textContent = targetText;
-        }
-      }, 40);
-    }
-
-    function prevPhase(e) { if(e) e.stopPropagation(); setPhase(currentPhase - 1); resetPhaseTimer(); }
-    function nextPhase(e) { if(e) e.stopPropagation(); setPhase(currentPhase + 1); resetPhaseTimer(); }
+    function prevPhase() { setPhase(currentPhase - 1); resetPhaseTimer(); }
+    function nextPhase() { setPhase(currentPhase + 1); resetPhaseTimer(); }
 
     function resetPhaseTimer() {
       if (phaseTimer) clearInterval(phaseTimer);
@@ -757,13 +579,11 @@ Copy and paste the entirety of this code into your file:
 
     function handleDrewClick(e) { if(e) e.stopPropagation(); prevPhase(); }
     function handleWtfClick(e) { if(e) e.stopPropagation(); nextPhase(); }
-    function handleDotClick(e) { if(e) e.stopPropagation(); setPhase(Math.floor(Math.random()*300) + 1); resetPhaseTimer(); }
+    function handleDotClick(e) { if(e) e.stopPropagation(); setPhase(Math.floor(Math.random()*150) + 1); resetPhaseTimer(); }
 
-    function toggleModal(show) {
-      document.getElementById('contact-modal').style.display = show ? 'flex' : 'none';
-    }
+    function toggleModal(show) { document.getElementById('contact-modal').style.display = show ? 'flex' : 'none'; }
 
-    /* --- DREW.WTF + MULTI-SCRIPT MORPH ENGINE --- */
+    /* --- DREW.WTF MORPH ENGINE --- */
     const langVariants = [
       { left: "DREW",     right: "666",              font: "'Press Start 2P', monospace" },
       { left: "DREW",     right: "777",              font: "'Orbitron', sans-serif" },
@@ -780,8 +600,6 @@ Copy and paste the entirety of this code into your file:
       { left: "דרו",      right: "וטף",              font: "'Noto Sans Hebrew', sans-serif" },
       { left: "ดรูว์",     right: "ดับเบิลยูทีเอฟ",    font: "'Noto Sans Thai', sans-serif" }
     ];
-
-    const intlGlitchChars = ["0", "1", "3", "7", "_", "@", "$", "%", "*", "!", "中", "鬼", "魔", "龙", "अ", "Д", "ا", "א", "ก", "가", "あ", "🔥", "💀", "😈", "666"];
 
     const scrambleTextEl = document.getElementById("scramble-text");
     const wordDrewEl = document.getElementById("word-drew");
@@ -822,7 +640,6 @@ Copy and paste the entirety of this code into your file:
       }, 2000);
     }
 
-    // POSSESSED COUNTER
     setInterval(() => {
       const vb = document.getElementById("visitor-box");
       if (Math.random() < 0.15) {
@@ -838,5 +655,3 @@ Copy and paste the entirety of this code into your file:
   </script>
 </body>
 </html>
-
-```
