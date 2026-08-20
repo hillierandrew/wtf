@@ -18,137 +18,335 @@
       --ui-border: #ff1111;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-    html, body {
-      width: 100%; height: 100%; min-height: 100vh;
-      background-color: #000000; color: var(--crt-red);
-      font-family: 'Courier New', Courier, monospace; overflow: hidden;
-      position: relative; touch-action: manipulation;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    body { display: flex; justify-content: center; align-items: center; flex-direction: column; }
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      min-height: 100vh;
+      background-color: #000000;
+      color: var(--crt-red);
+      font-family: 'Courier New', Courier, monospace;
+      overflow: hidden;
+      position: relative;
+      touch-action: manipulation;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
 
     #bg-canvas {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      z-index: 1; display: block; pointer-events: none;
-    }
-
-    body::before {
-      content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
-      background: radial-gradient(circle at center, transparent 20%, rgba(0, 0, 0, 0.95) 100%);
-      pointer-events: none !important; z-index: 10;
-    }
-
-    body::after {
-      content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
-      background: linear-gradient(rgba(20, 0, 0, 0) 50%, rgba(0, 0, 0, 0.6) 50%);
-      background-size: 100% 4px; pointer-events: none !important; z-index: 11;
-    }
-
-    .container {
-      text-align: center; z-index: 50; padding: 10px; max-width: 96vw;
-      user-select: none; -webkit-user-select: none; position: relative; pointer-events: none;
-    }
-
-    .title {
-      font-size: clamp(2rem, 9vw, 6rem); font-weight: bold; letter-spacing: 0.1em;
-      color: #ffaaaa; mix-blend-mode: exclusion;
-      text-shadow: 0 0 20px #ff0000, 0 0 40px #ff0000;
-      animation: flicker 0.15s infinite; min-height: 1.2em; display: inline-block;
-      white-space: nowrap; transition: filter 0.3s ease, color 0.3s ease, font-family 0.2s ease;
-    }
-
-    .clickable-word { cursor: pointer; display: inline-block; pointer-events: auto; padding: 0 6px; position: relative; }
-    .clickable-word:active { transform: scale(0.85); filter: brightness(2); }
-
-    @keyframes flicker { 0% { opacity: 0.92; } 50% { opacity: 1; } 100% { opacity: 0.96; } }
-
-    .top-bar-ui {
-      position: fixed; top: 12px; left: 0; width: 100vw; padding: 0 12px;
-      z-index: 999999; display: flex; justify-content: space-between; align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      display: block;
       pointer-events: none;
     }
 
-    .top-group { display: flex; gap: 6px; align-items: center; pointer-events: auto; }
+    body::before {
+      content: "";
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      background: radial-gradient(
+        circle at center,
+        transparent 20%,
+        rgba(0, 0, 0, 0.95) 100%
+      );
+      pointer-events: none !important;
+      z-index: 10;
+    }
+
+    body::after {
+      content: "";
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      background: linear-gradient(
+        rgba(20, 0, 0, 0) 50%,
+        rgba(0, 0, 0, 0.6) 50%
+      );
+      background-size: 100% 4px;
+      pointer-events: none !important;
+      z-index: 11;
+    }
+
+    .container {
+      text-align: center;
+      z-index: 50;
+      padding: 10px;
+      max-width: 96vw;
+      user-select: none;
+      -webkit-user-select: none;
+      position: relative;
+      pointer-events: none;
+    }
+
+    .title {
+      font-size: clamp(2rem, 9vw, 6rem);
+      font-weight: bold;
+      letter-spacing: 0.1em;
+      color: #ffaaaa;
+      mix-blend-mode: exclusion;
+      text-shadow:
+        0 0 20px #ff0000,
+        0 0 40px #ff0000;
+      animation: flicker 0.15s infinite;
+      min-height: 1.2em;
+      display: inline-block;
+      white-space: nowrap;
+      transition:
+        filter 0.3s ease,
+        color 0.3s ease,
+        font-family 0.2s ease;
+    }
+
+    .clickable-word {
+      cursor: pointer;
+      display: inline-block;
+      pointer-events: auto;
+      padding: 0 6px;
+      position: relative;
+    }
+
+    .clickable-word:active {
+      transform: scale(0.85);
+      filter: brightness(2);
+    }
+
+    @keyframes flicker {
+      0% {
+        opacity: 0.92;
+      }
+
+      50% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0.96;
+      }
+    }
+
+    .top-bar-ui {
+      position: fixed;
+      top: 12px;
+      left: 0;
+      width: 100vw;
+      padding: 0 12px;
+      z-index: 999999;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .top-group {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      pointer-events: auto;
+    }
 
     .phase-badge-top {
-      font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--ui-accent);
-      background: var(--ui-bg); border: 2px solid var(--ui-border); padding: 8px 10px;
-      border-radius: 6px; box-shadow: 0 0 10px var(--ui-accent); letter-spacing: 0.05em;
-      text-align: center; cursor: pointer; max-width: 45vw; white-space: nowrap;
-      overflow: hidden; text-overflow: ellipsis; text-transform: uppercase;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 9px;
+      color: var(--ui-accent);
+      background: var(--ui-bg);
+      border: 2px solid var(--ui-border);
+      padding: 8px 10px;
+      border-radius: 6px;
+      box-shadow: 0 0 10px var(--ui-accent);
+      letter-spacing: 0.05em;
+      text-align: center;
+      cursor: pointer;
+      max-width: 45vw;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-transform: uppercase;
     }
 
     .top-btn {
-      font-family: 'Press Start 2P', monospace; font-size: 12px; color: #fff;
-      background: var(--ui-bg); border: 2px solid var(--ui-border); padding: 8px 10px;
-      border-radius: 6px; cursor: pointer; box-shadow: 0 0 10px var(--ui-accent);
-      display: flex; justify-content: center; align-items: center; min-width: 38px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 12px;
+      color: #fff;
+      background: var(--ui-bg);
+      border: 2px solid var(--ui-border);
+      padding: 8px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 0 10px var(--ui-accent);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-width: 38px;
     }
 
-    .top-btn:active, .phase-badge-top:active { transform: scale(0.92); background: rgba(255, 255, 255, 0.25); }
+    .top-btn:active,
+    .phase-badge-top:active {
+      transform: scale(0.92);
+      background: rgba(255, 255, 255, 0.25);
+    }
 
     .visitor-counter {
-      font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--ui-accent);
-      background: var(--ui-bg); border: 1px solid var(--ui-border); padding: 6px 8px;
-      border-radius: 6px; letter-spacing: 0.05em; pointer-events: none;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px;
+      color: var(--ui-accent);
+      background: var(--ui-bg);
+      border: 1px solid var(--ui-border);
+      padding: 6px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.05em;
+      pointer-events: none;
     }
 
     .bottom-ui-container {
-      position: fixed; bottom: 30px; left: 16px; right: 16px;
-      z-index: 999999; display: flex; justify-content: center; align-items: center; pointer-events: auto;
+      position: fixed;
+      bottom: 30px;
+      left: 16px;
+      right: 16px;
+      z-index: 999999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      pointer-events: auto;
     }
 
     .contact-btn {
-      width: 100%; max-width: 700px; box-sizing: border-box; 
+      width: 100%;
+      max-width: 700px;
+      box-sizing: border-box;
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-      font-size: clamp(16px, 5vw, 22px); font-weight: 900; color: #ffffff !important; 
-      letter-spacing: 0.08em; user-select: none; padding: 20px 14px;
-      border-radius: 20px; background-color: rgba(18, 18, 18, 0.95); border: 3px solid rgba(255, 255, 255, 0.9);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.9), 0 0 20px var(--ui-accent);
-      text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      cursor: pointer; text-transform: uppercase;
+      font-size: clamp(16px, 5vw, 22px);
+      font-weight: 900;
+      color: #ffffff !important;
+      letter-spacing: 0.08em;
+      user-select: none;
+      padding: 20px 14px;
+      border-radius: 20px;
+      background-color: rgba(18, 18, 18, 0.95);
+      border: 3px solid rgba(255, 255, 255, 0.9);
+      box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.9),
+        0 0 20px var(--ui-accent);
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+      text-transform: uppercase;
     }
 
     .watermark-footer {
-      position: fixed; bottom: 6px; left: 50%; transform: translateX(-50%); z-index: 999999;
-      font-family: sans-serif; font-size: 10px; color: rgba(255, 255, 255, 0.4); pointer-events: none;
+      position: fixed;
+      bottom: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 999999;
+      font-family: sans-serif;
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.4);
+      pointer-events: none;
     }
 
     .modal {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95);
-      z-index: 9999999; justify-content: center; align-items: center;
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 9999999;
+      justify-content: center;
+      align-items: center;
     }
 
     .modal-content {
-      border: 2px solid var(--ui-border); background: #050a05; padding: 40px; text-align: center;
-      box-shadow: 0 0 40px var(--ui-accent); border-radius: 12px; max-width: 90vw;
+      border: 2px solid var(--ui-border);
+      background: #050a05;
+      padding: 40px;
+      text-align: center;
+      box-shadow: 0 0 40px var(--ui-accent);
+      border-radius: 12px;
+      max-width: 90vw;
     }
 
     .modal-content a {
-      color: var(--ui-accent); text-decoration: none; font-size: 1.4rem; display: block; margin: 24px 0;
+      color: var(--ui-accent);
+      text-decoration: none;
+      font-size: 1.4rem;
+      display: block;
+      margin: 24px 0;
     }
 
     .close-btn {
-      background: transparent; border: 2px solid var(--ui-border); color: var(--ui-accent); padding: 10px 24px;
-      font-family: inherit; font-size: 1.1rem; cursor: pointer; border-radius: 6px;
+      background: transparent;
+      border: 2px solid var(--ui-border);
+      color: var(--ui-accent);
+      padding: 10px 24px;
+      font-family: inherit;
+      font-size: 1.1rem;
+      cursor: pointer;
+      border-radius: 6px;
     }
   </style>
 </head>
+
 <body>
 
-  <div id="tap-prev" style="position:fixed; top:0; left:0; width:100vw; height:45vh; z-index:40; cursor:pointer;"></div>
-  <div id="tap-next" style="position:fixed; bottom:0; left:0; width:100vw; height:45vh; z-index:40; cursor:pointer;"></div>
+  <div
+    id="tap-prev"
+    style="position:fixed; top:0; left:0; width:100vw; height:45vh; z-index:40; cursor:pointer;"
+  ></div>
+
+  <div
+    id="tap-next"
+    style="position:fixed; bottom:0; left:0; width:100vw; height:45vh; z-index:40; cursor:pointer;"
+  ></div>
 
   <div class="top-bar-ui">
     <div class="top-group">
-      <button id="audio-toggle" class="top-btn" onclick="toggleAudio(event)">🔊</button>
-      <div id="phase-badge-top" class="phase-badge-top" onclick="nextPhase(event)">001: OUTRUN 198X</div>
+      <button id="audio-toggle" class="top-btn" onclick="toggleAudio(event)">🔇</button>
+      <div
+        id="phase-badge-top"
+        class="phase-badge-top"
+        onclick="nextPhase(event)"
+      >
+        001: OUTRUN 198X
+      </div>
     </div>
+
     <div class="top-group">
       <div id="visitor-box" class="visitor-counter">V:00666</div>
-      <button id="pause-toggle" class="top-btn" onclick="toggleAutoAdvance(event)">⏸️</button>
+
+      <button
+        id="pause-toggle"
+        class="top-btn"
+        onclick="toggleAutoAdvance(event)"
+      >
+        ⏸️
+      </button>
     </div>
   </div>
 
@@ -156,37 +354,89 @@
 
   <div id="main-container" class="container">
     <div id="scramble-text" class="title">
-      <span id="word-drew" class="clickable-word" onclick="handleDrewClick(event)">DREW</span><span id="word-dot" class="clickable-word" onclick="handleDotClick(event)">.</span><span id="word-wtf" class="clickable-word" onclick="handleWtfClick(event)">WTF</span>
+      <span
+        id="word-drew"
+        class="clickable-word"
+        onclick="handleDrewClick(event)"
+      >DREW</span><span
+        id="word-dot"
+        class="clickable-word"
+        onclick="handleDotClick(event)"
+      >.</span><span
+        id="word-wtf"
+        class="clickable-word"
+        onclick="handleWtfClick(event)"
+      >WTF</span>
     </div>
   </div>
 
   <div class="bottom-ui-container">
-    <button id="contact-btn" class="contact-btn" onclick="toggleModal(true)">[ INITIALIZE HANDSHAKE ]</button>
+    <button
+      id="contact-btn"
+      class="contact-btn"
+      onclick="toggleModal(true)"
+    >
+      [ INITIALIZE HANDSHAKE ]
+    </button>
   </div>
 
-  <div class="watermark-footer">Copyright © 2026 DREW.WTF. All rights reserved.</div>
+  <div class="watermark-footer">
+    Copyright © 2026 DREW.WTF. All rights reserved.
+  </div>
 
   <div id="contact-modal" class="modal">
     <div class="modal-content">
-      <p style="letter-spacing: 0.1em; font-size: 0.8rem; opacity: 0.8;">DIRECTORY INITIALIZED</p>
-      <a href="mailto:email@andrewhillier.ca">email@andrewhillier.ca</a>
-      <button class="close-btn" onclick="toggleModal(false)">[ CLOSE ]</button>
+      <p style="letter-spacing: 0.1em; font-size: 0.8rem; opacity: 0.8;">
+        DIRECTORY INITIALIZED
+      </p>
+
+      <a href="mailto:email@andrewhillier.ca">
+        email@andrewhillier.ca
+      </a>
+
+      <button
+        class="close-btn"
+        onclick="toggleModal(false)"
+      >
+        [ CLOSE ]
+      </button>
     </div>
   </div>
 
   <script>
-    document.getElementById('tap-prev').addEventListener('pointerdown', (e) => { e.preventDefault(); prevPhase(); });
-    document.getElementById('tap-next').addEventListener('pointerdown', (e) => { e.preventDefault(); nextPhase(); });
+    /* =========================================
+       TOUCH CONTROLS
+       ========================================= */
+
+    document.getElementById("tap-prev").addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      prevPhase();
+    });
+
+    document.getElementById("tap-next").addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      nextPhase();
+    });
 
     window.addEventListener("keydown", (e) => {
-      if (["ArrowUp", "ArrowRight", "ArrowDown", "ArrowLeft"].includes(e.key)) {
-        e.preventDefault(); 
-        if (e.key === "ArrowUp" || e.key === "ArrowRight") nextPhase();
-        else prevPhase();
+      if (
+        ["ArrowUp", "ArrowRight", "ArrowDown", "ArrowLeft"].includes(e.key)
+      ) {
+        e.preventDefault();
+
+        if (e.key === "ArrowUp" || e.key === "ArrowRight") {
+          nextPhase();
+        } else {
+          prevPhase();
+        }
       }
     });
 
-    /* --- 8-BIT MAGDALENA BAY SYNTH-POP AUDIO ENGINE --- */
+
+    /* =========================================
+       AUDIO ENGINE
+       ========================================= */
+
     let audioCtx = null;
     let masterGain = null;
     let isPlaying = false;
@@ -195,220 +445,702 @@
     let currentStep = 0;
 
     const mbFreqs = {
-      'C3': 130.81, 'Eb3': 155.56, 'G3': 196.00, 'Bb3': 233.08,
-      'C4': 261.63, 'D4': 293.66, 'Eb4': 311.13, 'F4': 349.23,
-      'G4': 392.00, 'Ab4': 415.30, 'Bb4': 466.16, 'C5': 523.25,
-      'Eb5': 622.25, 'F5': 698.46, 'G5': 783.99, 'Bb5': 932.33, 'C6': 1046.50
+      C3: 130.81,
+      Eb3: 155.56,
+      G3: 196.00,
+      Bb3: 233.08,
+      C4: 261.63,
+      D4: 293.66,
+      Eb4: 311.13,
+      F4: 349.23,
+      G4: 392.00,
+      Ab4: 415.30,
+      Bb4: 466.16,
+      C5: 523.25,
+      Eb5: 622.25,
+      F5: 698.46,
+      G5: 783.99,
+      Bb5: 932.33,
+      C6: 1046.50
     };
 
-    const mbLead = ['C5', 'Eb5', 'G5', 'Bb5', 'C6', 'Bb5', 'G5', 'Eb5', 'F5', 'Ab5', 'C6', 'Ab5', 'G5', 'Eb5', 'D4', 'C4'];
-    const mbBass = ['C3', 'C3', 'Eb3', 'Eb3', 'G3', 'G3', 'Bb3', 'Bb3'];
+    const mbLead = [
+      "C5", "Eb5", "G5", "Bb5",
+      "C6", "Bb5", "G5", "Eb5",
+      "F5", "Ab5", "C6", "Ab5",
+      "G5", "Eb5", "D4", "C4"
+    ];
+
+    const mbBass = [
+      "C3", "C3",
+      "Eb3", "Eb3",
+      "G3", "G3",
+      "Bb3", "Bb3"
+    ];
 
     function play8BitSynth(freq, type, startTime, duration, vol) {
       if (!freq || !audioCtx || !masterGain) return;
+
       try {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
+
         osc.type = type;
         osc.frequency.setValueAtTime(freq, startTime);
+
         gain.gain.setValueAtTime(vol, startTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
-        osc.connect(gain); gain.connect(masterGain);
-        osc.start(startTime); osc.stop(startTime + duration + 0.05);
-      } catch (e) {}
+        gain.gain.exponentialRampToValueAtTime(
+          0.001,
+          startTime + duration
+        );
+
+        osc.connect(gain);
+        gain.connect(masterGain);
+
+        osc.start(startTime);
+        osc.stop(startTime + duration + 0.05);
+      } catch (e) {
+        console.warn("Audio oscillator error:", e);
+      }
     }
 
     function play8BitNoise(startTime) {
-       try {
-        const bufferSize = audioCtx.sampleRate * 0.08;
-        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      if (!audioCtx || !masterGain) return;
+
+      try {
+        const bufferSize = Math.floor(audioCtx.sampleRate * 0.08);
+        const buffer = audioCtx.createBuffer(
+          1,
+          bufferSize,
+          audioCtx.sampleRate
+        );
+
         const data = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+
         const noise = audioCtx.createBufferSource();
         noise.buffer = buffer;
+
         const gain = audioCtx.createGain();
+
         gain.gain.setValueAtTime(0.08, startTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.08);
-        noise.connect(gain); gain.connect(masterGain);
+        gain.gain.exponentialRampToValueAtTime(
+          0.001,
+          startTime + 0.08
+        );
+
+        noise.connect(gain);
+        gain.connect(masterGain);
+
         noise.start(startTime);
-       } catch(e){}
+      } catch (e) {
+        console.warn("Audio noise error:", e);
+      }
     }
 
     function scheduleMagdalenaBay8Bit() {
-      if (!isPlaying || !audioCtx || audioCtx.state !== 'running') return;
-      const scheduleAheadTime = 0.2;
-      const noteTime = (60.0 / 130) / 4; 
+      if (
+        !isPlaying ||
+        !audioCtx ||
+        audioCtx.state !== "running"
+      ) {
+        return;
+      }
 
-      while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
-        let step = currentStep % 16;
+      const scheduleAheadTime = 0.2;
+      const noteTime = (60.0 / 130) / 4;
+
+      while (
+        nextNoteTime <
+        audioCtx.currentTime + scheduleAheadTime
+      ) {
+        const step = currentStep % 16;
+
         const leadNote = mbLead[step];
-        if (mbFreqs[leadNote]) play8BitSynth(mbFreqs[leadNote], 'square', nextNoteTime, noteTime * 1.1, 0.06);
-        if (step % 2 === 0) {
-          const bassNote = mbBass[Math.floor(step / 2) % mbBass.length];
-          if (mbFreqs[bassNote]) play8BitSynth(mbFreqs[bassNote], 'sawtooth', nextNoteTime, noteTime * 1.4, 0.2);
+
+        if (mbFreqs[leadNote]) {
+          play8BitSynth(
+            mbFreqs[leadNote],
+            "square",
+            nextNoteTime,
+            noteTime * 1.1,
+            0.06
+          );
         }
-        if (step === 4 || step === 12 || step % 4 === 2) play8BitNoise(nextNoteTime);
+
+        if (step % 2 === 0) {
+          const bassNote =
+            mbBass[Math.floor(step / 2) % mbBass.length];
+
+          if (mbFreqs[bassNote]) {
+            play8BitSynth(
+              mbFreqs[bassNote],
+              "sawtooth",
+              nextNoteTime,
+              noteTime * 1.4,
+              0.2
+            );
+          }
+        }
+
+        if (
+          step === 4 ||
+          step === 12 ||
+          step % 4 === 2
+        ) {
+          play8BitNoise(nextNoteTime);
+        }
 
         nextNoteTime += noteTime;
         currentStep++;
       }
-      timerID = setTimeout(scheduleMagdalenaBay8Bit, 100);
+
+      timerID = setTimeout(
+        scheduleMagdalenaBay8Bit,
+        100
+      );
     }
 
     function toggleAudio(e) {
       if (e) e.stopPropagation();
+
       const btn = document.getElementById("audio-toggle");
+
       if (!isPlaying) {
         if (!audioCtx) {
-          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-          masterGain = audioCtx.createGain(); 
-          masterGain.gain.value = 1; 
+          const AudioContext =
+            window.AudioContext ||
+            window.webkitAudioContext;
+
+          if (!AudioContext) {
+            alert("Your browser does not support Web Audio.");
+            return;
+          }
+
+          audioCtx = new AudioContext();
+
+          masterGain = audioCtx.createGain();
+          masterGain.gain.value = 1;
+
           masterGain.connect(audioCtx.destination);
         }
-        
+
         audioCtx.resume().then(() => {
-          nextNoteTime = audioCtx.currentTime + 0.05;
-          currentStep = 0; 
+          nextNoteTime =
+            audioCtx.currentTime + 0.05;
+
+          currentStep = 0;
           isPlaying = true;
-          btn.textContent = '🔊'; 
+
+          btn.textContent = "🔊";
+
           scheduleMagdalenaBay8Bit();
         });
       } else {
         isPlaying = false;
-        if (timerID) clearTimeout(timerID);
-        btn.textContent = '🔇';
+
+        if (timerID) {
+          clearTimeout(timerID);
+          timerID = null;
+        }
+
+        btn.textContent = "🔇";
       }
     }
 
-    /* --- CANVAS ANIMATION ENGINE --- */
-    const canvas = document.getElementById("bg-canvas");
+
+    /* =========================================
+       CANVAS ENGINE
+       ========================================= */
+
+    const canvas =
+      document.getElementById("bg-canvas");
+
     const ctx = canvas.getContext("2d");
-    let width, height, cx, cy;
+
+    let width;
+    let height;
+    let cx;
+    let cy;
+
     let globalAngle = 0;
-    let autoAdvancePaused = false;
 
     function resizeCanvas() {
-      width = window.innerWidth; 
+      width = window.innerWidth;
       height = window.innerHeight;
-      canvas.width = width; 
+
+      canvas.width = width;
       canvas.height = height;
-      cx = width / 2; 
+
+      cx = width / 2;
       cy = height / 2;
     }
-    window.addEventListener("resize", resizeCanvas);
+
+    window.addEventListener(
+      "resize",
+      resizeCanvas
+    );
+
     resizeCanvas();
 
-    let particles = [];
-    for (let i = 0; i < 250; i++) particles.push({ x: Math.random() * width, y: Math.random() * height, z: Math.random() * width });
-    let matrixCols = [];
+    const particles = [];
 
-    const renderers = [
-      () => {
-        ctx.fillStyle = "rgba(10,0,20,0.3)"; ctx.fillRect(0,0,width,height);
-        ctx.fillStyle = "#ff00aa"; ctx.beginPath(); ctx.arc(cx, cy, 150, 0, Math.PI, true); ctx.fill();
-        ctx.strokeStyle = "#00ffff"; ctx.lineWidth = 2;
-        for(let i=0; i<20; i++) {
-            let y = cy + Math.pow((globalAngle*2 + i)%20, 2);
-            if(y < height) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke(); }
-        }
-      },
-      () => {
-        ctx.fillStyle = "rgba(0,0,0,0.3)"; ctx.fillRect(0,0,width,height);
-        particles.forEach(p => {
-          p.z -= 8; if(p.z <= 0) p.z = width;
-          let sx = (p.x - cx) * (width/p.z) + cx, sy = (p.y - cy) * (width/p.z) + cy;
-          ctx.fillStyle = "#ffffff"; ctx.fillRect(sx, sy, 3, 3);
-        });
-      },
-      () => {
-        ctx.fillStyle = "rgba(20,10,0,0.3)"; ctx.fillRect(0,0,width,height);
-        ctx.strokeStyle = "#ff6600"; ctx.lineWidth = 4;
-        ctx.strokeRect(cx - 100, cy - 100, 200, 200);
-        ctx.fillStyle = "#ff6600"; ctx.font = "bold 80px sans-serif";
-        ctx.fillText("λ", cx - 30, cy + 30);
-      },
-      () => {
-        ctx.fillStyle = "rgba(20,0,30,0.3)"; ctx.fillRect(0,0,width,height);
-        ctx.font = "40px serif";
-        for(let i=0; i<8; i++) {
-           let x = (cx + Math.sin(globalAngle*2 + i)*250) % width;
-           let y = (cy + Math.cos(globalAngle*1.5 + i)*150) % height;
-           ctx.fillText(i%2===0 ? "💎" : "🪙", Math.abs(x), Math.abs(y));
-        }
-      },
-      () => {
-        ctx.fillStyle = "#e6f2ff"; ctx.fillRect(0,0,width,height);
-        ctx.strokeStyle = "#ff0000"; ctx.lineWidth = 6;
-        ctx.beginPath(); ctx.arc(cx, cy, 120, 0, Math.PI*2); ctx.stroke();
-        ctx.fillStyle = "#ff0000"; ctx.font = "50px serif"; ctx.fillText("🪽", cx - 25, cy + 15);
-      },
-      () => {
-        ctx.fillStyle = "rgba(30,0,0,0.3)"; ctx.fillRect(0,0,width,height);
-        ctx.font = "30px serif";
-        for(let i=0; i<15; i++) {
-           let x = (i * 80 + globalAngle*50) % width;
-           let y = (globalAngle*120 + i*60) % height;
-           ctx.fillText("🍁", x, y);
-        }
-      },
-      () => {
-        ctx.fillStyle = "rgba(0,0,10,0.3)"; ctx.fillRect(0,0,width,height);
-        ctx.fillStyle = "#555555"; ctx.fillRect(cx - 10, cy - 150, 20, 300);
-        ctx.fillStyle = "#ff0000"; ctx.fillRect(cx - 30, cy - 80, 60, 20);
-        ctx.beginPath(); ctx.arc(cx, cy - 150, 8, 0, Math.PI*2); ctx.fill();
-      }
-    ];
-
-    function animateCanvas() {
-      globalAngle += 0.015;
-      let rendererFunc = renderers[currentPhase % renderers.length];
-      if(rendererFunc) rendererFunc();
-      requestAnimationFrame(animateCanvas);
+    for (let i = 0; i < 250; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        z: Math.random() * width
+      });
     }
 
-    const phaseNamesRaw = "OUTRUN 198X,SKYNET NEURAL NET,420 BLAZE IT,TYPEWRITER TERMINAL,PALLET TOWN (PKMN),DIGI-WORLD (DIGIMON),MOON PRISM (SAILOR)";
-    const phaseNames = phaseNamesRaw.split(',');
-    const phaseColors = ["#000000", "#1a0f00", "#0a0015", "#000a10", "#001005"];
+
+    /* =========================================
+       PHASES
+       ========================================= */
+
+    const phaseNamesRaw =
+      "OUTRUN 198X,SKYNET NEURAL NET,420 BLAZE IT,TYPEWRITER TERMINAL,PALLET TOWN (PKMN),DIGI-WORLD (DIGIMON),MOON PRISM (SAILOR)";
+
+    const phaseNames =
+      phaseNamesRaw.split(",");
+
+    const phaseColors = [
+      "#000000",
+      "#1a0f00",
+      "#0a0015",
+      "#000a10",
+      "#001005",
+      "#00100a",
+      "#100010"
+    ];
 
     let currentPhase = 1;
     let phaseTimer = null;
+    let autoAdvancePaused = false;
+
+
+    /* =========================================
+       CANVAS RENDERERS
+       ========================================= */
+
+    const renderers = [
+
+      // OUTRUN
+      () => {
+        ctx.fillStyle =
+          "rgba(10,0,20,0.3)";
+        ctx.fillRect(
+          0,
+          0,
+          width,
+          height
+        );
+
+        ctx.fillStyle = "#ff00aa";
+
+        ctx.beginPath();
+
+        ctx.arc(
+          cx,
+          cy,
+          150,
+          0,
+          Math.PI,
+          true
+        );
+
+        ctx.fill();
+
+        ctx.strokeStyle = "#00ffff";
+        ctx.lineWidth = 2;
+
+        for (let i = 0; i < 20; i++) {
+          const y =
+            cy +
+            Math.pow(
+              (globalAngle * 2 + i) % 20,
+              2
+            );
+
+          if (y < height) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(width, y);
+            ctx.stroke();
+          }
+        }
+      },
+
+
+      // STARFIELD
+      () => {
+        ctx.fillStyle =
+          "rgba(0,0,0,0.3)";
+
+        ctx.fillRect(
+          0,
+          0,
+          width,
+          height
+        );
+
+        particles.forEach((p) => {
+          p.z -= 8;
+
+          if (p.z <= 0) {
+            p.z = width;
+          }
+
+          const sx =
+            (p.x - cx) *
+            (width / p.z) +
+            cx;
+
+          const sy =
+            (p.y - cy) *
+            (width / p.z) +
+            cy;
+
+          ctx.fillStyle = "#ffffff";
+
+          ctx.fillRect(
+            sx,
+            sy,
+            3,
+            3
+          );
+        });
+      },
+
+
+      // NEURAL
+      () => {
+        ctx.fillStyle =
+          "rgba(20,10,0,0.3)";
+
+        ctx.fillRect(
+          0,
+          0,
+          width,
+          height
+        );
+
+        ctx.strokeStyle = "#ff6600";
+        ctx.lineWidth = 4;
+
+        ctx.strokeRect(
+          cx - 100,
+          cy - 100,
+          200,
+          200
+        );
+
+        ctx.fillStyle = "#ff6600";
+        ctx.font =
+          "bold 80px sans-serif";
+
+        ctx.fillText(
+          "λ",
+          cx - 30,
+          cy + 30
+        );
+      },
+
+
+      // TYPEWRITER
+      () => {
+        ctx.fillStyle =
+          "rgba(20,0,30,0.3)";
+
+        ctx.fillRect(
+          0,
+          0,
+          width,
+          height
+        );
+
+        ctx.font = "40px serif";
+
+        for (let i = 0; i < 8; i++) {
+          const x =
+            (cx +
+              Math.sin(
+                globalAngle * 2 + i
+              ) *
+                250) %
+            width;
+
+          const y =
+            (cy +
+              Math.cos(
+                globalAngle * 1.5 + i
+              ) *
+                150) %
+            height;
+
+          ctx.fillText(
+            i % 2 === 0
+              ? "💎"
+              : "🪙",
+            Math.abs(x),
+            Math.abs(y)
+          );
+        }
+      },
+
+
+      // ANGEL
+      () => {
+        ctx.fillStyle = "#e6f2ff";
+
+        ctx.fillRect(
+          0,
+          0,
+          width,
+          height
+        );
+
+        ctx.strokeStyle = "#ff0000";
+        ctx.lineWidth = 6;
+
+        ctx.beginPath();
+
+        ctx.arc(
+          cx,
+          cy,
+          120,
+          0,
+          Math.PI * 2
+        );
+
+        ctx.stroke();
+
+        ctx.fillStyle = "#ff0000";
+        ctx.font = "50px serif";
+
+        ctx.fillText(
+          "🪽",
+          cx - 25,
+          cy + 15
+        );
+      },
+
+
+      // CANADA
+      () => {
+        ctx.fillStyle =
+          "rgba(30,0,0,0.3)";
+
+        ctx.fillRect(
+          0,
+          0,
+          width,
+          height
+        );
+
+        ctx.font = "30px serif";
+
+        for (let i = 0; i < 15; i++) {
+          const x =
+            (i * 80 +
+              globalAngle * 50) %
+            width;
+
+          const y =
+            (globalAngle * 120 +
+              i * 60) %
+            height;
+
+          ctx.fillText(
+            "🍁",
+            x,
+            y
+          );
+        }
+      },
+
+
+      // SIGNAL
+      () => {
+        ctx.fillStyle =
+          "rgba(0,0,10,0.3)";
+
+        ctx.fillRect(
+          0,
+          0,
+          width,
+          height
+        );
+
+        ctx.fillStyle = "#555555";
+
+        ctx.fillRect(
+          cx - 10,
+          cy - 150,
+          20,
+          300
+        );
+
+        ctx.fillStyle = "#ff0000";
+
+        ctx.fillRect(
+          cx - 30,
+          cy - 80,
+          60,
+          20
+        );
+
+        ctx.beginPath();
+
+        ctx.arc(
+          cx,
+          cy - 150,
+          8,
+          0,
+          Math.PI * 2
+        );
+
+        ctx.fill();
+      }
+    ];
+
+
+    function animateCanvas() {
+      globalAngle += 0.015;
+
+      const rendererFunc =
+        renderers[
+          (currentPhase - 1) %
+          renderers.length
+        ];
+
+      if (rendererFunc) {
+        rendererFunc();
+      }
+
+      requestAnimationFrame(
+        animateCanvas
+      );
+    }
+
+
+    /* =========================================
+       PHASE CONTROLS
+       ========================================= */
 
     function setPhase(p) {
       currentPhase = p;
-      if (currentPhase > phaseNames.length) currentPhase = 1;
-      if (currentPhase < 1) currentPhase = phaseNames.length;
 
-      const pName = phaseNames[currentPhase - 1] || "SYSTEM GLITCH";
-      document.getElementById("phase-badge-top").textContent = `${String(currentPhase).padStart(3, '0')}: ${pName}`;
-      document.body.style.backgroundColor = phaseColors[currentPhase % phaseColors.length];
-    }
-
-    function prevPhase() { setPhase(currentPhase - 1); resetPhaseTimer(); }
-    function nextPhase() { setPhase(currentPhase + 1); resetPhaseTimer(); }
-
-    function resetPhaseTimer() {
-      if (phaseTimer) clearInterval(phaseTimer);
-      if (!autoAdvancePaused) {
-        phaseTimer = setInterval(() => { nextPhase(); }, 30000);
+      if (currentPhase > phaseNames.length) {
+        currentPhase = 1;
       }
+
+      if (currentPhase < 1) {
+        currentPhase = phaseNames.length;
+      }
+
+      const pName =
+        phaseNames[currentPhase - 1] ||
+        "SYSTEM GLITCH";
+
+      document.getElementById(
+        "phase-badge-top"
+      ).textContent =
+        `${String(currentPhase).padStart(3, "0")}: ${pName}`;
+
+      document.body.style.backgroundColor =
+        phaseColors[currentPhase - 1] ||
+        "#000000";
     }
 
-    let autoAdvancePaused = false;
-    function toggleAutoAdvance(e) {
-      if(e) e.stopPropagation();
-      autoAdvancePaused = !autoAdvancePaused;
-      document.getElementById("pause-toggle").textContent = autoAdvancePaused ? "▶️" : "⏸️";
+    function prevPhase() {
+      setPhase(currentPhase - 1);
       resetPhaseTimer();
     }
 
-    function handleDrewClick(e) { if(e) e.stopPropagation(); prevPhase(); }
-    function handleWtfClick(e) { if(e) e.stopPropagation(); nextPhase(); }
-    function handleDotClick(e) { if(e) e.stopPropagation(); setPhase(Math.floor(Math.random()*phaseNames.length) + 1); resetPhaseTimer(); }
-    function toggleModal(show) { document.getElementById('contact-modal').style.display = show ? 'flex' : 'none'; }
+    function nextPhase() {
+      setPhase(currentPhase + 1);
+      resetPhaseTimer();
+    }
+
+    function resetPhaseTimer() {
+      if (phaseTimer) {
+        clearInterval(phaseTimer);
+        phaseTimer = null;
+      }
+
+      if (!autoAdvancePaused) {
+        phaseTimer = setInterval(() => {
+          nextPhase();
+        }, 30000);
+      }
+    }
+
+    function toggleAutoAdvance(e) {
+      if (e) {
+        e.stopPropagation();
+      }
+
+      autoAdvancePaused =
+        !autoAdvancePaused;
+
+      document.getElementById(
+        "pause-toggle"
+      ).textContent =
+        autoAdvancePaused
+          ? "▶️"
+          : "⏸️";
+
+      resetPhaseTimer();
+    }
+
+
+    /* =========================================
+       TITLE / MODAL CONTROLS
+       ========================================= */
+
+    function handleDrewClick(e) {
+      if (e) e.stopPropagation();
+      prevPhase();
+    }
+
+    function handleWtfClick(e) {
+      if (e) e.stopPropagation();
+      nextPhase();
+    }
+
+    function handleDotClick(e) {
+      if (e) e.stopPropagation();
+
+      setPhase(
+        Math.floor(
+          Math.random() *
+          phaseNames.length
+        ) + 1
+      );
+
+      resetPhaseTimer();
+    }
+
+    function toggleModal(show) {
+      document.getElementById(
+        "contact-modal"
+      ).style.display =
+        show ? "flex" : "none";
+    }
+
+
+    /* =========================================
+       START
+       ========================================= */
 
     setPhase(1);
     resetPhaseTimer();
     animateCanvas();
   </script>
+
 </body>
 </html>
