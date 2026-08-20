@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@900&family=Comic+Neue:wght@700&family=Courier+Prime:wght@700&family=Fira+Code:wght@700&family=Noto+Sans+SC:wght@900&family=Noto+Sans+Devanagari:wght@900&family=Orbitron:wght@900&family=Permanent+Marker&family=Press+Start+2P&family=Russo+One&family=VT323&display=swap" rel="stylesheet">
 
-  <!-- SVG Distortion Filter for Swirl & Trip Phases -->
+  <!-- SVG Distortion Filter -->
   <svg style="position: absolute; width: 0; height: 0;">
     <filter id="swirl-filter">
       <feTurbulence id="turbulence" type="fractalNoise" baseFrequency="0.02" numOctaves="3" result="noise" />
@@ -128,7 +129,7 @@
       100% { opacity: 0.97; }
     }
 
-    /* POSSESSED VISITOR COUNTER (Top Right) */
+    /* POSSESSED VISITOR COUNTER */
     .visitor-counter {
       position: fixed;
       top: max(16px, env(safe-area-inset-top, 16px));
@@ -147,7 +148,7 @@
       letter-spacing: 0.1em;
     }
 
-    /* UNIFIED BOTTOM UI CONTAINER */
+    /* SIDE-BY-SIDE SIDE BOTTOM UI CONTAINER */
     .bottom-ui-container {
       position: fixed;
       bottom: max(20px, env(safe-area-inset-bottom, 20px));
@@ -155,25 +156,26 @@
       transform: translateX(-50%);
       z-index: 999999;
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
+      justify-content: center;
       align-items: center;
-      gap: 12px;
+      gap: 16px;
       pointer-events: auto;
-      width: clamp(280px, 85vw, 420px);
+      width: clamp(320px, 90vw, 600px);
     }
 
     .ui-box {
-      width: 100%;
+      flex: 1;
       box-sizing: border-box;
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-      font-size: 20px;
+      font-size: 16px;
       font-weight: 900;
       color: #ffffff !important;
       -webkit-text-fill-color: #ffffff !important;
       letter-spacing: 0.08em;
       user-select: none;
       -webkit-user-select: none;
-      padding: 16px 24px;
+      padding: 14px 20px;
       border-radius: 40px;
       background-color: rgba(15, 15, 15, 0.95);
       border: 3px solid rgba(255, 255, 255, 0.85);
@@ -201,7 +203,7 @@
       pointer-events: none;
     }
 
-    /* TRIP & OS ANIMATION ENGINE STYLES */
+    /* ANIMATION STYLES */
     .swirl-trip { filter: url(#swirl-filter) !important; }
     .spin { animation: spin-hue 3s linear infinite !important; }
     @keyframes spin-hue { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
@@ -247,16 +249,14 @@
     </div>
   </div>
 
-  <!-- Bottom UI Controls -->
+  <!-- Bottom UI Controls (Side by Side) -->
   <div class="bottom-ui-container">
     <button id="audio-toggle" class="ui-box audio-btn" onclick="toggleAudio(event)">🔇 UNMUTE MUSIC</button>
-    <div id="phase-badge" class="ui-box phase-watermark">
-      PHASE NO. 0
-    </div>
+    <div id="phase-badge" class="ui-box phase-watermark">PHASE NO. 0</div>
   </div>
 
   <script>
-    /* --- FULL SHEET MUSIC TRANSCRIBED WEB AUDIO ENGINE --- */
+    /* --- FULL TRANSCRIBED WEB AUDIO ENGINE --- */
     let audioCtx = null;
     let isPlaying = false;
     let nextNoteTime = 0;
@@ -282,7 +282,7 @@
       'G3', 'F#3', 'B3', 'C4', 'G3', 'F#3', 'B3', 'C4', 'G3', 'B3', 'F#3', 'C4', 'G3', 'B3', 'F#3', 'C4'
     ];
 
-    function playNote(freq, startTime, duration, waveType = 'square', gainLevel = 0.06) {
+    function playNote(freq, startTime, duration, waveType = 'square', gainLevel = 0.08) {
       if (!freq || !audioCtx) return;
       try {
         const osc = audioCtx.createOscillator();
@@ -306,12 +306,12 @@
 
       while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
         const t1Note = track1Ostinato[currentStep % track1Ostinato.length];
-        if (freqs[t1Note]) playNote(freqs[t1Note], nextNoteTime, eighthNoteTime * 0.85, 'square', 0.05);
+        if (freqs[t1Note]) playNote(freqs[t1Note], nextNoteTime, eighthNoteTime * 0.85, 'square', 0.07);
 
         if (currentStep % 2 === 0) {
           const t2Index = Math.floor(currentStep / 2) % track2Harmony.length;
           const t2Note = track2Harmony[t2Index];
-          if (t2Note && freqs[t2Note]) playNote(freqs[t2Note], nextNoteTime, eighthNoteTime * 1.8, 'square', 0.08);
+          if (t2Note && freqs[t2Note]) playNote(freqs[t2Note], nextNoteTime, eighthNoteTime * 1.8, 'square', 0.1);
         }
 
         nextNoteTime += eighthNoteTime;
@@ -323,9 +323,16 @@
     function toggleAudio(e) {
       if (e) e.stopPropagation();
       const btn = document.getElementById("audio-toggle");
+      
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+
       if (!isPlaying) {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
         nextNoteTime = audioCtx.currentTime + 0.05;
         currentStep = 0;
         isPlaying = true;
@@ -354,7 +361,7 @@
       { font: "'Courier New', Courier, monospace" }
     ];
 
-    /* --- CANVAS BACKGROUND MULTI-MODE ENGINE --- */
+    /* --- CANVAS ENGINE --- */
     const canvas = document.getElementById("bg-canvas");
     const ctx = canvas.getContext("2d");
 
@@ -453,7 +460,6 @@
       globalAngle += 0.02;
 
       if (renderMode === "tron") {
-        // TRON Cyber Grid Mode
         ctx.fillStyle = "rgba(0, 5, 20, 0.3)";
         ctx.fillRect(0, 0, width, height);
 
@@ -461,7 +467,6 @@
         ctx.lineWidth = 1.5;
         const horizon = height * 0.55;
 
-        // Perspective Floor Grid
         for (let x = -width; x < width * 2; x += 80) {
           ctx.beginPath();
           ctx.moveTo(x, height);
@@ -475,7 +480,6 @@
           ctx.stroke();
         }
       } else if (renderMode === "spiral") {
-        // Hypnotic Trippy Spiral Mode
         ctx.fillStyle = "rgba(10, 0, 15, 0.2)";
         ctx.fillRect(0, 0, width, height);
 
@@ -492,7 +496,6 @@
         }
         ctx.restore();
       } else {
-        // Default Starfield Particles
         ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
         ctx.fillRect(0, 0, width, height);
 
@@ -512,7 +515,7 @@
     window.addEventListener("orientationchange", resizeCanvas);
     initParticles();
 
-    /* --- POSSESSED ROLLING VISITOR COUNTER ENGINE --- */
+    /* --- POSSESSED ROLLING VISITOR COUNTER --- */
     const visitorBox = document.getElementById("visitor-box");
     function runPossessedCounter() {
       setInterval(() => {
@@ -535,7 +538,7 @@
       "#001a0a", "#1a1200", "#12001a", "#051015", "#1c0d02", "#150022"
     ];
 
-    /* --- 300 PROCEDURAL WACKY & POSSESSED PHASE ENGINE --- */
+    /* --- 300 PHASE ENGINE --- */
     let currentPhase = 0;
     let phaseTimer = null;
     let activeWordLeft = "DREW";
@@ -584,42 +587,33 @@
       activeWordRight = variant[1];
       warpSpeed = (currentPhase % 30) + 2;
 
-      // 300-Phase Multi-Mode Engine
       if (currentPhase % 18 === 0) {
-        // TRON Cyber Grid Mode
         renderMode = "tron";
         el.style.color = "#00f0ff";
         el.style.fontFamily = "'Orbitron', sans-serif";
         el.style.textShadow = "0 0 20px #00f0ff";
       } else if (currentPhase % 16 === 0) {
-        // Heavenly Flowers Mode
         renderMode = "flowers";
         document.body.style.backgroundColor = "#0d1a0d";
         el.style.color = "#ffb6c1";
         el.style.textShadow = "0 0 15px #ffb6c1";
       } else if (currentPhase % 14 === 0) {
-        // Possessed Demonic Evil Mode
         renderMode = "devils";
         document.body.style.backgroundColor = "#1a0000";
         el.style.color = "#ff0000";
         el.style.textShadow = "0 0 30px #ff0000, 0 0 60px #880000";
         el.classList.add("slice-glitch");
       } else if (currentPhase % 12 === 0) {
-        // Hypnotic Spiral Trip
         renderMode = "spiral";
       } else if (currentPhase % 10 === 0) {
-        // Salvia Split
         el.classList.add("salvia-split");
       } else if (currentPhase % 8 === 0) {
-        // Cat Chaos
         renderMode = "cats";
         el.style.color = "#ff69b4";
       } else if (currentPhase % 7 === 0) {
-        // Doge Overdrive
         renderMode = "dogs";
         el.style.color = "#ffdd55";
       } else if (currentPhase % 5 === 0) {
-        // Liquid LSD Wave
         el.classList.add("liquid-wave");
         el.style.color = "#ff00ff";
       } else if (currentPhase % 3 === 0) {
@@ -730,3 +724,5 @@
   </script>
 </body>
 </html>
+
+```
