@@ -1,3 +1,13 @@
+The reason it looks broken (with all the text showing up on your screen) is because the conversational text from my chat reply was copied directly into your `index.html` file along with the code.
+
+To fix this:
+
+1. Open your `index.html` file.
+2. Delete everything currently inside it.
+3. Copy **only** the code block below—starting from `<!DOCTYPE html>` all the way down to `</html>`—and paste *only* that into the file.
+4. Once loaded in your browser, **click the speaker button (`🔇`) in the top left corner** to start the music (modern web browsers block audio from playing automatically until you click a button).
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -346,6 +356,7 @@
 
     let particles = [];
     for (let i = 0; i < 250; i++) particles.push({ x: Math.random() * width, y: Math.random() * height, z: Math.random() * width });
+    let matrixCols = [];
 
     const renderers = [
       // 0: Outrun Sun Grid
@@ -508,8 +519,10 @@
       () => {
         ctx.fillStyle = "rgba(0,0,0,0.15)"; ctx.fillRect(0,0,width,height);
         ctx.fillStyle = "#00ffff"; ctx.font = "20px monospace";
+        if (matrixCols.length < Math.floor(width/20)) { for(let i=0;i<width/20;i++) matrixCols[i] = Math.random()*height; }
         matrixCols.forEach((y, i) => {
           ctx.fillText(String.fromCharCode(0x30A0 + Math.random()*96), i*20, y);
+          matrixCols[i] = y > height || Math.random() > 0.975 ? 0 : y + 20;
         });
       }
     };
@@ -626,3 +639,5 @@
   </script>
 </body>
 </html>
+
+```
