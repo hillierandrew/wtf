@@ -42,6 +42,7 @@
       overflow: hidden;
       position: relative;
       touch-action: manipulation;
+      transition: background-color 0.5s ease;
     }
 
     body {
@@ -72,7 +73,7 @@
       display: block;
       position: fixed;
       top: 0; left: 0; bottom: 0; right: 0;
-      background: radial-gradient(circle at center, transparent 35%, rgba(0, 0, 0, 0.92) 100%);
+      background: radial-gradient(circle at center, transparent 35%, rgba(0, 0, 0, 0.85) 100%);
       pointer-events: none !important;
       z-index: 10;
     }
@@ -257,13 +258,12 @@
   </div>
 
   <script>
-    /* --- MULTI-TRACK POKÉMON MUSIC ENGINE (Transcribed Guitar Tab & Themes) --- */
+    /* --- EXACT SHEET MUSIC SYNTHESIZER ENGINE (Lavender Town Piano Arrangement) --- */
     let audioCtx = null;
     let isPlaying = false;
     let nextNoteTime = 0;
     let timerID = null;
     let currentStep = 0;
-    let activeTrackMode = "lavender"; // "lavender", "center", "gym"
 
     const freqs = {
       'C3': 130.81, 'C#3': 138.59, 'D3': 146.83, 'D#3': 155.56, 'E3': 164.81, 'F3': 174.61, 'F#3': 185.00, 'G3': 196.00, 'G#3': 207.65, 'A3': 220.00, 'A#3': 233.08, 'B3': 246.94,
@@ -272,20 +272,17 @@
       'C6': 1046.50, 'C#6': 1108.73, 'D6': 1174.66, 'D#6': 1244.51, 'E6': 1318.51, 'F6': 1396.91, 'F#6': 1479.98, 'G6': 1567.98, 'G#6': 1661.22, 'A6': 1760.00, 'B6': 1975.53
     };
 
-    // Guitar Tab Lavender Town Intro Echo: Fret 18 G (D#5), Fret 21 B (G#5), Fret 20 e (C6)
-    const lavenderEcho = ['D#5', 'G#5', 'C6', 'G#5'];
-    
-    // Tab Lead Lines: 13-13-10-10-13-12-10-13-7-7 / 13-13-12-12-13-13-12-13-14-14
-    const lavenderMelody = [
-      'C5', 'C5', 'G#4', 'G#4', 'C5', 'B4', 'G#4', 'C5', 'E4', 'E4',
-      'C5', 'C5', 'B4', 'B4', 'C5', 'C5', 'B4', 'C5', 'C#5', 'C#5'
+    // Right-Hand High Ostinato Pattern from Score: B5 -> C6 -> G5 -> B5 -> F#5[cite: 1]
+    const scoreOstinato = ['B5', 'C6', 'G5', 'B5', 'F#5', 'B5', 'C6', 'G5', 'B5', 'F#5', 'B5', 'C6', 'G5', 'B5', 'F#5', 'B5'];
+
+    // Left-Hand Bass Notes from Score: Measures 5-12, 13-20[cite: 1]
+    const scoreBassline = [
+      null, null, null, null,
+      'C3', 'G3', 'C3', 'G3', 'C3', 'G3', 'C3', 'G3',
+      'G2', 'D3', 'G2', 'D3', 'G2', 'D3', 'G2', 'D3',
+      'C3', 'G3', 'C3', 'G3', 'C3', 'G3', 'C3', 'G3',
+      'F#2', 'C#3', 'F#2', 'C#3', 'F#2', 'C#3', 'F#2', 'C#3'
     ];
-
-    // Pokémon Center Theme Sequence
-    const centerTheme = ['C5', 'E5', 'G5', 'C6', 'B5', 'G5', 'E5', 'C5', 'D5', 'F5', 'A5', 'D6', 'C6', 'A5', 'F5', 'D5'];
-
-    // Gym Battle Theme Sequence
-    const gymTheme = ['A4', 'A4', 'C5', 'A4', 'D5', 'A4', 'D#5', 'D5', 'A4', 'A4', 'C5', 'A4', 'G5', 'F5', 'E5', 'D5'];
 
     function playNote(freq, startTime, duration, waveType = 'square', gainLevel = 0.08) {
       if (!freq || !audioCtx) return;
@@ -307,26 +304,18 @@
       if (!isPlaying || !audioCtx) return;
       const lookAhead = 0.1;
       const scheduleAheadTime = 0.2;
-      const noteTime = (60.0 / 120) / 2;
+      const noteTime = (60.0 / 120) / 2; // 120 BPM tempo[cite: 1]
 
       while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
-        if (activeTrackMode === "lavender") {
-          // Tab Arpeggio Echo
-          const echoNote = lavenderEcho[currentStep % lavenderEcho.length];
-          if (freqs[echoNote]) playNote(freqs[echoNote], nextNoteTime, noteTime * 0.9, 'square', 0.06);
+        // Track 1: Ostinato[cite: 1]
+        const ostNote = scoreOstinato[currentStep % scoreOstinato.length];
+        if (freqs[ostNote]) playNote(freqs[ostNote], nextNoteTime, noteTime * 0.85, 'square', 0.06);
 
-          // Tab Lead Melody
-          if (currentStep % 2 === 0) {
-            const melIdx = Math.floor(currentStep / 2) % lavenderMelody.length;
-            const melNote = lavenderMelody[melIdx];
-            if (melNote && freqs[melNote]) playNote(freqs[melNote], nextNoteTime, noteTime * 1.8, 'square', 0.1);
-          }
-        } else if (activeTrackMode === "center") {
-          const cNote = centerTheme[currentStep % centerTheme.length];
-          if (freqs[cNote]) playNote(freqs[cNote], nextNoteTime, noteTime * 0.9, 'triangle', 0.09);
-        } else if (activeTrackMode === "gym") {
-          const gNote = gymTheme[currentStep % gymTheme.length];
-          if (freqs[gNote]) playNote(freqs[gNote], nextNoteTime, noteTime * 0.7, 'sawtooth', 0.08);
+        // Track 2: Lower Register Piano Accompaniment[cite: 1]
+        if (currentStep % 4 === 0) {
+          const bassIdx = Math.floor(currentStep / 4) % scoreBassline.length;
+          const bassNote = scoreBassline[bassIdx];
+          if (bassNote && freqs[bassNote]) playNote(freqs[bassNote], nextNoteTime, noteTime * 3.5, 'triangle', 0.12);
         }
 
         nextNoteTime += noteTime;
@@ -376,8 +365,7 @@
     const ctx = canvas.getContext("2d");
 
     let particles = [];
-    let dinoTrail = [];
-    const numParticles = 600;
+    const numParticles = 650;
     let width, height, cx, cy;
     let warpSpeed = 4;
     let renderMode = "stars";
@@ -561,9 +549,10 @@
     }
     runPossessedCounter();
 
-    const darkColors = [
-      "#000000", "#120000", "#00051a", "#10001a", 
-      "#001a0a", "#1a1200", "#12001a", "#051015", "#1c0d02", "#150022"
+    /* --- BACKGROUND SPECTRUM & COLOR MODES --- */
+    const phaseColors = [
+      "#000000", "#120000", "#00051a", "#10001a", "#001a0a",
+      "#ffffff", "#ff007f", "#00ffcc", "#ffcc00", "#7b00ff", "#150022"
     ];
 
     /* --- 300 PHASE ENGINE & LETTER MIXER --- */
@@ -593,44 +582,29 @@
       const randomFont = companyFonts[Math.floor(Math.random() * companyFonts.length)];
       el.style.fontFamily = randomFont.font;
 
-      const themeBg = darkColors[currentPhase % darkColors.length];
+      const themeBg = phaseColors[currentPhase % phaseColors.length];
       document.body.style.backgroundColor = themeBg;
       document.body.style.filter = "none";
       el.className = "title";
-      el.style.color = "";
+      el.style.color = themeBg === "#ffffff" ? "#000000" : "";
       el.style.filter = "";
       el.style.textShadow = "";
       renderMode = "stars";
       reverseWarp = false;
       canvas.classList.add("active");
 
-      // Music Mode Switching based on Phase
-      if (currentPhase % 15 === 0) {
-        activeTrackMode = "gym";
-      } else if (currentPhase % 10 === 0) {
-        activeTrackMode = "center";
-      } else {
-        activeTrackMode = "lavender";
-      }
+      // Default to DREW.WTF layout
+      activeWordLeft = "DREW";
+      activeWordRight = "WTF";
 
-      if (currentPhase === 0) {
-        activeWordLeft = "DREW";
-        activeWordRight = "WTF";
-        canvas.classList.remove("active");
-        return;
-      }
-
-      const variant = customTextVariants[currentPhase % customTextVariants.length];
-      activeWordLeft = variant[0];
-      activeWordRight = variant[1];
       warpSpeed = (currentPhase % 30) + 2;
 
       // Visual Background Modes
       if (currentPhase % 22 === 0) {
-        renderMode = "dino"; // Chrome Dino Phase
+        renderMode = "dino";
         el.style.color = "#535353";
       } else if (currentPhase % 20 === 0) {
-        renderMode = "rain"; // Rain / Storm Phase
+        renderMode = "rain";
         el.style.color = "#00bfff";
       } else if (currentPhase % 18 === 0) {
         renderMode = "tron";
@@ -639,12 +613,10 @@
         el.style.textShadow = "0 0 20px #00f0ff";
       } else if (currentPhase % 16 === 0) {
         renderMode = "flowers";
-        document.body.style.backgroundColor = "#0d1a0d";
         el.style.color = "#ffb6c1";
         el.style.textShadow = "0 0 15px #ffb6c1";
       } else if (currentPhase % 14 === 0) {
         renderMode = "devils";
-        document.body.style.backgroundColor = "#1a0000";
         el.style.color = "#ff0000";
         el.style.textShadow = "0 0 30px #ff0000, 0 0 60px #880000";
         el.classList.add("slice-glitch");
@@ -739,27 +711,40 @@
       "🔥","💀","😈","☣️","🟢","🛸","👽","🌸","🐱","🐕","🦖","🌧️","666"
     ];
 
+    /* Loop that keeps text as DREW.WTF, briefly glitches into a phase word, then returns to DREW.WTF */
     function runScrambleCycle() {
-      wordDrewEl.textContent = activeWordLeft;
-      wordWtfEl.textContent = activeWordRight;
+      wordDrewEl.textContent = "DREW";
+      wordWtfEl.textContent = "WTF";
+
       setTimeout(() => {
+        const variant = customTextVariants[currentPhase % customTextVariants.length];
+        const glitchLeft = variant[0];
+        const glitchRight = variant[1];
+
         let frame = 0;
         const interval = setInterval(() => {
-          wordDrewEl.textContent = activeWordLeft.split('').map(c => 
-            Math.random() < 0.4 ? intlGlitchChars[Math.floor(Math.random() * intlGlitchChars.length)] : c
+          wordDrewEl.textContent = glitchLeft.split('').map(c => 
+            Math.random() < 0.3 ? intlGlitchChars[Math.floor(Math.random() * intlGlitchChars.length)] : c
           ).join('');
-          wordWtfEl.textContent = activeWordRight.split('').map(c => 
-            Math.random() < 0.4 ? intlGlitchChars[Math.floor(Math.random() * intlGlitchChars.length)] : c
+          wordWtfEl.textContent = glitchRight.split('').map(c => 
+            Math.random() < 0.3 ? intlGlitchChars[Math.floor(Math.random() * intlGlitchChars.length)] : c
           ).join('');
+          
           frame++;
-          if (frame >= 15) {
+          if (frame >= 20) {
             clearInterval(interval);
-            wordDrewEl.textContent = activeWordLeft;
-            wordWtfEl.textContent = activeWordRight;
-            runScrambleCycle();
+            wordDrewEl.textContent = glitchLeft;
+            wordWtfEl.textContent = glitchRight;
+
+            // Hold phase word briefly before returning back to DREW.WTF
+            setTimeout(() => {
+              wordDrewEl.textContent = "DREW";
+              wordWtfEl.textContent = "WTF";
+              runScrambleCycle();
+            }, 1200);
           }
-        }, 40);
-      }, 1800);
+        }, 50);
+      }, 2200);
     }
 
     setPhase(0);
