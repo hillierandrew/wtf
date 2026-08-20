@@ -14,7 +14,7 @@
       --crt-red: #ff1111;
       --crt-dim: #660000;
       --ui-accent: #ff1111;
-      --ui-bg: rgba(10, 0, 0, 0.9);
+      --ui-bg: rgba(10, 0, 0, 0.92);
       --ui-border: #ff1111;
       --text-color: #ff1111;
     }
@@ -90,7 +90,7 @@
     }
 
     .title {
-      font-size: clamp(1.2rem, 6vw, 4.5rem);
+      font-size: clamp(1.4rem, 7vw, 4.8rem);
       font-weight: bold;
       letter-spacing: 0.1em;
       text-shadow: 0 0 10px var(--ui-accent), 0 0 25px var(--crt-dim), 0 0 40px var(--ui-accent);
@@ -105,7 +105,7 @@
       cursor: pointer;
       display: inline-block;
       pointer-events: auto;
-      padding: 0 4px;
+      padding: 0 6px;
       position: relative;
     }
 
@@ -120,7 +120,7 @@
       100% { opacity: 0.97; }
     }
 
-    /* Top Right Controls Overlay */
+    /* Mobile-Optimized Top Right Controls */
     .top-right-ui {
       position: fixed;
       top: max(16px, env(safe-area-inset-top, 16px));
@@ -142,12 +142,12 @@
 
     .phase-badge-top {
       font-family: 'Press Start 2P', monospace;
-      font-size: 10px;
+      font-size: 11px;
       color: var(--ui-accent);
       background: var(--ui-bg);
       border: 2px solid var(--ui-border);
-      padding: 6px 10px;
-      border-radius: 6px;
+      padding: 8px 12px;
+      border-radius: 8px;
       box-shadow: 0 0 12px var(--ui-accent);
       letter-spacing: 0.05em;
       text-align: right;
@@ -156,19 +156,19 @@
 
     .top-btn {
       font-family: 'Press Start 2P', monospace;
-      font-size: 9px;
+      font-size: 10px;
       color: #fff;
       background: var(--ui-bg);
       border: 2px solid var(--ui-border);
-      padding: 6px 10px;
-      border-radius: 6px;
+      padding: 8px 12px;
+      border-radius: 8px;
       cursor: pointer;
       box-shadow: 0 0 10px var(--ui-accent);
     }
 
     .top-btn:active, .phase-badge-top:active {
       transform: scale(0.92);
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.25);
     }
 
     .visitor-counter {
@@ -177,13 +177,13 @@
       color: var(--ui-accent);
       background: var(--ui-bg);
       border: 1px solid var(--ui-border);
-      padding: 4px 8px;
-      border-radius: 4px;
+      padding: 5px 9px;
+      border-radius: 6px;
       letter-spacing: 0.05em;
       pointer-events: none;
     }
 
-    /* Bottom Control Bar */
+    /* Enlarged iPhone-Friendly Bottom Control Bar */
     .bottom-ui-container {
       position: fixed;
       bottom: max(32px, env(safe-area-inset-bottom, 32px));
@@ -194,15 +194,15 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       pointer-events: auto;
-      width: clamp(280px, 85vw, 480px);
+      width: clamp(300px, 90vw, 540px);
     }
 
     .ui-row {
       display: flex;
       flex-direction: row;
-      gap: 10px;
+      gap: 12px;
       width: 100%;
     }
 
@@ -210,20 +210,20 @@
       flex: 1;
       box-sizing: border-box;
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-      font-size: 13px;
+      font-size: 15px;
       font-weight: 900;
       color: #ffffff !important;
       -webkit-text-fill-color: #ffffff !important;
       letter-spacing: 0.06em;
       user-select: none;
       -webkit-user-select: none;
-      padding: 12px 16px;
-      border-radius: 30px;
-      background-color: rgba(15, 15, 15, 0.92);
-      border: 2px solid rgba(255, 255, 255, 0.75);
-      -webkit-backdrop-filter: blur(10px);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 255, 255, 0.2);
+      padding: 16px 20px;
+      border-radius: 36px;
+      background-color: rgba(18, 18, 18, 0.95);
+      border: 2px solid rgba(255, 255, 255, 0.85);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.85), 0 0 12px rgba(255, 255, 255, 0.25);
       text-align: center;
       white-space: nowrap;
       display: flex;
@@ -233,32 +233,32 @@
     }
 
     .ui-box:active {
-      transform: scale(0.95);
-      background-color: rgba(255, 255, 255, 0.25);
+      transform: scale(0.94);
+      background-color: rgba(255, 255, 255, 0.3);
     }
 
     .contact-btn {
       width: 100%;
       border-color: var(--ui-border);
-      box-shadow: 0 0 12px var(--ui-accent);
-      font-size: 12px;
+      box-shadow: 0 0 16px var(--ui-accent);
+      font-size: 15px;
       text-transform: uppercase;
     }
 
     .phase-bottom-banner {
       position: fixed;
-      bottom: max(96px, env(safe-area-inset-bottom, 96px));
+      bottom: max(108px, env(safe-area-inset-bottom, 108px));
       left: 50%;
       transform: translateX(-50%);
       z-index: 99999;
       font-family: 'Press Start 2P', monospace;
-      font-size: 9px;
+      font-size: 10px;
       letter-spacing: 0.15em;
-      color: rgba(255, 255, 255, 0.85);
-      background: rgba(0, 0, 0, 0.75);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      padding: 6px 14px;
-      border-radius: 20px;
+      color: rgba(255, 255, 255, 0.9);
+      background: rgba(0, 0, 0, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      padding: 8px 18px;
+      border-radius: 24px;
       cursor: pointer;
       user-select: none;
       text-transform: uppercase;
@@ -267,7 +267,7 @@
 
     .phase-bottom-banner:active {
       transform: translateX(-50%) scale(0.94);
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.25);
     }
 
     .watermark-footer {
@@ -301,7 +301,8 @@
       padding: 30px;
       text-align: center;
       box-shadow: 0 0 30px var(--ui-accent);
-      border-radius: 8px;
+      border-radius: 12px;
+      max-width: 90vw;
     }
 
     .modal-content a {
@@ -311,15 +312,17 @@
       display: block;
       margin: 20px 0;
       text-shadow: 0 0 8px var(--ui-accent);
+      word-break: break-all;
     }
 
     .close-btn {
       background: transparent;
       border: 1px solid var(--ui-border);
       color: var(--ui-accent);
-      padding: 6px 16px;
+      padding: 8px 20px;
       font-family: inherit;
       cursor: pointer;
+      border-radius: 6px;
     }
   </style>
 </head>
@@ -347,7 +350,7 @@
   <div class="bottom-ui-container">
     <button id="contact-btn" class="ui-box contact-btn" onclick="toggleModal(true)">[ CONTACT ]</button>
     <div class="ui-row">
-      <button id="audio-toggle" class="ui-box" onclick="toggleAudio(event)">🔇 LO-FI 8-BIT BEAT</button>
+      <button id="audio-toggle" class="ui-box" onclick="toggleAudio(event)">🔇 90S KEYGEN CHIPTUNE</button>
     </div>
   </div>
 
@@ -362,7 +365,7 @@
   </div>
 
   <script>
-    /* --- LO-FI CHIP SYNTHESIZER --- */
+    /* --- FAST 90S KEYGEN CHIPTUNE SYNTHESIZER --- */
     let audioCtx = null;
     let masterGain = null;
     let isPlaying = false;
@@ -370,14 +373,25 @@
     let timerID = null;
     let currentStep = 0;
 
-    const lofiChords = [
-      [220.00, 261.63, 329.63, 392.00],
-      [146.83, 174.61, 220.00, 261.63],
-      [196.00, 246.94, 293.66, 349.23],
-      [130.81, 164.81, 196.00, 246.94]
+    const keygenNoteFreqs = {
+      'C4': 261.63, 'D4': 293.66, 'Eb4': 311.13, 'F4': 349.23, 'G4': 392.00, 'Ab4': 415.30, 'Bb4': 466.16,
+      'C5': 523.25, 'D5': 587.33, 'Eb5': 622.25, 'F5': 698.46, 'G5': 783.99, 'Ab5': 830.61, 'Bb5': 932.33,
+      'C6': 1046.50
+    };
+
+    const keygenLeadPattern = [
+      'C5', 'Eb5', 'G5', 'C6', 'Bb5', 'G5', 'Eb5', 'D5',
+      'C5', 'C5', 'Eb5', 'G5', 'F5', 'Eb5', 'D5', 'Bb4',
+      'C5', 'Eb5', 'G5', 'C6', 'D6', 'Eb6', 'D6', 'C6',
+      'G5', 'Ab5', 'G5', 'F5', 'Eb5', 'D5', 'C5', 'G4'
     ];
 
-    function playTone(freq, startTime, duration, waveType = 'triangle', gainLevel = 0.05) {
+    const keygenBassPattern = [
+      'C4', 'C4', 'C4', 'C4', 'Ab4', 'Ab4', 'Bb4', 'Bb4',
+      'C4', 'C4', 'C4', 'C4', 'F4', 'F4', 'G4', 'G4'
+    ];
+
+    function playKeygenNote(freq, startTime, duration, waveType = 'square', gainLevel = 0.06) {
       if (!freq || !audioCtx || !masterGain) return;
       try {
         const osc = audioCtx.createOscillator();
@@ -393,26 +407,31 @@
       } catch (e) {}
     }
 
-    function scheduleLofiBeat() {
+    function scheduleKeygenTrack() {
       if (!isPlaying || !audioCtx || audioCtx.state !== 'running') return;
       const lookAhead = 0.1;
       const scheduleAheadTime = 0.2;
-      const noteTime = (60.0 / 74) / 2;
+      const noteTime = (60.0 / 140) / 2; // Fast 140 BPM Arpeggiated Keygen Tempo
 
       while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
-        const chordIndex = Math.floor(currentStep / 8) % lofiChords.length;
-        const currentChord = lofiChords[chordIndex];
-        const note = currentChord[currentStep % currentChord.length];
-        playTone(note, nextNoteTime, noteTime * 1.5, 'triangle', 0.04);
+        // Fast Arp Lead
+        const leadNote = keygenLeadPattern[currentStep % keygenLeadPattern.length];
+        if (keygenNoteFreqs[leadNote]) {
+          playKeygenNote(keygenNoteFreqs[leadNote], nextNoteTime, noteTime * 0.8, 'square', 0.06);
+        }
 
-        if (currentStep % 4 === 0) {
-          playTone(55.0, nextNoteTime, 0.15, 'sine', 0.09);
+        // Driving Bass Line
+        if (currentStep % 2 === 0) {
+          const bassNote = keygenBassPattern[Math.floor(currentStep / 2) % keygenBassPattern.length];
+          if (keygenNoteFreqs[bassNote]) {
+            playKeygenNote(keygenNoteFreqs[bassNote] / 2, nextNoteTime, noteTime * 1.6, 'sawtooth', 0.09);
+          }
         }
 
         nextNoteTime += noteTime;
         currentStep++;
       }
-      timerID = setTimeout(scheduleLofiBeat, lookAhead * 1000);
+      timerID = setTimeout(scheduleKeygenTrack, lookAhead * 1000);
     }
 
     function toggleAudio(e) {
@@ -432,8 +451,8 @@
           nextNoteTime = audioCtx.currentTime + 0.05;
           currentStep = 0;
           isPlaying = true;
-          btn.textContent = '🔊 MUTE LO-FI BEAT';
-          scheduleLofiBeat();
+          btn.textContent = '🔊 MUTE KEYGEN CHIPTUNE';
+          scheduleKeygenTrack();
         };
 
         if (audioCtx.state === 'suspended') {
@@ -444,7 +463,7 @@
       } else {
         isPlaying = false;
         if (timerID) clearTimeout(timerID);
-        btn.textContent = '🔇 LO-FI 8-BIT BEAT';
+        btn.textContent = '🔇 90S KEYGEN CHIPTUNE';
       }
     }
 
@@ -505,6 +524,40 @@
     for (let i = 0; i < 200; i++) particles.push({ x: Math.random() * width, y: Math.random() * height, z: Math.random() * width });
 
     const renderers = {
+      hackery: () => {
+        ctx.fillStyle = "rgba(0, 10, 0, 0.2)"; ctx.fillRect(0, 0, width, height);
+        ctx.fillStyle = "#00ff66"; ctx.font = "14px 'Fira Code', monospace";
+        for (let i = 0; i < 12; i++) {
+          let y = (globalAngle * 200 + i * 40) % height;
+          ctx.fillText(`[ROOT@DREW-WTF]# sudo inject_payload_0x${Math.floor((i+globalAngle)*1000).toString(16)}`, 20, y);
+        }
+      },
+      martha_stewart: () => {
+        ctx.fillStyle = "rgba(255, 245, 238, 0.25)"; ctx.fillRect(0, 0, width, height);
+        ctx.font = "32px serif";
+        for (let i = 0; i < 6; i++) {
+          let x = cx + Math.sin(globalAngle + i) * 180, y = cy + Math.cos(globalAngle + i) * 120;
+          ctx.fillText("🥧 🧵 🌿 ☕", x, y);
+        }
+      },
+      phonk_drift: () => {
+        ctx.fillStyle = "rgba(10, 0, 15, 0.3)"; ctx.fillRect(0, 0, width, height);
+        ctx.strokeStyle = "#ff0055"; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(0, height * 0.8); ctx.lineTo(width, height * 0.8); ctx.stroke();
+        let carX = (globalAngle * 400) % (width + 100) - 50;
+        ctx.font = "36px serif"; ctx.fillText("🏎️💨", carX, height * 0.8 - 10);
+      },
+      cyberpunk_matrix: () => {
+        ctx.fillStyle = "rgba(0,0,0,0.15)"; ctx.fillRect(0,0,width,height);
+        ctx.fillStyle = "#00ffff"; ctx.font = "16px monospace";
+        if (matrixCols.length < Math.floor(width/20)) {
+          for(let i=0;i<width/20;i++) matrixCols[i] = Math.random()*height;
+        }
+        matrixCols.forEach((y, i) => {
+          ctx.fillText(String.fromCharCode(0x30A0 + Math.random()*96), i*20, y);
+          matrixCols[i] = y > height || Math.random() > 0.975 ? 0 : y + 20;
+        });
+      },
       snake: () => {
         ctx.fillStyle = "rgba(0, 20, 0, 0.3)"; ctx.fillRect(0, 0, width, height);
         const gs = 20;
@@ -568,17 +621,6 @@
         cactusX -= 8; if(cactusX < -20) cactusX = width;
         ctx.font = "30px serif"; ctx.fillText("🦖", cx - 100, cy + 45 + dinoY);
         ctx.fillText("🌵", cactusX, cy + 48);
-      },
-      matrix: () => {
-        ctx.fillStyle = "rgba(0,0,0,0.15)"; ctx.fillRect(0,0,width,height);
-        ctx.fillStyle = "#00ff00"; ctx.font = "16px monospace";
-        if(matrixCols.length < Math.floor(width/20)) {
-          for(let i=0;i<width/20;i++) matrixCols[i] = Math.random()*height;
-        }
-        matrixCols.forEach((y, i) => {
-          ctx.fillText(String.fromCharCode(0x30A0 + Math.random()*96), i*20, y);
-          matrixCols[i] = y > height || Math.random() > 0.975 ? 0 : y + 20;
-        });
       },
       stars: () => {
         ctx.fillStyle = "rgba(0,0,0,0.3)"; ctx.fillRect(0,0,width,height);
@@ -646,14 +688,15 @@
 
     /* --- 300 PROCEDURAL PHASES SYSTEM --- */
     const phaseNames = [
-      "RETRO SYSTEM", "PONG PROTOCOL", "GEOCITIES 2000", "OFFLINE DINO",
-      "NEON MATRIX", "SNAKE AUTOMATA", "HOCKEY RINK", "CASINO JACKPOT",
-      "ANGELIC LIGHTS", "DEMONIC REALM", "HYPERSPACE WARP", "SHROOM TRIP",
-      "LSD PLASMA", "ACID RAIN", "TRON GRID", "FIREWORKS DISPLAY"
+      "HACKER TERMINAL", "MARTHA STEWART COTTAGE", "PHONK DRIFT ZONE", "CYBERPUNK MATRIX",
+      "SNAKE AUTOMATA", "HOCKEY RINK", "CASINO JACKPOT", "ANGELIC LIGHTS",
+      "DEMONIC REALM", "OFFLINE DINO", "HYPERSPACE WARP", "SHROOM TRIP",
+      "LSD PLASMA", "ACID RAIN", "TRON GRID", "FIREWORKS DISPLAY",
+      "GEOCITIES 2000", "PONG PROTOCOL"
     ];
 
     const phaseColors = [
-      "#000000", "#050010", "#001005", "#100000", "#000a10",
+      "#000000", "#1a0f00", "#0a0015", "#000a10", "#001005",
       "#000000", "#1877f2", "#ffff00", "#00ffcc", "#ff007f", "#150022"
     ];
 
