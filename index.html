@@ -115,6 +115,21 @@
       transition: filter 0.3s ease, color 0.3s ease, text-shadow 0.3s ease, font-family 0.2s ease;
     }
 
+    /* Bouncing DVD Bumper Text */
+    #dvd-logo {
+      position: fixed;
+      z-index: 45;
+      font-size: clamp(1rem, 3.5vw, 2rem);
+      font-weight: bold;
+      letter-spacing: 0.1em;
+      color: #00ffcc;
+      text-shadow: 0 0 12px #00ffcc, 0 0 25px #008888;
+      user-select: none;
+      pointer-events: none;
+      white-space: nowrap;
+      font-family: 'Press Start 2P', monospace;
+    }
+
     .clickable-word {
       cursor: pointer;
       display: inline-block;
@@ -244,6 +259,9 @@
   <!-- Visitor Counter -->
   <div id="visitor-box" class="visitor-counter">VISITS: 00666</div>
 
+  <!-- DVD Bouncing Screensaver Bumper -->
+  <div id="dvd-logo">DREW.WTF</div>
+
   <!-- Main Canvas -->
   <canvas id="bg-canvas"></canvas>
 
@@ -261,7 +279,7 @@
   </div>
 
   <script>
-    /* --- AUTHENTIC GAMEBOY LAVENDER TOWN SOUND SYNTHESIZER --- */
+    /* --- NOTE-PERFECT LAVENDER TOWN GAME BOY SOUND ENGINE --- */
     let audioCtx = null;
     let isPlaying = false;
     let nextNoteTime = 0;
@@ -274,10 +292,10 @@
       'C6': 1046.50, 'C#6': 1108.73, 'D6': 1174.66, 'D#6': 1244.51, 'E6': 1318.51, 'F6': 1396.91, 'F#6': 1479.98, 'G6': 1567.98, 'G#6': 1661.22, 'A6': 1760.00, 'B6': 1975.53
     };
 
-    // Authentic Game Boy Channel 1/2 Four-Note Ostinato: C6 -> G5 -> B5 -> F#5[cite: 1]
+    // Authentic Game Boy Channel 1 High-Register 4-Note Ostinato: C6 -> G5 -> B5 -> F#5[cite: 1]
     const lavenderCh1 = ['C6', 'G5', 'B5', 'F#5'];
 
-    // Authentic Channel 2 Melody Lines (Measures 5-12)
+    // Authentic Channel 2 Melodic Counter-Melody (Measures 5-12)
     const lavenderCh2Melody = [
       'C5', 'C5', 'G4', 'G4', 'C5', 'B4', 'G4', 'C5', 'E4', 'E4',
       'C5', 'C5', 'B4', 'B4', 'C5', 'C5', 'B4', 'C5', 'C#5', 'C#5'
@@ -359,11 +377,40 @@
       { font: "'Courier New', Courier, monospace" }
     ];
 
+    /* --- DVD SCREENSAVER BUMPER ENGINE --- */
+    const dvdLogo = document.getElementById("dvd-logo");
+    let dvdX = 50, dvdY = 50;
+    let dvdSpeedX = 2.5, dvdSpeedY = 2.0;
+    const dvdColors = ["#00ffcc", "#ff00ff", "#ffff00", "#ff3300", "#00ff00", "#00f0ff"];
+
+    function animateDVDLogo() {
+      const w = window.innerWidth - dvdLogo.offsetWidth - 20;
+      const h = window.innerHeight - dvdLogo.offsetHeight - 80;
+
+      dvdX += dvdSpeedX;
+      dvdY += dvdSpeedY;
+
+      if (dvdX >= w || dvdX <= 10) {
+        dvdSpeedX = -dvdSpeedX;
+        dvdLogo.style.color = dvdColors[Math.floor(Math.random() * dvdColors.length)];
+      }
+      if (dvdY >= h || dvdY <= 10) {
+        dvdSpeedY = -dvdSpeedY;
+        dvdLogo.style.color = dvdColors[Math.floor(Math.random() * dvdColors.length)];
+      }
+
+      dvdLogo.style.left = `${dvdX}px`;
+      dvdLogo.style.top = `${dvdY}px`;
+      requestAnimationFrame(animateDVDLogo);
+    }
+    animateDVDLogo();
+
     /* --- CANVAS BACKGROUND VISUAL ENGINE --- */
     const canvas = document.getElementById("bg-canvas");
     const ctx = canvas.getContext("2d");
 
     let particles = [];
+    let fireworks = [];
     const numParticles = 650;
     let width, height, cx, cy;
     let warpSpeed = 4;
@@ -377,11 +424,10 @@
     const flowerEmojis = ["🌸", "🌺", "🌼", "🌻", "☁️", "✨"];
     const catEmojis = ["🐱", "🙀", "😸", "🐾"];
     const dogEmojis = ["🐕", "🦮", "🐩", "🦴"];
-    const dinoEmojis = ["🦖", "🌵", "🏃", "👾"];
     const rainEmojis = ["💧", "🌧️", "⚡", "🌊"];
-    const marioEmojis = ["🍄", "⭐️", "🪙", "🐢", "🎮"];
-    const invadersEmojis = ["👾", "🚀", "💥", "🛸"];
-    const asciiArt = ["[::]", "<=>", "{*}", "|||", "///", "@@@", "###"];
+    const boatEmojis = ["⛵", "🛳️", "🚤", "🌊"];
+    const carEmojis = ["🏎️", "🚗", "🏎️", "💨"];
+    const asciiExplosions = ["*BOOM*", "#$%!", "@@@@", "%%%%", "0101"];
 
     function resizeCanvas() {
       width = window.innerWidth;
@@ -406,11 +452,10 @@
         this.flE = flowerEmojis[Math.floor(Math.random() * flowerEmojis.length)];
         this.cE = catEmojis[Math.floor(Math.random() * catEmojis.length)];
         this.dogE = dogEmojis[Math.floor(Math.random() * dogEmojis.length)];
-        this.dinoE = dinoEmojis[Math.floor(Math.random() * dinoEmojis.length)];
         this.rE = rainEmojis[Math.floor(Math.random() * rainEmojis.length)];
-        this.marioE = marioEmojis[Math.floor(Math.random() * marioEmojis.length)];
-        this.invaderE = invadersEmojis[Math.floor(Math.random() * invadersEmojis.length)];
-        this.ascii = asciiArt[Math.floor(Math.random() * asciiArt.length)];
+        this.boatE = boatEmojis[Math.floor(Math.random() * boatEmojis.length)];
+        this.carE = carEmojis[Math.floor(Math.random() * carEmojis.length)];
+        this.asciiExp = asciiExplosions[Math.floor(Math.random() * asciiExplosions.length)];
       }
 
       update() {
@@ -419,10 +464,13 @@
           this.y += warpSpeed * 3;
           if (renderMode === "wind") this.x += warpSpeed * 4;
           if (this.y > height) { this.y = -20; this.x = (Math.random() - 0.5) * width * 2; }
-        } else if (renderMode === "ocean") {
+        } else if (renderMode === "ocean" || renderMode === "boats") {
           this.x += Math.sin(globalAngle + this.y) * 2;
           this.y -= warpSpeed * 0.5;
           if (this.y < 0) this.y = height;
+        } else if (renderMode === "driving") {
+          this.y += warpSpeed * 4;
+          if (this.y > height) this.y = -20;
         } else if (reverseWarp) {
           this.z += warpSpeed;
           if (this.z >= width) this.reset(false);
@@ -440,29 +488,23 @@
           ctx.font = `20px monospace`;
           ctx.fillText(this.rE, this.x, this.y);
           return;
-        } else if (renderMode === "ocean") {
-          ctx.font = `16px monospace`;
-          ctx.fillStyle = "#00ffff";
-          ctx.fillText("~ ~ ~", this.x, this.y);
+        } else if (renderMode === "boats") {
+          ctx.font = `22px monospace`;
+          ctx.fillText(this.boatE, this.x, this.y);
           return;
-        } else if (renderMode === "ascii") {
-          ctx.font = `14px monospace`;
-          ctx.fillStyle = "#00ff00";
-          ctx.fillText(this.ascii, sx, sy);
+        } else if (renderMode === "driving") {
+          ctx.font = `24px monospace`;
+          ctx.fillText(this.carE, this.x, this.y);
+          return;
+        } else if (renderMode === "ascii_exp") {
+          ctx.font = `16px monospace`;
+          ctx.fillStyle = "#ff0055";
+          ctx.fillText(this.asciiExp, sx, sy);
           return;
         }
 
         if (sx >= 0 && sx <= width && sy >= 0 && sy <= height) {
-          if (renderMode === "mario") {
-            ctx.font = `${Math.max(12, (1 - this.z / width) * 40)}px serif`;
-            ctx.fillText(this.marioE, sx, sy);
-          } else if (renderMode === "invaders") {
-            ctx.font = `${Math.max(12, (1 - this.z / width) * 38)}px serif`;
-            ctx.fillText(this.invaderE, sx, sy);
-          } else if (renderMode === "dino") {
-            ctx.font = `${Math.max(12, (1 - this.z / width) * 38)}px serif`;
-            ctx.fillText(this.dinoE, sx, sy);
-          } else if (renderMode === "flowers") {
+          if (renderMode === "flowers") {
             ctx.font = `${Math.max(12, (1 - this.z / width) * 42)}px serif`;
             ctx.fillText(this.flE, sx, sy);
           } else if (renderMode === "cats") {
@@ -500,29 +542,45 @@
     function drawCustomBackgrounds() {
       globalAngle += 0.02;
 
-      if (renderMode === "pong") {
-        // Pong Arcade Mode
-        ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
+      if (renderMode === "fireworks") {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
         ctx.fillRect(0, 0, width, height);
 
+        if (Math.random() < 0.1) {
+          fireworks.push({
+            x: Math.random() * width,
+            y: Math.random() * (height / 2),
+            color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+            radius: 2
+          });
+        }
+
+        for (let f of fireworks) {
+          ctx.beginPath();
+          ctx.arc(f.x, f.y, f.radius, 0, Math.PI * 2);
+          ctx.fillStyle = f.color;
+          ctx.fill();
+          f.radius += 2;
+        }
+        fireworks = fireworks.filter(f => f.radius < 40);
+      } else if (renderMode === "pong") {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
+        ctx.fillRect(0, 0, width, height);
         ctx.fillStyle = "#ffffff";
-        // Paddles
         ctx.fillRect(30, (Math.sin(globalAngle * 2) + 1) * (height / 2 - 50), 15, 80);
         ctx.fillRect(width - 45, (Math.cos(globalAngle * 2) + 1) * (height / 2 - 50), 15, 80);
-        // Ball
         ctx.fillRect((Math.sin(globalAngle * 3) + 1) * (width / 2 - 20) + 20, (Math.cos(globalAngle * 4) + 1) * (height / 2 - 20) + 20, 15, 15);
       } else if (renderMode === "geocities") {
-        // GeoCities 2000s High Schooler Mode
         ctx.fillStyle = "#000080";
         ctx.fillRect(0, 0, width, height);
         ctx.font = "20px 'Comic Sans MS', cursive";
         ctx.fillStyle = "#ffff00";
         ctx.fillText("UNDER CONSTRUCTION!", (Math.sin(globalAngle * 3) + 1) * (width / 4), (Math.cos(globalAngle * 2) + 1) * (height / 4) + 100);
-      } else if (renderMode === "tron" || renderMode === "driving") {
-        ctx.fillStyle = renderMode === "driving" ? "rgba(10, 10, 20, 0.3)" : "rgba(0, 5, 20, 0.3)";
+      } else if (renderMode === "tron") {
+        ctx.fillStyle = "rgba(0, 5, 20, 0.3)";
         ctx.fillRect(0, 0, width, height);
 
-        ctx.strokeStyle = renderMode === "driving" ? "rgba(255, 0, 128, 0.5)" : "rgba(0, 240, 255, 0.4)";
+        ctx.strokeStyle = "rgba(0, 240, 255, 0.4)";
         ctx.lineWidth = 1.5;
         const horizon = height * 0.55;
 
@@ -538,22 +596,6 @@
           ctx.lineTo(width, y);
           ctx.stroke();
         }
-      } else if (renderMode === "spiral") {
-        ctx.fillStyle = "rgba(10, 0, 15, 0.2)";
-        ctx.fillRect(0, 0, width, height);
-
-        ctx.save();
-        ctx.translate(cx, cy);
-        ctx.rotate(globalAngle);
-        for (let i = 0; i < 360; i += 15) {
-          const rad = i * Math.PI / 180;
-          ctx.strokeStyle = `hsl(${(i + globalAngle * 50) % 360}, 100%, 50%)`;
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.arc(0, 0, i * 1.5, rad, rad + 0.5);
-          ctx.stroke();
-        }
-        ctx.restore();
       } else {
         ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
         ctx.fillRect(0, 0, width, height);
@@ -602,12 +644,11 @@
     let currentPhase = 0;
     let phaseTimer = null;
 
-    // Generate 300 unique phase word variants
     const customTextVariants = [];
     const baseWords = [
       ["DREW", "WTF"], ["FACE", "BOOK"], ["ZUCK", "MODE"], ["GEO", "CITIES"],
-      ["SUPER", "MARIO"], ["PONG", "GAME"], ["SPACE", "INVADER"], ["CHROME", "DINO"],
-      ["RAIN", "WIND"], ["OCEAN", "WAVE"], ["DRIVE", "FAST"], ["MUTHUR", "6000"],
+      ["SUPER", "MARIO"], ["PONG", "GAME"], ["SPACE", "INVADER"], ["FIRE", "WORKS"],
+      ["RAIN", "WIND"], ["OCEAN", "BOATS"], ["DRIVE", "FAST"], ["ASCII", "BOOM"],
       ["MEOW", "PURR"], ["DOGE", "WOW"], ["TRON", "GRID"], ["HEAVEN", "ANGEL"],
       ["DEMON", "POSSESSED"], ["666", "EVIL"], ["ACID", "TRIP"], ["SALVIA", "SPLIT"]
     ];
@@ -635,7 +676,6 @@
       document.body.style.filter = "none";
       el.className = "title";
       
-      // Facebook & GeoCities Transition Aesthetics
       if (themeBg === "#f0f2f5" || themeBg === "#1877f2") {
         el.style.color = themeBg === "#f0f2f5" ? "#1877f2" : "#ffffff";
         el.style.textShadow = "0 0 10px rgba(24, 119, 242, 0.4)";
@@ -655,38 +695,35 @@
 
       warpSpeed = (currentPhase % 30) + 2;
 
-      // Phase Canvas Background Variations
-      if (currentPhase % 28 === 0) {
-        renderMode = "pong";
+      // Phase Background Canvas Modes
+      if (currentPhase % 30 === 0) {
+        renderMode = "fireworks";
+      } else if (currentPhase % 28 === 0) {
+        renderMode = "boats";
       } else if (currentPhase % 26 === 0) {
-        renderMode = "geocities";
-      } else if (currentPhase % 24 === 0) {
-        renderMode = "mario";
-      } else if (currentPhase % 22 === 0) {
-        renderMode = "invaders";
-      } else if (currentPhase % 20 === 0) {
         renderMode = "driving";
+      } else if (currentPhase % 24 === 0) {
+        renderMode = "ascii_exp";
+      } else if (currentPhase % 22 === 0) {
+        renderMode = "pong";
+      } else if (currentPhase % 20 === 0) {
+        renderMode = "geocities";
       } else if (currentPhase % 18 === 0) {
-        renderMode = "ocean";
-      } else if (currentPhase % 16 === 0) {
-        renderMode = "ascii";
-      } else if (currentPhase % 14 === 0) {
         renderMode = "rain";
-      } else if (currentPhase % 12 === 0) {
+      } else if (currentPhase % 16 === 0) {
         renderMode = "tron";
-      } else if (currentPhase % 10 === 0) {
+      } else if (currentPhase % 14 === 0) {
         renderMode = "flowers";
-      } else if (currentPhase % 8 === 0) {
+      } else if (currentPhase % 12 === 0) {
         renderMode = "devils";
-      } else if (currentPhase % 6 === 0) {
-        renderMode = "spiral";
-      } else if (currentPhase % 4 === 0) {
+      } else if (currentPhase % 10 === 0) {
         renderMode = "cats";
+      } else if (currentPhase % 8 === 0) {
+        renderMode = "dogs";
       } else {
         reverseWarp = currentPhase % 2 === 0;
       }
 
-      // Reset text loop on phase shift
       runScrambleCycle();
     }
 
@@ -775,18 +812,17 @@
       "中","文","鬼","魔","神","龍","悟",
       "अ","आ","इ","उ","ऋ","क","ख",
       "Д","Р","Е","В","У","Ш","К",
-      "🔥","💀","😈","☣️","🟢","🛸","👽","🌸","🐱","🐕","🦖","🌧️","666"
+      "🔥","💀","😈","☣️","🟢","🛸","👽","🌸","🐱","🐕","🚗","🎆","666"
     ];
 
     let currentScrambleInterval = null;
     let currentScrambleTimeout = null;
 
-    /* STRICT DREW.WTF OPENING & GLITCH CYCLE */
+    /* ALWAYS OPEN WITH DREW.WTF -> GLITCH TO PHASE WORD -> RETURN TO DREW.WTF */
     function runScrambleCycle() {
       if (currentScrambleInterval) clearInterval(currentScrambleInterval);
       if (currentScrambleTimeout) clearTimeout(currentScrambleTimeout);
 
-      // ALWAYS BEGIN PHASE WITH DREW.WTF FIRST
       wordDrewEl.textContent = "DREW";
       wordWtfEl.textContent = "WTF";
 
@@ -810,7 +846,6 @@
             wordDrewEl.textContent = glitchLeft;
             wordWtfEl.textContent = glitchRight;
 
-            // HOLD PHASE WORD BRIEFLY BEFORE GLITCHING BACK TO DREW.WTF
             currentScrambleTimeout = setTimeout(() => {
               wordDrewEl.textContent = "DREW";
               wordWtfEl.textContent = "WTF";
