@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>DREW.WTF</title>
-
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@900&family=Comic+Neue:wght@700&family=Courier+Prime:wght@700&family=Fira+Code:wght@700&family=Noto+Sans+SC:wght@900&family=Noto+Sans+Devanagari:wght@900&family=Noto+Sans+Arabic:wght@900&family=Noto+Sans+Hebrew:wght@900&family=Noto+Sans+Thai:wght@900&family=Noto+Sans+JP:wght@900&family=Noto+Sans+KR:wght@900&family=Orbitron:wght@900&family=Permanent+Marker&family=Press+Start+2P&family=Russo+One&family=VT323&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@900&family=Comic+Neue:wght@700&family=Courier+Prime:wght@700&family=Fira+Code:wght@700&family=Noto+Sans+SC:wght@900&family=Noto+Sans+Devanagari:wght@900&family=Orbitron:wght@900&family=Permanent+Marker&family=Press+Start+2P&family=Russo+One&family=VT323&display=swap" rel="stylesheet">
 
   <!-- SVG Distortion Filter -->
   <svg style="position: absolute; width: 0; height: 0;">
@@ -114,11 +114,35 @@
       transition: filter 0.3s ease, color 0.3s ease, text-shadow 0.3s ease, font-family 0.2s ease;
     }
 
+    /* Dynamic Contact Action Button */
+    .contact-btn-main {
+      margin-top: 1.5rem;
+      background: transparent;
+      color: var(--crt-red);
+      border: 2px solid var(--crt-red);
+      padding: 10px 24px;
+      font-family: inherit;
+      font-size: clamp(0.75rem, 2vw, 1rem);
+      letter-spacing: 0.15em;
+      cursor: pointer;
+      pointer-events: auto;
+      text-shadow: 0 0 5px var(--crt-red);
+      box-shadow: 0 0 8px var(--crt-dim);
+      transition: all 0.2s ease;
+      display: inline-block;
+    }
+
+    .contact-btn-main:hover {
+      background: var(--crt-red);
+      color: #000;
+      box-shadow: 0 0 18px var(--crt-red);
+    }
+
     /* Bouncing DVD Bumper Text */
     #dvd-logo {
       position: fixed;
       z-index: 45;
-      font-size: clamp(1rem, 3.5vw, 2rem);
+      font-size: clamp(0.9rem, 3vw, 1.8rem);
       font-weight: bold;
       letter-spacing: 0.1em;
       color: #00ffcc;
@@ -222,6 +246,43 @@
       pointer-events: none;
     }
 
+    /* Contact Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.88);
+      z-index: 9999999;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      border: 2px solid var(--crt-red);
+      background: #050a05;
+      padding: 30px;
+      text-align: center;
+      box-shadow: 0 0 25px var(--crt-dim);
+    }
+
+    .modal-content a {
+      color: var(--crt-red);
+      text-decoration: none;
+      font-size: 1.2rem;
+      display: block;
+      margin: 20px 0;
+      text-shadow: 0 0 8px var(--crt-red);
+    }
+
+    .close-btn {
+      background: transparent;
+      border: 1px solid var(--crt-red);
+      color: var(--crt-red);
+      padding: 6px 16px;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
     /* ANIMATION STYLES */
     .swirl-trip { filter: url(#swirl-filter) !important; }
     .spin { animation: spin-hue 3s linear infinite !important; }
@@ -269,6 +330,8 @@
     <div id="scramble-text" class="title">
       <span id="word-drew" class="clickable-word" onclick="handleDrewClick(event)">DREW</span><span id="word-dot" class="clickable-word" onclick="handleDotClick(event)">.</span><span id="word-wtf" class="clickable-word" onclick="handleWtfClick(event)">WTF</span>
     </div>
+    <br>
+    <button id="main-contact-btn" class="contact-btn-main" onclick="toggleModal(true)">[ CONTACT ]</button>
   </div>
 
   <!-- Bottom UI Controls -->
@@ -277,10 +340,18 @@
     <div id="phase-badge" class="ui-box phase-watermark">PHASE NO. 0</div>
   </div>
 
+  <!-- Modal -->
+  <div id="contact-modal" class="modal">
+    <div class="modal-content">
+      <p style="letter-spacing: 0.1em; font-size: 0.8rem; opacity: 0.8;">DIRECTORY</p>
+      <a href="mailto:email@andrewhillier.ca">email@andrewhillier.ca</a>
+      <button class="close-btn" onclick="toggleModal(false)">[ CLOSE ]</button>
+    </div>
+  </div>
+
   <script>
     /* --- NOTE-PERFECT LAVENDER TOWN GAME BOY SOUND ENGINE --- */
     let audioCtx = null;
-    let masterGain = null;
     let isPlaying = false;
     let nextNoteTime = 0;
     let timerID = null;
@@ -292,36 +363,36 @@
       'C6': 1046.50, 'C#6': 1108.73, 'D6': 1174.66, 'D#6': 1244.51, 'E6': 1318.51, 'F6': 1396.91, 'F#6': 1479.98, 'G6': 1567.98, 'G#6': 1661.22, 'A6': 1760.00, 'B6': 1975.53
     };
 
-    // Authentic Game Boy Channel 1 High-Register 4-Note Ostinato
+    // Game Boy Channel 1 Ostinato: C6 -> G5 -> B5 -> F#5[cite: 1]
     const lavenderCh1 = ['C6', 'G5', 'B5', 'F#5'];
 
-    // Authentic Channel 2 Melodic Counter-Melody
+    // Channel 2 Melodic Line
     const lavenderCh2Melody = [
       'C5', 'C5', 'G4', 'G4', 'C5', 'B4', 'G4', 'C5', 'E4', 'E4',
       'C5', 'C5', 'B4', 'B4', 'C5', 'C5', 'B4', 'C5', 'C#5', 'C#5'
     ];
 
     function playNote(freq, startTime, duration, waveType = 'square', gainLevel = 0.08) {
-      if (!freq || !audioCtx || !masterGain) return;
+      if (!freq || !audioCtx) return;
       try {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.type = waveType;
         osc.frequency.setValueAtTime(freq, startTime);
         gain.gain.setValueAtTime(gainLevel, startTime);
-        gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+        gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration - 0.01);
         osc.connect(gain);
-        gain.connect(masterGain);
+        gain.connect(audioCtx.destination);
         osc.start(startTime);
-        osc.stop(startTime + duration + 0.02);
-      } catch (e) { /* note skipped */ }
+        osc.stop(startTime + duration);
+      } catch(e) {}
     }
 
     function scheduleLavenderTownTheme() {
-      if (!isPlaying || !audioCtx || audioCtx.state !== 'running') return;
+      if (!isPlaying || !audioCtx) return;
       const lookAhead = 0.1;
       const scheduleAheadTime = 0.2;
-      const noteTime = (60.0 / 120) / 2; // 120 BPM, eighth notes
+      const noteTime = (60.0 / 120) / 2; // 120 BPM tempo[cite: 1]
 
       while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
         const ostNote = lavenderCh1[currentStep % lavenderCh1.length];
@@ -342,31 +413,16 @@
     function toggleAudio(e) {
       if (e) e.stopPropagation();
       const btn = document.getElementById("audio-toggle");
+      
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
 
       if (!isPlaying) {
-        if (!audioCtx) {
-          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-          masterGain = audioCtx.createGain();
-          masterGain.gain.value = 1;
-          masterGain.connect(audioCtx.destination);
-        }
-
-        const start = () => {
-          if (audioCtx.state !== 'running') return; // still blocked, bail quietly
-          nextNoteTime = audioCtx.currentTime + 0.05;
-          currentStep = 0;
-          isPlaying = true;
-          btn.textContent = '🔊 MUTE MUSIC';
-          scheduleLavenderTownTheme();
-        };
-
-        // THE FIX: wait for resume() to actually resolve before scheduling notes,
-        // otherwise browsers silently drop everything scheduled while still 'suspended'.
-        if (audioCtx.state === 'suspended') {
-          audioCtx.resume().then(start).catch(start);
-        } else {
-          start();
-        }
+        nextNoteTime = audioCtx.currentTime + 0.05;
+        currentStep = 0;
+        isPlaying = true;
+        btn.textContent = '🔊 MUTE MUSIC';
+        scheduleLavenderTownTheme();
       } else {
         isPlaying = false;
         if (timerID) clearTimeout(timerID);
@@ -374,7 +430,16 @@
       }
     }
 
-    /* --- BRAND WEBFONTS (for the resting "DREW.WTF" look) --- */
+    /* --- CONTACT BUTTON TEXT VARIATIONS --- */
+    const contactNameVariants = [
+      "[ CONTACT ]", "[ CALL ]", "[ SEND SMOKE SIGNAL ]", "[ SEND TELEPATHICALLY ]",
+      "[ KNOCK ON DOOR ]", "[ PING HOST ]", "[ TRANSMIT DATA ]", "[ DISPATCH CARRIER PIGEON ]",
+      "[ INITIALIZE HANDSHAKE ]", "[ SHOUT VERY LOUDLY ]", "[ TELEPORT MESSAGE ]", "[ RING DOORBELL ]",
+      "[ EXECUTE TALK.EXE ]", "[ PROJECT ASTRAL BODY ]", "[ CONSULT OUJA BOARD ]", "[ THROW BOTTLE ]",
+      "[ PET THE CAT ]", "[ BARK AT DOOR ]", "[ PRESS F TO PAY RESPECTS ]", "[ SUMMON DREW ]"
+    ];
+
+    /* --- BRAND WEBFONTS --- */
     const companyFonts = [
       { font: "'Press Start 2P', monospace" },
       { font: "'Orbitron', sans-serif" },
@@ -385,11 +450,10 @@
       { font: "'VT323', monospace" },
       { font: "'Fira Code', monospace" },
       { font: "'Courier Prime', monospace" },
+      { font: "'Noto Sans SC', sans-serif" },
+      { font: "'Noto Sans Devanagari', sans-serif" },
       { font: "'Courier New', Courier, monospace" }
     ];
-
-    // Broad multi-script fallback stack used only while chars are actively scrambling
-    const scrambleFontStack = "'Noto Sans Devanagari','Noto Sans Arabic','Noto Sans Hebrew','Noto Sans Thai','Noto Sans SC','Noto Sans JP','Noto Sans KR', sans-serif";
 
     /* --- DVD SCREENSAVER BUMPER ENGINE --- */
     const dvdLogo = document.getElementById("dvd-logo");
@@ -434,6 +498,7 @@
 
     const mEmojis = ["🍄", "🍆", "✨", "💫"];
     const dEmojis = ["😈", "👿", "🔥", "⚡", "666"];
+    const sEmojis = ["💀", "☠️", "☣️", "🟢"];
     const flowerEmojis = ["🌸", "🌺", "🌼", "🌻", "☁️", "✨"];
     const catEmojis = ["🐱", "🙀", "😸", "🐾"];
     const dogEmojis = ["🐕", "🦮", "🐩", "🦴"];
@@ -461,6 +526,7 @@
         this.pz = this.z;
         this.mE = mEmojis[Math.floor(Math.random() * mEmojis.length)];
         this.dE = dEmojis[Math.floor(Math.random() * dEmojis.length)];
+        this.sE = sEmojis[Math.floor(Math.random() * sEmojis.length)];
         this.flE = flowerEmojis[Math.floor(Math.random() * flowerEmojis.length)];
         this.cE = catEmojis[Math.floor(Math.random() * catEmojis.length)];
         this.dogE = dogEmojis[Math.floor(Math.random() * dogEmojis.length)];
@@ -652,82 +718,90 @@
       "#f0f2f5", "#1877f2", "#ffff00", "#00ffcc", "#ff007f", "#150022"
     ];
 
-    /* --- WEIGHTED RANDOM BACKGROUND MODE SELECTION (kills the starfield-overload problem) --- */
-    const bgModes = [
-      { mode: "fireworks", weight: 3 },
-      { mode: "boats", weight: 3 },
-      { mode: "driving", weight: 3 },
-      { mode: "ascii_exp", weight: 2 },
-      { mode: "pong", weight: 2 },
-      { mode: "geocities", weight: 2 },
-      { mode: "rain", weight: 3 },
-      { mode: "wind", weight: 2 },
-      { mode: "tron", weight: 3 },
-      { mode: "flowers", weight: 3 },
-      { mode: "devils", weight: 3 },
-      { mode: "cats", weight: 3 },
-      { mode: "dogs", weight: 3 },
-      { mode: "mushrooms", weight: 3 },
-      { mode: "ocean", weight: 2 },
-      { mode: "stars", weight: 2 }
-    ];
-    let lastMode = null;
-    function pickRenderMode() {
-      const pool = bgModes.filter(m => m.mode !== lastMode);
-      const total = pool.reduce((s, m) => s + m.weight, 0);
-      let r = Math.random() * total;
-      for (const m of pool) {
-        if (r < m.weight) { lastMode = m.mode; return m.mode; }
-        r -= m.weight;
-      }
-      lastMode = pool[0].mode;
-      return pool[0].mode;
-    }
-
-    /* --- 300 PHASES --- */
+    /* --- 300 FULL PHASES --- */
     let currentPhase = 0;
     let phaseTimer = null;
-    let restingFont = "'Courier New', monospace";
 
-    const scrambleTextEl = document.getElementById("scramble-text");
-    const wordDrewEl = document.getElementById("word-drew");
-    const wordWtfEl = document.getElementById("word-wtf");
+    const customTextVariants = [];
+    const baseWords = [
+      ["DREW", "WTF"], ["FACE", "BOOK"], ["ZUCK", "MODE"], ["GEO", "CITIES"],
+      ["SUPER", "MARIO"], ["PONG", "GAME"], ["SPACE", "INVADER"], ["FIRE", "WORKS"],
+      ["RAIN", "WIND"], ["OCEAN", "BOATS"], ["DRIVE", "FAST"], ["ASCII", "BOOM"],
+      ["MEOW", "PURR"], ["DOGE", "WOW"], ["TRON", "GRID"], ["HEAVEN", "ANGEL"],
+      ["DEMON", "POSSESSED"], ["666", "EVIL"], ["ACID", "TRIP"], ["SALVIA", "SPLIT"]
+    ];
+
+    for (let i = 0; i <= 300; i++) {
+      const pair = baseWords[i % baseWords.length];
+      customTextVariants.push([pair[0], `${pair[1]}_${i}`]);
+    }
 
     function setPhase(p) {
       currentPhase = p;
       if (currentPhase > 300) currentPhase = 0;
       if (currentPhase < 0) currentPhase = 300;
 
+      const el = document.getElementById("scramble-text");
       const badge = document.getElementById("phase-badge");
+      const mainBtn = document.getElementById("main-contact-btn");
+      
       badge.textContent = `PHASE NO. ${currentPhase}`;
+      mainBtn.textContent = contactNameVariants[currentPhase % contactNameVariants.length];
 
       const randomFont = companyFonts[Math.floor(Math.random() * companyFonts.length)];
-      scrambleTextEl.style.fontFamily = randomFont.font;
+      el.style.fontFamily = randomFont.font;
 
       const themeBg = phaseColors[currentPhase % phaseColors.length];
       document.body.style.backgroundColor = themeBg;
       document.body.style.filter = "none";
-      scrambleTextEl.className = "title";
-
+      el.className = "title";
+      
       if (themeBg === "#f0f2f5" || themeBg === "#1877f2") {
-        scrambleTextEl.style.color = themeBg === "#f0f2f5" ? "#1877f2" : "#ffffff";
-        scrambleTextEl.style.textShadow = "0 0 10px rgba(24, 119, 242, 0.4)";
-        scrambleTextEl.style.fontFamily = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+        el.style.color = themeBg === "#f0f2f5" ? "#1877f2" : "#ffffff";
+        el.style.textShadow = "0 0 10px rgba(24, 119, 242, 0.4)";
+        el.style.fontFamily = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
       } else if (themeBg === "#ffff00") {
-        scrambleTextEl.style.color = "#ff00ff";
-        scrambleTextEl.style.textShadow = "0 0 15px #00ffff";
-        scrambleTextEl.style.fontFamily = "'Comic Neue', cursive";
+        el.style.color = "#ff00ff";
+        el.style.textShadow = "0 0 15px #00ffff";
+        el.style.fontFamily = "'Comic Neue', cursive";
       } else {
-        scrambleTextEl.style.color = "";
-        scrambleTextEl.style.textShadow = "";
+        el.style.color = "";
+        el.style.textShadow = "";
       }
 
-      restingFont = scrambleTextEl.style.fontFamily;
-
-      renderMode = pickRenderMode();
-      reverseWarp = Math.random() < 0.5;
-      warpSpeed = Math.floor(Math.random() * 8) + 2;
+      renderMode = "stars";
+      reverseWarp = false;
       canvas.classList.add("active");
+
+      warpSpeed = (currentPhase % 30) + 2;
+
+      if (currentPhase % 30 === 0) {
+        renderMode = "fireworks";
+      } else if (currentPhase % 28 === 0) {
+        renderMode = "boats";
+      } else if (currentPhase % 26 === 0) {
+        renderMode = "driving";
+      } else if (currentPhase % 24 === 0) {
+        renderMode = "ascii_exp";
+      } else if (currentPhase % 22 === 0) {
+        renderMode = "pong";
+      } else if (currentPhase % 20 === 0) {
+        renderMode = "geocities";
+      } else if (currentPhase % 18 === 0) {
+        renderMode = "rain";
+      } else if (currentPhase % 16 === 0) {
+        renderMode = "tron";
+      } else if (currentPhase % 14 === 0) {
+        renderMode = "flowers";
+      } else if (currentPhase % 12 === 0) {
+        renderMode = "devils";
+      } else if (currentPhase % 10 === 0) {
+        renderMode = "cats";
+      } else if (currentPhase % 8 === 0) {
+        renderMode = "dogs";
+      } else {
+        reverseWarp = currentPhase % 2 === 0;
+      }
 
       runScrambleCycle();
     }
@@ -763,112 +837,99 @@
     window.addEventListener("wheel", (e) => {
       if (isScrolling) return;
       isScrolling = true;
-      if (e.deltaY > 0) nextPhase(); else if (e.deltaY < 0) prevPhase();
-      setTimeout(() => { isScrolling = false; }, 200);
+
+      if (e.deltaY > 0) {
+        nextPhase();
+      } else if (e.deltaY < 0) {
+        prevPhase();
+      }
+
+      setTimeout(() => {
+        isScrolling = false;
+      }, 200);
     });
 
     /* --- WORD NAVIGATION HANDLERS --- */
-    function handleDrewClick(e) { if (e) e.stopPropagation(); prevPhase(); }
-    function handleWtfClick(e) { if (e) e.stopPropagation(); nextPhase(); }
-    function handleDotClick(e) { if (e) e.stopPropagation(); randomPhase(); }
+    function handleDrewClick(e) {
+      if (e) e.stopPropagation();
+      prevPhase();
+    }
+
+    function handleWtfClick(e) {
+      if (e) e.stopPropagation();
+      nextPhase();
+    }
+
+    function handleDotClick(e) {
+      if (e) e.stopPropagation();
+      randomPhase();
+    }
+
+    function toggleModal(show) {
+      document.getElementById('contact-modal').style.display = show ? 'flex' : 'none';
+    }
 
     window.addEventListener("pointerdown", (e) => {
-      if (e.target.closest(".clickable-word") || e.target.closest(".audio-btn")) return;
+      if (e.target.closest(".clickable-word") || e.target.closest(".audio-btn") || e.target.closest(".contact-btn-main") || e.target.closest(".modal-content")) return;
       const centerY = window.innerHeight / 2;
-      if (e.clientY < centerY) prevPhase(); else nextPhase();
+      if (e.clientY < centerY) {
+        prevPhase();
+      } else {
+        nextPhase();
+      }
     });
 
     window.addEventListener("keydown", (e) => {
-      if (e.key === "ArrowUp" || e.key === "ArrowRight") nextPhase();
-      else if (e.key === "ArrowDown" || e.key === "ArrowLeft") prevPhase();
+      if (e.key === "ArrowUp" || e.key === "ArrowRight") {
+        nextPhase();
+      } else if (e.key === "ArrowDown" || e.key === "ArrowLeft") {
+        prevPhase();
+      }
     });
 
-    /* --- MULTI-SCRIPT / MULTI-VIBE MORPH TARGETS --- */
-    // "left" morphs from DREW, "right" morphs from WTF. font is applied only while that
-    // variant is held so each script renders with proper glyphs.
-    const langVariants = [
-      { left: "ड्रू",     right: "डब्ल्यूटीएफ़",     font: "'Noto Sans Devanagari', sans-serif" }, // Hindi
-      { left: "ڈریو",     right: "ڈبلیوٹی\u200cایف", font: "'Noto Sans Arabic', sans-serif" },      // Urdu
-      { left: "ДРЕВ",     right: "ВТФ",              font: "'Courier New', monospace" },            // Russian/Cyrillic
-      { left: "德鲁",      right: "网站",              font: "'Noto Sans SC', sans-serif" },          // Chinese
-      { left: "ドリュー",   right: "ワット",            font: "'Noto Sans JP', sans-serif" },          // Japanese
-      { left: "드류",      right: "더블유티에프",       font: "'Noto Sans KR', sans-serif" },          // Korean
-      { left: "ΔΡΕΩ",     right: "ΩΤΦ",              font: "'Cinzel', serif" },                     // Greek-styled
-      { left: "דרו",      right: "וטף",              font: "'Noto Sans Hebrew', sans-serif" },      // Hebrew
-      { left: "ดรูว์",     right: "ดับเบิลยูทีเอฟ",    font: "'Noto Sans Thai', sans-serif" },        // Thai
-      { left: "✞☠✟♰",     right: "☣☢☠♱",             font: "'Courier New', monospace" },            // dingbat / wingding-style
-      { left: "666",      right: "EVIL",             font: "'Permanent Marker', cursive" },
-      { left: "FACE",     right: "BOOK",             font: "-apple-system, sans-serif" },
-      { left: "GEO",      right: "CITIES",           font: "'Comic Neue', cursive" },
-      { left: "TRON",     right: "GRID",             font: "'Orbitron', sans-serif" },
-      { left: "ACID",     right: "TRIP",             font: "'Fira Code', monospace" },
-      { left: "SUPER",    right: "MARIO",            font: "'Press Start 2P', monospace" },
-      { left: "SPACE",    right: "INVADER",          font: "'VT323', monospace" },
-      { left: "MEOW",     right: "PURR",             font: "'Comic Neue', cursive" },
-      { left: "DOGE",     right: "WOW",              font: "'Comic Neue', cursive" },
-      { left: "HEAVEN",   right: "ANGEL",            font: "'Cinzel', serif" },
-      { left: "DEMON",    right: "POSSESSED",        font: "'Russo One', sans-serif" }
-    ];
-
-    const wildClasses = ["swirl-trip", "spin", "liquid-wave", "pulse-glow", "slice-glitch", "salvia-split"];
+    const wordDrewEl = document.getElementById("word-drew");
+    const wordWtfEl = document.getElementById("word-wtf");
 
     const intlGlitchChars = [
-      "0", "1", "3", "7", "_", "/#", "\\|", "@", "$", "%", "*", "!",
-      "中", "文", "鬼", "魔", "神", "龍", "悟",
-      "अ", "आ", "इ", "उ", "ऋ", "क", "ख",
-      "Д", "Р", "Е", "В", "У", "Ш", "К",
-      "ا", "ب", "ت", "ث", "ج", "ح",
-      "א", "ב", "ג", "ד", "ה",
-      "ก", "ข", "ค", "ง", "จ",
-      "가", "나", "다", "라", "마",
-      "あ", "い", "う", "え", "お",
-      "☠", "☣", "☢", "✞", "♰", "웃",
-      "🔥", "💀", "😈", "☣️", "🟢", "🛸", "👽", "🌸", "🐱", "🐕", "🚗", "🎆", "666"
+      "0","1","3","7","_","/#","\\|","@","$","%","*","!",
+      "中","文","鬼","魔","神","龍","悟",
+      "अ","आ","इ","उ","ऋ","क","ख",
+      "Д","Р","Е","В","У","Ш","К",
+      "🔥","💀","😈","☣️","🟢","🛸","👽","🌸","🐱","🐕","🚗","🎆","666"
     ];
-
-    function randomizeString(str) {
-      return str.split('').map(c =>
-        Math.random() < 0.35 ? intlGlitchChars[Math.floor(Math.random() * intlGlitchChars.length)] : c
-      ).join('');
-    }
 
     let currentScrambleInterval = null;
     let currentScrambleTimeout = null;
 
-    /* ALWAYS OPEN WITH DREW.WTF -> GLITCH TO RANDOM VARIANT -> HOLD (+ optional wild fx) -> RETURN TO DREW.WTF */
+    /* ALWAYS OPEN WITH DREW.WTF -> GLITCH TO PHASE WORD -> RETURN TO DREW.WTF */
     function runScrambleCycle() {
       if (currentScrambleInterval) clearInterval(currentScrambleInterval);
       if (currentScrambleTimeout) clearTimeout(currentScrambleTimeout);
 
-      scrambleTextEl.classList.remove(...wildClasses);
-      scrambleTextEl.style.fontFamily = restingFont;
       wordDrewEl.textContent = "DREW";
       wordWtfEl.textContent = "WTF";
 
       currentScrambleTimeout = setTimeout(() => {
-        const variant = langVariants[Math.floor(Math.random() * langVariants.length)];
-        scrambleTextEl.style.fontFamily = scrambleFontStack;
+        const variant = customTextVariants[currentPhase % customTextVariants.length];
+        const glitchLeft = variant[0];
+        const glitchRight = variant[1];
 
         let frame = 0;
         currentScrambleInterval = setInterval(() => {
-          wordDrewEl.textContent = randomizeString(variant.left);
-          wordWtfEl.textContent = randomizeString(variant.right);
-
+          wordDrewEl.textContent = glitchLeft.split('').map(c => 
+            Math.random() < 0.35 ? intlGlitchChars[Math.floor(Math.random() * intlGlitchChars.length)] : c
+          ).join('');
+          wordWtfEl.textContent = glitchRight.split('').map(c => 
+            Math.random() < 0.35 ? intlGlitchChars[Math.floor(Math.random() * intlGlitchChars.length)] : c
+          ).join('');
+          
           frame++;
           if (frame >= 18) {
             clearInterval(currentScrambleInterval);
-            scrambleTextEl.style.fontFamily = variant.font;
-            wordDrewEl.textContent = variant.left;
-            wordWtfEl.textContent = variant.right;
-
-            if (Math.random() < 0.6) {
-              const wild = wildClasses[Math.floor(Math.random() * wildClasses.length)];
-              scrambleTextEl.classList.add(wild);
-            }
+            wordDrewEl.textContent = glitchLeft;
+            wordWtfEl.textContent = glitchRight;
 
             currentScrambleTimeout = setTimeout(() => {
-              scrambleTextEl.classList.remove(...wildClasses);
-              scrambleTextEl.style.fontFamily = restingFont;
               wordDrewEl.textContent = "DREW";
               wordWtfEl.textContent = "WTF";
               runScrambleCycle();
