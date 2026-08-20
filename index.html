@@ -1,3 +1,7 @@
+I see what happened—the cyan DVD logo text was lingering as a floating element outside the phase loop, and the bottom UI layout got scrambled.
+
+Here is the clean build. The bouncing cyan DVD logo is completely gone, the contact button and top-right controls are fixed in place, and the copyright watermark matches the bottom styling:
+
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -9,13 +13,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@900&family=Comic+Neue:wght@700&family=Courier+Prime:wght@700&family=Fira+Code:wght@700&family=Noto+Sans+Arabic:wght@900&family=Noto+Sans+Devanagari:wght@900&family=Noto+Sans+Hebrew:wght@900&family=Noto+Sans+JP:wght@900&family=Noto+Sans+KR:wght@900&family=Noto+Sans+SC:wght@900&family=Noto+Sans+Thai:wght@900&family=Orbitron:wght@900&family=Permanent+Marker&family=Press+Start+2P&family=Russo+One&family=VT323&display=swap" rel="stylesheet">
-
-  <svg style="position: absolute; width: 0; height: 0;">
-    <filter id="swirl-filter">
-      <feTurbulence id="turbulence" type="fractalNoise" baseFrequency="0.03" numOctaves="4" result="noise" />
-      <feDisplacementMap in="SourceGraphic" in2="noise" scale="45" xChannelSelector="R" yChannelSelector="G" />
-    </filter>
-  </svg>
 
   <style>
     :root {
@@ -45,7 +42,6 @@
       overflow: hidden;
       position: relative;
       touch-action: manipulation;
-      transition: background-color 0.4s ease, color 0.4s ease;
     }
 
     body {
@@ -129,7 +125,7 @@
       100% { opacity: 0.97; }
     }
 
-    /* Top Right UI Container */
+    /* Top Right Controls Overlay */
     .top-right-ui {
       position: fixed;
       top: max(16px, env(safe-area-inset-top, 16px));
@@ -138,14 +134,14 @@
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      gap: 6px;
+      gap: 8px;
       user-select: none;
       pointer-events: auto;
     }
 
     .top-row-controls {
       display: flex;
-      gap: 6px;
+      gap: 8px;
       align-items: center;
     }
 
@@ -165,7 +161,7 @@
 
     .top-btn {
       font-family: 'Press Start 2P', monospace;
-      font-size: 10px;
+      font-size: 9px;
       color: #fff;
       background: var(--ui-bg);
       border: 2px solid var(--ui-border);
@@ -192,7 +188,7 @@
       pointer-events: none;
     }
 
-    /* Bottom UI Container */
+    /* Bottom Control Bar */
     .bottom-ui-container {
       position: fixed;
       bottom: max(32px, env(safe-area-inset-bottom, 32px));
@@ -205,7 +201,7 @@
       align-items: center;
       gap: 10px;
       pointer-events: auto;
-      width: clamp(280px, 85vm, 500px);
+      width: clamp(280px, 85vw, 480px);
     }
 
     .ui-row {
@@ -226,7 +222,7 @@
       letter-spacing: 0.06em;
       user-select: none;
       -webkit-user-select: none;
-      padding: 10px 14px;
+      padding: 12px 16px;
       border-radius: 30px;
       background-color: rgba(15, 15, 15, 0.92);
       border: 2px solid rgba(255, 255, 255, 0.75);
@@ -239,7 +235,6 @@
       justify-content: center;
       align-items: center;
       cursor: pointer;
-      transition: background-color 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
     }
 
     .ui-box:active {
@@ -255,7 +250,24 @@
       text-transform: uppercase;
     }
 
-    /* Bottom Watermark Copyright */
+    .phase-bottom-banner {
+      position: fixed;
+      bottom: max(96px, env(safe-area-inset-bottom, 96px));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 99999;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 9px;
+      letter-spacing: 0.15em;
+      color: rgba(255, 255, 255, 0.75);
+      background: rgba(0, 0, 0, 0.7);
+      padding: 4px 10px;
+      border-radius: 4px;
+      pointer-events: none;
+      user-select: none;
+      text-transform: uppercase;
+    }
+
     .watermark-footer {
       position: fixed;
       bottom: 8px;
@@ -269,25 +281,6 @@
       pointer-events: none;
       user-select: none;
       white-space: nowrap;
-    }
-
-    /* Phase Bottom Banner */
-    .phase-bottom-banner {
-      position: fixed;
-      bottom: max(90px, env(safe-area-inset-bottom, 90px));
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 99999;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 9px;
-      letter-spacing: 0.15em;
-      color: rgba(255, 255, 255, 0.7);
-      background: rgba(0, 0, 0, 0.6);
-      padding: 4px 10px;
-      border-radius: 4px;
-      pointer-events: none;
-      user-select: none;
-      text-transform: uppercase;
     }
 
     .modal {
@@ -326,43 +319,14 @@
       font-family: inherit;
       cursor: pointer;
     }
-
-    .swirl-trip { filter: url(#swirl-filter) !important; }
-    .spin { animation: spin-hue 3s linear infinite !important; }
-    @keyframes spin-hue { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
-
-    .liquid-wave { animation: flicker 0.12s infinite, liquid 1.8s ease-in-out infinite alternate !important; }
-    @keyframes liquid {
-      0% { letter-spacing: 0.1em; }
-      100% { letter-spacing: 0.3em; filter: blur(2px) contrast(200%); }
-    }
-
-    .pulse-glow { animation: flicker 0.12s infinite, glow 0.8s ease-in-out infinite alternate !important; }
-    @keyframes glow { 0% { filter: brightness(1); } 100% { filter: brightness(2) drop-shadow(0 0 30px #ffffff); } }
-
-    .slice-glitch { animation: slice 0.2s steps(2) infinite !important; }
-    @keyframes slice {
-      0% { clip-path: inset(0 0 0 0); }
-      50% { clip-path: inset(20% 0 30% 0); }
-      100% { clip-path: inset(60% 0 10% 0); }
-    }
-
-    .salvia-split {
-      text-shadow: -15px 0 0 #ff00ff, 15px 0 0 #00ffff, 0 15px 0 #00ff00 !important;
-      animation: salvia 0.1s infinite alternate;
-    }
-    @keyframes salvia {
-      0% { transform: skewX(-10deg) scale(0.9); }
-      100% { transform: skewX(10deg) scale(1.1); }
-    }
   </style>
 </head>
 <body>
 
-  <!-- Top Right UI -->
+  <!-- Top Right UI Controls -->
   <div class="top-right-ui">
-    <div id="phase-badge-top" class="phase-badge-top">PHASE 001</div>
     <div class="top-row-controls">
+      <div id="phase-badge-top" class="phase-badge-top">PHASE 001</div>
       <button id="pause-toggle" class="top-btn" onclick="togglePause(event)">⏸️ PAUSE</button>
     </div>
     <div id="visitor-box" class="visitor-counter">VISITS: 00666</div>
@@ -396,7 +360,7 @@
   </div>
 
   <script>
-    /* --- LO-FI 8-BIT STUDY CHIP-BEAT SYNTHESIZER --- */
+    /* --- LO-FI BEAT CHIP SYNTHESIZER --- */
     let audioCtx = null;
     let masterGain = null;
     let isPlaying = false;
@@ -404,12 +368,11 @@
     let timerID = null;
     let currentStep = 0;
 
-    // Lofi chord frequencies (Am7 -> Dm7 -> G7 -> Cmaj7)
     const lofiChords = [
-      [220.00, 261.63, 329.63, 392.00], // Am7
-      [146.83, 174.61, 220.00, 261.63], // Dm7
-      [196.00, 246.94, 293.66, 349.23], // G7
-      [130.81, 164.81, 196.00, 246.94]  // Cmaj7
+      [220.00, 261.63, 329.63, 392.00],
+      [146.83, 174.61, 220.00, 261.63],
+      [196.00, 246.94, 293.66, 349.23],
+      [130.81, 164.81, 196.00, 246.94]
     ];
 
     function playTone(freq, startTime, duration, waveType = 'triangle', gainLevel = 0.05) {
@@ -432,17 +395,14 @@
       if (!isPlaying || !audioCtx || audioCtx.state !== 'running') return;
       const lookAhead = 0.1;
       const scheduleAheadTime = 0.2;
-      const noteTime = (60.0 / 74) / 2; // 74 BPM Lofi Chill Speed
+      const noteTime = (60.0 / 74) / 2;
 
       while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
         const chordIndex = Math.floor(currentStep / 8) % lofiChords.length;
         const currentChord = lofiChords[chordIndex];
-
-        // Arpeggiated lofi chords
         const note = currentChord[currentStep % currentChord.length];
         playTone(note, nextNoteTime, noteTime * 1.5, 'triangle', 0.04);
 
-        // Soft lofi kick on beats 1 and 3
         if (currentStep % 4 === 0) {
           playTone(55.0, nextNoteTime, 0.15, 'sine', 0.09);
         }
@@ -486,7 +446,7 @@
       }
     }
 
-    /* --- EXPANDED CONTACT BUTTON TEXTS --- */
+    /* --- CONTACT BUTTON TEXT VARIATIONS --- */
     const contactTexts = [
       "[ CONTACT ]", "[ CALL ]", "[ PING HOST ]", "[ TRANSMIT DATA ]",
       "[ INITIALIZE HANDSHAKE ]", "[ DIAL-UP (56K) ]", "[ SEND EMAIL ]", "[ EXECUTE TALK.EXE ]",
@@ -497,7 +457,6 @@
       "[ BARK AT DOOR ]", "[ PRESS F TO PAY RESPECTS ]", "[ SUMMON DREW ]", "[ BLINK TWICE ]", "[ SEND POKE ]"
     ];
 
-    /* --- BRAND WEBFONTS --- */
     const companyFonts = [
       { font: "'Press Start 2P', monospace" },
       { font: "'Orbitron', sans-serif" },
@@ -513,7 +472,7 @@
 
     const scrambleFontStack = "'Noto Sans Devanagari','Noto Sans Arabic','Noto Sans Hebrew','Noto Sans Thai','Noto Sans SC','Noto Sans JP','Noto Sans KR', sans-serif";
 
-    /* --- CANVAS ENGINE & 32 VISUAL RENDERERS --- */
+    /* --- CANVAS ENGINE --- */
     const canvas = document.getElementById("bg-canvas");
     const ctx = canvas.getContext("2d");
     let width, height, cx, cy;
@@ -534,7 +493,6 @@
     let snake = [{x: 10, y: 10}, {x: 9, y: 10}, {x: 8, y: 10}];
     let snakeDir = {x: 1, y: 0};
     let snakeFood = {x: 15, y: 15};
-    let dvdPos = {x: 100, y: 100, vx: 3, vy: 2, color: '#00ffcc'};
     let dinoY = 0, dinoVY = 0, cactusX = width;
     let matrixCols = [];
     let particles = [];
@@ -596,14 +554,6 @@
         }
         ctx.closePath(); ctx.stroke();
       },
-      dvd: () => {
-        ctx.fillStyle = "rgba(0,0,0,0.3)"; ctx.fillRect(0,0,width,height);
-        dvdPos.x += dvdPos.vx; dvdPos.y += dvdPos.vy;
-        if(dvdPos.x <= 0 || dvdPos.x >= width - 120) { dvdPos.vx *= -1; dvdPos.color = `hsl(${Math.random()*360},100%,50%)`; }
-        if(dvdPos.y <= 0 || dvdPos.y >= height - 40) { dvdPos.vy *= -1; dvdPos.color = `hsl(${Math.random()*360},100%,50%)`; }
-        ctx.font = "24px 'Press Start 2P', monospace"; ctx.fillStyle = dvdPos.color;
-        ctx.fillText("DREW.WTF", dvdPos.x, dvdPos.y + 24);
-      },
       dino: () => {
         ctx.fillStyle = "#f7f7f7"; ctx.fillRect(0,0,width,height);
         ctx.strokeStyle = "#535353"; ctx.lineWidth = 2;
@@ -696,9 +646,9 @@
     const phaseNames = [
       "RETRO SYSTEM", "PONG PROTOCOL", "GEOCITIES 2000", "OFFLINE DINO",
       "LAVENDER HAUNT", "NEON MATRIX", "SNAKE AUTOMATA", "HOCKEY RINK",
-      "CASINO JACKPOT", "ANGELIC LIGHTS", "DEMONIC REALM", "DVD SCREENSAVER",
-      "HYPERSPACE WARP", "SHROOM TRIP", "LSD PLASMA", "ACID RAIN",
-      "TRON GRID", "FIREWORKS DISPLAY", "DOS TERMINAL", "CYBERPUNK CITY"
+      "CASINO JACKPOT", "ANGELIC LIGHTS", "DEMONIC REALM", "HYPERSPACE WARP",
+      "SHROOM TRIP", "LSD PLASMA", "ACID RAIN", "TRON GRID",
+      "FIREWORKS DISPLAY", "DOS TERMINAL", "CYBERPUNK CITY"
     ];
 
     const phaseColors = [
@@ -717,795 +667,6 @@
       const pName = phaseNames[(currentPhase - 1) % phaseNames.length];
       document.getElementById("phase-badge-top").textContent = `PHASE ${String(currentPhase).padStart(3, '0')}`;
       document.getElementById("phase-bottom-banner").textContent = pName;
-
-      const themeBg = phaseColors[(currentPhase - 1) % phaseColors.length];
-      document.body.style.backgroundColor = themeBg;
-
-      const randomFont = companyFonts[Math.floor(Math.random() * companyFonts.length)];
-      document.getElementById("scramble-text").style.fontFamily = randomFont.font;
-
-      glitchContactButtonText();
-      runScrambleCycle();
-    }
-
-    function glitchContactButtonText() {
-      const btn = document.getElementById("contact-btn");
-      const targetText = contactTexts[(currentPhase - 1) % contactTexts.length];
-      let frame = 0;
-      const interval = setInterval(() => {
-        btn.textContent = targetText.split('').map(c => Math.random() < 0.4 ? intlGlitchChars[Math.floor(Math.random() * intlGlitchChars.length)] : c).join('');
-        frame++;
-        if (frame >= 10) {
-          clearInterval(interval);
-          btn.textContent = targetText;
-        }
-      }, 40);
-    }
-
-    function prevPhase() { setPhase(currentPhase - 1); resetPhaseTimer(); }
-    function nextPhase() { setPhase(currentPhase + 1); resetPhaseTimer(); }
-
-    function resetPhaseTimer() {
-      if (phaseTimer) clearInterval(phaseTimer);
-      phaseTimer = setInterval(() => {
-        if(!isPaused) nextPhase();
-      }, 30000); // 30 seconds auto-advance
-    }
-
-    function togglePause(e) {
-      if(e) e.stopPropagation();
-      isPaused = !isPaused;
-      document.getElementById("pause-toggle").textContent = isPaused ? "▶️ PLAY" : "⏸️ PAUSE";
-    }
-
-    /* --- SCROLL WHEEL & INPUT ENGINE --- */
-    let isScrolling = false;
-    window.addEventListener("wheel", (e) => {
-      if (isScrolling) return;
-      isScrolling = true;
-      if (e.deltaY > 0) nextPhase(); else if (e.deltaY < 0) prevPhase();
-      setTimeout(() => { isScrolling = false; }, 200);
-    });
-
-    function handleDrewClick(e) { if(e) e.stopPropagation(); prevPhase(); }
-    function handleWtfClick(e) { if(e) e.stopPropagation(); nextPhase(); }
-    function handleDotClick(e) { if(e) e.stopPropagation(); setPhase(Math.floor(Math.random()*300) + 1); resetPhaseTimer(); }
-
-    function toggleModal(show) {
-      document.getElementById('contact-modal').style.display = show ? 'flex' : 'none';
-    }
-
-    /* --- MULTI-SCRIPT MORPH ENGINE --- */
-    const langVariants = [
-      { left: "ड्रू",     right: "डब्ल्यूटीएफ़",     font: "'Noto Sans Devanagari', sans-serif" },
-      { left: "ڈریو",     right: "ڈبلیوٹی\u200cایف", font: "'Noto Sans Arabic', sans-serif" },
-      { left: "ДРЕВ",     right: "ВТФ",              font: "'Courier New', monospace" },
-      { left: "德鲁",      right: "网站",              font: "'Noto Sans SC', sans-serif" },
-      { left: "ドリュー",   right: "ワット",            font: "'Noto Sans JP', sans-serif" },
-      { left: "드류",      right: "더블유티에프",       font: "'Noto Sans KR', sans-serif" },
-      { left: "ΔΡΕΩ",     right: "ΩΤΦ",              font: "'Cinzel', serif" },
-      { left: "דרו",      right: "וטף",              font: "'Noto Sans Hebrew', sans-serif" },
-      { left: "ดรูว์",     right: "ดับเบิลยูทีเอฟ",    font: "'Noto Sans Thai', sans-serif" }
-    ];
-
-    const intlGlitchChars = ["0", "1", "3", "7", "_", "@", "$", "%", "*", "!", "中", "鬼", "魔", "龙", "अ", "Д", "ا", "א", "ก", "가", "あ", "🔥", "💀", "😈", "666"];
-
-    const scrambleTextEl = document.getElementById("scramble-text");
-    const wordDrewEl = document.getElementById("word-drew");
-    const wordWtfEl = document.getElementById("word-wtf");
-
-    let scrambleInterval = null, scrambleTimeout = null;
-
-    function runScrambleCycle() {
-      if (scrambleInterval) clearInterval(scrambleInterval);
-      if (scrambleTimeout) clearTimeout(scrambleTimeout);
-
-      wordDrewEl.textContent = "DREW";
-      wordWtfEl.textContent = "WTF";
-
-      scrambleTimeout = setTimeout(() => {
-        if(isPaused) return;
-        const variant = langVariants[Math.floor(Math.random() * langVariants.length)];
-        scrambleTextEl.style.fontFamily = scrambleFontStack;
-
-        let frame = 0;
-        scrambleInterval = setInterval(() => {
-          wordDrewEl.textContent = variant.left.split('').map(c => Math.random()<0.35 ? intlGlitchChars[Math.floor(Math.random()*intlGlitchChars.length)] : c).join('');
-          wordWtfEl.textContent = variant.right.split('').map(c => Math.random()<0.35 ? intlGlitchChars[Math.floor(Math.random()*intlGlitchChars.length)] : c).join('');
-
-          frame++;
-          if (frame >= 18) {
-            clearInterval(scrambleInterval);
-            scrambleTextEl.style.fontFamily = variant.font;
-            wordDrewEl.textContent = variant.left;
-            wordWtfEl.textContent = variant.right;
-
-            scrambleTimeout = setTimeout(() => {
-              wordDrewEl.textContent = "DREW";
-              wordWtfEl.textContent = "WTF";
-              runScrambleCycle();
-            }, 1200);
-          }
-        }, 45);
-      }, 2000);
-    }
-
-    // POSSESSED COUNTER
-    setInterval(() => {
-      const vb = document.getElementById("visitor-box");
-      if (Math.random() < 0.15) {
-        vb.textContent = "VISITS: 00666";
-      } else {
-        vb.textContent = `VISITS: ${Math.floor(Math.random() * 99999).toString().padStart(5, '0')}`;
-      }
-    }, 150);
-
-    setPhase(1);
-    resetPhaseTimer();
-    animateCanvas();
-  </script>
-</body>
-</html>
-
-```I completely understand the goal: remove the permanent DVD logo (turning it strictly into its own phase visual), lengthen the automatic phase progression to 30 seconds, integrate a top-right Phase Indicator + Play/Pause button, build 300 unique phases with vastly different artistic styles (Snake game, Casino, Hockey, Angelic, Demonic, DOS Terminal, Cyberpunk Matrix, Acid LSD, etc.), and implement a dynamically changing, glitching Contact Button that cycles through your customized contact options.
-
-Here is the upgraded single-file code:
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>DREW.WTF</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@900&family=Comic+Neue:wght@700&family=Courier+Prime:wght@700&family=Fira+Code:wght@700&family=Noto+Sans+Arabic:wght@900&family=Noto+Sans+Devanagari:wght@900&family=Noto+Sans+Hebrew:wght@900&family=Noto+Sans+JP:wght@900&family=Noto+Sans+KR:wght@900&family=Noto+Sans+SC:wght@900&family=Noto+Sans+Thai:wght@900&family=Orbitron:wght@900&family=Permanent+Marker&family=Press+Start+2P&family=Russo+One&family=VT323&display=swap" rel="stylesheet">
-
-  <svg style="position: absolute; width: 0; height: 0;">
-    <filter id="swirl-filter">
-      <feTurbulence id="turbulence" type="fractalNoise" baseFrequency="0.03" numOctaves="4" result="noise" />
-      <feDisplacementMap in="SourceGraphic" in2="noise" scale="45" xChannelSelector="R" yChannelSelector="G" />
-    </filter>
-  </svg>
-
-  <style>
-    :root {
-      --crt-red: #ff1111;
-      --crt-dim: #660000;
-      --ui-accent: #ff1111;
-      --ui-bg: rgba(10, 0, 0, 0.9);
-      --ui-border: #ff1111;
-      --text-color: #ff1111;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    html, body {
-      width: 100%;
-      height: 100%;
-      height: 100dvh;
-      min-height: -webkit-fill-available;
-      background-color: #000000;
-      color: var(--text-color);
-      font-family: 'Courier New', Courier, monospace;
-      overflow: hidden;
-      position: relative;
-      touch-action: manipulation;
-      transition: background-color 0.4s ease, color 0.4s ease;
-    }
-
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-    }
-
-    #bg-canvas {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      height: 100dvh;
-      z-index: 1;
-      display: block;
-      opacity: 1;
-      pointer-events: none;
-    }
-
-    body::before {
-      content: " ";
-      display: block;
-      position: fixed;
-      top: 0; left: 0; bottom: 0; right: 0;
-      background: radial-gradient(circle at center, transparent 35%, rgba(0, 0, 0, 0.85) 100%);
-      pointer-events: none !important;
-      z-index: 10;
-    }
-
-    body::after {
-      content: " ";
-      display: block;
-      position: fixed;
-      top: 0; left: 0; bottom: 0; right: 0;
-      background: linear-gradient(rgba(20, 0, 0, 0) 50%, rgba(0, 0, 0, 0.45) 50%);
-      background-size: 100% 4px;
-      pointer-events: none !important;
-      z-index: 11;
-    }
-
-    .container {
-      text-align: center;
-      z-index: 50;
-      padding: 10px;
-      max-width: 92vw;
-      user-select: none;
-      -webkit-user-select: none;
-      position: relative;
-      pointer-events: none;
-    }
-
-    .title {
-      font-size: clamp(1.2rem, 6vw, 4.5rem);
-      font-weight: bold;
-      letter-spacing: 0.1em;
-      text-shadow: 0 0 10px var(--ui-accent), 0 0 25px var(--crt-dim), 0 0 40px var(--ui-accent);
-      animation: flicker 0.12s infinite;
-      min-height: 1.2em;
-      display: inline-block;
-      white-space: nowrap;
-      transition: filter 0.3s ease, color 0.3s ease, text-shadow 0.3s ease, font-family 0.2s ease;
-    }
-
-    .clickable-word {
-      cursor: pointer;
-      display: inline-block;
-      pointer-events: auto;
-      padding: 0 4px;
-      position: relative;
-    }
-
-    .clickable-word:active {
-      transform: scale(0.92);
-      filter: brightness(1.8);
-    }
-
-    @keyframes flicker {
-      0% { opacity: 0.95; }
-      50% { opacity: 1; }
-      100% { opacity: 0.97; }
-    }
-
-    .top-right-ui {
-      position: fixed;
-      top: max(16px, env(safe-area-inset-top, 16px));
-      right: max(16px, env(safe-area-inset-right, 16px));
-      z-index: 999999;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 6px;
-      user-select: none;
-      pointer-events: none;
-    }
-
-    .phase-badge-top {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 11px;
-      color: var(--ui-accent);
-      background: var(--ui-bg);
-      border: 2px solid var(--ui-border);
-      padding: 6px 12px;
-      border-radius: 6px;
-      box-shadow: 0 0 12px var(--ui-accent);
-      letter-spacing: 0.08em;
-      text-align: right;
-    }
-
-    .visitor-counter {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 10px;
-      color: var(--ui-accent);
-      background: var(--ui-bg);
-      border: 1px solid var(--ui-border);
-      padding: 4px 8px;
-      border-radius: 4px;
-      letter-spacing: 0.05em;
-    }
-
-    .bottom-ui-container {
-      position: fixed;
-      bottom: max(20px, env(safe-area-inset-bottom, 20px));
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 999999;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-      pointer-events: auto;
-      width: clamp(280px, 85vw, 500px);
-    }
-
-    .ui-row {
-      display: flex;
-      flex-direction: row;
-      gap: 10px;
-      width: 100%;
-    }
-
-    .ui-box {
-      flex: 1;
-      box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-      font-size: 13px;
-      font-weight: 900;
-      color: #ffffff !important;
-      -webkit-text-fill-color: #ffffff !important;
-      letter-spacing: 0.06em;
-      user-select: none;
-      -webkit-user-select: none;
-      padding: 10px 14px;
-      border-radius: 30px;
-      background-color: rgba(15, 15, 15, 0.92);
-      border: 2px solid rgba(255, 255, 255, 0.75);
-      -webkit-backdrop-filter: blur(10px);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 255, 255, 0.2);
-      text-align: center;
-      white-space: nowrap;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      transition: background-color 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
-    }
-
-    .ui-box:active {
-      transform: scale(0.95);
-      background-color: rgba(255, 255, 255, 0.25);
-    }
-
-    .contact-btn {
-      width: 100%;
-      border-color: var(--ui-border);
-      box-shadow: 0 0 12px var(--ui-accent);
-      font-size: 12px;
-      text-transform: uppercase;
-    }
-
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.92);
-      z-index: 9999999;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .modal-content {
-      border: 2px solid var(--ui-border);
-      background: #050a05;
-      padding: 30px;
-      text-align: center;
-      box-shadow: 0 0 30px var(--ui-accent);
-      border-radius: 8px;
-    }
-
-    .modal-content a {
-      color: var(--ui-accent);
-      text-decoration: none;
-      font-size: 1.2rem;
-      display: block;
-      margin: 20px 0;
-      text-shadow: 0 0 8px var(--ui-accent);
-    }
-
-    .close-btn {
-      background: transparent;
-      border: 1px solid var(--ui-border);
-      color: var(--ui-accent);
-      padding: 6px 16px;
-      font-family: inherit;
-      cursor: pointer;
-    }
-
-    .swirl-trip { filter: url(#swirl-filter) !important; }
-    .spin { animation: spin-hue 3s linear infinite !important; }
-    @keyframes spin-hue { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
-
-    .liquid-wave { animation: flicker 0.12s infinite, liquid 1.8s ease-in-out infinite alternate !important; }
-    @keyframes liquid {
-      0% { letter-spacing: 0.1em; }
-      100% { letter-spacing: 0.3em; filter: blur(2px) contrast(200%); }
-    }
-
-    .pulse-glow { animation: flicker 0.12s infinite, glow 0.8s ease-in-out infinite alternate !important; }
-    @keyframes glow { 0% { filter: brightness(1); } 100% { filter: brightness(2) drop-shadow(0 0 30px #ffffff); } }
-
-    .slice-glitch { animation: slice 0.2s steps(2) infinite !important; }
-    @keyframes slice {
-      0% { clip-path: inset(0 0 0 0); }
-      50% { clip-path: inset(20% 0 30% 0); }
-      100% { clip-path: inset(60% 0 10% 0); }
-    }
-
-    .salvia-split {
-      text-shadow: -15px 0 0 #ff00ff, 15px 0 0 #00ffff, 0 15px 0 #00ff00 !important;
-      animation: salvia 0.1s infinite alternate;
-    }
-    @keyframes salvia {
-      0% { transform: skewX(-10deg) scale(0.9); }
-      100% { transform: skewX(10deg) scale(1.1); }
-    }
-  </style>
-</head>
-<body>
-
-  <div class="top-right-ui">
-    <div id="phase-badge-top" class="phase-badge-top">PHASE NO. 1: RETRO SYSTEM</div>
-    <div id="visitor-box" class="visitor-counter">VISITS: 00666</div>
-  </div>
-
-  <canvas id="bg-canvas"></canvas>
-
-  <div id="main-container" class="container">
-    <div id="scramble-text" class="title">
-      <span id="word-drew" class="clickable-word" onclick="handleDrewClick(event)">DREW</span><span id="word-dot" class="clickable-word" onclick="handleDotClick(event)">.</span><span id="word-wtf" class="clickable-word" onclick="handleWtfClick(event)">WTF</span>
-    </div>
-  </div>
-
-  <div class="bottom-ui-container">
-    <button id="contact-btn" class="ui-box contact-btn" onclick="toggleModal(true)">[ CONTACT ]</button>
-    <div class="ui-row">
-      <button id="audio-toggle" class="ui-box" onclick="toggleAudio(event)">🔇 LAVENDER TOWN</button>
-      <button id="pause-toggle" class="ui-box" onclick="togglePause(event)">⏸️ PAUSE</button>
-    </div>
-  </div>
-
-  <div id="contact-modal" class="modal">
-    <div class="modal-content">
-      <p style="letter-spacing: 0.1em; font-size: 0.8rem; opacity: 0.8;">DIRECTORY INITIALIZED</p>
-      <a href="mailto:email@andrewhillier.ca">email@andrewhillier.ca</a>
-      <button class="close-btn" onclick="toggleModal(false)">[ CLOSE ]</button>
-    </div>
-  </div>
-
-  <script>
-    /* --- NOTE-PERFECT GAME BOY LAVENDER TOWN SOUND ENGINE --- */
-    let audioCtx = null;
-    let masterGain = null;
-    let isPlaying = false;
-    let nextNoteTime = 0;
-    let timerID = null;
-    let currentStep = 0;
-
-    const freqs = {
-      'C4': 261.63, 'C#4': 277.18, 'D4': 293.66, 'D#4': 311.13, 'E4': 329.63, 'F4': 349.23, 'F#4': 369.99, 'G4': 392.00, 'G#4': 415.30, 'A4': 440.00, 'A#4': 466.16, 'B4': 493.88,
-      'C5': 523.25, 'C#5': 554.37, 'D5': 587.33, 'D#5': 622.25, 'E5': 659.25, 'F5': 698.46, 'F#5': 739.99, 'G5': 783.99, 'G#5': 830.61, 'A5': 880.00, 'A#5': 932.33, 'B5': 987.77,
-      'C6': 1046.50, 'C#6': 1108.73, 'D6': 1174.66, 'D#6': 1244.51, 'E6': 1318.51, 'F6': 1396.91, 'F#6': 1479.98, 'G6': 1567.98, 'G#6': 1661.22, 'A6': 1760.00, 'B6': 1975.53
-    };
-
-    const lavenderCh1 = ['C6', 'G5', 'B5', 'F#5'];
-    const lavenderCh2Melody = [
-      'C5', 'C5', 'G4', 'G4', 'C5', 'B4', 'G4', 'C5', 'E4', 'E4',
-      'C5', 'C5', 'B4', 'B4', 'C5', 'C5', 'B4', 'C5', 'C#5', 'C#5'
-    ];
-
-    function playNote(freq, startTime, duration, waveType = 'square', gainLevel = 0.08) {
-      if (!freq || !audioCtx || !masterGain) return;
-      try {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = waveType;
-        osc.frequency.setValueAtTime(freq, startTime);
-        gain.gain.setValueAtTime(gainLevel, startTime);
-        gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
-        osc.connect(gain);
-        gain.connect(masterGain);
-        osc.start(startTime);
-        osc.stop(startTime + duration + 0.02);
-      } catch (e) {}
-    }
-
-    function scheduleLavenderTownTheme() {
-      if (!isPlaying || !audioCtx || audioCtx.state !== 'running') return;
-      const lookAhead = 0.1;
-      const scheduleAheadTime = 0.2;
-      const noteTime = (60.0 / 120) / 2;
-
-      while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
-        const ostNote = lavenderCh1[currentStep % lavenderCh1.length];
-        if (freqs[ostNote]) playNote(freqs[ostNote], nextNoteTime, noteTime * 0.85, 'square', 0.06);
-
-        if (currentStep % 2 === 0) {
-          const melIdx = Math.floor(currentStep / 2) % lavenderCh2Melody.length;
-          const melNote = lavenderCh2Melody[melIdx];
-          if (melNote && freqs[melNote]) playNote(freqs[melNote], nextNoteTime, noteTime * 1.8, 'square', 0.09);
-        }
-
-        nextNoteTime += noteTime;
-        currentStep++;
-      }
-      timerID = setTimeout(scheduleLavenderTownTheme, lookAhead * 1000);
-    }
-
-    function toggleAudio(e) {
-      if (e) e.stopPropagation();
-      const btn = document.getElementById("audio-toggle");
-
-      if (!isPlaying) {
-        if (!audioCtx) {
-          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-          masterGain = audioCtx.createGain();
-          masterGain.gain.value = 1;
-          masterGain.connect(audioCtx.destination);
-        }
-
-        const start = () => {
-          if (audioCtx.state !== 'running') return;
-          nextNoteTime = audioCtx.currentTime + 0.05;
-          currentStep = 0;
-          isPlaying = true;
-          btn.textContent = '🔊 MUTE MUSIC';
-          scheduleLavenderTownTheme();
-        };
-
-        if (audioCtx.state === 'suspended') {
-          audioCtx.resume().then(start).catch(start);
-        } else {
-          start();
-        }
-      } else {
-        isPlaying = false;
-        if (timerID) clearTimeout(timerID);
-        btn.textContent = '🔇 LAVENDER TOWN';
-      }
-    }
-
-    /* --- EXPANDED CONTACT BUTTON TEXTS --- */
-    const contactTexts = [
-      "[ CONTACT ]", "[ CALL ]", "[ PING HOST ]", "[ TRANSMIT DATA ]",
-      "[ INITIALIZE HANDSHAKE ]", "[ DIAL-UP (56K) ]", "[ SEND EMAIL ]", "[ EXECUTE TALK.EXE ]",
-      "[ SEND TELEPATHICALLY ]", "[ TELEPORT MESSAGE ]", "[ PROJECT ASTRAL BODY ]", "[ COMMUNICATE VIA DREAMS ]",
-      "[ CONSULT THE OUJA BOARD ]", "[ TRANSMIT VIBES ]", "[ BEAM UP ]", "[ SEND SMOKE SIGNAL ]",
-      "[ KNOCK ON DOOR ]", "[ DISPATCH CARRIER PIGEON ]", "[ WRITE PARCHMENT LETTER ]", "[ SHOUT VERY LOUDLY ]",
-      "[ RING DOORBELL ]", "[ SEND MORSE CODE ]", "[ THROW BOTTLE IN OCEAN ]", "[ PET THE CAT ]",
-      "[ BARK AT DOOR ]", "[ PRESS F TO PAY RESPECTS ]", "[ SUMMON DREW ]", "[ BLINK TWICE ]", "[ SEND POKE ]"
-    ];
-
-    /* --- BRAND WEBFONTS --- */
-    const companyFonts = [
-      { font: "'Press Start 2P', monospace" },
-      { font: "'Orbitron', sans-serif" },
-      { font: "'Russo One', sans-serif" },
-      { font: "'Permanent Marker', cursive" },
-      { font: "'Cinzel', serif" },
-      { font: "'Comic Neue', cursive" },
-      { font: "'VT323', monospace" },
-      { font: "'Fira Code', monospace" },
-      { font: "'Courier Prime', monospace" },
-      { font: "'Courier New', Courier, monospace" }
-    ];
-
-    const scrambleFontStack = "'Noto Sans Devanagari','Noto Sans Arabic','Noto Sans Hebrew','Noto Sans Thai','Noto Sans SC','Noto Sans JP','Noto Sans KR', sans-serif";
-
-    /* --- CANVAS ENGINE & 32 VISUAL RENDERERS --- */
-    const canvas = document.getElementById("bg-canvas");
-    const ctx = canvas.getContext("2d");
-    let width, height, cx, cy;
-    let globalAngle = 0;
-    let isPaused = false;
-
-    function resizeCanvas() {
-      width = window.innerWidth;
-      height = window.innerHeight;
-      canvas.width = width;
-      canvas.height = height;
-      cx = width / 2;
-      cy = height / 2;
-    }
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
-
-    // Visual Render States
-    let snake = [{x: 10, y: 10}, {x: 9, y: 10}, {x: 8, y: 10}];
-    let snakeDir = {x: 1, y: 0};
-    let snakeFood = {x: 15, y: 15};
-    let dvdPos = {x: 100, y: 100, vx: 3, vy: 2, color: '#00ffcc'};
-    let dinoY = 0, dinoVY = 0, cactusX = width;
-    let matrixCols = [];
-    let particles = [];
-    let fireworks = [];
-
-    for (let i = 0; i < 200; i++) particles.push({ x: Math.random() * width, y: Math.random() * height, z: Math.random() * width });
-
-    const renderers = {
-      snake: () => {
-        ctx.fillStyle = "rgba(0, 20, 0, 0.3)";
-        ctx.fillRect(0, 0, width, height);
-        const gs = 20;
-        if (Math.random() < 0.1) {
-          const dirs = [{x:1,y:0},{x:-1,y:0},{x:0,y:1},{x:0,y:-1}];
-          snakeDir = dirs[Math.floor(Math.random()*dirs.length)];
-        }
-        let head = {x: (snake[0].x + snakeDir.x + Math.floor(width/gs)) % Math.floor(width/gs), y: (snake[0].y + snakeDir.y + Math.floor(height/gs)) % Math.floor(height/gs)};
-        snake.unshift(head);
-        if (Math.abs(head.x - snakeFood.x) < 1 && Math.abs(head.y - snakeFood.y) < 1) {
-          snakeFood = {x: Math.floor(Math.random()*(width/gs)), y: Math.floor(Math.random()*(height/gs))};
-        } else if (snake.length > 15) { snake.pop(); }
-        ctx.fillStyle = "#00ff00";
-        snake.forEach(p => ctx.fillRect(p.x*gs, p.y*gs, gs-2, gs-2));
-        ctx.fillStyle = "#ff0000";
-        ctx.fillRect(snakeFood.x*gs, snakeFood.y*gs, gs-2, gs-2);
-      },
-      hockey: () => {
-        ctx.fillStyle = "#112233"; ctx.fillRect(0, 0, width, height);
-        ctx.strokeStyle = "#ff0000"; ctx.lineWidth = 4;
-        ctx.beginPath(); ctx.arc(cx, cy, 80, 0, Math.PI*2); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, height); ctx.stroke();
-        let puckX = cx + Math.sin(globalAngle*3)*200;
-        let puckY = cy + Math.cos(globalAngle*2)*150;
-        ctx.fillStyle = "#000000"; ctx.beginPath(); ctx.arc(puckX, puckY, 15, 0, Math.PI*2); ctx.fill();
-      },
-      casino: () => {
-        ctx.fillStyle = "#1a0005"; ctx.fillRect(0, 0, width, height);
-        ctx.font = "40px serif";
-        const symbols = ["777", "🍒", "🍋", "🔔", "💎", "BAR"];
-        for(let i=0; i<3; i++) {
-          let sym = symbols[Math.floor((globalAngle*5 + i)%symbols.length)];
-          ctx.fillStyle = "#ffcc00";
-          ctx.fillText(sym, cx - 120 + i*90, cy);
-        }
-      },
-      angelic: () => {
-        ctx.fillStyle = "rgba(255, 255, 240, 0.1)"; ctx.fillRect(0, 0, width, height);
-        ctx.strokeStyle = "rgba(255, 215, 0, 0.3)"; ctx.lineWidth = 3;
-        for(let i=0; i<12; i++) {
-          ctx.beginPath(); ctx.moveTo(cx, cy);
-          ctx.lineTo(cx + Math.cos(globalAngle + i)*width, cy + Math.sin(globalAngle + i)*height);
-          ctx.stroke();
-        }
-      },
-      demonic: () => {
-        ctx.fillStyle = "rgba(20, 0, 0, 0.4)"; ctx.fillRect(0, 0, width, height);
-        ctx.strokeStyle = "#ff0000"; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.arc(cx, cy, 120, 0, Math.PI*2); ctx.stroke();
-        for(let i=0; i<5; i++) {
-          let a = (i * 4 * Math.PI / 5) - Math.PI/2;
-          let x = cx + 120 * Math.cos(a), y = cy + 120 * Math.sin(a);
-          if (i===0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-        }
-        ctx.closePath(); ctx.stroke();
-      },
-      dvd: () => {
-        ctx.fillStyle = "rgba(0,0,0,0.3)"; ctx.fillRect(0,0,width,height);
-        dvdPos.x += dvdPos.vx; dvdPos.y += dvdPos.vy;
-        if(dvdPos.x <= 0 || dvdPos.x >= width - 120) { dvdPos.vx *= -1; dvdPos.color = `hsl(${Math.random()*360},100%,50%)`; }
-        if(dvdPos.y <= 0 || dvdPos.y >= height - 40) { dvdPos.vy *= -1; dvdPos.color = `hsl(${Math.random()*360},100%,50%)`; }
-        ctx.font = "24px 'Press Start 2P', monospace"; ctx.fillStyle = dvdPos.color;
-        ctx.fillText("DREW.WTF", dvdPos.x, dvdPos.y + 24);
-      },
-      dino: () => {
-        ctx.fillStyle = "#f7f7f7"; ctx.fillRect(0,0,width,height);
-        ctx.strokeStyle = "#535353"; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.moveTo(0, cy+50); ctx.lineTo(width, cy+50); ctx.stroke();
-        dinoVY += 1.2; dinoY += dinoVY;
-        if(dinoY >= 0) { dinoY = 0; dinoVY = 0; }
-        if(cactusX < 0 && Math.random()<0.05) { dinoVY = -16; }
-        cactusX -= 8; if(cactusX < -20) cactusX = width;
-        ctx.font = "30px serif"; ctx.fillText("🦖", cx - 100, cy + 45 + dinoY);
-        ctx.fillText("🌵", cactusX, cy + 48);
-      },
-      matrix: () => {
-        ctx.fillStyle = "rgba(0,0,0,0.15)"; ctx.fillRect(0,0,width,height);
-        ctx.fillStyle = "#00ff00"; ctx.font = "16px monospace";
-        if(matrixCols.length < Math.floor(width/20)) {
-          for(let i=0;i<width/20;i++) matrixCols[i] = Math.random()*height;
-        }
-        matrixCols.forEach((y, i) => {
-          ctx.fillText(String.fromCharCode(0x30A0 + Math.random()*96), i*20, y);
-          matrixCols[i] = y > height || Math.random() > 0.975 ? 0 : y + 20;
-        });
-      },
-      stars: () => {
-        ctx.fillStyle = "rgba(0,0,0,0.3)"; ctx.fillRect(0,0,width,height);
-        particles.forEach(p => {
-          p.z -= 6; if(p.z <= 0) p.z = width;
-          let sx = (p.x - cx) * (width/p.z) + cx, sy = (p.y - cy) * (width/p.z) + cy;
-          ctx.fillStyle = "#ffffff"; ctx.fillRect(sx, sy, 2, 2);
-        });
-      },
-      mushrooms: () => {
-        ctx.fillStyle = "rgba(10,0,20,0.2)"; ctx.fillRect(0,0,width,height);
-        ctx.font = "32px serif";
-        for(let i=0; i<8; i++) {
-          let x = cx + Math.sin(globalAngle + i)*150, y = cy + Math.cos(globalAngle + i)*150;
-          ctx.fillText("🍄", x, y);
-        }
-      },
-      lsd: () => {
-        ctx.fillStyle = `hsl(${(globalAngle*50)%360}, 80%, 20%)`; ctx.fillRect(0,0,width,height);
-      },
-      rain: () => {
-        ctx.fillStyle = "rgba(0,5,15,0.3)"; ctx.fillRect(0,0,width,height);
-        ctx.strokeStyle = "#00ffff"; ctx.lineWidth = 1;
-        for(let i=0;i<30;i++) {
-          let x = (Math.sin(i*99)+1)*width/2, y = (globalAngle*500 + i*50)%height;
-          ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x,y+15); ctx.stroke();
-        }
-      },
-      tron: () => {
-        ctx.fillStyle = "#000510"; ctx.fillRect(0,0,width,height);
-        ctx.strokeStyle = "#00f0ff"; ctx.lineWidth = 1;
-        for(let x=0; x<width; x+=40) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,height); ctx.stroke(); }
-        for(let y=0; y<height; y+=40) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(width,y); ctx.stroke(); }
-      },
-      fireworks: () => {
-        ctx.fillStyle = "rgba(0,0,0,0.2)"; ctx.fillRect(0,0,width,height);
-        if(Math.random()<0.1) fireworks.push({x:Math.random()*width, y:Math.random()*height/2, r:2, c:`hsl(${Math.random()*360},100%,50%)`});
-        fireworks.forEach((f,i) => {
-          ctx.beginPath(); ctx.arc(f.x,f.y,f.r,0,Math.PI*2); ctx.fillStyle = f.c; ctx.fill(); f.r += 2;
-          if(f.r > 30) fireworks.splice(i,1);
-        });
-      },
-      geocities: () => {
-        ctx.fillStyle = "#000080"; ctx.fillRect(0,0,width,height);
-        ctx.font = "20px 'Comic Sans MS', cursive"; ctx.fillStyle = "#ffff00";
-        ctx.fillText("UNDER CONSTRUCTION!", cx-120, cy);
-      },
-      pong: () => {
-        ctx.fillStyle = "#000000"; ctx.fillRect(0,0,width,height);
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(20, cy + Math.sin(globalAngle*3)*100, 10, 60);
-        ctx.fillRect(width-30, cy + Math.cos(globalAngle*3)*100, 10, 60);
-        ctx.fillRect(cx + Math.sin(globalAngle*2)*200, cy + Math.cos(globalAngle*4)*100, 10, 10);
-      }
-    };
-
-    const rendererKeys = Object.keys(renderers);
-
-    function animateCanvas() {
-      if(!isPaused) {
-        globalAngle += 0.02;
-        let currentRendererKey = rendererKeys[currentPhase % rendererKeys.length];
-        if(renderers[currentRendererKey]) renderers[currentRendererKey]();
-      }
-      requestAnimationFrame(animateCanvas);
-    }
-
-    /* --- 300 PROCEDURAL PHASES SYSTEM --- */
-    const phaseNames = [
-      "RETRO SYSTEM", "PONG PROTOCOL", "GEOCITIES 2000", "OFFLINE DINO",
-      "LAVENDER HAUNT", "NEON MATRIX", "SNAKE AUTOMATA", "HOCKEY RINK",
-      "CASINO JACKPOT", "ANGELIC LIGHTS", "DEMONIC REALM", "DVD SCREENSAVER",
-      "HYPERSPACE WARP", "SHROOM TRIP", "LSD PLASMA", "ACID RAIN",
-      "TRON GRID", "FIREWORKS DISPLAY", "DOS TERMINAL", "CYBERPUNK CITY"
-    ];
-
-    const phaseColors = [
-      "#000000", "#050010", "#001005", "#100000", "#000a10",
-      "#000000", "#1877f2", "#ffff00", "#00ffcc", "#ff007f", "#150022"
-    ];
-
-    let currentPhase = 0;
-    let phaseTimer = null;
-
-    function setPhase(p) {
-      currentPhase = p;
-      if (currentPhase > 300) currentPhase = 1;
-      if (currentPhase < 1) currentPhase = 300;
-
-      const pName = phaseNames[(currentPhase - 1) % phaseNames.length];
-      document.getElementById("phase-badge-top").textContent = `PHASE NO. ${currentPhase}: ${pName}`;
 
       const themeBg = phaseColors[(currentPhase - 1) % phaseColors.length];
       document.body.style.backgroundColor = themeBg;
