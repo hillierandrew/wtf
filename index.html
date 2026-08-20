@@ -52,7 +52,7 @@
       flex-direction: column;
     }
 
-    /* Main Multi-Mode Background Canvas */
+    /* Main Canvas Engine */
     #bg-canvas {
       position: fixed;
       top: 0; left: 0;
@@ -67,7 +67,7 @@
 
     #bg-canvas.active { opacity: 1; }
 
-    /* Vignette & Scanlines */
+    /* Vignette & CRT Effects */
     body::before {
       content: " ";
       display: block;
@@ -131,7 +131,7 @@
       100% { opacity: 0.97; }
     }
 
-    /* POSSESSED VISITOR COUNTER */
+    /* Visitor Counter */
     .visitor-counter {
       position: fixed;
       top: max(16px, env(safe-area-inset-top, 16px));
@@ -150,7 +150,7 @@
       letter-spacing: 0.1em;
     }
 
-    /* SIDE-BY-SIDE BOTTOM UI CONTAINER */
+    /* Bottom UI Controls */
     .bottom-ui-container {
       position: fixed;
       bottom: max(20px, env(safe-area-inset-bottom, 20px));
@@ -205,7 +205,7 @@
       pointer-events: none;
     }
 
-    /* ANIMATION STYLES */
+    /* CSS Animations */
     .swirl-trip { filter: url(#swirl-filter) !important; }
     .spin { animation: spin-hue 3s linear infinite !important; }
     @keyframes spin-hue { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
@@ -258,7 +258,7 @@
   </div>
 
   <script>
-    /* --- EXACT SHEET MUSIC SYNTHESIZER ENGINE (Lavender Town Piano Arrangement) --- */
+    /* --- COMPLETE NOV_DC PIANO ARRANGEMENT SYNTHESIZER ENGINE --- */
     let audioCtx = null;
     let isPlaying = false;
     let nextNoteTime = 0;
@@ -266,25 +266,30 @@
     let currentStep = 0;
 
     const freqs = {
+      'G2': 98.00, 'G#2': 103.83, 'A2': 110.00, 'A#2': 116.54, 'B2': 123.47,
       'C3': 130.81, 'C#3': 138.59, 'D3': 146.83, 'D#3': 155.56, 'E3': 164.81, 'F3': 174.61, 'F#3': 185.00, 'G3': 196.00, 'G#3': 207.65, 'A3': 220.00, 'A#3': 233.08, 'B3': 246.94,
       'C4': 261.63, 'C#4': 277.18, 'D4': 293.66, 'D#4': 311.13, 'E4': 329.63, 'F4': 349.23, 'F#4': 369.99, 'G4': 392.00, 'G#4': 415.30, 'A4': 440.00, 'A#4': 466.16, 'B4': 493.88,
       'C5': 523.25, 'C#5': 554.37, 'D5': 587.33, 'D#5': 622.25, 'E5': 659.25, 'F5': 698.46, 'F#5': 739.99, 'G5': 783.99, 'G#5': 830.61, 'A5': 880.00, 'A#5': 932.33, 'B5': 987.77,
       'C6': 1046.50, 'C#6': 1108.73, 'D6': 1174.66, 'D#6': 1244.51, 'E6': 1318.51, 'F6': 1396.91, 'F#6': 1479.98, 'G6': 1567.98, 'G#6': 1661.22, 'A6': 1760.00, 'B6': 1975.53
     };
 
-    // Right-Hand High Ostinato Pattern from Score: B5 -> C6 -> G5 -> B5 -> F#5[cite: 1]
-    const scoreOstinato = ['B5', 'C6', 'G5', 'B5', 'F#5', 'B5', 'C6', 'G5', 'B5', 'F#5', 'B5', 'C6', 'G5', 'B5', 'F#5', 'B5'];
+    // Nov_DC Intro & High Register Section
+    const novDcIntroOstinato = [
+      'G6', 'F6', 'D6', 'B5', 'G5', 'F5', 'D5', 'B4',
+      'C5', 'G4', 'B4', 'F#4', 'C5', 'G4', 'B4', 'F#4',
+      'C5', 'G4', 'B4', 'F#4', 'C5', 'G4', 'B4', 'F#4'
+    ];
 
-    // Left-Hand Bass Notes from Score: Measures 5-12, 13-20[cite: 1]
-    const scoreBassline = [
-      null, null, null, null,
+    // Nov_DC Section A / Section B Bass & Harmony Line
+    const novDcBassline = [
+      null, null, null, null, null, null, null, null,
       'C3', 'G3', 'C3', 'G3', 'C3', 'G3', 'C3', 'G3',
       'G2', 'D3', 'G2', 'D3', 'G2', 'D3', 'G2', 'D3',
       'C3', 'G3', 'C3', 'G3', 'C3', 'G3', 'C3', 'G3',
       'F#2', 'C#3', 'F#2', 'C#3', 'F#2', 'C#3', 'F#2', 'C#3'
     ];
 
-    function playNote(freq, startTime, duration, waveType = 'square', gainLevel = 0.08) {
+    function playNote(freq, startTime, duration, waveType = 'sine', gainLevel = 0.08) {
       if (!freq || !audioCtx) return;
       try {
         const osc = audioCtx.createOscillator();
@@ -304,18 +309,18 @@
       if (!isPlaying || !audioCtx) return;
       const lookAhead = 0.1;
       const scheduleAheadTime = 0.2;
-      const noteTime = (60.0 / 120) / 2; // 120 BPM tempo[cite: 1]
+      const noteTime = (60.0 / 108) / 2; // Rubato Grave/Affettuoso Tempo
 
       while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
-        // Track 1: Ostinato[cite: 1]
-        const ostNote = scoreOstinato[currentStep % scoreOstinato.length];
-        if (freqs[ostNote]) playNote(freqs[ostNote], nextNoteTime, noteTime * 0.85, 'square', 0.06);
+        // Track 1: Nov_DC High Arpeggios
+        const leadNote = novDcIntroOstinato[currentStep % novDcIntroOstinato.length];
+        if (freqs[leadNote]) playNote(freqs[leadNote], nextNoteTime, noteTime * 0.9, 'sine', 0.07);
 
-        // Track 2: Lower Register Piano Accompaniment[cite: 1]
-        if (currentStep % 4 === 0) {
-          const bassIdx = Math.floor(currentStep / 4) % scoreBassline.length;
-          const bassNote = scoreBassline[bassIdx];
-          if (bassNote && freqs[bassNote]) playNote(freqs[bassNote], nextNoteTime, noteTime * 3.5, 'triangle', 0.12);
+        // Track 2: Accompaniment Bass
+        if (currentStep % 2 === 0) {
+          const bassIdx = Math.floor(currentStep / 2) % novDcBassline.length;
+          const bassNote = novDcBassline[bassIdx];
+          if (bassNote && freqs[bassNote]) playNote(freqs[bassNote], nextNoteTime, noteTime * 1.8, 'triangle', 0.1);
         }
 
         nextNoteTime += noteTime;
@@ -380,6 +385,7 @@
     const dogEmojis = ["🐕", "🦮", "🐩", "🦴"];
     const dinoEmojis = ["🦖", "🌵", "🏃", "👾"];
     const rainEmojis = ["💧", "🌧️", "⚡", "🌊"];
+    const asciiArt = ["[::]", "<=>", "{*}", "|||", "///", "@@@", "###"];
 
     function resizeCanvas() {
       width = window.innerWidth;
@@ -406,6 +412,7 @@
         this.dogE = dogEmojis[Math.floor(Math.random() * dogEmojis.length)];
         this.dinoE = dinoEmojis[Math.floor(Math.random() * dinoEmojis.length)];
         this.rE = rainEmojis[Math.floor(Math.random() * rainEmojis.length)];
+        this.ascii = asciiArt[Math.floor(Math.random() * asciiArt.length)];
       }
 
       update() {
@@ -414,6 +421,10 @@
           this.y += warpSpeed * 3;
           if (renderMode === "wind") this.x += warpSpeed * 4;
           if (this.y > height) { this.y = -20; this.x = (Math.random() - 0.5) * width * 2; }
+        } else if (renderMode === "ocean") {
+          this.x += Math.sin(globalAngle + this.y) * 2;
+          this.y -= warpSpeed * 0.5;
+          if (this.y < 0) this.y = height;
         } else if (reverseWarp) {
           this.z += warpSpeed;
           if (this.z >= width) this.reset(false);
@@ -430,6 +441,16 @@
         if (renderMode === "rain" || renderMode === "wind") {
           ctx.font = `20px monospace`;
           ctx.fillText(this.rE, this.x, this.y);
+          return;
+        } else if (renderMode === "ocean") {
+          ctx.font = `16px monospace`;
+          ctx.fillStyle = "#00ffff";
+          ctx.fillText("~ ~ ~", this.x, this.y);
+          return;
+        } else if (renderMode === "ascii") {
+          ctx.font = `14px monospace`;
+          ctx.fillStyle = "#00ff00";
+          ctx.fillText(this.ascii, sx, sy);
           return;
         }
 
@@ -475,11 +496,11 @@
     function drawCustomBackgrounds() {
       globalAngle += 0.02;
 
-      if (renderMode === "tron") {
-        ctx.fillStyle = "rgba(0, 5, 20, 0.3)";
+      if (renderMode === "tron" || renderMode === "driving") {
+        ctx.fillStyle = renderMode === "driving" ? "rgba(10, 10, 20, 0.3)" : "rgba(0, 5, 20, 0.3)";
         ctx.fillRect(0, 0, width, height);
 
-        ctx.strokeStyle = "rgba(0, 240, 255, 0.4)";
+        ctx.strokeStyle = renderMode === "driving" ? "rgba(255, 0, 128, 0.5)" : "rgba(0, 240, 255, 0.4)";
         ctx.lineWidth = 1.5;
         const horizon = height * 0.55;
 
@@ -549,24 +570,22 @@
     }
     runPossessedCounter();
 
-    /* --- BACKGROUND SPECTRUM & COLOR MODES --- */
+    /* --- BACKGROUND SPECTRUM & PROFESSIONAL PALETTES --- */
     const phaseColors = [
       "#000000", "#120000", "#00051a", "#10001a", "#001a0a",
-      "#ffffff", "#ff007f", "#00ffcc", "#ffcc00", "#7b00ff", "#150022"
+      "#f5f5f7", "#1877f2", "#00ffcc", "#ffcc00", "#7b00ff", "#150022"
     ];
 
-    /* --- 300 PHASE ENGINE & LETTER MIXER --- */
+    /* --- 300 PHASE ENGINE --- */
     let currentPhase = 0;
     let phaseTimer = null;
-    let activeWordLeft = "DREW";
-    let activeWordRight = "WTF";
 
     const customTextVariants = [
-      ["DREW", "WTF"], ["MUTHUR", "6000"], ["MEOW", "PURR"], ["DOGE", "WOW"],
-      ["TRON", "GRID"], ["HEAVEN", "ANGEL"], ["DEMON", "POSSESSED"], ["666", "EVIL"],
-      ["ACID", "TRIP"], ["SALVIA", "SPLIT"], ["APPLE", "MAC"], ["MSDOS", "PROMPT"],
-      ["SHROOM", "LSD"], ["DR3W", "W7F"], ["VOID", "NULL"], ["HELL", "MODE"],
-      ["CHROME", "DINO"], ["RAIN", "WIND"], ["POKE", "CENTER"], ["GYM", "BATTLE"]
+      ["DREW", "WTF"], ["APPLE", "MAC"], ["FACE", "BOOK"], ["MUTHUR", "6000"],
+      ["MEOW", "PURR"], ["DOGE", "WOW"], ["TRON", "GRID"], ["HEAVEN", "ANGEL"],
+      ["DEMON", "POSSESSED"], ["666", "EVIL"], ["ACID", "TRIP"], ["SALVIA", "SPLIT"],
+      ["MSDOS", "PROMPT"], ["SHROOM", "LSD"], ["DR3W", "W7F"], ["VOID", "NULL"],
+      ["CHROME", "DINO"], ["RAIN", "WIND"], ["OCEAN", "WAVE"], ["DRIVE", "FAST"]
     ];
 
     function setPhase(p) {
@@ -586,55 +605,50 @@
       document.body.style.backgroundColor = themeBg;
       document.body.style.filter = "none";
       el.className = "title";
-      el.style.color = themeBg === "#ffffff" ? "#000000" : "";
-      el.style.filter = "";
-      el.style.textShadow = "";
+      
+      // Professional Apple/Facebook styling for clean light phases
+      if (themeBg === "#f5f5f7") {
+        el.style.color = "#1d1d1f";
+        el.style.textShadow = "0 0 5px rgba(0,0,0,0.1)";
+        el.style.fontFamily = "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif";
+      } else if (themeBg === "#1877f2") {
+        el.style.color = "#ffffff";
+        el.style.textShadow = "0 0 10px rgba(255,255,255,0.5)";
+        el.style.fontFamily = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+      } else {
+        el.style.color = "";
+        el.style.textShadow = "";
+      }
+
       renderMode = "stars";
       reverseWarp = false;
       canvas.classList.add("active");
 
-      // Default to DREW.WTF layout
-      activeWordLeft = "DREW";
-      activeWordRight = "WTF";
-
       warpSpeed = (currentPhase % 30) + 2;
 
-      // Visual Background Modes
-      if (currentPhase % 22 === 0) {
-        renderMode = "dino";
-        el.style.color = "#535353";
+      // Phase Background Modes
+      if (currentPhase % 24 === 0) {
+        renderMode = "driving";
+      } else if (currentPhase % 22 === 0) {
+        renderMode = "ocean";
       } else if (currentPhase % 20 === 0) {
-        renderMode = "rain";
-        el.style.color = "#00bfff";
+        renderMode = "ascii";
       } else if (currentPhase % 18 === 0) {
-        renderMode = "tron";
-        el.style.color = "#00f0ff";
-        el.style.fontFamily = "'Orbitron', sans-serif";
-        el.style.textShadow = "0 0 20px #00f0ff";
+        renderMode = "dino";
       } else if (currentPhase % 16 === 0) {
-        renderMode = "flowers";
-        el.style.color = "#ffb6c1";
-        el.style.textShadow = "0 0 15px #ffb6c1";
+        renderMode = "rain";
       } else if (currentPhase % 14 === 0) {
-        renderMode = "devils";
-        el.style.color = "#ff0000";
-        el.style.textShadow = "0 0 30px #ff0000, 0 0 60px #880000";
-        el.classList.add("slice-glitch");
+        renderMode = "tron";
       } else if (currentPhase % 12 === 0) {
-        renderMode = "spiral";
+        renderMode = "flowers";
       } else if (currentPhase % 10 === 0) {
-        el.classList.add("salvia-split");
+        renderMode = "devils";
       } else if (currentPhase % 8 === 0) {
+        renderMode = "spiral";
+      } else if (currentPhase % 6 === 0) {
         renderMode = "cats";
-        el.style.color = "#ff69b4";
-      } else if (currentPhase % 7 === 0) {
+      } else if (currentPhase % 4 === 0) {
         renderMode = "dogs";
-        el.style.color = "#ffdd55";
-      } else if (currentPhase % 5 === 0) {
-        el.classList.add("liquid-wave");
-        el.style.color = "#ff00ff";
-      } else if (currentPhase % 3 === 0) {
-        el.classList.add("pulse-glow");
       } else {
         reverseWarp = currentPhase % 2 === 0;
       }
@@ -711,7 +725,7 @@
       "🔥","💀","😈","☣️","🟢","🛸","👽","🌸","🐱","🐕","🦖","🌧️","666"
     ];
 
-    /* Loop that keeps text as DREW.WTF, briefly glitches into a phase word, then returns to DREW.WTF */
+    /* Always start phase showing DREW.WTF -> Glitch to variant -> Return back to DREW.WTF */
     function runScrambleCycle() {
       wordDrewEl.textContent = "DREW";
       wordWtfEl.textContent = "WTF";
@@ -724,14 +738,14 @@
         let frame = 0;
         const interval = setInterval(() => {
           wordDrewEl.textContent = glitchLeft.split('').map(c => 
-            Math.random() < 0.3 ? intlGlitchChars[Math.floor(Math.random() * intlGlitchChars.length)] : c
+            Math.random() < 0.35 ? intlGlitchChars[Math.floor(Math.random() * intlGlitchChars.length)] : c
           ).join('');
           wordWtfEl.textContent = glitchRight.split('').map(c => 
-            Math.random() < 0.3 ? intlGlitchChars[Math.floor(Math.random() * intlGlitchChars.length)] : c
+            Math.random() < 0.35 ? intlGlitchChars[Math.floor(Math.random() * intlGlitchChars.length)] : c
           ).join('');
           
           frame++;
-          if (frame >= 20) {
+          if (frame >= 18) {
             clearInterval(interval);
             wordDrewEl.textContent = glitchLeft;
             wordWtfEl.textContent = glitchRight;
@@ -743,8 +757,8 @@
               runScrambleCycle();
             }, 1200);
           }
-        }, 50);
-      }, 2200);
+        }, 45);
+      }, 2000);
     }
 
     setPhase(0);
