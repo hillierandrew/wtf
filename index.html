@@ -1,8 +1,3 @@
-I see what happened—the cyan DVD logo text was lingering as a floating element outside the phase loop, and the bottom UI layout got scrambled.
-
-Here is the clean build. The bouncing cyan DVD logo is completely gone, the contact button and top-right controls are fixed in place, and the copyright watermark matches the bottom styling:
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -156,7 +151,7 @@ Here is the clean build. The bouncing cyan DVD logo is completely gone, the cont
       box-shadow: 0 0 12px var(--ui-accent);
       letter-spacing: 0.05em;
       text-align: right;
-      pointer-events: none;
+      cursor: pointer;
     }
 
     .top-btn {
@@ -171,7 +166,7 @@ Here is the clean build. The bouncing cyan DVD logo is completely gone, the cont
       box-shadow: 0 0 10px var(--ui-accent);
     }
 
-    .top-btn:active {
+    .top-btn:active, .phase-badge-top:active {
       transform: scale(0.92);
       background: rgba(255, 255, 255, 0.2);
     }
@@ -259,13 +254,20 @@ Here is the clean build. The bouncing cyan DVD logo is completely gone, the cont
       font-family: 'Press Start 2P', monospace;
       font-size: 9px;
       letter-spacing: 0.15em;
-      color: rgba(255, 255, 255, 0.75);
-      background: rgba(0, 0, 0, 0.7);
-      padding: 4px 10px;
-      border-radius: 4px;
-      pointer-events: none;
+      color: rgba(255, 255, 255, 0.85);
+      background: rgba(0, 0, 0, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
       user-select: none;
       text-transform: uppercase;
+      pointer-events: auto;
+    }
+
+    .phase-bottom-banner:active {
+      transform: translateX(-50%) scale(0.94);
+      background: rgba(255, 255, 255, 0.2);
     }
 
     .watermark-footer {
@@ -326,8 +328,8 @@ Here is the clean build. The bouncing cyan DVD logo is completely gone, the cont
   <!-- Top Right UI Controls -->
   <div class="top-right-ui">
     <div class="top-row-controls">
-      <div id="phase-badge-top" class="phase-badge-top">PHASE 001</div>
-      <button id="pause-toggle" class="top-btn" onclick="togglePause(event)">⏸️ PAUSE</button>
+      <div id="phase-badge-top" class="phase-badge-top" onclick="nextPhase()">PHASE 001</div>
+      <button id="pause-toggle" class="top-btn" onclick="toggleAutoAdvance(event)">⏸️ PAUSE</button>
     </div>
     <div id="visitor-box" class="visitor-counter">VISITS: 00666</div>
   </div>
@@ -340,7 +342,7 @@ Here is the clean build. The bouncing cyan DVD logo is completely gone, the cont
     </div>
   </div>
 
-  <div id="phase-bottom-banner" class="phase-bottom-banner">RETRO SYSTEM</div>
+  <div id="phase-bottom-banner" class="phase-bottom-banner" onclick="nextPhase()">RETRO SYSTEM</div>
 
   <div class="bottom-ui-container">
     <button id="contact-btn" class="ui-box contact-btn" onclick="toggleModal(true)">[ CONTACT ]</button>
@@ -360,7 +362,7 @@ Here is the clean build. The bouncing cyan DVD logo is completely gone, the cont
   </div>
 
   <script>
-    /* --- LO-FI BEAT CHIP SYNTHESIZER --- */
+    /* --- LO-FI CHIP SYNTHESIZER --- */
     let audioCtx = null;
     let masterGain = null;
     let isPlaying = false;
@@ -446,7 +448,7 @@ Here is the clean build. The bouncing cyan DVD logo is completely gone, the cont
       }
     }
 
-    /* --- CONTACT BUTTON TEXT VARIATIONS --- */
+    /* --- EXPANDED CONTACT PHRASES --- */
     const contactTexts = [
       "[ CONTACT ]", "[ CALL ]", "[ PING HOST ]", "[ TRANSMIT DATA ]",
       "[ INITIALIZE HANDSHAKE ]", "[ DIAL-UP (56K) ]", "[ SEND EMAIL ]", "[ EXECUTE TALK.EXE ]",
@@ -454,7 +456,8 @@ Here is the clean build. The bouncing cyan DVD logo is completely gone, the cont
       "[ CONSULT THE OUJA BOARD ]", "[ TRANSMIT VIBES ]", "[ BEAM UP ]", "[ SEND SMOKE SIGNAL ]",
       "[ KNOCK ON DOOR ]", "[ DISPATCH CARRIER PIGEON ]", "[ WRITE PARCHMENT LETTER ]", "[ SHOUT VERY LOUDLY ]",
       "[ RING DOORBELL ]", "[ SEND MORSE CODE ]", "[ THROW BOTTLE IN OCEAN ]", "[ PET THE CAT ]",
-      "[ BARK AT DOOR ]", "[ PRESS F TO PAY RESPECTS ]", "[ SUMMON DREW ]", "[ BLINK TWICE ]", "[ SEND POKE ]"
+      "[ BARK AT DOOR ]", "[ PRESS F TO PAY RESPECTS ]", "[ SUMMON DREW ]", "[ BLINK TWICE ]",
+      "[ SEND POKE ]", "[ SLIDE IN DMs ]", "[ HONK HORN ]", "[ WHISTLE LOUDLY ]"
     ];
 
     const companyFonts = [
@@ -472,12 +475,12 @@ Here is the clean build. The bouncing cyan DVD logo is completely gone, the cont
 
     const scrambleFontStack = "'Noto Sans Devanagari','Noto Sans Arabic','Noto Sans Hebrew','Noto Sans Thai','Noto Sans SC','Noto Sans JP','Noto Sans KR', sans-serif";
 
-    /* --- CANVAS ENGINE --- */
+    /* --- CANVAS ANIMATION ENGINE --- */
     const canvas = document.getElementById("bg-canvas");
     const ctx = canvas.getContext("2d");
     let width, height, cx, cy;
     let globalAngle = 0;
-    let isPaused = false;
+    let autoAdvancePaused = false;
 
     function resizeCanvas() {
       width = window.innerWidth;
@@ -490,6 +493,7 @@ Here is the clean build. The bouncing cyan DVD logo is completely gone, the cont
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
 
+    // Visual Render States
     let snake = [{x: 10, y: 10}, {x: 9, y: 10}, {x: 8, y: 10}];
     let snakeDir = {x: 1, y: 0};
     let snakeFood = {x: 15, y: 15};
@@ -634,21 +638,18 @@ Here is the clean build. The bouncing cyan DVD logo is completely gone, the cont
     const rendererKeys = Object.keys(renderers);
 
     function animateCanvas() {
-      if(!isPaused) {
-        globalAngle += 0.02;
-        let currentRendererKey = rendererKeys[currentPhase % rendererKeys.length];
-        if(renderers[currentRendererKey]) renderers[currentRendererKey]();
-      }
+      globalAngle += 0.02;
+      let currentRendererKey = rendererKeys[(currentPhase - 1) % rendererKeys.length];
+      if(renderers[currentRendererKey]) renderers[currentRendererKey]();
       requestAnimationFrame(animateCanvas);
     }
 
     /* --- 300 PROCEDURAL PHASES SYSTEM --- */
     const phaseNames = [
       "RETRO SYSTEM", "PONG PROTOCOL", "GEOCITIES 2000", "OFFLINE DINO",
-      "LAVENDER HAUNT", "NEON MATRIX", "SNAKE AUTOMATA", "HOCKEY RINK",
-      "CASINO JACKPOT", "ANGELIC LIGHTS", "DEMONIC REALM", "HYPERSPACE WARP",
-      "SHROOM TRIP", "LSD PLASMA", "ACID RAIN", "TRON GRID",
-      "FIREWORKS DISPLAY", "DOS TERMINAL", "CYBERPUNK CITY"
+      "NEON MATRIX", "SNAKE AUTOMATA", "HOCKEY RINK", "CASINO JACKPOT",
+      "ANGELIC LIGHTS", "DEMONIC REALM", "HYPERSPACE WARP", "SHROOM TRIP",
+      "LSD PLASMA", "ACID RAIN", "TRON GRID", "FIREWORKS DISPLAY"
     ];
 
     const phaseColors = [
@@ -697,18 +698,21 @@ Here is the clean build. The bouncing cyan DVD logo is completely gone, the cont
 
     function resetPhaseTimer() {
       if (phaseTimer) clearInterval(phaseTimer);
-      phaseTimer = setInterval(() => {
-        if(!isPaused) nextPhase();
-      }, 30000);
+      if (!autoAdvancePaused) {
+        phaseTimer = setInterval(() => {
+          nextPhase();
+        }, 30000); // 30 seconds
+      }
     }
 
-    function togglePause(e) {
+    function toggleAutoAdvance(e) {
       if(e) e.stopPropagation();
-      isPaused = !isPaused;
-      document.getElementById("pause-toggle").textContent = isPaused ? "▶️ PLAY" : "⏸️ PAUSE";
+      autoAdvancePaused = !autoAdvancePaused;
+      document.getElementById("pause-toggle").textContent = autoAdvancePaused ? "▶️ PLAY" : "⏸️ PAUSE";
+      resetPhaseTimer();
     }
 
-    /* --- SCROLL WHEEL & INPUT ENGINE --- */
+    /* --- INPUT CONTROLS --- */
     let isScrolling = false;
     window.addEventListener("wheel", (e) => {
       if (isScrolling) return;
@@ -725,8 +729,13 @@ Here is the clean build. The bouncing cyan DVD logo is completely gone, the cont
       document.getElementById('contact-modal').style.display = show ? 'flex' : 'none';
     }
 
-    /* --- MULTI-SCRIPT MORPH ENGINE --- */
+    /* --- DREW.WTF + DREW.666 + MULTI-SCRIPT MORPH ENGINE --- */
     const langVariants = [
+      { left: "DREW",     right: "666",              font: "'Press Start 2P', monospace" },
+      { left: "DREW",     right: "777",              font: "'Orbitron', sans-serif" },
+      { left: "DREW",     right: "NULL",             font: "'Fira Code', monospace" },
+      { left: "DREW",     right: "VOID",             font: "'VT323', monospace" },
+      { left: "DREW",     right: "EXE",              font: "'Courier Prime', monospace" },
       { left: "ड्रू",     right: "डब्ल्यूटीएफ़",     font: "'Noto Sans Devanagari', sans-serif" },
       { left: "ڈریو",     right: "ڈبلیوٹی\u200cایف", font: "'Noto Sans Arabic', sans-serif" },
       { left: "ДРЕВ",     right: "ВТФ",              font: "'Courier New', monospace" },
@@ -754,7 +763,6 @@ Here is the clean build. The bouncing cyan DVD logo is completely gone, the cont
       wordWtfEl.textContent = "WTF";
 
       scrambleTimeout = setTimeout(() => {
-        if(isPaused) return;
         const variant = langVariants[Math.floor(Math.random() * langVariants.length)];
         scrambleTextEl.style.fontFamily = scrambleFontStack;
 
@@ -796,5 +804,3 @@ Here is the clean build. The bouncing cyan DVD logo is completely gone, the cont
   </script>
 </body>
 </html>
-
-```
