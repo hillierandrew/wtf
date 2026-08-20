@@ -1,14 +1,13 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>DREW.WTF</title>
-  
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@900&family=Comic+Neue:wght@700&family=Courier+Prime:wght@700&family=Fira+Code:wght@700&family=Noto+Sans+SC:wght@900&family=Noto+Sans+Devanagari:wght@900&family=Orbitron:wght@900&family=Permanent+Marker&family=Press+Start+2P&family=Russo+One&family=VT323&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@900&family=Comic+Neue:wght@700&family=Courier+Prime:wght@700&family=Fira+Code:wght@700&family=Noto+Sans+SC:wght@900&family=Noto+Sans+Devanagari:wght@900&family=Noto+Sans+Arabic:wght@900&family=Noto+Sans+Hebrew:wght@900&family=Noto+Sans+Thai:wght@900&family=Noto+Sans+JP:wght@900&family=Noto+Sans+KR:wght@900&family=Orbitron:wght@900&family=Permanent+Marker&family=Press+Start+2P&family=Russo+One&family=VT323&display=swap" rel="stylesheet">
 
   <!-- SVG Distortion Filter -->
   <svg style="position: absolute; width: 0; height: 0;">
@@ -281,6 +280,7 @@
   <script>
     /* --- NOTE-PERFECT LAVENDER TOWN GAME BOY SOUND ENGINE --- */
     let audioCtx = null;
+    let masterGain = null;
     let isPlaying = false;
     let nextNoteTime = 0;
     let timerID = null;
@@ -292,43 +292,41 @@
       'C6': 1046.50, 'C#6': 1108.73, 'D6': 1174.66, 'D#6': 1244.51, 'E6': 1318.51, 'F6': 1396.91, 'F#6': 1479.98, 'G6': 1567.98, 'G#6': 1661.22, 'A6': 1760.00, 'B6': 1975.53
     };
 
-    // Authentic Game Boy Channel 1 High-Register 4-Note Ostinato: C6 -> G5 -> B5 -> F#5[cite: 1]
+    // Authentic Game Boy Channel 1 High-Register 4-Note Ostinato
     const lavenderCh1 = ['C6', 'G5', 'B5', 'F#5'];
 
-    // Authentic Channel 2 Melodic Counter-Melody (Measures 5-12)
+    // Authentic Channel 2 Melodic Counter-Melody
     const lavenderCh2Melody = [
       'C5', 'C5', 'G4', 'G4', 'C5', 'B4', 'G4', 'C5', 'E4', 'E4',
       'C5', 'C5', 'B4', 'B4', 'C5', 'C5', 'B4', 'C5', 'C#5', 'C#5'
     ];
 
     function playNote(freq, startTime, duration, waveType = 'square', gainLevel = 0.08) {
-      if (!freq || !audioCtx) return;
+      if (!freq || !audioCtx || !masterGain) return;
       try {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.type = waveType;
         osc.frequency.setValueAtTime(freq, startTime);
         gain.gain.setValueAtTime(gainLevel, startTime);
-        gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration - 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
         osc.connect(gain);
-        gain.connect(audioCtx.destination);
+        gain.connect(masterGain);
         osc.start(startTime);
-        osc.stop(startTime + duration);
-      } catch(e) {}
+        osc.stop(startTime + duration + 0.02);
+      } catch (e) { /* note skipped */ }
     }
 
     function scheduleLavenderTownTheme() {
-      if (!isPlaying || !audioCtx) return;
+      if (!isPlaying || !audioCtx || audioCtx.state !== 'running') return;
       const lookAhead = 0.1;
       const scheduleAheadTime = 0.2;
-      const noteTime = (60.0 / 120) / 2; // Exact 120 BPM tempo[cite: 1]
+      const noteTime = (60.0 / 120) / 2; // 120 BPM, eighth notes
 
       while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
-        // High Chiptune Square Ostinato[cite: 1]
         const ostNote = lavenderCh1[currentStep % lavenderCh1.length];
         if (freqs[ostNote]) playNote(freqs[ostNote], nextNoteTime, noteTime * 0.85, 'square', 0.06);
 
-        // Mid-Range Lead Melody
         if (currentStep % 2 === 0) {
           const melIdx = Math.floor(currentStep / 2) % lavenderCh2Melody.length;
           const melNote = lavenderCh2Melody[melIdx];
@@ -344,16 +342,31 @@
     function toggleAudio(e) {
       if (e) e.stopPropagation();
       const btn = document.getElementById("audio-toggle");
-      
-      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      if (audioCtx.state === 'suspended') audioCtx.resume();
 
       if (!isPlaying) {
-        nextNoteTime = audioCtx.currentTime + 0.05;
-        currentStep = 0;
-        isPlaying = true;
-        btn.textContent = '🔊 MUTE MUSIC';
-        scheduleLavenderTownTheme();
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          masterGain = audioCtx.createGain();
+          masterGain.gain.value = 1;
+          masterGain.connect(audioCtx.destination);
+        }
+
+        const start = () => {
+          if (audioCtx.state !== 'running') return; // still blocked, bail quietly
+          nextNoteTime = audioCtx.currentTime + 0.05;
+          currentStep = 0;
+          isPlaying = true;
+          btn.textContent = '🔊 MUTE MUSIC';
+          scheduleLavenderTownTheme();
+        };
+
+        // THE FIX: wait for resume() to actually resolve before scheduling notes,
+        // otherwise browsers silently drop everything scheduled while still 'suspended'.
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume().then(start).catch(start);
+        } else {
+          start();
+        }
       } else {
         isPlaying = false;
         if (timerID) clearTimeout(timerID);
@@ -361,7 +374,7 @@
       }
     }
 
-    /* --- BRAND WEBFONTS --- */
+    /* --- BRAND WEBFONTS (for the resting "DREW.WTF" look) --- */
     const companyFonts = [
       { font: "'Press Start 2P', monospace" },
       { font: "'Orbitron', sans-serif" },
@@ -372,10 +385,11 @@
       { font: "'VT323', monospace" },
       { font: "'Fira Code', monospace" },
       { font: "'Courier Prime', monospace" },
-      { font: "'Noto Sans SC', sans-serif" },
-      { font: "'Noto Sans Devanagari', sans-serif" },
       { font: "'Courier New', Courier, monospace" }
     ];
+
+    // Broad multi-script fallback stack used only while chars are actively scrambling
+    const scrambleFontStack = "'Noto Sans Devanagari','Noto Sans Arabic','Noto Sans Hebrew','Noto Sans Thai','Noto Sans SC','Noto Sans JP','Noto Sans KR', sans-serif";
 
     /* --- DVD SCREENSAVER BUMPER ENGINE --- */
     const dvdLogo = document.getElementById("dvd-logo");
@@ -420,7 +434,6 @@
 
     const mEmojis = ["🍄", "🍆", "✨", "💫"];
     const dEmojis = ["😈", "👿", "🔥", "⚡", "666"];
-    const sEmojis = ["💀", "☠️", "☣️", "🟢"];
     const flowerEmojis = ["🌸", "🌺", "🌼", "🌻", "☁️", "✨"];
     const catEmojis = ["🐱", "🙀", "😸", "🐾"];
     const dogEmojis = ["🐕", "🦮", "🐩", "🦴"];
@@ -448,7 +461,6 @@
         this.pz = this.z;
         this.mE = mEmojis[Math.floor(Math.random() * mEmojis.length)];
         this.dE = dEmojis[Math.floor(Math.random() * dEmojis.length)];
-        this.sE = sEmojis[Math.floor(Math.random() * sEmojis.length)];
         this.flE = flowerEmojis[Math.floor(Math.random() * flowerEmojis.length)];
         this.cE = catEmojis[Math.floor(Math.random() * catEmojis.length)];
         this.dogE = dogEmojis[Math.floor(Math.random() * dogEmojis.length)];
@@ -640,89 +652,82 @@
       "#f0f2f5", "#1877f2", "#ffff00", "#00ffcc", "#ff007f", "#150022"
     ];
 
-    /* --- 300 FULL PHASES --- */
+    /* --- WEIGHTED RANDOM BACKGROUND MODE SELECTION (kills the starfield-overload problem) --- */
+    const bgModes = [
+      { mode: "fireworks", weight: 3 },
+      { mode: "boats", weight: 3 },
+      { mode: "driving", weight: 3 },
+      { mode: "ascii_exp", weight: 2 },
+      { mode: "pong", weight: 2 },
+      { mode: "geocities", weight: 2 },
+      { mode: "rain", weight: 3 },
+      { mode: "wind", weight: 2 },
+      { mode: "tron", weight: 3 },
+      { mode: "flowers", weight: 3 },
+      { mode: "devils", weight: 3 },
+      { mode: "cats", weight: 3 },
+      { mode: "dogs", weight: 3 },
+      { mode: "mushrooms", weight: 3 },
+      { mode: "ocean", weight: 2 },
+      { mode: "stars", weight: 2 }
+    ];
+    let lastMode = null;
+    function pickRenderMode() {
+      const pool = bgModes.filter(m => m.mode !== lastMode);
+      const total = pool.reduce((s, m) => s + m.weight, 0);
+      let r = Math.random() * total;
+      for (const m of pool) {
+        if (r < m.weight) { lastMode = m.mode; return m.mode; }
+        r -= m.weight;
+      }
+      lastMode = pool[0].mode;
+      return pool[0].mode;
+    }
+
+    /* --- 300 PHASES --- */
     let currentPhase = 0;
     let phaseTimer = null;
+    let restingFont = "'Courier New', monospace";
 
-    const customTextVariants = [];
-    const baseWords = [
-      ["DREW", "WTF"], ["FACE", "BOOK"], ["ZUCK", "MODE"], ["GEO", "CITIES"],
-      ["SUPER", "MARIO"], ["PONG", "GAME"], ["SPACE", "INVADER"], ["FIRE", "WORKS"],
-      ["RAIN", "WIND"], ["OCEAN", "BOATS"], ["DRIVE", "FAST"], ["ASCII", "BOOM"],
-      ["MEOW", "PURR"], ["DOGE", "WOW"], ["TRON", "GRID"], ["HEAVEN", "ANGEL"],
-      ["DEMON", "POSSESSED"], ["666", "EVIL"], ["ACID", "TRIP"], ["SALVIA", "SPLIT"]
-    ];
-
-    for (let i = 0; i <= 300; i++) {
-      const pair = baseWords[i % baseWords.length];
-      customTextVariants.push([pair[0], `${pair[1]}_${i}`]);
-    }
+    const scrambleTextEl = document.getElementById("scramble-text");
+    const wordDrewEl = document.getElementById("word-drew");
+    const wordWtfEl = document.getElementById("word-wtf");
 
     function setPhase(p) {
       currentPhase = p;
       if (currentPhase > 300) currentPhase = 0;
       if (currentPhase < 0) currentPhase = 300;
 
-      const el = document.getElementById("scramble-text");
       const badge = document.getElementById("phase-badge");
-      
       badge.textContent = `PHASE NO. ${currentPhase}`;
 
       const randomFont = companyFonts[Math.floor(Math.random() * companyFonts.length)];
-      el.style.fontFamily = randomFont.font;
+      scrambleTextEl.style.fontFamily = randomFont.font;
 
       const themeBg = phaseColors[currentPhase % phaseColors.length];
       document.body.style.backgroundColor = themeBg;
       document.body.style.filter = "none";
-      el.className = "title";
-      
+      scrambleTextEl.className = "title";
+
       if (themeBg === "#f0f2f5" || themeBg === "#1877f2") {
-        el.style.color = themeBg === "#f0f2f5" ? "#1877f2" : "#ffffff";
-        el.style.textShadow = "0 0 10px rgba(24, 119, 242, 0.4)";
-        el.style.fontFamily = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+        scrambleTextEl.style.color = themeBg === "#f0f2f5" ? "#1877f2" : "#ffffff";
+        scrambleTextEl.style.textShadow = "0 0 10px rgba(24, 119, 242, 0.4)";
+        scrambleTextEl.style.fontFamily = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
       } else if (themeBg === "#ffff00") {
-        el.style.color = "#ff00ff";
-        el.style.textShadow = "0 0 15px #00ffff";
-        el.style.fontFamily = "'Comic Neue', cursive";
+        scrambleTextEl.style.color = "#ff00ff";
+        scrambleTextEl.style.textShadow = "0 0 15px #00ffff";
+        scrambleTextEl.style.fontFamily = "'Comic Neue', cursive";
       } else {
-        el.style.color = "";
-        el.style.textShadow = "";
+        scrambleTextEl.style.color = "";
+        scrambleTextEl.style.textShadow = "";
       }
 
-      renderMode = "stars";
-      reverseWarp = false;
+      restingFont = scrambleTextEl.style.fontFamily;
+
+      renderMode = pickRenderMode();
+      reverseWarp = Math.random() < 0.5;
+      warpSpeed = Math.floor(Math.random() * 8) + 2;
       canvas.classList.add("active");
-
-      warpSpeed = (currentPhase % 30) + 2;
-
-      // Phase Background Canvas Modes
-      if (currentPhase % 30 === 0) {
-        renderMode = "fireworks";
-      } else if (currentPhase % 28 === 0) {
-        renderMode = "boats";
-      } else if (currentPhase % 26 === 0) {
-        renderMode = "driving";
-      } else if (currentPhase % 24 === 0) {
-        renderMode = "ascii_exp";
-      } else if (currentPhase % 22 === 0) {
-        renderMode = "pong";
-      } else if (currentPhase % 20 === 0) {
-        renderMode = "geocities";
-      } else if (currentPhase % 18 === 0) {
-        renderMode = "rain";
-      } else if (currentPhase % 16 === 0) {
-        renderMode = "tron";
-      } else if (currentPhase % 14 === 0) {
-        renderMode = "flowers";
-      } else if (currentPhase % 12 === 0) {
-        renderMode = "devils";
-      } else if (currentPhase % 10 === 0) {
-        renderMode = "cats";
-      } else if (currentPhase % 8 === 0) {
-        renderMode = "dogs";
-      } else {
-        reverseWarp = currentPhase % 2 === 0;
-      }
 
       runScrambleCycle();
     }
@@ -758,95 +763,112 @@
     window.addEventListener("wheel", (e) => {
       if (isScrolling) return;
       isScrolling = true;
-
-      if (e.deltaY > 0) {
-        nextPhase();
-      } else if (e.deltaY < 0) {
-        prevPhase();
-      }
-
-      setTimeout(() => {
-        isScrolling = false;
-      }, 200);
+      if (e.deltaY > 0) nextPhase(); else if (e.deltaY < 0) prevPhase();
+      setTimeout(() => { isScrolling = false; }, 200);
     });
 
     /* --- WORD NAVIGATION HANDLERS --- */
-    function handleDrewClick(e) {
-      if (e) e.stopPropagation();
-      prevPhase();
-    }
-
-    function handleWtfClick(e) {
-      if (e) e.stopPropagation();
-      nextPhase();
-    }
-
-    function handleDotClick(e) {
-      if (e) e.stopPropagation();
-      randomPhase();
-    }
+    function handleDrewClick(e) { if (e) e.stopPropagation(); prevPhase(); }
+    function handleWtfClick(e) { if (e) e.stopPropagation(); nextPhase(); }
+    function handleDotClick(e) { if (e) e.stopPropagation(); randomPhase(); }
 
     window.addEventListener("pointerdown", (e) => {
       if (e.target.closest(".clickable-word") || e.target.closest(".audio-btn")) return;
       const centerY = window.innerHeight / 2;
-      if (e.clientY < centerY) {
-        prevPhase();
-      } else {
-        nextPhase();
-      }
+      if (e.clientY < centerY) prevPhase(); else nextPhase();
     });
 
     window.addEventListener("keydown", (e) => {
-      if (e.key === "ArrowUp" || e.key === "ArrowRight") {
-        nextPhase();
-      } else if (e.key === "ArrowDown" || e.key === "ArrowLeft") {
-        prevPhase();
-      }
+      if (e.key === "ArrowUp" || e.key === "ArrowRight") nextPhase();
+      else if (e.key === "ArrowDown" || e.key === "ArrowLeft") prevPhase();
     });
 
-    const wordDrewEl = document.getElementById("word-drew");
-    const wordWtfEl = document.getElementById("word-wtf");
+    /* --- MULTI-SCRIPT / MULTI-VIBE MORPH TARGETS --- */
+    // "left" morphs from DREW, "right" morphs from WTF. font is applied only while that
+    // variant is held so each script renders with proper glyphs.
+    const langVariants = [
+      { left: "ड्रू",     right: "डब्ल्यूटीएफ़",     font: "'Noto Sans Devanagari', sans-serif" }, // Hindi
+      { left: "ڈریو",     right: "ڈبلیوٹی\u200cایف", font: "'Noto Sans Arabic', sans-serif" },      // Urdu
+      { left: "ДРЕВ",     right: "ВТФ",              font: "'Courier New', monospace" },            // Russian/Cyrillic
+      { left: "德鲁",      right: "网站",              font: "'Noto Sans SC', sans-serif" },          // Chinese
+      { left: "ドリュー",   right: "ワット",            font: "'Noto Sans JP', sans-serif" },          // Japanese
+      { left: "드류",      right: "더블유티에프",       font: "'Noto Sans KR', sans-serif" },          // Korean
+      { left: "ΔΡΕΩ",     right: "ΩΤΦ",              font: "'Cinzel', serif" },                     // Greek-styled
+      { left: "דרו",      right: "וטף",              font: "'Noto Sans Hebrew', sans-serif" },      // Hebrew
+      { left: "ดรูว์",     right: "ดับเบิลยูทีเอฟ",    font: "'Noto Sans Thai', sans-serif" },        // Thai
+      { left: "✞☠✟♰",     right: "☣☢☠♱",             font: "'Courier New', monospace" },            // dingbat / wingding-style
+      { left: "666",      right: "EVIL",             font: "'Permanent Marker', cursive" },
+      { left: "FACE",     right: "BOOK",             font: "-apple-system, sans-serif" },
+      { left: "GEO",      right: "CITIES",           font: "'Comic Neue', cursive" },
+      { left: "TRON",     right: "GRID",             font: "'Orbitron', sans-serif" },
+      { left: "ACID",     right: "TRIP",             font: "'Fira Code', monospace" },
+      { left: "SUPER",    right: "MARIO",            font: "'Press Start 2P', monospace" },
+      { left: "SPACE",    right: "INVADER",          font: "'VT323', monospace" },
+      { left: "MEOW",     right: "PURR",             font: "'Comic Neue', cursive" },
+      { left: "DOGE",     right: "WOW",              font: "'Comic Neue', cursive" },
+      { left: "HEAVEN",   right: "ANGEL",            font: "'Cinzel', serif" },
+      { left: "DEMON",    right: "POSSESSED",        font: "'Russo One', sans-serif" }
+    ];
+
+    const wildClasses = ["swirl-trip", "spin", "liquid-wave", "pulse-glow", "slice-glitch", "salvia-split"];
 
     const intlGlitchChars = [
-      "0","1","3","7","_","/#","\\|","@","$","%","*","!",
-      "中","文","鬼","魔","神","龍","悟",
-      "अ","आ","इ","उ","ऋ","क","ख",
-      "Д","Р","Е","В","У","Ш","К",
-      "🔥","💀","😈","☣️","🟢","🛸","👽","🌸","🐱","🐕","🚗","🎆","666"
+      "0", "1", "3", "7", "_", "/#", "\\|", "@", "$", "%", "*", "!",
+      "中", "文", "鬼", "魔", "神", "龍", "悟",
+      "अ", "आ", "इ", "उ", "ऋ", "क", "ख",
+      "Д", "Р", "Е", "В", "У", "Ш", "К",
+      "ا", "ب", "ت", "ث", "ج", "ح",
+      "א", "ב", "ג", "ד", "ה",
+      "ก", "ข", "ค", "ง", "จ",
+      "가", "나", "다", "라", "마",
+      "あ", "い", "う", "え", "お",
+      "☠", "☣", "☢", "✞", "♰", "웃",
+      "🔥", "💀", "😈", "☣️", "🟢", "🛸", "👽", "🌸", "🐱", "🐕", "🚗", "🎆", "666"
     ];
+
+    function randomizeString(str) {
+      return str.split('').map(c =>
+        Math.random() < 0.35 ? intlGlitchChars[Math.floor(Math.random() * intlGlitchChars.length)] : c
+      ).join('');
+    }
 
     let currentScrambleInterval = null;
     let currentScrambleTimeout = null;
 
-    /* ALWAYS OPEN WITH DREW.WTF -> GLITCH TO PHASE WORD -> RETURN TO DREW.WTF */
+    /* ALWAYS OPEN WITH DREW.WTF -> GLITCH TO RANDOM VARIANT -> HOLD (+ optional wild fx) -> RETURN TO DREW.WTF */
     function runScrambleCycle() {
       if (currentScrambleInterval) clearInterval(currentScrambleInterval);
       if (currentScrambleTimeout) clearTimeout(currentScrambleTimeout);
 
+      scrambleTextEl.classList.remove(...wildClasses);
+      scrambleTextEl.style.fontFamily = restingFont;
       wordDrewEl.textContent = "DREW";
       wordWtfEl.textContent = "WTF";
 
       currentScrambleTimeout = setTimeout(() => {
-        const variant = customTextVariants[currentPhase % customTextVariants.length];
-        const glitchLeft = variant[0];
-        const glitchRight = variant[1];
+        const variant = langVariants[Math.floor(Math.random() * langVariants.length)];
+        scrambleTextEl.style.fontFamily = scrambleFontStack;
 
         let frame = 0;
         currentScrambleInterval = setInterval(() => {
-          wordDrewEl.textContent = glitchLeft.split('').map(c => 
-            Math.random() < 0.35 ? intlGlitchChars[Math.floor(Math.random() * intlGlitchChars.length)] : c
-          ).join('');
-          wordWtfEl.textContent = glitchRight.split('').map(c => 
-            Math.random() < 0.35 ? intlGlitchChars[Math.floor(Math.random() * intlGlitchChars.length)] : c
-          ).join('');
-          
+          wordDrewEl.textContent = randomizeString(variant.left);
+          wordWtfEl.textContent = randomizeString(variant.right);
+
           frame++;
           if (frame >= 18) {
             clearInterval(currentScrambleInterval);
-            wordDrewEl.textContent = glitchLeft;
-            wordWtfEl.textContent = glitchRight;
+            scrambleTextEl.style.fontFamily = variant.font;
+            wordDrewEl.textContent = variant.left;
+            wordWtfEl.textContent = variant.right;
+
+            if (Math.random() < 0.6) {
+              const wild = wildClasses[Math.floor(Math.random() * wildClasses.length)];
+              scrambleTextEl.classList.add(wild);
+            }
 
             currentScrambleTimeout = setTimeout(() => {
+              scrambleTextEl.classList.remove(...wildClasses);
+              scrambleTextEl.style.fontFamily = restingFont;
               wordDrewEl.textContent = "DREW";
               wordWtfEl.textContent = "WTF";
               runScrambleCycle();
@@ -862,5 +884,3 @@
   </script>
 </body>
 </html>
-
-```
