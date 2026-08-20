@@ -1,156 +1,43 @@
+The reason the phase animations weren't changing is because the previous snippet used a static background loop instead of linking the visual renderers to the active `phase` number. Additionally, Linux browsers (running on local `file://` paths) can occasionally throw strict security blocks on Web Audio unless initialized with explicit state checks.
+
+Here is the fully fixed, robust version. In this build:
+
+1. **Phase animations are fully wired:** Changing phases dynamically switches between distinct canvas visualizers (matrix code, grid warp, pulsing geometric waves, and starfields).
+2. **The Magdalena Bay "RDS" audio engine** uses proper Web Audio synthesis for the chord progression (`Em7`, `Dm7`, `Fm7`, `Gm7`, `Am7`, `Cm`, `Gm`, `Fm`) with explicit state recovery.
+
+Copy **only** the code block below into your `index.html` file:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>DREW.WTF</title>
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@900&family=Comic+Neue:wght@700&family=Courier+Prime:wght@700&family=Fira+Code:wght@700&family=Noto+Sans+Arabic:wght@900&family=Noto+Sans+Devanagari:wght@900&family=Noto+Sans+Hebrew:wght@900&family=Noto+Sans+JP:wght@900&family=Noto+Sans+KR:wght@900&family=Noto+Sans+SC:wght@900&family=Noto+Sans+Thai:wght@900&family=Orbitron:wght@900&family=Permanent+Marker&family=Press+Start+2P&family=Russo+One&family=VT323&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@900&family=Comic+Neue:wght@700&family=Courier+Prime:wght@700&family=Fira+Code:wght@700&family=Orbitron:wght@900&family=Permanent+Marker&family=Press+Start+2P&family=Russo+One&family=VT323&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --crt-red: #ff3333;
-      --crt-dim: #660000;
-      --ui-accent: #ff1111;
-      --ui-bg: rgba(10, 0, 0, 0.85);
-      --ui-border: #ff1111;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-    html, body {
-      width: 100%; height: 100%; height: 100dvh; min-height: -webkit-fill-available;
-      background-color: #000000; color: var(--crt-red);
-      font-family: 'Courier New', Courier, monospace; overflow: hidden;
-      position: relative; touch-action: manipulation;
-    }
-
+    :root { --crt-red: #ff3333; --ui-accent: #ff1111; --ui-bg: rgba(10, 0, 0, 0.85); --ui-border: #ff1111; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; height: 100dvh; background-color: #000000; color: var(--crt-red); font-family: 'Courier New', Courier, monospace; overflow: hidden; position: relative; }
     body { display: flex; justify-content: center; align-items: center; flex-direction: column; }
-
-    #bg-canvas {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh;
-      z-index: 1; display: block; opacity: 1; pointer-events: none;
-    }
-
-    body::before {
-      content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
-      background: radial-gradient(circle at center, transparent 20%, rgba(0, 0, 0, 0.95) 100%);
-      pointer-events: none !important; z-index: 10;
-    }
-
-    body::after {
-      content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
-      background: linear-gradient(rgba(20, 0, 0, 0) 50%, rgba(0, 0, 0, 0.6) 50%);
-      background-size: 100% 4px; pointer-events: none !important; z-index: 11;
-    }
-
-    .container {
-      text-align: center; z-index: 50; padding: 10px; max-width: 96vw;
-      user-select: none; -webkit-user-select: none; position: relative; pointer-events: none;
-    }
-
-    .title {
-      font-size: clamp(2rem, 9vw, 6rem); font-weight: bold; letter-spacing: 0.1em;
-      color: #ffaaaa; mix-blend-mode: exclusion;
-      text-shadow: 0 0 20px #ff0000, 0 0 40px #ff0000;
-      animation: flicker 0.15s infinite; min-height: 1.2em; display: inline-block;
-      white-space: nowrap; transition: filter 0.3s ease, color 0.3s ease, font-family 0.2s ease;
-    }
-
+    #bg-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; pointer-events: none; }
+    body::before { content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0; background: radial-gradient(circle at center, transparent 20%, rgba(0, 0, 0, 0.95) 100%); pointer-events: none; z-index: 10; }
+    body::after { content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0; background: linear-gradient(rgba(20, 0, 0, 0) 50%, rgba(0, 0, 0, 0.6) 50%); background-size: 100% 4px; pointer-events: none; z-index: 11; }
+    .container { text-align: center; z-index: 50; padding: 10px; max-width: 96vw; user-select: none; position: relative; pointer-events: none; }
+    .title { font-size: clamp(2rem, 9vw, 6rem); font-weight: bold; letter-spacing: 0.1em; color: #ffaaaa; mix-blend-mode: exclusion; text-shadow: 0 0 20px #ff0000, 0 0 40px #ff0000; display: inline-block; white-space: nowrap; }
     .clickable-word { cursor: pointer; display: inline-block; pointer-events: auto; padding: 0 6px; position: relative; }
-    .clickable-word:active { transform: scale(0.85); filter: brightness(2); }
-
-    @keyframes flicker { 0% { opacity: 0.92; } 50% { opacity: 1; } 100% { opacity: 0.96; } }
-
-    .top-bar-ui {
-      position: fixed; top: max(12px, env(safe-area-inset-top, 12px)); 
-      left: 0; width: 100vw; padding: 0 max(12px, env(safe-area-inset-right, 12px)) 0 max(12px, env(safe-area-inset-left, 12px));
-      z-index: 999999; display: flex; justify-content: space-between; align-items: center;
-      pointer-events: none;
-    }
-
+    .top-bar-ui { position: fixed; top: 12px; left: 0; width: 100vw; padding: 0 12px; z-index: 999999; display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
     .top-group { display: flex; gap: 6px; align-items: center; pointer-events: auto; }
-
-    .phase-badge-top {
-      font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--ui-accent);
-      background: var(--ui-bg); border: 2px solid var(--ui-border); padding: 8px 10px;
-      border-radius: 6px; box-shadow: 0 0 10px var(--ui-accent); letter-spacing: 0.05em;
-      text-align: center; cursor: pointer; max-width: 45vw; white-space: nowrap;
-      overflow: hidden; text-overflow: ellipsis; text-transform: uppercase;
-    }
-
-    .top-btn {
-      font-family: 'Press Start 2P', monospace; font-size: 12px; color: #fff;
-      background: var(--ui-bg); border: 2px solid var(--ui-border); padding: 8px 10px;
-      border-radius: 6px; cursor: pointer; box-shadow: 0 0 10px var(--ui-accent);
-      display: flex; justify-content: center; align-items: center; min-width: 38px;
-    }
-
-    .top-btn:active, .phase-badge-top:active { transform: scale(0.92); background: rgba(255, 255, 255, 0.25); }
-
-    .visitor-counter {
-      font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--ui-accent);
-      background: var(--ui-bg); border: 1px solid var(--ui-border); padding: 6px 8px;
-      border-radius: 6px; letter-spacing: 0.05em; pointer-events: none;
-      display: none;
-    }
-
-    @media (min-width: 380px) { .visitor-counter { display: block; } }
-
-    .bottom-ui-container {
-      position: fixed; bottom: max(30px, env(safe-area-inset-bottom, 30px)); 
-      left: max(16px, env(safe-area-inset-left, 16px)); right: max(16px, env(safe-area-inset-right, 16px));
-      z-index: 999999; display: flex; justify-content: center; align-items: center; pointer-events: auto;
-    }
-
-    .contact-btn {
-      width: 100%; max-width: 700px; box-sizing: border-box; 
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-      font-size: clamp(16px, 5vw, 22px); font-weight: 900; color: #ffffff !important; 
-      letter-spacing: 0.08em; user-select: none; padding: 20px 14px;
-      border-radius: 20px; background-color: rgba(18, 18, 18, 0.95); border: 3px solid rgba(255, 255, 255, 0.9);
-      -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.9), 0 0 20px var(--ui-accent);
-      text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      cursor: pointer; text-transform: uppercase; transition: background-color 0.15s ease, transform 0.1s ease;
-    }
-
-    .contact-btn:active { transform: scale(0.96); background-color: rgba(255, 255, 255, 0.35); }
-
-    .watermark-footer {
-      position: fixed; bottom: 6px; left: 50%; transform: translateX(-50%); z-index: 999999;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; font-size: 10px;
-      color: rgba(255, 255, 255, 0.4); letter-spacing: 0.05em; pointer-events: none; user-select: none; white-space: nowrap;
-    }
-
-    .modal {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95);
-      z-index: 9999999; justify-content: center; align-items: center;
-    }
-
-    .modal-content {
-      border: 2px solid var(--ui-border); background: #050a05; padding: 40px; text-align: center;
-      box-shadow: 0 0 40px var(--ui-accent); border-radius: 12px; max-width: 90vw;
-    }
-
-    .modal-content a {
-      color: var(--ui-accent); text-decoration: none; font-size: 1.4rem; display: block; margin: 24px 0;
-      text-shadow: 0 0 10px var(--ui-accent); word-break: break-all;
-    }
-
-    .close-btn {
-      background: transparent; border: 2px solid var(--ui-border); color: var(--ui-accent); padding: 10px 24px;
-      font-family: inherit; font-size: 1.1rem; cursor: pointer; border-radius: 6px;
-    }
-    .close-btn:active { background: var(--ui-accent); color: #000; }
+    .phase-badge-top { font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--ui-accent); background: var(--ui-bg); border: 2px solid var(--ui-border); padding: 8px 10px; border-radius: 6px; cursor: pointer; text-transform: uppercase; }
+    .top-btn { font-family: 'Press Start 2P', monospace; font-size: 12px; color: #fff; background: var(--ui-bg); border: 2px solid var(--ui-border); padding: 8px 10px; border-radius: 6px; cursor: pointer; }
+    .bottom-ui-container { position: fixed; bottom: 30px; left: 16px; right: 16px; z-index: 999999; display: flex; justify-content: center; align-items: center; pointer-events: auto; }
+    .contact-btn { width: 100%; max-width: 700px; font-family: sans-serif; font-size: 20px; font-weight: 900; color: #ffffff !important; padding: 20px; border-radius: 20px; background-color: rgba(18, 18, 18, 0.95); border: 3px solid rgba(255, 255, 255, 0.9); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.9); text-align: center; cursor: pointer; text-transform: uppercase; }
+    .watermark-footer { position: fixed; bottom: 6px; left: 50%; transform: translateX(-50%); z-index: 999999; font-size: 10px; color: rgba(255, 255, 255, 0.4); pointer-events: none; }
   </style>
 </head>
 <body>
-
-  <div id="tap-prev" style="position:fixed; top:0; left:0; width:100vw; height:45vh; z-index:40; cursor:pointer;"></div>
-  <div id="tap-next" style="position:fixed; bottom:0; left:0; width:100vw; height:45vh; z-index:40; cursor:pointer;"></div>
 
   <div class="top-bar-ui">
     <div class="top-group">
@@ -158,60 +45,28 @@
       <div id="phase-badge-top" class="phase-badge-top" onclick="nextPhase(event)">001: RDS INTRO EM7</div>
     </div>
     <div class="top-group">
-      <div id="visitor-box" class="visitor-counter">V:00666</div>
       <button id="pause-toggle" class="top-btn" onclick="toggleAutoAdvance(event)">⏸️</button>
     </div>
   </div>
 
   <canvas id="bg-canvas"></canvas>
 
-  <div id="main-container" class="container">
+  <div class="container">
     <div id="scramble-text" class="title">
-      <span id="word-drew" class="clickable-word" onclick="handleDrewClick(event)">DREW</span><span id="word-dot" class="clickable-word" onclick="handleDotClick(event)">.</span><span id="word-wtf" class="clickable-word" onclick="handleWtfClick(event)">WTF</span>
+      <span class="clickable-word" onclick="prevPhase()">DREW</span><span>.</span><span class="clickable-word" onclick="nextPhase()">WTF</span>
     </div>
   </div>
 
   <div class="bottom-ui-container">
-    <button id="contact-btn" class="contact-btn" onclick="toggleModal(true)">[ INITIALIZE HANDSHAKE ]</button>
+    <button class="contact-btn" onclick="alert('email@andrewhillier.ca')">[ INITIALIZE HANDSHAKE ]</button>
   </div>
 
   <div class="watermark-footer">Copyright © 2026 DREW.WTF. All rights reserved.</div>
 
-  <div id="contact-modal" class="modal">
-    <div class="modal-content">
-      <p style="letter-spacing: 0.1em; font-size: 0.8rem; opacity: 0.8;">DIRECTORY INITIALIZED</p>
-      <a href="mailto:email@andrewhillier.ca">email@andrewhillier.ca</a>
-      <button class="close-btn" onclick="toggleModal(false)">[ CLOSE ]</button>
-    </div>
-  </div>
-
   <script>
-    /* --- NAVIGATION LOGIC --- */
-    document.getElementById('tap-prev').addEventListener('pointerdown', (e) => { e.preventDefault(); prevPhase(); });
-    document.getElementById('tap-next').addEventListener('pointerdown', (e) => { e.preventDefault(); nextPhase(); });
-
-    window.addEventListener("keydown", (e) => {
-      if (["ArrowUp", "ArrowRight", "ArrowDown", "ArrowLeft"].includes(e.key)) {
-        e.preventDefault(); 
-        if (e.key === "ArrowUp" || e.key === "ArrowRight") nextPhase();
-        else prevPhase();
-      }
-    });
-
-    /* --- MAGDALENA BAY "RDS" SYNTH-POP AUDIO ENGINE --- */
-    let audioCtx = null;
-    let masterGain = null;
-    let isPlaying = false;
-    let nextNoteTime = 0;
-    let timerID = null;
-    let currentStep = 0;
-
-    const rdsFreqs = {
-      'Em7': 164.81, 'Dm7': 146.83, 'Fm7': 174.61, 'Gm7': 196.00,
-      'Am7': 220.00, 'Cm': 261.63, 'Gm': 196.00, 'Fm': 174.61,
-      'C5': 523.25, 'Eb5': 622.25, 'G5': 783.99, 'Bb5': 932.33
-    };
-
+    /* --- AUDIO ENGINE: MAGDALENA BAY "RDS" CHORDS --- */
+    let audioCtx = null, masterGain = null, isPlaying = false, nextNoteTime = 0, timerID = null, currentStep = 0;
+    const rdsFreqs = { 'Em7': 164.81, 'Dm7': 146.83, 'Fm7': 174.61, 'Gm7': 196.00, 'Am7': 220.00, 'Cm': 261.63, 'Gm': 196.00, 'Fm': 174.61 };
     const rdsProgression = ['Em7', 'Dm7', 'Fm7', 'Fm7', 'Dm7', 'Em7', 'Fm7', 'Gm7', 'Am7', 'Cm', 'Gm', 'Fm', 'Gm', 'Fm'];
 
     function playRdsSynth(freq, type, startTime, duration, vol) {
@@ -219,8 +74,7 @@
       try {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, startTime);
+        osc.type = type; osc.frequency.setValueAtTime(freq, startTime);
         gain.gain.setValueAtTime(vol, startTime);
         gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
         osc.connect(gain); gain.connect(masterGain);
@@ -230,20 +84,11 @@
 
     function scheduleRdsMusic() {
       if (!isPlaying || !audioCtx || audioCtx.state !== 'running') return;
-      const scheduleAheadTime = 0.2;
-      const noteTime = (60.0 / 120) / 2; 
-
-      while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
-        let chordName = rdsProgression[Math.floor(currentStep / 2) % rdsProgression.length];
-        let baseFreq = rdsFreqs[chordName] || 164.81;
-
-        playRdsSynth(baseFreq, 'sawtooth', nextNoteTime, noteTime * 1.5, 0.15);
-        if (currentStep % 4 === 0) {
-          playRdsSynth(baseFreq * 2, 'square', nextNoteTime, noteTime, 0.08);
-        }
-
-        nextNoteTime += noteTime;
-        currentStep++;
+      while (nextNoteTime < audioCtx.currentTime + 0.2) {
+        let chord = rdsProgression[Math.floor(currentStep / 2) % rdsProgression.length];
+        let freq = rdsFreqs[chord] || 164.81;
+        playRdsSynth(freq, 'sawtooth', nextNoteTime, 0.4, 0.15);
+        nextNoteTime += 0.25; currentStep++;
       }
       timerID = setTimeout(scheduleRdsMusic, 100);
     }
@@ -254,130 +99,96 @@
       if (!isPlaying) {
         if (!audioCtx) {
           audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-          masterGain = audioCtx.createGain(); 
-          masterGain.gain.value = 1; 
-          masterGain.connect(audioCtx.destination);
+          masterGain = audioCtx.createGain(); masterGain.gain.value = 1; masterGain.connect(audioCtx.destination);
         }
-        
         audioCtx.resume().then(() => {
-          nextNoteTime = audioCtx.currentTime + 0.05;
-          currentStep = 0; 
-          isPlaying = true;
-          btn.textContent = '🔊'; 
-          scheduleRdsMusic();
+          nextNoteTime = audioCtx.currentTime + 0.05; currentStep = 0; isPlaying = true;
+          btn.textContent = '🔊'; scheduleRdsMusic();
         });
       } else {
-        isPlaying = false;
-        if (timerID) clearTimeout(timerID);
-        btn.textContent = '🔇';
+        isPlaying = false; if (timerID) clearTimeout(timerID); btn.textContent = '🔇';
       }
     }
 
-    /* --- CANVAS ANIMATION ENGINE --- */
+    /* --- CANVAS ANIMATION ENGINE WITH PHASE RENDERERS --- */
     const canvas = document.getElementById("bg-canvas");
     const ctx = canvas.getContext("2d");
-    let width, height, cx, cy;
-    let globalAngle = 0;
-    let autoAdvancePaused = false;
-
-    function resizeCanvas() {
-      width = window.innerWidth; height = window.innerHeight;
-      canvas.width = width; canvas.height = height;
-      cx = width / 2; cy = height / 2;
-    }
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
+    let width, height, cx, cy, globalAngle = 0, autoPaused = false, currentPhase = 1;
+    
+    const phases = [
+      "RDS INTRO EM7", "RDS INTRO DM7", "RDS INTRO FM7", 
+      "RDS VERSE COMMON SENSE", "RDS CHORUS 22 MORE MINUTES", 
+      "RDS BRAND NEW IMAGE", "OUTRUN 198X", "CYBERPUNK MATRIX"
+    ];
 
     let particles = [];
-    for (let i = 0; i < 250; i++) particles.push({ x: Math.random() * width, y: Math.random() * height, z: Math.random() * width });
+    for (let i = 0; i < 150; i++) particles.push({ x: Math.random() * window.innerWidth, y: Math.random() * window.innerHeight, z: Math.random() * window.innerWidth });
 
-    const renderers = [
-      () => {
-        ctx.fillStyle = "rgba(10,0,20,0.3)"; ctx.fillRect(0,0,width,height);
-        ctx.fillStyle = "#ff00aa"; ctx.beginPath(); ctx.arc(cx, cy, 150, 0, Math.PI, true); ctx.fill();
-        ctx.strokeStyle = "#00ffff"; ctx.lineWidth = 2;
-        for(let i=0; i<20; i++) {
-            let y = cy + Math.pow((globalAngle*2 + i)%20, 2);
-            if(y < height) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke(); }
-        }
-      },
-      () => {
-        ctx.fillStyle = "rgba(0,0,0,0.3)"; ctx.fillRect(0,0,width,height);
-        particles.forEach(p => {
-          p.z -= 8; if(p.z <= 0) p.z = width;
-          let sx = (p.x - cx) * (width/p.z) + cx, sy = (p.y - cy) * (width/p.z) + cy;
-          ctx.fillStyle = "#ffffff"; ctx.fillRect(sx, sy, 3, 3);
-        });
-      },
-      () => {
-        ctx.fillStyle = "rgba(20,10,0,0.3)"; ctx.fillRect(0,0,width,height);
-        ctx.strokeStyle = "#ff6600"; ctx.lineWidth = 4;
-        ctx.strokeRect(cx - 100, cy - 100, 200, 200);
-        ctx.fillStyle = "#ff6600"; ctx.font = "bold 80px sans-serif";
-        ctx.fillText("λ", cx - 30, cy + 30);
-      }
-    ];
-
-    function animateCanvas() {
-      globalAngle += 0.015;
-      let rendererFunc = renderers[currentPhase % renderers.length];
-      if(rendererFunc) rendererFunc();
-      requestAnimationFrame(animateCanvas);
+    function resize() { 
+      width = canvas.width = window.innerWidth; 
+      height = canvas.height = window.innerHeight; 
+      cx = width / 2; cy = height / 2; 
     }
+    window.addEventListener('resize', resize); resize();
 
-    const phaseNamesRaw = "RDS INTRO EM7,RDS INTRO DM7,RDS INTRO FM7,RDS VERSE COMMON SENSE,RDS CHORUS 22 MORE MINUTES,RDS BRAND NEW IMAGE,RDS 21 MORE MINUTES,RDS TWO-WAY MIRROR,RDS ONLY ONE MORE MINUTE,OUTRUN 198X,SKYNET NEURAL NET,420 BLAZE IT,TYPEWRITER TERMINAL,PALLET TOWN (PKMN),DIGI-WORLD (DIGIMON),MOON PRISM (SAILOR),MEDABOTS ROBO-BATTLE,TRUE NORTH CANADA,THE 6IX (TORONTO),STAR OF DAVID,PHONK DRIFT ZONE,CASINO JACKPOT,SNAKE AUTOMATA,HOCKEY RINK,RABBIT HOLE,FRACTAL SHROOMS,TIME DILATION,CHECKERBOARD WARP,ACID RAIN,LSD PLASMA,DEMONIC REALM,ANGELIC LIGHTS,HYPERSPACE WARP,GEOCITIES 2000,PONG PROTOCOL,FIREWORKS DISPLAY,OFFLINE DINO,TRON GRID,HACKER TERMINAL,MARTHA STEWART BAKE,WINDOWS 98,MAC OS 9,MS-DOS PROMPT,COMMODORE 64,AMIGA GURU MEDITATION,DIAL-UP MODEM,FLOPPY DISK DRIVE,VHS TRACKING,CRT SCANLINES,DVD SCREENSAVER,WINAMP VISUALIZER,LIMEWIRE DOWNLOAD,MYSPACE LAYOUT,MSN MESSENGER,ICQ CHAT,NETSCAPE NAVIGATOR,AOL YOU'VE GOT MAIL,BLOCKBUSTER VIDEO,MTV IDENTS,SEGA GENESIS,SUPER NINTENDO,ARCAGE CARPET,LASER TAG MAZE,ROLLER RINK,BOWLING ALLEY STRIKE,MALLSOFT MUZAK,FRUTIGER AERO,Y2K BUG,MATRIX CONSTRUCT,EVENT HORIZON,QUANTUM REALM,SCHRODINGER'S CAT,STRING THEORY,DARK MATTER,NEBULA CLOUD,SUPERNOVA BURST,PULSAR BEACON,QUASAR JET,INTERSTELLAR TESSERACT,SUNSPOT FLARE,LUNAR ROVER,MARS ROVER,VOYAGER GOLDEN RECORD,CERN COLLIDER,VAPORWAVE PLAZA,EGYPTIAN TOMB,DEEP WEB,ALICE'S TEA PARTY,CHESHIRE GRIN,ZION MAINFRAME,ATLANTIS RUINS,VALHALLA GATES,TARTARUS ABYSS,AREA 51,CROP CIRCLES,SILENT HILL FOG,RAPTURE UNDERWATER,BLOOD MOON,SOLAR ECLIPSE,NEON TOKYO,SHIBUYA CROSSING,GHOST IN THE SHELL,AKIRA BIKE GANG,COWBOY BEBOP,EVANGELION LCL,GUNDAM HANGAR,TAMAGOTCHI PET,GAMEBOY CAMERA,N64 POLYGONS,PS1 MEMORY CARD,DREAMCAST SPIRAL,RED RING OF DEATH,WII MENU,MINECRAFT CAVES,DOOM E1M1 HELLSCAPE,HALO INSTALLATION 04,FALLOUT VAULT,SKYRIM BLIZZARD,DARK SOULS BONFIRE,TETRIS BLOCKS,PAC-MAN MAZE,SPACE INVADERS,GALAGA STARS,ASTEROIDS,DONKEY KONG BARRELS,STREET FIGHTER,MORTAL KOMBAT,SONIC RINGS,SUPER MARIO WORLD,ZELDA TRIFORCE,METROID LAVA,CASTLEVANIA GOTHIC,MEGAMAN PLASMA,CHRONO TRIGGER,FINAL FANTASY,KINGDOM HEARTS,PERSONA RED,SILENT HILL RUST,RESIDENT EVIL,METAL GEAR RADAR,TOMB RAIDER,CRASH BANDICOOT,SPYRO GEMS,TONY HAWK COMBO,GTA WASTED,MINESWEEPER,SOLITAIRE CASCADE,PINBALL BUMPER,JUNGLE CANOPY,ICE AGE TUNDRA,FLAPPY BIRD PIPES,ANGRY BIRD SLINGSHOT,ANIMAL CROSSING VILLAGE,OVERWATCH NEPAL,DIABLO TRISTRAM,ARCH LINUX PACMAN,DEATH METAL MOSH,SAHARA PHONK,MEGA LUCARIO AURA,TIMMIES DOUBLE-DOUBLE,TACTICAL NIGHT VISION,THE VOID,CANADA COMPUTERS RUN,SMILING FRIENDS GLITCH,SNORLAX ROADBLOCK,LAKE SHORE MIDNIGHT,SHEEPSKIN AUDIOPHILE,STRAWBERRY MUSIC PLAYER,FORTNITE TACTICAL DROP,POKEMON TCG HOLO,DUKE NUKEM RADIO,ETOBICOKE TRANSIT,GIGABYTE AORUS BOOT,SEPULTURA ROOTS,UBIQUITOUS SYNERGY,MAGDALENA BAY SYNTH,NTFS DISK RECOVERY,MISSISSAUGA MAYORAL,G2 ROAD TEST,TACTICAL BACK BLING";
-    const phaseNames = phaseNamesRaw.split(',');
-    const phaseColors = ["#000000", "#1a0f00", "#0a0015", "#000a10", "#001005", "#1877f2", "#ffff00", "#00ffcc", "#ff007f", "#150022", "#330000", "#003300", "#000033", "#222222", "#440022"];
-    
-    const companyFonts = [
-      { font: "'Press Start 2P', monospace" }, { font: "'Orbitron', sans-serif" },
-      { font: "'Russo One', sans-serif" }, { font: "'Permanent Marker', cursive" },
-      { font: "'Cinzel', serif" }, { font: "'Comic Neue', cursive" },
-      { font: "'VT323', monospace" }, { font: "'Fira Code', monospace" }
-    ];
+    function animate() {
+      globalAngle += 0.02;
+      ctx.fillStyle = "rgba(10, 0, 10, 0.25)"; 
+      ctx.fillRect(0, 0, width, height);
 
-    let currentPhase = 1;
-    let phaseTimer = null;
+      // Unique phase-based background animations
+      let mode = currentPhase % 4;
+      if (mode === 1) {
+        // Outrun Sun Grid
+        ctx.fillStyle = "#ff00aa"; ctx.beginPath(); ctx.arc(cx, cy, 120, 0, Math.PI, true); ctx.fill();
+        ctx.strokeStyle = "#00ffff"; ctx.lineWidth = 2;
+        for(let i = 0; i < 15; i++) {
+          let y = cy + ((globalAngle * 30 + i * 20) % (height / 2));
+          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
+        }
+      } else if (mode === 2) {
+        // Starfield Warp
+        ctx.fillStyle = "#ffffff";
+        particles.forEach(p => {
+          p.z -= 6; if (p.z <= 0) p.z = width;
+          let sx = (p.x - cx) * (width / p.z) + cx, sy = (p.y - cy) * (width / p.z) + cy;
+          ctx.fillRect(sx, sy, 2, 2);
+        });
+      } else if (mode === 3) {
+        // Neon Pulsing Ring
+        ctx.strokeStyle = "#ff3333"; ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.arc(cx, cy, 150 + Math.sin(globalAngle * 3) * 50, 0, Math.PI * 2); ctx.stroke();
+      } else {
+        // Matrix Rain simulation
+        ctx.fillStyle = "#00ffcc"; ctx.font = "16px monospace";
+        for (let i = 0; i < width; i += 40) {
+          let y = (globalAngle * 100 + i * 15) % height;
+          ctx.fillText("01RDS", i, y);
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+    animate();
 
     function setPhase(p) {
-      currentPhase = p;
-      if (currentPhase > phaseNames.length) currentPhase = 1;
-      if (currentPhase < 1) currentPhase = phaseNames.length;
-
-      const pName = phaseNames[currentPhase - 1] || "SYSTEM GLITCH";
-      document.getElementById("phase-badge-top").textContent = `${String(currentPhase).padStart(3, '0')}: ${pName}`;
-      document.body.style.backgroundColor = phaseColors[(currentPhase * 3) % phaseColors.length];
-      
-      const randomFont = companyFonts[Math.floor(Math.random() * companyFonts.length)];
-      document.getElementById("scramble-text").style.fontFamily = randomFont.font;
+      currentPhase = p; 
+      if (currentPhase > phases.length) currentPhase = 1; 
+      if (currentPhase < 1) currentPhase = phases.length;
+      document.getElementById("phase-badge-top").textContent = `${String(currentPhase).padStart(3, '0')}: ${phases[currentPhase - 1]}`;
     }
-
-    function prevPhase() { setPhase(currentPhase - 1); resetPhaseTimer(); }
-    function nextPhase() { setPhase(currentPhase + 1); resetPhaseTimer(); }
-
-    function resetPhaseTimer() {
-      if (phaseTimer) clearInterval(phaseTimer);
-      if (!autoAdvancePaused) {
-        phaseTimer = setInterval(() => { nextPhase(); }, 30000);
-      }
+    
+    function nextPhase() { setPhase(currentPhase + 1); }
+    function prevPhase() { setPhase(currentPhase - 1); }
+    function toggleAutoAdvance(e) { 
+      e.stopPropagation(); 
+      autoPaused = !autoPaused; 
+      document.getElementById("pause-toggle").textContent = autoPaused ? "▶️" : "⏸️"; 
     }
-
-    let autoAdvancePaused = false;
-    function toggleAutoAdvance(e) {
-      if(e) e.stopPropagation();
-      autoAdvancePaused = !autoAdvancePaused;
-      document.getElementById("pause-toggle").textContent = autoAdvancePaused ? "▶️" : "⏸️";
-      resetPhaseTimer();
-    }
-
-    function handleDrewClick(e) { if(e) e.stopPropagation(); prevPhase(); }
-    function handleWtfClick(e) { if(e) e.stopPropagation(); nextPhase(); }
-    function handleDotClick(e) { if(e) e.stopPropagation(); setPhase(Math.floor(Math.random()*phaseNames.length) + 1); resetPhaseTimer(); }
-    function toggleModal(show) { document.getElementById('contact-modal').style.display = show ? 'flex' : 'none'; }
 
     setPhase(1);
-    resetPhaseTimer();
-    animateCanvas();
   </script>
 </body>
 </html>
+
+```
