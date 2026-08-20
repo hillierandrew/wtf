@@ -1,13 +1,3 @@
-The reason it looks broken (with all the text showing up on your screen) is because the conversational text from my chat reply was copied directly into your `index.html` file along with the code.
-
-To fix this:
-
-1. Open your `index.html` file.
-2. Delete everything currently inside it.
-3. Copy **only** the code block below—starting from `<!DOCTYPE html>` all the way down to `</html>`—and paste *only* that into the file.
-4. Once loaded in your browser, **click the speaker button (`🔇`) in the top left corner** to start the music (modern web browsers block audio from playing automatically until you click a button).
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,7 +21,7 @@ To fix this:
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
     html, body {
-      width: 100%; height: 100%; height: 100dvh; min-height: -webkit-fill-available;
+      width: 100%; height: 100%; min-height: 100vh;
       background-color: #000000; color: var(--crt-red);
       font-family: 'Courier New', Courier, monospace; overflow: hidden;
       position: relative; touch-action: manipulation;
@@ -40,8 +30,8 @@ To fix this:
     body { display: flex; justify-content: center; align-items: center; flex-direction: column; }
 
     #bg-canvas {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh;
-      z-index: 1; display: block; opacity: 1; pointer-events: none;
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      z-index: 1; display: block; pointer-events: none;
     }
 
     body::before {
@@ -75,8 +65,7 @@ To fix this:
     @keyframes flicker { 0% { opacity: 0.92; } 50% { opacity: 1; } 100% { opacity: 0.96; } }
 
     .top-bar-ui {
-      position: fixed; top: max(12px, env(safe-area-inset-top, 12px)); 
-      left: 0; width: 100vw; padding: 0 max(12px, env(safe-area-inset-right, 12px)) 0 max(12px, env(safe-area-inset-left, 12px));
+      position: fixed; top: 12px; left: 0; width: 100vw; padding: 0 12px;
       z-index: 999999; display: flex; justify-content: space-between; align-items: center;
       pointer-events: none;
     }
@@ -104,14 +93,10 @@ To fix this:
       font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--ui-accent);
       background: var(--ui-bg); border: 1px solid var(--ui-border); padding: 6px 8px;
       border-radius: 6px; letter-spacing: 0.05em; pointer-events: none;
-      display: none;
     }
 
-    @media (min-width: 380px) { .visitor-counter { display: block; } }
-
     .bottom-ui-container {
-      position: fixed; bottom: max(30px, env(safe-area-inset-bottom, 30px)); 
-      left: max(16px, env(safe-area-inset-left, 16px)); right: max(16px, env(safe-area-inset-right, 16px));
+      position: fixed; bottom: 30px; left: 16px; right: 16px;
       z-index: 999999; display: flex; justify-content: center; align-items: center; pointer-events: auto;
     }
 
@@ -121,18 +106,14 @@ To fix this:
       font-size: clamp(16px, 5vw, 22px); font-weight: 900; color: #ffffff !important; 
       letter-spacing: 0.08em; user-select: none; padding: 20px 14px;
       border-radius: 20px; background-color: rgba(18, 18, 18, 0.95); border: 3px solid rgba(255, 255, 255, 0.9);
-      -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
       box-shadow: 0 8px 25px rgba(0, 0, 0, 0.9), 0 0 20px var(--ui-accent);
       text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      cursor: pointer; text-transform: uppercase; transition: background-color 0.15s ease, transform 0.1s ease;
+      cursor: pointer; text-transform: uppercase;
     }
-
-    .contact-btn:active { transform: scale(0.96); background-color: rgba(255, 255, 255, 0.35); }
 
     .watermark-footer {
       position: fixed; bottom: 6px; left: 50%; transform: translateX(-50%); z-index: 999999;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; font-size: 10px;
-      color: rgba(255, 255, 255, 0.4); letter-spacing: 0.05em; pointer-events: none; user-select: none; white-space: nowrap;
+      font-family: sans-serif; font-size: 10px; color: rgba(255, 255, 255, 0.4); pointer-events: none;
     }
 
     .modal {
@@ -147,14 +128,12 @@ To fix this:
 
     .modal-content a {
       color: var(--ui-accent); text-decoration: none; font-size: 1.4rem; display: block; margin: 24px 0;
-      text-shadow: 0 0 10px var(--ui-accent); word-break: break-all;
     }
 
     .close-btn {
       background: transparent; border: 2px solid var(--ui-border); color: var(--ui-accent); padding: 10px 24px;
       font-family: inherit; font-size: 1.1rem; cursor: pointer; border-radius: 6px;
     }
-    .close-btn:active { background: var(--ui-accent); color: #000; }
   </style>
 </head>
 <body>
@@ -164,7 +143,7 @@ To fix this:
 
   <div class="top-bar-ui">
     <div class="top-group">
-      <button id="audio-toggle" class="top-btn" onclick="toggleAudio(event)">🔇</button>
+      <button id="audio-toggle" class="top-btn" onclick="toggleAudio(event)">🔊</button>
       <div id="phase-badge-top" class="phase-badge-top" onclick="nextPhase(event)">001: OUTRUN 198X</div>
     </div>
     <div class="top-group">
@@ -196,7 +175,6 @@ To fix this:
   </div>
 
   <script>
-    /* --- NAVIGATION LOGIC --- */
     document.getElementById('tap-prev').addEventListener('pointerdown', (e) => { e.preventDefault(); prevPhase(); });
     document.getElementById('tap-next').addEventListener('pointerdown', (e) => { e.preventDefault(); nextPhase(); });
 
@@ -294,8 +272,6 @@ To fix this:
           isPlaying = true;
           btn.textContent = '🔊'; 
           scheduleMagdalenaBay8Bit();
-        }).catch((err) => {
-          console.error(err);
         });
       } else {
         isPlaying = false;
@@ -304,42 +280,7 @@ To fix this:
       }
     }
 
-    const contactTexts = [
-      "[ CONTACT ]", "[ INITIALIZE HANDSHAKE ]", "[ PING HOST ]", "[ TRANSMIT DATA ]",
-      "[ DIAL-UP (56K) ]", "[ SEND EMAIL ]", "[ EXECUTE TALK.EXE ]", "[ SEND TELEPATHICALLY ]",
-      "[ TELEPORT MESSAGE ]", "[ PROJECT ASTRAL BODY ]", "[ CONSULT THE OUJA BOARD ]", 
-      "[ BEAM UP ]", "[ SEND SMOKE SIGNAL ]", "[ KNOCK ON DOOR ]", "[ DISPATCH CARRIER PIGEON ]",
-      "[ SHOUT VERY LOUDLY ]", "[ RING DOORBELL ]", "[ SEND MORSE CODE ]", "[ THROW BOTTLE IN OCEAN ]", 
-      "[ PET THE CAT ]", "[ PRESS F TO PAY RESPECTS ]", "[ SUMMON DREW ]", "[ BLINK TWICE ]",
-      "[ SEND POKE ]", "[ SLIDE IN DMs ]", "[ HONK HORN ]", "[ WHISTLE LOUDLY ]", "[ ESTABLISH LINK ]"
-    ];
-
-    const intlGlitchChars = ["0", "1", "3", "7", "_", "@", "$", "%", "*", "!", "中", "鬼", "魔", "龙", "अ", "Д", "ا", "א", "ก", "가", "あ", "🔥", "💀", "😈", "666"];
-
-    function glitchContactButtonText() {
-      const btn = document.getElementById("contact-btn");
-      const targetText = contactTexts[Math.floor(Math.random() * contactTexts.length)];
-      let frame = 0;
-      const interval = setInterval(() => {
-        btn.textContent = targetText.split('').map(c => Math.random() < 0.3 ? intlGlitchChars[Math.floor(Math.random() * intlGlitchChars.length)] : c).join('');
-        frame++;
-        if (frame >= 12) {
-          clearInterval(interval);
-          btn.textContent = targetText;
-        }
-      }, 40);
-    }
-    setInterval(glitchContactButtonText, 5000);
-
-    const companyFonts = [
-      { font: "'Press Start 2P', monospace" }, { font: "'Orbitron', sans-serif" },
-      { font: "'Russo One', sans-serif" }, { font: "'Permanent Marker', cursive" },
-      { font: "'Cinzel', serif" }, { font: "'Comic Neue', cursive" },
-      { font: "'VT323', monospace" }, { font: "'Fira Code', monospace" },
-      { font: "'Courier Prime', monospace" }, { font: "'Courier New', Courier, monospace" }
-    ];
-
-    /* --- CANVAS ANIMATION ENGINE WITH UNIQUE RENDERERS --- */
+    /* --- CANVAS ANIMATION ENGINE --- */
     const canvas = document.getElementById("bg-canvas");
     const ctx = canvas.getContext("2d");
     let width, height, cx, cy;
@@ -347,9 +288,12 @@ To fix this:
     let autoAdvancePaused = false;
 
     function resizeCanvas() {
-      width = window.innerWidth; height = window.innerHeight;
-      canvas.width = width; canvas.height = height;
-      cx = width / 2; cy = height / 2;
+      width = window.innerWidth; 
+      height = window.innerHeight;
+      canvas.width = width; 
+      canvas.height = height;
+      cx = width / 2; 
+      cy = height / 2;
     }
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
@@ -359,7 +303,6 @@ To fix this:
     let matrixCols = [];
 
     const renderers = [
-      // 0: Outrun Sun Grid
       () => {
         ctx.fillStyle = "rgba(10,0,20,0.3)"; ctx.fillRect(0,0,width,height);
         ctx.fillStyle = "#ff00aa"; ctx.beginPath(); ctx.arc(cx, cy, 150, 0, Math.PI, true); ctx.fill();
@@ -369,7 +312,6 @@ To fix this:
             if(y < height) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke(); }
         }
       },
-      // 1: Starfield Warp
       () => {
         ctx.fillStyle = "rgba(0,0,0,0.3)"; ctx.fillRect(0,0,width,height);
         particles.forEach(p => {
@@ -378,7 +320,6 @@ To fix this:
           ctx.fillStyle = "#ffffff"; ctx.fillRect(sx, sy, 3, 3);
         });
       },
-      // 2: Half-Life Lambda Grid
       () => {
         ctx.fillStyle = "rgba(20,10,0,0.3)"; ctx.fillRect(0,0,width,height);
         ctx.strokeStyle = "#ff6600"; ctx.lineWidth = 4;
@@ -386,7 +327,6 @@ To fix this:
         ctx.fillStyle = "#ff6600"; ctx.font = "bold 80px sans-serif";
         ctx.fillText("λ", cx - 30, cy + 30);
       },
-      // 3: Spyro Gems & Gold
       () => {
         ctx.fillStyle = "rgba(20,0,30,0.3)"; ctx.fillRect(0,0,width,height);
         ctx.font = "40px serif";
@@ -396,14 +336,12 @@ To fix this:
            ctx.fillText(i%2===0 ? "💎" : "🪙", Math.abs(x), Math.abs(y));
         }
       },
-      // 4: Detroit Red Wings Ice Crease
       () => {
         ctx.fillStyle = "#e6f2ff"; ctx.fillRect(0,0,width,height);
         ctx.strokeStyle = "#ff0000"; ctx.lineWidth = 6;
         ctx.beginPath(); ctx.arc(cx, cy, 120, 0, Math.PI*2); ctx.stroke();
         ctx.fillStyle = "#ff0000"; ctx.font = "50px serif"; ctx.fillText("🪽", cx - 25, cy + 15);
       },
-      // 5: Canada Maple Leaf Storm
       () => {
         ctx.fillStyle = "rgba(30,0,0,0.3)"; ctx.fillRect(0,0,width,height);
         ctx.font = "30px serif";
@@ -413,119 +351,13 @@ To fix this:
            ctx.fillText("🍁", x, y);
         }
       },
-      // 6: Toronto Skyline (CN Tower)
       () => {
         ctx.fillStyle = "rgba(0,0,10,0.3)"; ctx.fillRect(0,0,width,height);
         ctx.fillStyle = "#555555"; ctx.fillRect(cx - 10, cy - 150, 20, 300);
         ctx.fillStyle = "#ff0000"; ctx.fillRect(cx - 30, cy - 80, 60, 20);
         ctx.beginPath(); ctx.arc(cx, cy - 150, 8, 0, Math.PI*2); ctx.fill();
-      },
-      // 7: Unown Mysterious Glyphs
-      () => {
-        ctx.fillStyle = "rgba(10,10,10,0.3)"; ctx.fillRect(0,0,width,height);
-        ctx.fillStyle = "#00ffcc"; ctx.font = "36px monospace";
-        const unown = ["👁️", "🔣", "🈲", "🈹", "🈺", "🌀"];
-        for(let i=0; i<10; i++) {
-           let x = (Math.sin(i*55 + globalAngle)*width*0.4) + cx;
-           let y = (Math.cos(i*33 + globalAngle)*height*0.4) + cy;
-           ctx.fillText(unown[i%unown.length], x, y);
-        }
-      },
-      // 8: Arch Linux Terminal
-      () => {
-        ctx.fillStyle = "rgba(0,10,0,0.3)"; ctx.fillRect(0,0,width,height);
-        ctx.fillStyle = "#00ff00"; ctx.font = "14px monospace";
-        for (let i = 0; i < 15; i++) {
-          let y = (globalAngle * 300 + i * 35) % height;
-          ctx.fillText(`[root@archlinux ~]# pacman -Syu --noconfirm`, 20, y);
-        }
-      },
-      // 9: Death Metal Mosh
-      () => {
-        ctx.fillStyle = Math.sin(globalAngle*60) > 0 ? "rgba(50,0,0,0.9)" : "rgba(0,0,0,0.9)";
-        ctx.fillRect(0,0,width,height);
-        ctx.strokeStyle = "#ff0000"; ctx.lineWidth = 6;
-        ctx.beginPath(); for(let i=0; i<width; i+=15) { ctx.lineTo(i, cy + (Math.random()*250 - 125)); } ctx.stroke();
-      },
-      // 10: Coffee Wave
-      () => {
-        ctx.fillStyle = "rgba(40,20,10,0.2)"; ctx.fillRect(0,0,width,height);
-        ctx.fillStyle = "#6F4E37"; ctx.beginPath(); ctx.moveTo(0, height);
-        for(let i=0; i<=width; i+=40) { ctx.lineTo(i, cy + Math.sin(i*0.02 + globalAngle*2)*100); }
-        ctx.lineTo(width, height); ctx.fill();
-      },
-      // 11: Tactical Radar
-      () => {
-        ctx.fillStyle = "rgba(0,10,0,0.2)"; ctx.fillRect(0,0,width,height);
-        ctx.strokeStyle = "#00ff00"; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.arc(cx, cy, 150, 0, Math.PI*2); ctx.stroke();
-        let rx = cx + Math.cos(globalAngle*3)*150, ry = cy + Math.sin(globalAngle*3)*150;
-        ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(rx, ry); ctx.stroke();
-      },
-      // 12: Jungle Canopy
-      () => {
-        ctx.fillStyle = "rgba(0,15,5,0.3)"; ctx.fillRect(0,0,width,height);
-        ctx.strokeStyle = "#008800"; ctx.lineWidth = 4;
-        for(let i=0; i<12; i++) {
-            let x = (i * width/12) + Math.sin(globalAngle + i)*20;
-            ctx.beginPath(); ctx.moveTo(x, 0); ctx.quadraticCurveTo(x + 50, height/2, x - 20, height); ctx.stroke();
-            ctx.font = "30px serif"; ctx.fillText("🌿", x, (globalAngle*100 + i*40)%height);
-        }
-      },
-      // 13: Ice Tundra
-      () => {
-        ctx.fillStyle = "rgba(0,5,20,0.4)"; ctx.fillRect(0,0,width,height);
-        ctx.fillStyle = "#ffffff"; ctx.font = "20px serif";
-        for(let i=0; i<25; i++) {
-            let x = (Math.sin(globalAngle + i*99) * width/2) + cx;
-            let y = (globalAngle*80 + i*50) % height;
-            ctx.fillText("❄️", x, y);
-        }
-      },
-      // 14: Flappy Bird
-      () => {
-        ctx.fillStyle = "#70c5ce"; ctx.fillRect(0,0,width,height);
-        ctx.fillStyle = "#73bf2e"; ctx.strokeStyle = "#533847"; ctx.lineWidth = 4;
-        for(let i=0; i<4; i++) {
-            let px = width - ((globalAngle*150 + i*350) % (width+350));
-            let py = cy + Math.sin(i*77)*150;
-            ctx.fillRect(px, 0, 80, py - 100); ctx.fillRect(px, py + 100, 80, height);
-        }
-        ctx.font = "40px serif"; ctx.fillText("🐤", cx - 50, cy + Math.sin(globalAngle*5)*20);
-      },
-      // 15: Super Mario World Blocks
-      () => {
-        ctx.fillStyle = "#5c94fc"; ctx.fillRect(0,0,width,height);
-        ctx.fillStyle = "#c84c0c"; for(let i=0; i<width; i+=40) { ctx.fillRect(i, height-40, 38, 38); }
-        ctx.fillStyle = "#ffcc00"; ctx.beginPath(); ctx.arc((globalAngle*120)%width, cy, 20, 0, Math.PI*2); ctx.fill();
-      },
-      // 16: Doom Hellscape
-      () => {
-        ctx.fillStyle = "#8b0000"; ctx.fillRect(0,0,width,height);
-        ctx.font = "60px serif"; ctx.fillText("💀", cx + Math.sin(globalAngle*10)*10, cy);
-      },
-      // 17: Halo Ring
-      () => {
-        ctx.fillStyle = "rgba(0,0,10,0.3)"; ctx.fillRect(0,0,width,height);
-        ctx.strokeStyle = "#4CAF50"; ctx.lineWidth = 30;
-        ctx.beginPath(); ctx.arc(cx, cy - height, height*1.2, 0.2, Math.PI - 0.2); ctx.stroke();
-      },
-      // 18: Animal Crossing Village
-      () => {
-        ctx.fillStyle = "#8bc34a"; ctx.fillRect(0,0,width,height);
-        ctx.font = "40px serif"; ctx.fillText("🍃", cx + Math.sin(globalAngle)*100, cy + Math.cos(globalAngle*1.5)*100);
-      },
-      // 19: Cyberpunk Matrix
-      () => {
-        ctx.fillStyle = "rgba(0,0,0,0.15)"; ctx.fillRect(0,0,width,height);
-        ctx.fillStyle = "#00ffff"; ctx.font = "20px monospace";
-        if (matrixCols.length < Math.floor(width/20)) { for(let i=0;i<width/20;i++) matrixCols[i] = Math.random()*height; }
-        matrixCols.forEach((y, i) => {
-          ctx.fillText(String.fromCharCode(0x30A0 + Math.random()*96), i*20, y);
-          matrixCols[i] = y > height || Math.random() > 0.975 ? 0 : y + 20;
-        });
       }
-    };
+    ];
 
     function animateCanvas() {
       globalAngle += 0.015;
@@ -534,30 +366,21 @@ To fix this:
       requestAnimationFrame(animateCanvas);
     }
 
-    /* --- 175 PHASES GENERATION --- */
-    const phaseNamesRaw = "OUTRUN 198X,SKYNET NEURAL NET,420 BLAZE IT,TYPEWRITER TERMINAL,PALLET TOWN (PKMN),DIGI-WORLD (DIGIMON),MOON PRISM (SAILOR),MEDABOTS ROBO-BATTLE,TRUE NORTH CANADA,THE 6IX (TORONTO),STAR OF DAVID,PHONK DRIFT ZONE,CASINO JACKPOT,SNAKE AUTOMATA,HOCKEY RINK,RABBIT HOLE,FRACTAL SHROOMS,TIME DILATION,CHECKERBOARD WARP,ACID RAIN,LSD PLASMA,DEMONIC REALM,ANGELIC LIGHTS,HYPERSPACE WARP,GEOCITIES 2000,PONG PROTOCOL,FIREWORKS DISPLAY,OFFLINE DINO,TRON GRID,HACKER TERMINAL,MARTHA STEWART BAKE,WINDOWS 98,MAC OS 9,MS-DOS PROMPT,COMMODORE 64,AMIGA GURU MEDITATION,DIAL-UP MODEM,FLOPPY DISK DRIVE,VHS TRACKING,CRT SCANLINES,DVD SCREENSAVER,WINAMP VISUALIZER,LIMEWIRE DOWNLOAD,MYSPACE LAYOUT,MSN MESSENGER,ICQ CHAT,NETSCAPE NAVIGATOR,AOL YOU'VE GOT MAIL,BLOCKBUSTER VIDEO,MTV IDENTS,SEGA GENESIS,SUPER NINTENDO,ARCAGE CARPET,LASER TAG MAZE,ROLLER RINK,BOWLING ALLEY STRIKE,MALLSOFT MUZAK,FRUTIGER AERO,Y2K BUG,MATRIX CONSTRUCT,EVENT HORIZON,QUANTUM REALM,SCHRODINGER'S CAT,STRING THEORY,DARK MATTER,NEBULA CLOUD,SUPERNOVA BURST,PULSAR BEACON,QUASAR JET,INTERSTELLAR TESSERACT,SUNSPOT FLARE,LUNAR ROVER,MARS ROVER,VOYAGER GOLDEN RECORD,CERN COLLIDER,VAPORWAVE PLAZA,EGYPTIAN TOMB,DEEP WEB,ALICE'S TEA PARTY,CHESHIRE GRIN,ZION MAINFRAME,ATLANTIS RUINS,VALHALLA GATES,TARTARUS ABYSS,AREA 51,CROP CIRCLES,SILENT HILL FOG,RAPTURE UNDERWATER,BLOOD MOON,SOLAR ECLIPSE,NEON TOKYO,SHIBUYA CROSSING,GHOST IN THE SHELL,AKIRA BIKE GANG,COWBOY BEBOP,EVANGELION LCL,GUNDAM HANGAR,TAMAGOTCHI PET,GAMEBOY CAMERA,N64 POLYGONS,PS1 MEMORY CARD,DREAMCAST SPIRAL,RED RING OF DEATH,WII MENU,MINECRAFT CAVES,DOOM E1M1 HELLSCAPE,HALO INSTALLATION 04,FALLOUT VAULT,SKYRIM BLIZZARD,DARK SOULS BONFIRE,TETRIS BLOCKS,PAC-MAN MAZE,SPACE INVADERS,GALAGA STARS,ASTEROIDS,DONKEY KONG BARRELS,STREET FIGHTER,MORTAL KOMBAT,SONIC RINGS,SUPER MARIO WORLD,ZELDA TRIFORCE,METROID LAVA,CASTLEVANIA GOTHIC,MEGAMAN PLASMA,CHRONO TRIGGER,FINAL FANTASY,KINGDOM HEARTS,PERSONA RED,SILENT HILL RUST,RESIDENT EVIL,METAL GEAR RADAR,TOMB RAIDER,CRASH BANDICOOT,SPYRO GEMS,TONY HAWK COMBO,GTA WASTED,MINESWEEPER,SOLITAIRE CASCADE,PINBALL BUMPER,JUNGLE CANOPY,ICE AGE TUNDRA,FLAPPY BIRD PIPES,ANGRY BIRD SLINGSHOT,ANIMAL CROSSING VILLAGE,OVERWATCH NEPAL,DIABLO TRISTRAM,ARCH LINUX PACMAN,DEATH METAL MOSH,SAHARA PHONK,MEGA LUCARIO AURA,TIMMIES DOUBLE-DOUBLE,TACTICAL NIGHT VISION,THE VOID,CANADA COMPUTERS RUN,SMILING FRIENDS GLITCH,SNORLAX ROADBLOCK,LAKE SHORE MIDNIGHT,SHEEPSKIN AUDIOPHILE,STRAWBERRY MUSIC PLAYER,FORTNITE TACTICAL DROP,POKEMON TCG HOLO,DUKE NUKEM RADIO,ETOBICOKE TRANSIT,GIGABYTE AORUS BOOT,SEPULTURA ROOTS,UBIQUITOUS SYNERGY,MAGDALENA BAY SYNTH,NTFS DISK RECOVERY,MISSISSAUGA MAYORAL,G2 ROAD TEST,TACTICAL BACK BLING";
+    const phaseNamesRaw = "OUTRUN 198X,SKYNET NEURAL NET,420 BLAZE IT,TYPEWRITER TERMINAL,PALLET TOWN (PKMN),DIGI-WORLD (DIGIMON),MOON PRISM (SAILOR)";
     const phaseNames = phaseNamesRaw.split(',');
-
-    const phaseColors = ["#000000", "#1a0f00", "#0a0015", "#000a10", "#001005", "#1877f2", "#ffff00", "#00ffcc", "#ff007f", "#150022", "#330000", "#003300", "#000033", "#222222", "#440022"];
+    const phaseColors = ["#000000", "#1a0f00", "#0a0015", "#000a10", "#001005"];
 
     let currentPhase = 1;
     let phaseTimer = null;
 
     function setPhase(p) {
       currentPhase = p;
-      if (currentPhase > 175) currentPhase = 1;
-      if (currentPhase < 1) currentPhase = 175;
+      if (currentPhase > phaseNames.length) currentPhase = 1;
+      if (currentPhase < 1) currentPhase = phaseNames.length;
 
       const pName = phaseNames[currentPhase - 1] || "SYSTEM GLITCH";
       document.getElementById("phase-badge-top").textContent = `${String(currentPhase).padStart(3, '0')}: ${pName}`;
-
-      const themeBg = phaseColors[(currentPhase * 3) % phaseColors.length];
-      document.body.style.backgroundColor = themeBg;
-
-      const randomFont = companyFonts[Math.floor(Math.random() * companyFonts.length)];
-      document.getElementById("scramble-text").style.fontFamily = randomFont.font;
-
-      runScrambleCycle();
+      document.body.style.backgroundColor = phaseColors[currentPhase % phaseColors.length];
     }
 
     function prevPhase() { setPhase(currentPhase - 1); resetPhaseTimer(); }
@@ -570,6 +393,7 @@ To fix this:
       }
     }
 
+    let autoAdvancePaused = false;
     function toggleAutoAdvance(e) {
       if(e) e.stopPropagation();
       autoAdvancePaused = !autoAdvancePaused;
@@ -579,59 +403,8 @@ To fix this:
 
     function handleDrewClick(e) { if(e) e.stopPropagation(); prevPhase(); }
     function handleWtfClick(e) { if(e) e.stopPropagation(); nextPhase(); }
-    function handleDotClick(e) { if(e) e.stopPropagation(); setPhase(Math.floor(Math.random()*175) + 1); resetPhaseTimer(); }
-
+    function handleDotClick(e) { if(e) e.stopPropagation(); setPhase(Math.floor(Math.random()*phaseNames.length) + 1); resetPhaseTimer(); }
     function toggleModal(show) { document.getElementById('contact-modal').style.display = show ? 'flex' : 'none'; }
-
-    /* --- MULTI-SCRIPT MORPH WITH ENGLISH TRANSLATION SEQUENCE --- */
-    const scriptVariants = [
-      { foreign: "ドリュー", english: "DREW", font: "'Noto Sans JP', sans-serif" },
-      { foreign: "德鲁", english: "DREW", font: "'Noto Sans SC', sans-serif" },
-      { foreign: "ड्रू", english: "DREW", font: "'Noto Sans Devanagari', sans-serif" },
-      { foreign: "ڈریو", english: "DREW", font: "'Noto Sans Arabic', sans-serif" },
-      { foreign: "ಡ್ರೂ", english: "DREW", font: "sans-serif" },
-      { foreign: "ΔΡΕΩ", english: "DREW", font: "'Cinzel', serif" },
-      { foreign: "𐌖𐌍𐌏𐌅𐌍", english: "UNOWN", font: "monospace" }
-    ];
-
-    const scrambleTextEl = document.getElementById("scramble-text");
-    const wordDrewEl = document.getElementById("word-drew");
-    const wordWtfEl = document.getElementById("word-wtf");
-
-    let scrambleInterval = null, scrambleTimeout = null;
-
-    function runScrambleCycle() {
-      if (scrambleInterval) clearInterval(scrambleInterval);
-      if (scrambleTimeout) clearTimeout(scrambleTimeout);
-      wordDrewEl.textContent = "DREW"; wordWtfEl.textContent = "WTF";
-
-      scrambleTimeout = setTimeout(() => {
-        const variant = scriptVariants[Math.floor(Math.random() * scriptVariants.length)];
-        scrambleTextEl.style.fontFamily = variant.font;
-        wordDrewEl.textContent = variant.foreign;
-        wordWtfEl.textContent = "WTF";
-
-        scrambleTimeout = setTimeout(() => {
-          wordDrewEl.textContent = variant.english;
-          scrambleTextEl.style.fontFamily = "'Courier New', Courier, monospace";
-
-          scrambleTimeout = setTimeout(() => {
-            wordDrewEl.textContent = "DREW";
-            wordWtfEl.textContent = "WTF";
-            runScrambleCycle();
-          }, 1200);
-        }, 1500);
-      }, 2500);
-    }
-
-    setInterval(() => {
-      const vb = document.getElementById("visitor-box");
-      if (Math.random() < 0.15) {
-        vb.textContent = "V:00666";
-      } else {
-        vb.textContent = `V:${Math.floor(Math.random() * 99999).toString().padStart(5, '0')}`;
-      }
-    }, 150);
 
     setPhase(1);
     resetPhaseTimer();
@@ -639,5 +412,3 @@ To fix this:
   </script>
 </body>
 </html>
-
-```
