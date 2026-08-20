@@ -1,3 +1,15 @@
+Here is the fully upgraded, highly-lucid code.
+
+### What's New:
+
+1. **Alice in Wonderland & Lucid Trip Backgrounds:** Introduced new wildly scaling renderers (`MAD HATTER TEACUPS`, `RABBIT HOLE`, `TIME DILATION`, `FRACTAL SHROOMS`, `CHECKERBOARD WARP`) that dynamically pulse from tiny specks to massive, screen-filling elements.
+2. **True Transparency Text (No Covering):** Applied an `exclusion` mix-blend mode to the `DREW.WTF` text. This means the text acts like a dynamic color filter—the animations completely pass *through* the text, never being blocked or covered by it.
+3. **Top/Bottom Navigation:** Tapping/clicking anywhere on the top half of the screen goes back a phase. Tapping the bottom half goes forward. (UI buttons are excluded so they still work normally).
+4. **Layout Updates:** The `[ CONTACT ]` button is significantly larger and bolder. The `MUTE` button has been moved to its own dedicated spot in the top-left corner.
+
+Copy and paste the entirety of this code into your file:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,12 +23,11 @@
 
   <style>
     :root {
-      --crt-red: #ff1111;
+      --crt-red: #ff3333;
       --crt-dim: #660000;
       --ui-accent: #ff1111;
-      --ui-bg: rgba(10, 0, 0, 0.92);
+      --ui-bg: rgba(10, 0, 0, 0.85);
       --ui-border: #ff1111;
-      --text-color: #ff1111;
     }
 
     * {
@@ -32,7 +43,7 @@
       height: 100dvh;
       min-height: -webkit-fill-available;
       background-color: #000000;
-      color: var(--text-color);
+      color: var(--crt-red);
       font-family: 'Courier New', Courier, monospace;
       overflow: hidden;
       position: relative;
@@ -62,7 +73,7 @@
       display: block;
       position: fixed;
       top: 0; left: 0; bottom: 0; right: 0;
-      background: radial-gradient(circle at center, transparent 35%, rgba(0, 0, 0, 0.85) 100%);
+      background: radial-gradient(circle at center, transparent 20%, rgba(0, 0, 0, 0.95) 100%);
       pointer-events: none !important;
       z-index: 10;
     }
@@ -72,7 +83,7 @@
       display: block;
       position: fixed;
       top: 0; left: 0; bottom: 0; right: 0;
-      background: linear-gradient(rgba(20, 0, 0, 0) 50%, rgba(0, 0, 0, 0.45) 50%);
+      background: linear-gradient(rgba(20, 0, 0, 0) 50%, rgba(0, 0, 0, 0.5) 50%);
       background-size: 100% 4px;
       pointer-events: none !important;
       z-index: 11;
@@ -82,23 +93,26 @@
       text-align: center;
       z-index: 50;
       padding: 10px;
-      max-width: 92vw;
+      max-width: 96vw;
       user-select: none;
       -webkit-user-select: none;
       position: relative;
       pointer-events: none;
     }
 
+    /* TRI-BLEND TEXT - Animations pass entirely THROUGH this */
     .title {
-      font-size: clamp(1.4rem, 7vw, 4.8rem);
+      font-size: clamp(1.8rem, 8vw, 5.5rem);
       font-weight: bold;
       letter-spacing: 0.1em;
-      text-shadow: 0 0 10px var(--ui-accent), 0 0 25px var(--crt-dim), 0 0 40px var(--ui-accent);
-      animation: flicker 0.12s infinite;
+      color: #ffaaaa;
+      mix-blend-mode: exclusion;
+      text-shadow: 0 0 20px #ff0000, 0 0 40px #ff0000;
+      animation: flicker 0.15s infinite;
       min-height: 1.2em;
       display: inline-block;
       white-space: nowrap;
-      transition: filter 0.3s ease, color 0.3s ease, text-shadow 0.3s ease, font-family 0.2s ease;
+      transition: filter 0.3s ease, color 0.3s ease, font-family 0.2s ease;
     }
 
     .clickable-word {
@@ -110,17 +124,29 @@
     }
 
     .clickable-word:active {
-      transform: scale(0.92);
-      filter: brightness(1.8);
+      transform: scale(0.85);
+      filter: brightness(2);
     }
 
     @keyframes flicker {
-      0% { opacity: 0.95; }
+      0% { opacity: 0.92; }
       50% { opacity: 1; }
-      100% { opacity: 0.97; }
+      100% { opacity: 0.96; }
     }
 
-    /* Mobile-Optimized Top Right Controls */
+    /* Top Left UI Controls */
+    .top-left-ui {
+      position: fixed;
+      top: max(16px, env(safe-area-inset-top, 16px));
+      left: max(16px, env(safe-area-inset-left, 16px));
+      z-index: 999999;
+      display: flex;
+      gap: 8px;
+      user-select: none;
+      pointer-events: auto;
+    }
+
+    /* Top Right Controls Overlay */
     .top-right-ui {
       position: fixed;
       top: max(16px, env(safe-area-inset-top, 16px));
@@ -183,10 +209,10 @@
       pointer-events: none;
     }
 
-    /* Enlarged iPhone-Friendly Bottom Control Bar */
+    /* Massive Contact Button Container */
     .bottom-ui-container {
       position: fixed;
-      bottom: max(32px, env(safe-area-inset-bottom, 32px));
+      bottom: max(50px, env(safe-area-inset-bottom, 50px));
       left: 50%;
       transform: translateX(-50%);
       z-index: 999999;
@@ -196,68 +222,55 @@
       align-items: center;
       gap: 12px;
       pointer-events: auto;
-      width: clamp(300px, 90vw, 540px);
+      width: clamp(320px, 92vw, 600px);
     }
 
-    .ui-row {
-      display: flex;
-      flex-direction: row;
-      gap: 12px;
+    .contact-btn {
       width: 100%;
-    }
-
-    .ui-box {
-      flex: 1;
       box-sizing: border-box;
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-      font-size: 15px;
+      font-size: 22px;
       font-weight: 900;
       color: #ffffff !important;
       -webkit-text-fill-color: #ffffff !important;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.1em;
       user-select: none;
       -webkit-user-select: none;
-      padding: 16px 20px;
-      border-radius: 36px;
+      padding: 24px 20px;
+      border-radius: 50px;
       background-color: rgba(18, 18, 18, 0.95);
-      border: 2px solid rgba(255, 255, 255, 0.85);
+      border: 3px solid rgba(255, 255, 255, 0.9);
       -webkit-backdrop-filter: blur(12px);
       backdrop-filter: blur(12px);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.85), 0 0 12px rgba(255, 255, 255, 0.25);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9), 0 0 25px var(--ui-accent);
       text-align: center;
       white-space: nowrap;
       display: flex;
       justify-content: center;
       align-items: center;
       cursor: pointer;
-    }
-
-    .ui-box:active {
-      transform: scale(0.94);
-      background-color: rgba(255, 255, 255, 0.3);
-    }
-
-    .contact-btn {
-      width: 100%;
-      border-color: var(--ui-border);
-      box-shadow: 0 0 16px var(--ui-accent);
-      font-size: 15px;
       text-transform: uppercase;
+      transition: background-color 0.15s ease, transform 0.1s ease;
+    }
+
+    .contact-btn:active {
+      transform: scale(0.92);
+      background-color: rgba(255, 255, 255, 0.35);
     }
 
     .phase-bottom-banner {
       position: fixed;
-      bottom: max(108px, env(safe-area-inset-bottom, 108px));
+      bottom: max(140px, env(safe-area-inset-bottom, 140px));
       left: 50%;
       transform: translateX(-50%);
       z-index: 99999;
       font-family: 'Press Start 2P', monospace;
       font-size: 10px;
       letter-spacing: 0.15em;
-      color: rgba(255, 255, 255, 0.9);
-      background: rgba(0, 0, 0, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      padding: 8px 18px;
+      color: rgba(255, 255, 255, 0.95);
+      background: rgba(0, 0, 0, 0.85);
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      padding: 10px 20px;
       border-radius: 24px;
       cursor: pointer;
       user-select: none;
@@ -267,12 +280,12 @@
 
     .phase-bottom-banner:active {
       transform: translateX(-50%) scale(0.94);
-      background: rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.3);
     }
 
     .watermark-footer {
       position: fixed;
-      bottom: 8px;
+      bottom: 12px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 999999;
@@ -289,7 +302,7 @@
       display: none;
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.92);
+      background: rgba(0, 0, 0, 0.95);
       z-index: 9999999;
       justify-content: center;
       align-items: center;
@@ -298,9 +311,9 @@
     .modal-content {
       border: 2px solid var(--ui-border);
       background: #050a05;
-      padding: 30px;
+      padding: 40px;
       text-align: center;
-      box-shadow: 0 0 30px var(--ui-accent);
+      box-shadow: 0 0 40px var(--ui-accent);
       border-radius: 12px;
       max-width: 90vw;
     }
@@ -308,30 +321,45 @@
     .modal-content a {
       color: var(--ui-accent);
       text-decoration: none;
-      font-size: 1.2rem;
+      font-size: 1.4rem;
       display: block;
-      margin: 20px 0;
-      text-shadow: 0 0 8px var(--ui-accent);
+      margin: 24px 0;
+      text-shadow: 0 0 10px var(--ui-accent);
       word-break: break-all;
     }
 
     .close-btn {
       background: transparent;
-      border: 1px solid var(--ui-border);
+      border: 2px solid var(--ui-border);
       color: var(--ui-accent);
-      padding: 8px 20px;
+      padding: 10px 24px;
       font-family: inherit;
+      font-size: 1.1rem;
       cursor: pointer;
       border-radius: 6px;
+    }
+
+    .close-btn:active {
+      background: var(--ui-accent);
+      color: #000;
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Right UI Controls -->
+  <!-- Background Split Screen Area for Tapping -->
+  <div id="tap-prev" style="position:fixed; top:0; left:0; width:100vw; height:50vh; z-index:40; cursor:pointer;"></div>
+  <div id="tap-next" style="position:fixed; bottom:0; left:0; width:100vw; height:50vh; z-index:40; cursor:pointer;"></div>
+
+  <!-- Top Left UI (Mute) -->
+  <div class="top-left-ui">
+    <button id="audio-toggle" class="top-btn" onclick="toggleAudio(event)">🔇 90S KEYGEN</button>
+  </div>
+
+  <!-- Top Right UI Controls (Phase & Pause) -->
   <div class="top-right-ui">
     <div class="top-row-controls">
-      <div id="phase-badge-top" class="phase-badge-top" onclick="nextPhase()">PHASE 001</div>
+      <div id="phase-badge-top" class="phase-badge-top" onclick="nextPhase(event)">PHASE 001</div>
       <button id="pause-toggle" class="top-btn" onclick="toggleAutoAdvance(event)">⏸️ PAUSE</button>
     </div>
     <div id="visitor-box" class="visitor-counter">VISITS: 00666</div>
@@ -345,13 +373,10 @@
     </div>
   </div>
 
-  <div id="phase-bottom-banner" class="phase-bottom-banner" onclick="nextPhase()">RETRO SYSTEM</div>
+  <div id="phase-bottom-banner" class="phase-bottom-banner" onclick="nextPhase(event)">RETRO SYSTEM</div>
 
   <div class="bottom-ui-container">
-    <button id="contact-btn" class="ui-box contact-btn" onclick="toggleModal(true)">[ CONTACT ]</button>
-    <div class="ui-row">
-      <button id="audio-toggle" class="ui-box" onclick="toggleAudio(event)">🔇 90S KEYGEN CHIPTUNE</button>
-    </div>
+    <button id="contact-btn" class="contact-btn" onclick="toggleModal(true)">[ CONTACT ]</button>
   </div>
 
   <div class="watermark-footer">Copyright © 2026 DREW.WTF. All rights reserved.</div>
@@ -365,6 +390,14 @@
   </div>
 
   <script>
+    /* --- TAP NAVIGATION LOGIC --- */
+    document.getElementById('tap-prev').addEventListener('pointerdown', (e) => {
+      e.preventDefault(); prevPhase();
+    });
+    document.getElementById('tap-next').addEventListener('pointerdown', (e) => {
+      e.preventDefault(); nextPhase();
+    });
+
     /* --- FAST 90S KEYGEN CHIPTUNE SYNTHESIZER --- */
     let audioCtx = null;
     let masterGain = null;
@@ -411,23 +444,19 @@
       if (!isPlaying || !audioCtx || audioCtx.state !== 'running') return;
       const lookAhead = 0.1;
       const scheduleAheadTime = 0.2;
-      const noteTime = (60.0 / 140) / 2; // Fast 140 BPM Arpeggiated Keygen Tempo
+      const noteTime = (60.0 / 140) / 2;
 
       while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
-        // Fast Arp Lead
         const leadNote = keygenLeadPattern[currentStep % keygenLeadPattern.length];
         if (keygenNoteFreqs[leadNote]) {
           playKeygenNote(keygenNoteFreqs[leadNote], nextNoteTime, noteTime * 0.8, 'square', 0.06);
         }
-
-        // Driving Bass Line
         if (currentStep % 2 === 0) {
           const bassNote = keygenBassPattern[Math.floor(currentStep / 2) % keygenBassPattern.length];
           if (keygenNoteFreqs[bassNote]) {
             playKeygenNote(keygenNoteFreqs[bassNote] / 2, nextNoteTime, noteTime * 1.6, 'sawtooth', 0.09);
           }
         }
-
         nextNoteTime += noteTime;
         currentStep++;
       }
@@ -437,7 +466,6 @@
     function toggleAudio(e) {
       if (e) e.stopPropagation();
       const btn = document.getElementById("audio-toggle");
-
       if (!isPlaying) {
         if (!audioCtx) {
           audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -445,16 +473,14 @@
           masterGain.gain.value = 1;
           masterGain.connect(audioCtx.destination);
         }
-
         const start = () => {
           if (audioCtx.state !== 'running') return;
           nextNoteTime = audioCtx.currentTime + 0.05;
           currentStep = 0;
           isPlaying = true;
-          btn.textContent = '🔊 MUTE KEYGEN CHIPTUNE';
+          btn.textContent = '🔊 MUTE KEYGEN';
           scheduleKeygenTrack();
         };
-
         if (audioCtx.state === 'suspended') {
           audioCtx.resume().then(start).catch(start);
         } else {
@@ -463,7 +489,7 @@
       } else {
         isPlaying = false;
         if (timerID) clearTimeout(timerID);
-        btn.textContent = '🔇 90S KEYGEN CHIPTUNE';
+        btn.textContent = '🔇 90S KEYGEN';
       }
     }
 
@@ -494,7 +520,7 @@
 
     const scrambleFontStack = "'Noto Sans Devanagari','Noto Sans Arabic','Noto Sans Hebrew','Noto Sans Thai','Noto Sans SC','Noto Sans JP','Noto Sans KR', sans-serif";
 
-    /* --- CANVAS ANIMATION ENGINE --- */
+    /* --- TRIPPY LUCID CANVAS ANIMATION ENGINE --- */
     const canvas = document.getElementById("bg-canvas");
     const ctx = canvas.getContext("2d");
     let width, height, cx, cy;
@@ -512,56 +538,103 @@
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
 
-    // Visual Render States
     let snake = [{x: 10, y: 10}, {x: 9, y: 10}, {x: 8, y: 10}];
     let snakeDir = {x: 1, y: 0};
     let snakeFood = {x: 15, y: 15};
     let dinoY = 0, dinoVY = 0, cactusX = width;
     let matrixCols = [];
     let particles = [];
-    let fireworks = [];
-
     for (let i = 0; i < 200; i++) particles.push({ x: Math.random() * width, y: Math.random() * height, z: Math.random() * width });
 
     const renderers = {
-      hackery: () => {
-        ctx.fillStyle = "rgba(0, 10, 0, 0.2)"; ctx.fillRect(0, 0, width, height);
-        ctx.fillStyle = "#00ff66"; ctx.font = "14px 'Fira Code', monospace";
-        for (let i = 0; i < 12; i++) {
-          let y = (globalAngle * 200 + i * 40) % height;
-          ctx.fillText(`[ROOT@DREW-WTF]# sudo inject_payload_0x${Math.floor((i+globalAngle)*1000).toString(16)}`, 20, y);
+      rabbit_hole: () => {
+        ctx.fillStyle = "rgba(0,0,0,0.15)"; ctx.fillRect(0,0,width,height);
+        for(let i=15; i>0; i--) {
+           let radius = ((globalAngle * 60 + i * 40) % 600) * Math.max(0.1, Math.abs(Math.sin(globalAngle*0.5)+1.5));
+           ctx.beginPath();
+           ctx.arc(cx, cy, radius, 0, Math.PI*2);
+           ctx.strokeStyle = `hsl(${(globalAngle*150 + i*15)%360}, 100%, 50%)`;
+           ctx.lineWidth = 4 + (i%3);
+           ctx.stroke();
         }
       },
-      martha_stewart: () => {
-        ctx.fillStyle = "rgba(255, 245, 238, 0.25)"; ctx.fillRect(0, 0, width, height);
-        ctx.font = "32px serif";
-        for (let i = 0; i < 6; i++) {
-          let x = cx + Math.sin(globalAngle + i) * 180, y = cy + Math.cos(globalAngle + i) * 120;
-          ctx.fillText("🥧 🧵 🌿 ☕", x, y);
+      mad_hatter_teacups: () => {
+        ctx.fillStyle = "rgba(10,0,25,0.3)"; ctx.fillRect(0,0,width,height);
+        const icons = ["☕", "🍄", "🎩", "🕰️", "🐇", "🫖", "🃏"];
+        for(let i=0; i<icons.length; i++) {
+            let scale = Math.abs(Math.sin(globalAngle*2 + i)) * (Math.min(width,height)*0.8) + 20; 
+            let x = cx + Math.sin(globalAngle*1.5 + i*Math.PI/3) * (cx*0.7);
+            let y = cy + Math.cos(globalAngle*2.2 + i*Math.PI/3) * (cy*0.7);
+            ctx.font = `${scale}px serif`;
+            ctx.save();
+            ctx.translate(x,y);
+            ctx.rotate(globalAngle*(i%2==0?1:-1) + i);
+            ctx.fillText(icons[i], -scale/2, scale/2);
+            ctx.restore();
+        }
+      },
+      time_dilation: () => {
+        ctx.fillStyle = `hsla(${(globalAngle*30)%360}, 80%, 15%, 0.2)`; ctx.fillRect(0,0,width,height);
+        for(let i=0; i<8; i++) {
+            let lineY = cy + Math.sin(globalAngle*3 + i)*cy;
+            let thick = Math.abs(Math.cos(globalAngle + i))*100 + 2;
+            ctx.fillStyle = `hsl(${(globalAngle*100 + i*40)%360}, 100%, 60%)`;
+            ctx.fillRect(0, lineY - thick/2, width, thick);
+        }
+      },
+      fractal_shrooms: () => {
+        ctx.fillStyle = "rgba(0,10,0,0.3)"; ctx.fillRect(0,0,width,height);
+        for(let i=0; i<12; i++) {
+            let scale = Math.abs(Math.cos(globalAngle*1.2 + i*0.5)) * 300 + 10;
+            let x = cx + Math.sin(globalAngle*3 + i)*Math.tan(globalAngle*0.5 + i)*150;
+            let y = cy + Math.cos(globalAngle*2 + i)*Math.sin(globalAngle*1.5)*150;
+            ctx.font = `${scale}px serif`;
+            ctx.fillText("🍄", x % width, (y + height) % height);
+        }
+      },
+      checkerboard_warp: () => {
+        let size = Math.abs(Math.sin(globalAngle*0.8))*150 + 40;
+        for(let x=0; x<width; x+=size) {
+            for(let y=0; y<height; y+=size) {
+                let colorFlip = (Math.floor(x/size) + Math.floor(y/size) + Math.floor(globalAngle*5)) % 2;
+                ctx.fillStyle = colorFlip === 0 ? "#ff00aa" : "#00ffcc";
+                ctx.fillRect(x, y + Math.sin(globalAngle*4 + x)*30, size, size);
+            }
+        }
+      },
+      hackery: () => {
+        ctx.fillStyle = "rgba(0, 10, 0, 0.2)"; ctx.fillRect(0, 0, width, height);
+        ctx.fillStyle = "#00ff66"; ctx.font = "clamp(14px, 4vw, 32px) 'Fira Code', monospace";
+        for (let i = 0; i < 15; i++) {
+          let y = (globalAngle * 300 + i * 50) % height;
+          ctx.fillText(`[ROOT@DREW-WTF]# sudo inject_payload_0x${Math.floor((i+globalAngle)*1000).toString(16)}`, 20, y);
         }
       },
       phonk_drift: () => {
         ctx.fillStyle = "rgba(10, 0, 15, 0.3)"; ctx.fillRect(0, 0, width, height);
-        ctx.strokeStyle = "#ff0055"; ctx.lineWidth = 3;
+        ctx.strokeStyle = "#ff0055"; ctx.lineWidth = 6;
         ctx.beginPath(); ctx.moveTo(0, height * 0.8); ctx.lineTo(width, height * 0.8); ctx.stroke();
-        let carX = (globalAngle * 400) % (width + 100) - 50;
-        ctx.font = "36px serif"; ctx.fillText("🏎️💨", carX, height * 0.8 - 10);
+        let scale = Math.abs(Math.sin(globalAngle*8))*50 + 50;
+        let carX = (globalAngle * 800) % (width + 200) - 100;
+        ctx.font = `${scale}px serif`; ctx.fillText("🏎️💨", carX, height * 0.8 - scale/4);
       },
       cyberpunk_matrix: () => {
         ctx.fillStyle = "rgba(0,0,0,0.15)"; ctx.fillRect(0,0,width,height);
-        ctx.fillStyle = "#00ffff"; ctx.font = "16px monospace";
+        ctx.fillStyle = "#00ffff"; 
+        let mSize = Math.abs(Math.sin(globalAngle))*30 + 10;
+        ctx.font = `${mSize}px monospace`;
         if (matrixCols.length < Math.floor(width/20)) {
           for(let i=0;i<width/20;i++) matrixCols[i] = Math.random()*height;
         }
         matrixCols.forEach((y, i) => {
           ctx.fillText(String.fromCharCode(0x30A0 + Math.random()*96), i*20, y);
-          matrixCols[i] = y > height || Math.random() > 0.975 ? 0 : y + 20;
+          matrixCols[i] = y > height || Math.random() > 0.975 ? 0 : y + mSize;
         });
       },
       snake: () => {
         ctx.fillStyle = "rgba(0, 20, 0, 0.3)"; ctx.fillRect(0, 0, width, height);
-        const gs = 20;
-        if (Math.random() < 0.1) {
+        const gs = 30; // Bigger grid
+        if (Math.random() < 0.15) {
           const dirs = [{x:1,y:0},{x:-1,y:0},{x:0,y:1},{x:0,y:-1}];
           snakeDir = dirs[Math.floor(Math.random()*dirs.length)];
         }
@@ -569,118 +642,39 @@
         snake.unshift(head);
         if (Math.abs(head.x - snakeFood.x) < 1 && Math.abs(head.y - snakeFood.y) < 1) {
           snakeFood = {x: Math.floor(Math.random()*(width/gs)), y: Math.floor(Math.random()*(height/gs))};
-        } else if (snake.length > 15) { snake.pop(); }
+        } else if (snake.length > 25) { snake.pop(); }
         ctx.fillStyle = "#00ff00"; snake.forEach(p => ctx.fillRect(p.x*gs, p.y*gs, gs-2, gs-2));
         ctx.fillStyle = "#ff0000"; ctx.fillRect(snakeFood.x*gs, snakeFood.y*gs, gs-2, gs-2);
       },
-      hockey: () => {
-        ctx.fillStyle = "#112233"; ctx.fillRect(0, 0, width, height);
-        ctx.strokeStyle = "#ff0000"; ctx.lineWidth = 4;
-        ctx.beginPath(); ctx.arc(cx, cy, 80, 0, Math.PI*2); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, height); ctx.stroke();
-        let puckX = cx + Math.sin(globalAngle*3)*200;
-        let puckY = cy + Math.cos(globalAngle*2)*150;
-        ctx.fillStyle = "#000000"; ctx.beginPath(); ctx.arc(puckX, puckY, 15, 0, Math.PI*2); ctx.fill();
-      },
       casino: () => {
         ctx.fillStyle = "#1a0005"; ctx.fillRect(0, 0, width, height);
-        ctx.font = "40px serif";
+        let scale = Math.abs(Math.cos(globalAngle*2))*100 + 40;
+        ctx.font = `${scale}px serif`;
         const symbols = ["777", "🍒", "🍋", "🔔", "💎", "BAR"];
         for(let i=0; i<3; i++) {
-          let sym = symbols[Math.floor((globalAngle*5 + i)%symbols.length)];
-          ctx.fillStyle = "#ffcc00"; ctx.fillText(sym, cx - 120 + i*90, cy);
+          let sym = symbols[Math.floor((globalAngle*8 + i)%symbols.length)];
+          ctx.fillStyle = "#ffcc00"; 
+          ctx.fillText(sym, cx - (scale*1.5) + i*(scale*1.2), cy + scale/3);
         }
       },
-      angelic: () => {
-        ctx.fillStyle = "rgba(255, 255, 240, 0.1)"; ctx.fillRect(0, 0, width, height);
-        ctx.strokeStyle = "rgba(255, 215, 0, 0.3)"; ctx.lineWidth = 3;
-        for(let i=0; i<12; i++) {
-          ctx.beginPath(); ctx.moveTo(cx, cy);
-          ctx.lineTo(cx + Math.cos(globalAngle + i)*width, cy + Math.sin(globalAngle + i)*height);
-          ctx.stroke();
-        }
+      lsd_plasma: () => {
+        ctx.fillStyle = `hsl(${(globalAngle*80)%360}, 100%, 50%)`; ctx.fillRect(0,0,width,height);
       },
-      demonic: () => {
-        ctx.fillStyle = "rgba(20, 0, 0, 0.4)"; ctx.fillRect(0, 0, width, height);
-        ctx.strokeStyle = "#ff0000"; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.arc(cx, cy, 120, 0, Math.PI*2); ctx.stroke();
-        for(let i=0; i<5; i++) {
-          let a = (i * 4 * Math.PI / 5) - Math.PI/2;
-          let x = cx + 120 * Math.cos(a), y = cy + 120 * Math.sin(a);
-          if (i===0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-        }
-        ctx.closePath(); ctx.stroke();
-      },
-      dino: () => {
-        ctx.fillStyle = "#f7f7f7"; ctx.fillRect(0,0,width,height);
-        ctx.strokeStyle = "#535353"; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.moveTo(0, cy+50); ctx.lineTo(width, cy+50); ctx.stroke();
-        dinoVY += 1.2; dinoY += dinoVY;
-        if(dinoY >= 0) { dinoY = 0; dinoVY = 0; }
-        if(cactusX < 0 && Math.random()<0.05) { dinoVY = -16; }
-        cactusX -= 8; if(cactusX < -20) cactusX = width;
-        ctx.font = "30px serif"; ctx.fillText("🦖", cx - 100, cy + 45 + dinoY);
-        ctx.fillText("🌵", cactusX, cy + 48);
-      },
-      stars: () => {
-        ctx.fillStyle = "rgba(0,0,0,0.3)"; ctx.fillRect(0,0,width,height);
-        particles.forEach(p => {
-          p.z -= 6; if(p.z <= 0) p.z = width;
-          let sx = (p.x - cx) * (width/p.z) + cx, sy = (p.y - cy) * (width/p.z) + cy;
-          ctx.fillStyle = "#ffffff"; ctx.fillRect(sx, sy, 2, 2);
-        });
-      },
-      mushrooms: () => {
-        ctx.fillStyle = "rgba(10,0,20,0.2)"; ctx.fillRect(0,0,width,height);
-        ctx.font = "32px serif";
-        for(let i=0; i<8; i++) {
-          let x = cx + Math.sin(globalAngle + i)*150, y = cy + Math.cos(globalAngle + i)*150;
-          ctx.fillText("🍄", x, y);
-        }
-      },
-      lsd: () => {
-        ctx.fillStyle = `hsl(${(globalAngle*50)%360}, 80%, 20%)`; ctx.fillRect(0,0,width,height);
-      },
-      rain: () => {
+      acid_rain: () => {
         ctx.fillStyle = "rgba(0,5,15,0.3)"; ctx.fillRect(0,0,width,height);
-        ctx.strokeStyle = "#00ffff"; ctx.lineWidth = 1;
-        for(let i=0;i<30;i++) {
-          let x = (Math.sin(i*99)+1)*width/2, y = (globalAngle*500 + i*50)%height;
-          ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x,y+15); ctx.stroke();
+        ctx.strokeStyle = "#00ffff"; ctx.lineWidth = 3;
+        for(let i=0;i<40;i++) {
+          let scale = Math.abs(Math.sin(i+globalAngle))*100 + 10;
+          let x = (Math.sin(i*99)+1)*width/2, y = (globalAngle*800 + i*80)%height;
+          ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x,y+scale); ctx.stroke();
         }
-      },
-      tron: () => {
-        ctx.fillStyle = "#000510"; ctx.fillRect(0,0,width,height);
-        ctx.strokeStyle = "#00f0ff"; ctx.lineWidth = 1;
-        for(let x=0; x<width; x+=40) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,height); ctx.stroke(); }
-        for(let y=0; y<height; y+=40) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(width,y); ctx.stroke(); }
-      },
-      fireworks: () => {
-        ctx.fillStyle = "rgba(0,0,0,0.2)"; ctx.fillRect(0,0,width,height);
-        if(Math.random()<0.1) fireworks.push({x:Math.random()*width, y:Math.random()*height/2, r:2, c:`hsl(${Math.random()*360},100%,50%)`});
-        fireworks.forEach((f,i) => {
-          ctx.beginPath(); ctx.arc(f.x,f.y,f.r,0,Math.PI*2); ctx.fillStyle = f.c; ctx.fill(); f.r += 2;
-          if(f.r > 30) fireworks.splice(i,1);
-        });
-      },
-      geocities: () => {
-        ctx.fillStyle = "#000080"; ctx.fillRect(0,0,width,height);
-        ctx.font = "20px 'Comic Sans MS', cursive"; ctx.fillStyle = "#ffff00";
-        ctx.fillText("UNDER CONSTRUCTION!", cx-120, cy);
-      },
-      pong: () => {
-        ctx.fillStyle = "#000000"; ctx.fillRect(0,0,width,height);
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(20, cy + Math.sin(globalAngle*3)*100, 10, 60);
-        ctx.fillRect(width-30, cy + Math.cos(globalAngle*3)*100, 10, 60);
-        ctx.fillRect(cx + Math.sin(globalAngle*2)*200, cy + Math.cos(globalAngle*4)*100, 10, 10);
       }
     };
 
     const rendererKeys = Object.keys(renderers);
 
     function animateCanvas() {
-      globalAngle += 0.02;
+      globalAngle += 0.015;
       let currentRendererKey = rendererKeys[(currentPhase - 1) % rendererKeys.length];
       if(renderers[currentRendererKey]) renderers[currentRendererKey]();
       requestAnimationFrame(animateCanvas);
@@ -688,16 +682,14 @@
 
     /* --- 300 PROCEDURAL PHASES SYSTEM --- */
     const phaseNames = [
-      "HACKER TERMINAL", "MARTHA STEWART COTTAGE", "PHONK DRIFT ZONE", "CYBERPUNK MATRIX",
-      "SNAKE AUTOMATA", "HOCKEY RINK", "CASINO JACKPOT", "ANGELIC LIGHTS",
-      "DEMONIC REALM", "OFFLINE DINO", "HYPERSPACE WARP", "SHROOM TRIP",
-      "LSD PLASMA", "ACID RAIN", "TRON GRID", "FIREWORKS DISPLAY",
-      "GEOCITIES 2000", "PONG PROTOCOL"
+      "MAD HATTER TEACUPS", "RABBIT HOLE", "FRACTAL SHROOMS", "TIME DILATION",
+      "CHECKERBOARD WARP", "HACKER TERMINAL", "PHONK DRIFT ZONE", "CYBERPUNK MATRIX",
+      "SNAKE AUTOMATA", "CASINO JACKPOT", "LSD PLASMA", "ACID RAIN"
     ];
 
     const phaseColors = [
       "#000000", "#1a0f00", "#0a0015", "#000a10", "#001005",
-      "#000000", "#1877f2", "#ffff00", "#00ffcc", "#ff007f", "#150022"
+      "#1877f2", "#ffff00", "#00ffcc", "#ff007f", "#150022"
     ];
 
     let currentPhase = 1;
@@ -736,15 +728,15 @@
       }, 40);
     }
 
-    function prevPhase() { setPhase(currentPhase - 1); resetPhaseTimer(); }
-    function nextPhase() { setPhase(currentPhase + 1); resetPhaseTimer(); }
+    function prevPhase(e) { if(e) e.stopPropagation(); setPhase(currentPhase - 1); resetPhaseTimer(); }
+    function nextPhase(e) { if(e) e.stopPropagation(); setPhase(currentPhase + 1); resetPhaseTimer(); }
 
     function resetPhaseTimer() {
       if (phaseTimer) clearInterval(phaseTimer);
       if (!autoAdvancePaused) {
         phaseTimer = setInterval(() => {
           nextPhase();
-        }, 30000); // 30 seconds
+        }, 30000);
       }
     }
 
@@ -755,7 +747,6 @@
       resetPhaseTimer();
     }
 
-    /* --- INPUT CONTROLS --- */
     let isScrolling = false;
     window.addEventListener("wheel", (e) => {
       if (isScrolling) return;
@@ -772,7 +763,7 @@
       document.getElementById('contact-modal').style.display = show ? 'flex' : 'none';
     }
 
-    /* --- DREW.WTF + DREW.666 + MULTI-SCRIPT MORPH ENGINE --- */
+    /* --- DREW.WTF + MULTI-SCRIPT MORPH ENGINE --- */
     const langVariants = [
       { left: "DREW",     right: "666",              font: "'Press Start 2P', monospace" },
       { left: "DREW",     right: "777",              font: "'Orbitron', sans-serif" },
@@ -847,3 +838,5 @@
   </script>
 </body>
 </html>
+
+```
