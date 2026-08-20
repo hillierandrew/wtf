@@ -369,7 +369,7 @@ body::after{
       id="phase-box"
       class="ui-small phase-box"
       onclick="nextPhase()">
-      001: OUTRUN
+      001: GAME BOY CLASSIC
     </div>
 
   </div>
@@ -408,7 +408,7 @@ body::after{
     id="contact-btn"
     class="contact-btn"
     onclick="toggleModal(true)">
-    [ INITIALIZE HANDSHAKE ]
+    [ PRESS START ]
   </button>
 
   <button
@@ -452,7 +452,7 @@ body::after{
 <script>
 
 /* =========================================================
-   AUDIO
+   AUDIO (8-BIT ARCADE / CHIPTUNE LOOP ENGINE)
    ========================================================= */
 
 let audioCtx=null;
@@ -608,37 +608,53 @@ resize();
 
 
 /* =========================================================
-   PHASES
+   PHASES (INCLUDES GAME BOY, SEGA, NINTENDO 64 STYLES)
    ========================================================= */
 
 const phases=[
-  { name:"OUTRUN 198X", bg:"#08000f", mode:"outrun" },
-  { name:"CYBERPUNK NEURAL NET", bg:"#000810", mode:"tron" },
-  { name:"DOS.EXE", bg:"#000", mode:"dos" },
-  { name:"FACEBOOK 2008", bg:"#f0f2f5", mode:"facebook" },
-  { name:"MATRIX RAIN", bg:"#001000", mode:"matrix" },
-  { name:"MUSHROOM DIMENSION", bg:"#160020", mode:"mushrooms" },
-  { name:"ACID PLASMA", bg:"#150010", mode:"plasma" },
-  { name:"GEOCITIES", bg:"#000080", mode:"geocities" },
-  { name:"CHROME OFFLINE", bg:"#fff", mode:"dino" },
-  { name:"DVD SCREENSAVER", bg:"#000", mode:"dvd" },
-  { name:"FIREWORKS", bg:"#000", mode:"fireworks" },
-  { name:"ASCII FIRE", bg:"#100000", mode:"fire" },
-  { name:"RAIN", bg:"#000814", mode:"rain" },
-  { name:"SPACE INVADERS", bg:"#000", mode:"invaders" },
-  { name:"PONG", bg:"#000", mode:"pong" },
-  { name:"SNAKE", bg:"#001000", mode:"snake" },
-  { name:"HOCKEY NIGHT", bg:"#06121a", mode:"hockey" },
-  { name:"CASINO", bg:"#100000", mode:"casino" },
-  { name:"ANGELIC SIGNAL", bg:"#071020", mode:"angel" },
-  { name:"DEMONIC CHANNEL", bg:"#120000", mode:"demon" },
-  { name:"AQUARIUM", bg:"#001525", mode:"aquarium" },
-  { name:"AURORA", bg:"#00120e", mode:"aurora" },
-  { name:"BLACK HOLE", bg:"#000", mode:"blackhole" },
-  { name:"DISCO", bg:"#080008", mode:"disco" },
-  { name:"VOLCANO", bg:"#140300", mode:"volcano" },
-  { name:"SNOWGLOBE", bg:"#06101a", mode:"snow" },
-  { name:"PROFESSIONAL PORTFOLIO", bg:"#050505", mode:"clean" }
+  { name:"GAME BOY CLASSIC", bg:"#0f380f", mode:"gameboy", contact:"[ PRESS START ]" },
+  { name:"SEGA GENESIS 16-BIT", bg:"#000033", mode:"sega", contact:"[ COLLECT 100 RINGS ]" },
+  { name:"NINTENDO 64 POLYGON", bg:"#110022", mode:"n64", contact:"[ FIND THE TRIFORCE ]" },
+  { name:"OUTRUN 198X", bg:"#08000f", mode:"outrun", contact:"[ INITIALIZE HANDSHAKE ]" },
+  { name:"CYBERPUNK NEURAL NET", bg:"#000810", mode:"tron", contact:"[ PING HOST ]" },
+  { name:"DOS.EXE", bg:"#000", mode:"dos", contact:"[ EXECUTE TALK.EXE ]" },
+  { name:"FACEBOOK 2008", bg:"#f0f2f5", mode:"facebook", contact:"[ SEND MESSAGE ]" },
+  { name:"MATRIX RAIN", bg:"#001000", mode:"matrix", contact:"[ JACK IN ]" },
+  { name:"MUSHROOM DIMENSION", bg:"#160020", mode:"mushrooms", contact:"[ TRANSMIT VIBES ]" },
+  { name:"ACID PLASMA", bg:"#150010", mode:"plasma", contact:"[ PROJECT ASTRAL BODY ]" },
+  { name:"GEOCITIES", bg:"#000080", mode:"geocities", contact:"[ SIGN GUESTBOOK ]" },
+  { name:"CHROME OFFLINE", bg:"#fff", mode:"dino", contact:"[ RUN FROM INTERNET ]" },
+  { name:"DVD SCREENSAVER", bg:"#000", mode:"dvd", contact:"[ WAIT FOR CORNER HIT ]" },
+  { name:"FIREWORKS", bg:"#000", mode:"fireworks", contact:"[ LAUNCH MESSAGE ]" },
+  { name:"ASCII FIRE", bg:"#100000", mode:"fire", contact:"[ SEND SMOKE SIGNAL ]" },
+  { name:"RAIN", bg:"#000814", mode:"rain", contact:"[ SEND MESSAGE ]" },
+  { name:"SPACE INVADERS", bg:"#000", mode:"invaders", contact:"[ ATTACK ]" },
+  { name:"PONG", bg:"#000", mode:"pong", contact:"[ CHALLENGE DREW ]" },
+  { name:"SNAKE", bg:"#001000", mode:"snake", contact:"[ FEED THE SNAKE ]" },
+  { name:"HOCKEY NIGHT", bg:"#06121a", mode:"hockey", contact:"[ DROP THE PUCK ]" },
+  { name:"CASINO", bg:"#100000", mode:"casino", contact:"[ PLACE MESSAGE ]" },
+  { name:"ANGELIC SIGNAL", bg:"#071020", mode:"angel", contact:"[ SEND TELEPATHICALLY ]" },
+  { name:"DEMONIC CHANNEL", bg:"#120000", mode:"demon", contact:"[ SUMMON DREW ]" },
+  { name:"AQUARIUM", bg:"#001525", mode:"aquarium", contact:"[ SEND BOTTLE ]" },
+  { name:"AURORA", bg:"#00120e", mode:"aurora", contact:"[ BEAM MESSAGE ]" },
+  { name:"BLACK HOLE", bg:"#000", mode:"blackhole", contact:"[ TRANSMIT INTO VOID ]" },
+  { name:"DISCO", bg:"#080008", mode:"disco", contact:"[ SEND GOOD VIBES ]" },
+  { name:"VOLCANO", bg:"#140300", mode:"volcano", contact:"[ SHOUT VERY LOUDLY ]" },
+  { name:"SNOWGLOBE", bg:"#06101a", mode:"snow", contact:"[ SHAKE THE GLOBE ]" },
+  { name:"PROFESSIONAL PORTFOLIO", bg:"#050505", mode:"clean", contact:"[ CONTACT ]" }
+];
+
+const contactVariants=[
+  "[ CONTACT ]", "[ CALL ]", "[ PING HOST ]", "[ TRANSMIT DATA ]",
+  "[ INITIALIZE HANDSHAKE ]", "[ DIAL-UP 56K ]", "[ SEND EMAIL ]",
+  "[ EXECUTE TALK.EXE ]", "[ SEND TELEPATHICALLY ]", "[ TELEPORT MESSAGE ]",
+  "[ PROJECT ASTRAL BODY ]", "[ COMMUNICATE VIA DREAMS ]", "[ TRANSMIT VIBES ]",
+  "[ BEAM UP ]", "[ SEND SMOKE SIGNAL ]", "[ KNOCK ON DOOR ]",
+  "[ DISPATCH CARRIER PIGEON ]", "[ WRITE PARCHMENT LETTER ]", "[ SHOUT VERY LOUDLY ]",
+  "[ RING DOORBELL ]", "[ SEND MORSE CODE ]", "[ THROW BOTTLE IN OCEAN ]",
+  "[ PET THE CAT ]", "[ BARK AT DOOR ]", "[ PRESS F TO PAY RESPECTS ]",
+  "[ SUMMON DREW ]", "[ BLINK TWICE ]", "[ SEND POKE ]",
+  "[ PRESS START ]", "[ COLLECT 100 RINGS ]", "[ FIND THE TRIFORCE ]", "[ CATCH 'EM ALL ]"
 ];
 
 const allPhases=[];
@@ -648,7 +664,8 @@ for(let i=0;i<300;i++){
   allPhases.push({
     name: cycle===0 ? base.name : `${base.name} // ${String(cycle+1).padStart(2,"0")}`,
     bg: base.bg,
-    mode: base.mode
+    mode: base.mode,
+    contact: contactVariants[i%contactVariants.length]
   });
 }
 
@@ -662,6 +679,17 @@ let snake=[{x:10,y:10},{x:9,y:10},{x:8,y:10}];
 let snakeDir={x:1,y:0};
 let snakeFood={x:15,y:8};
 
+const randomPhaseFonts = [
+  "'Press Start 2P', monospace",
+  "'Orbitron', sans-serif",
+  "'Russo One', sans-serif",
+  "'Permanent Marker', cursive",
+  "'Cinzel', serif",
+  "'Comic Neue', cursive",
+  "'VT323', monospace",
+  "'Fira Code', monospace"
+];
+
 function setPhase(index){
   index=((index%allPhases.length)+allPhases.length)%allPhases.length;
   currentPhase=index;
@@ -670,10 +698,15 @@ function setPhase(index){
   document.body.style.backgroundColor=phase.bg;
   document.documentElement.style.setProperty("--accent", phase.mode==="facebook" ? "#1877f2" : "#ff1111");
   document.getElementById("phase-box").textContent=`${String(index+1).padStart(3,"0")}: ${phase.name}`;
+  document.getElementById("contact-btn").textContent=phase.contact;
+  
+  const titleEl = document.getElementById("scramble-text");
+  titleEl.style.fontFamily = randomPhaseFonts[index % randomPhaseFonts.length];
+
   if(phase.mode==="facebook"){
-    document.getElementById("scramble-text").style.color="#1877f2";
+    titleEl.style.color="#1877f2";
   }else{
-    document.getElementById("scramble-text").style.color="#ffaaaa";
+    titleEl.style.color="#ffaaaa";
   }
   fireworks=[];
   snake=[{x:10,y:10},{x:9,y:10},{x:8,y:10}];
@@ -707,6 +740,60 @@ function togglePause(e){
 function clearScreen(alpha=.25){
   ctx.fillStyle=`rgba(0,0,0,${alpha})`;
   ctx.fillRect(0,0,width,height);
+}
+
+function drawGameBoy(){
+  ctx.fillStyle="#8bac0f";
+  ctx.fillRect(0,0,width,height);
+  ctx.fillStyle="#0f380f";
+  ctx.font="20px 'Press Start 2P', monospace";
+  ctx.fillText("NINTENDO GAME BOY", 40, 60);
+  ctx.font="14px monospace";
+  for(let i=0; i<15; i++){
+    ctx.fillText("TM & © 1989 NINTENDO", (i*200 - angle*50)%width, height - 40);
+  }
+  for(let x=0; x<width; x+=40){
+    for(let y=0; y<height; y+=40){
+      ctx.fillRect(x, y, 2, 2);
+    }
+  }
+}
+
+function drawSega(){
+  ctx.fillStyle="#000033";
+  ctx.fillRect(0,0,width,height);
+  ctx.fillStyle="#ff0000";
+  ctx.font="bold 50px 'Press Start 2P'";
+  ctx.fillText("SEGA", cx-70, 80);
+  ctx.fillStyle="#00ffcc";
+  const horizon = height * 0.6;
+  for(let x=-width; x<width*2; x+=60){
+    let xx = x + ((angle*100)%60);
+    ctx.fillRect(xx, horizon, 30, height - horizon);
+  }
+}
+
+function drawN64(){
+  ctx.fillStyle="#110022";
+  ctx.fillRect(0,0,width,height);
+  ctx.strokeStyle="#ffff00";
+  ctx.lineWidth=4;
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(angle);
+  ctx.beginPath();
+  for(let i=0; i<3; i++){
+    let a = i * ((Math.PI*2)/3);
+    let x = Math.cos(a)*100;
+    let y = Math.sin(a)*100;
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.closePath();
+  ctx.stroke();
+  ctx.restore();
+  ctx.fillStyle="#ffff00";
+  ctx.font="20px 'Press Start 2P'";
+  ctx.fillText("N64 POLYGON ENGINE", 30, 50);
 }
 
 function drawOutrun(){
@@ -1069,6 +1156,9 @@ function render(){
   if(!paused){
     angle+=.018;
     switch(currentMode){
+      case"gameboy": drawGameBoy(); break;
+      case"sega": drawSega(); break;
+      case"n64": drawN64(); break;
       case"outrun": drawOutrun(); break;
       case"tron": drawTron(); break;
       case"dos": drawDOS(); break;
@@ -1124,6 +1214,10 @@ const funnyHandshakes = [
   "[ SLIDE IN DMs ]",
   "[ HONK HORN ]",
   "[ WHISTLE LOUDLY ]",
+  "[ PRESS START ]",
+  "[ COLLECT 100 RINGS ]",
+  "[ FIND THE TRIFORCE ]",
+  "[ CATCH 'EM ALL ]",
   "[ INITIALIZE HANDSHAKE ]"
 ];
 
@@ -1145,10 +1239,14 @@ setInterval(cycleHandshakeButton, 7000);
 
 
 /* =========================================================
-   LANGUAGE MORPH
+   ENDLESS GLITCH & MORPH ENGINE (DEMON.WTF, DREW.FTW, ETC.)
    ========================================================= */
 
 const variants=[
+  { left:"DEMON", right:"WTF", font:"'Russo One', sans-serif" },
+  { left:"DREW", right:"FTW", font:"'Press Start 2P', monospace" },
+  { left:"EVIL", right:"WTF", font:"'Permanent Marker', cursive" },
+  { left:"DREW", right:"EXE", font:"'VT323', monospace" },
   { left:"ड्रू", right:"डब्ल्यूटीएफ", font:"'Noto Sans Devanagari',sans-serif" },
   { left:"ڈریو", right:"ڈبلیو ٹی ایف", font:"'Noto Sans Arabic',sans-serif" },
   { left:"德鲁", right:"网站", font:"'Noto Sans SC',sans-serif" },
@@ -1156,11 +1254,7 @@ const variants=[
   { left:"드류", right:"더블유티에프", font:"'Noto Sans KR',sans-serif" },
   { left:"דרו", right:"וטף", font:"'Noto Sans Hebrew',sans-serif" },
   { left:"ДРЕВ", right:"ВТФ", font:"'Courier New',monospace" },
-  { left:"✞☠✟♰", right:"☣☢☠♱", font:"'Courier New',monospace" },
-  { left:"666", right:"EVIL", font:"'Permanent Marker',cursive" },
-  { left:"FACE", right:"BOOK", font:"Arial,sans-serif" },
-  { left:"ACID", right:"TRIP", font:"'Fira Code',monospace" },
-  { left:"SPACE", right:"INVADER", font:"'VT323',monospace" }
+  { left:"✞☠✟♰", right:"☣☢☠♱", font:"'Courier New',monospace" }
 ];
 
 const glitchChars=[
@@ -1201,7 +1295,7 @@ function runMorph(){
       wtf.textContent=randomize(variant.right);
       frame++;
 
-      if(frame>=20){
+      if(frame>=18){
         clearInterval(morphInterval);
         title.style.fontFamily=variant.font;
         drew.textContent=variant.left;
@@ -1212,15 +1306,24 @@ function runMorph(){
         }
 
         morphTimer=setTimeout(()=>{
-          title.className="title";
-          title.style.fontFamily="'Courier New',monospace";
-          drew.textContent="DREW";
-          wtf.textContent="WTF";
-          if(!paused){ runMorph(); }
-        },1600);
+          let returnFrame=0;
+          const returnInterval=setInterval(()=>{
+            drew.textContent=randomize("DREW");
+            wtf.textContent=randomize("WTF");
+            returnFrame++;
+            if(returnFrame>=12){
+              clearInterval(returnInterval);
+              title.className="title";
+              title.style.fontFamily="'Courier New',monospace";
+              drew.textContent="DREW";
+              wtf.textContent="WTF";
+              if(!paused){ runMorph(); }
+            }
+          },45);
+        },2000);
       }
     },50);
-  },4000);
+  },3000);
 }
 
 
