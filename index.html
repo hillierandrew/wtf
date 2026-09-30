@@ -2,19 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>DREW.WTF — Unhinged Hardware Freedom</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>DREW.WTF — Wow That's Fantastic</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Courier+Prime:wght@700&family=Inter:wght@300;400;600;900&family=JetBrains+Mono:wght@400;700&family=Syne:wght@800&display=swap" rel="stylesheet">
 
   <style>
     :root {
       --bg-dark: #080808;
-      --card-bg: rgba(16, 16, 16, 0.85);
-      --border-color: rgba(255, 255, 255, 0.12);
-      --border-hover: rgba(255, 255, 255, 0.4);
+      --card-bg: rgba(16, 16, 16, 0.88);
+      --border-color: rgba(255, 255, 255, 0.14);
+      --border-hover: rgba(255, 255, 255, 0.45);
       --text-main: #f5f5f5;
       --text-muted: #888888;
       --ecg-green: #00ff66;
@@ -26,6 +26,7 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      -webkit-tap-highlight-color: transparent;
     }
 
     html {
@@ -43,7 +44,7 @@
       position: relative;
     }
 
-    /* --- OBSCURA PRELOADER INTRO --- */
+    /* PRELOADER INTRO SCREEN - STAYS UNTIL SCROLL */
     #preloader {
       position: fixed;
       top: 0; left: 0;
@@ -53,11 +54,12 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 3rem 2rem;
+      padding: clamp(1.5rem, 5vw, 3rem);
       transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.8s ease;
+      touch-action: none;
     }
 
-    #preloader.loaded {
+    #preloader.dismissed {
       transform: translateY(-100%);
       opacity: 0;
       pointer-events: none;
@@ -65,11 +67,13 @@
 
     .loader-center-brand {
       margin: auto;
-      font-size: clamp(3rem, 10vw, 8rem);
+      font-size: clamp(2.2rem, 10vw, 7.5rem);
       font-weight: 900;
       letter-spacing: -0.04em;
       color: #fff;
       text-transform: uppercase;
+      text-align: center;
+      white-space: nowrap;
     }
 
     .loader-bottom {
@@ -77,19 +81,27 @@
       justify-content: space-between;
       align-items: flex-end;
       font-family: var(--font-mono);
+      width: 100%;
     }
 
     .loader-counter {
-      font-size: clamp(2.5rem, 6vw, 5rem);
+      font-size: clamp(2rem, 6vw, 4.5rem);
       font-weight: 300;
       color: #fff;
     }
 
-    .loader-sub {
-      font-size: 0.8rem;
-      color: var(--text-muted);
+    .loader-prompt {
+      font-size: 0.85rem;
+      color: var(--ecg-green);
       letter-spacing: 0.15em;
       text-transform: uppercase;
+      animation: flash-prompt 1.2s infinite alternate;
+      cursor: pointer;
+    }
+
+    @keyframes flash-prompt {
+      0% { opacity: 0.3; }
+      100% { opacity: 1; }
     }
 
     /* Background Canvas */
@@ -99,7 +111,7 @@
       width: 100vw; height: 100vh;
       z-index: 1;
       display: block;
-      opacity: 0.5;
+      opacity: 0.45;
       pointer-events: none;
     }
 
@@ -111,49 +123,22 @@
       z-index: 2;
     }
 
-    /* Floating Image Hover Preview Effect */
-    #hover-preview {
-      position: fixed;
-      width: 260px;
-      height: 260px;
-      pointer-events: none;
-      z-index: 8;
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(0.8);
-      transition: opacity 0.25s ease, transform 0.25s ease;
-      border-radius: 8px;
-      overflow: hidden;
-      border: 1px solid var(--border-hover);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-      background: #111;
-    }
-
-    #hover-preview.active {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-    }
-
-    #hover-preview img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      filter: grayscale(100%) contrast(150%);
-    }
-
     /* Site Container */
     .site-wrapper {
       position: relative;
       z-index: 10;
       max-width: 1200px;
       margin: 0 auto;
-      padding: 2rem 1.5rem;
+      padding: clamp(1rem, 3vw, 2rem);
     }
 
-    /* Fixed Top Nav Bar */
+    /* Navigation Header */
     header {
       position: sticky;
       top: 0;
-      background: rgba(8, 8, 8, 0.85);
-      backdrop-filter: blur(12px);
+      background: rgba(8, 8, 8, 0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       z-index: 100;
       width: 100%;
       display: flex;
@@ -165,7 +150,9 @@
       letter-spacing: 0.05em;
       color: var(--text-muted);
       border-bottom: 1px solid var(--border-color);
-      padding: 1.2rem 0;
+      padding: 1rem 0;
+      flex-wrap: wrap;
+      gap: 0.8rem;
     }
 
     .brand-logo {
@@ -174,34 +161,30 @@
       text-decoration: none;
       letter-spacing: 0.1em;
       font-size: 1.1rem;
+      display: inline-block;
+      white-space: nowrap;
     }
 
-    .nav-links {
+    .header-right {
       display: flex;
-      gap: 1.5rem;
       align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
     }
-
-    .nav-links a {
-      color: var(--text-muted);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-
-    .nav-links a:hover { color: var(--text-main); }
 
     .header-btns {
       display: flex;
-      gap: 0.8rem;
+      gap: 0.6rem;
       align-items: center;
     }
 
     .action-btn {
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid var(--border-color);
-      border-radius: 50%;
-      width: 38px; height: 38px;
-      font-size: 1.1rem;
+      border-radius: 20px;
+      padding: 0.4rem 0.9rem;
+      font-size: 0.8rem;
+      font-family: var(--font-mono);
       cursor: pointer;
       display: flex;
       justify-content: center;
@@ -210,19 +193,16 @@
       color: #fff;
     }
 
-    .action-btn:hover {
-      transform: scale(1.1);
-      background: rgba(255, 255, 255, 0.22);
-    }
+    .action-btn:active { transform: scale(0.92); }
 
-    /* Audio ECG Monitor Banner */
+    /* REAL LIVE AUDIO VISUALIZER & ECG BANNER */
     .audio-monitor-bar {
       width: 100%;
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.7);
       border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 0.75rem 1.2rem;
-      margin-top: 1.5rem;
+      border-radius: 10px;
+      padding: 0.8rem 1.2rem;
+      margin-top: 1rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -236,6 +216,7 @@
       align-items: center;
       gap: 0.75rem;
       flex: 1;
+      min-width: 200px;
     }
 
     .pulse-dot {
@@ -251,9 +232,12 @@
       50% { transform: scale(1.4); opacity: 1; }
     }
 
-    #ecg-canvas {
-      height: 28px;
-      width: 200px;
+    #visualizer-canvas {
+      height: 36px;
+      width: 100%;
+      max-width: 240px;
+      background: rgba(0,0,0,0.4);
+      border-radius: 4px;
     }
 
     .track-info {
@@ -265,19 +249,20 @@
 
     /* Hero Section */
     .hero-section {
-      padding: 6rem 0 4rem 0;
+      padding: clamp(2rem, 6vw, 4rem) 0 2rem 0;
     }
 
     .hero-tag {
       font-family: var(--font-mono);
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: var(--text-muted);
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.2rem;
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      flex-wrap: wrap;
     }
 
     .hero-tag::before {
@@ -287,34 +272,68 @@
       border-radius: 50%;
     }
 
-    .hero-giant-title {
-      font-size: clamp(3rem, 9.5vw, 7.5rem);
-      font-weight: 900;
-      line-height: 0.95;
-      letter-spacing: -0.04em;
-      text-transform: uppercase;
-      margin-bottom: 2rem;
-      cursor: default;
-    }
-
-    .hero-giant-title span {
-      display: block;
-      transition: color 0.3s ease;
-    }
-
-    .hero-giant-title span:hover {
+    /* WOW THAT'S FANTASTIC TRANSLATION BANNER */
+    .wtf-meaning-banner {
+      font-family: var(--font-mono);
+      font-size: clamp(0.85rem, 2vw, 1.1rem);
       color: var(--ecg-green);
+      background: rgba(0, 255, 102, 0.06);
+      border-left: 3px solid var(--ecg-green);
+      padding: 0.6rem 1rem;
+      margin-bottom: 1.5rem;
+      border-radius: 0 6px 6px 0;
+      transition: opacity 0.3s ease;
     }
+
+    /* TITLE WRAPPING FIXED FOR ALL DEVICES */
+    .title-wrapper {
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .hero-cycling-title {
+      font-size: clamp(2.8rem, 8.5vw, 6.5rem);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      white-space: nowrap;
+      transition: font-family 0.2s ease, color 0.2s ease;
+      cursor: pointer;
+      display: inline-block;
+      max-width: 100%;
+    }
+
+    .font-style-0 { font-family: 'Inter', sans-serif; font-weight: 900; }
+    .font-style-1 { font-family: 'JetBrains Mono', monospace; letter-spacing: -0.06em; }
+    .font-style-2 { font-family: 'Cinzel', serif; font-weight: 700; color: #ff3366; }
+    .font-style-3 { font-family: 'Courier Prime', monospace; text-shadow: 0 0 12px var(--ecg-green); }
+    .font-style-4 { font-family: 'Syne', sans-serif; letter-spacing: 0.01em; }
 
     .subline {
-      font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+      font-size: clamp(1rem, 2.2vw, 1.4rem);
       font-weight: 300;
       color: var(--text-muted);
       max-width: 820px;
       line-height: 1.5;
     }
 
-    /* Case Study / Manifesto Portfolio Section */
+    /* Mobile Quick FX Controls Bar */
+    .mobile-fx-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(20, 20, 20, 0.8);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+    }
+
+    /* Manifesto Section */
     .section-label {
       font-family: var(--font-mono);
       font-size: 0.8rem;
@@ -323,172 +342,93 @@
       text-transform: uppercase;
       border-bottom: 1px solid var(--border-color);
       padding-bottom: 0.8rem;
-      margin: 6rem 0 3rem 0;
+      margin: 3.5rem 0 2rem 0;
     }
 
     .portfolio-grid {
       display: flex;
       flex-direction: column;
-      gap: 4rem;
+      gap: 2rem;
     }
 
     .portfolio-card {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       border-radius: 12px;
-      padding: 2rem;
-      align-items: center;
+      padding: 1.8rem;
       transition: border-color 0.3s;
     }
 
-    .portfolio-card:hover {
-      border-color: var(--border-hover);
-    }
+    .portfolio-card:hover { border-color: var(--border-hover); }
 
     .card-meta {
       font-family: var(--font-mono);
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: var(--text-muted);
-      margin-bottom: 1rem;
+      margin-bottom: 0.8rem;
     }
 
     .card-title {
-      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-size: clamp(1.4rem, 3.5vw, 2.2rem);
       font-weight: 700;
-      margin-bottom: 1rem;
+      margin-bottom: 0.8rem;
     }
 
     .card-desc {
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       color: var(--text-muted);
-      line-height: 1.6;
-      margin-bottom: 1.5rem;
+      line-height: 1.55;
     }
 
-    .card-img-box {
-      width: 100%;
-      height: 280px;
-      background: #121212;
+    /* Social Links Grid */
+    .socials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 0.8rem;
+    }
+
+    .social-link-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.8rem 1rem;
+      background: rgba(255, 255, 255, 0.04);
       border: 1px solid var(--border-color);
       border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .card-img-box img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-    }
-
-    /* Services Accordion List */
-    .services-list {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .service-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1.8rem 0;
-      border-bottom: 1px solid var(--border-color);
-      font-size: clamp(1.2rem, 3vw, 2.2rem);
-      font-weight: 500;
-      cursor: pointer;
-      transition: color 0.2s, padding-left 0.2s;
-    }
-
-    .service-row:hover {
-      color: var(--ecg-green);
-      padding-left: 1rem;
-    }
-
-    /* QR Code Upload Section */
-    .qr-section {
-      margin-top: 5rem;
-      background: rgba(12, 12, 12, 0.7);
-      border: 1px dashed var(--border-color);
-      border-radius: 12px;
-      padding: 2.5rem;
-      text-align: center;
-    }
-
-    .qr-grid {
-      display: flex;
-      justify-content: center;
-      gap: 2rem;
-      flex-wrap: wrap;
-      margin-top: 1.5rem;
-    }
-
-    .qr-box {
-      width: 150px;
-      height: 150px;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      background: rgba(0,0,0,0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.5rem;
+      color: var(--text-main);
+      text-decoration: none;
       font-family: var(--font-mono);
-      font-size: 0.7rem;
-      color: var(--text-muted);
+      font-size: 0.8rem;
+      transition: background 0.2s, border-color 0.2s, transform 0.2s;
     }
 
-    .qr-box img {
-      max-width: 100%; max-height: 100%;
-      object-fit: contain;
+    .social-link-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--border-hover);
+      transform: translateY(-2px);
     }
 
-    /* ASCII Fire Overlay */
-    #ascii-fire {
-      position: fixed;
-      bottom: 0; left: 0;
-      width: 100vw;
-      text-align: center;
-      color: #ff3300;
-      font-family: var(--font-mono);
-      font-weight: bold;
-      font-size: 1rem;
-      line-height: 0.85rem;
-      z-index: 3;
-      opacity: 0;
-      pointer-events: none;
-      white-space: pre;
-      transition: opacity 0.8s ease;
-    }
-
-    /* Oversized Footer */
+    /* Footer */
     footer {
-      margin-top: 8rem;
-      padding-top: 3rem;
+      margin-top: 5rem;
+      padding-top: 2.5rem;
       border-top: 1px solid var(--border-color);
       display: flex;
       flex-direction: column;
-      gap: 3rem;
-    }
-
-    .footer-top {
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
       gap: 2rem;
     }
 
     .footer-brand-giant {
-      font-size: clamp(3rem, 14vw, 12rem);
+      font-size: clamp(2.5rem, 12vw, 10rem);
       font-weight: 900;
       letter-spacing: -0.05em;
       text-transform: uppercase;
       line-height: 0.85;
       color: var(--text-main);
+      white-space: nowrap;
     }
 
     .footer-bottom {
@@ -496,13 +436,15 @@
       justify-content: space-between;
       align-items: center;
       font-family: var(--font-mono);
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: var(--text-muted);
       padding-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
     }
 
     .phase-badge {
-      padding: 6px 18px;
+      padding: 6px 16px;
       border-radius: 20px;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border-color);
@@ -510,157 +452,129 @@
       cursor: pointer;
     }
 
-    @media (max-width: 768px) {
-      .portfolio-card { grid-template-columns: 1fr; }
-      .header-btns { gap: 0.4rem; }
-      header { flex-direction: column; align-items: flex-start; gap: 1rem; }
-      .nav-links { width: 100%; justify-content: space-between; }
+    @media (max-width: 600px) {
+      header { flex-direction: column; align-items: flex-start; }
+      .header-right { width: 100%; justify-content: space-between; }
+      .socials-grid { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
 <body>
 
-  <!-- OBSCURA PRELOADER -->
+  <!-- PRELOADER - STAYS UNTIL SCROLL -->
   <div id="preloader">
     <div class="loader-center-brand">DREW.WTF®</div>
     <div class="loader-bottom">
       <div class="loader-counter" id="loader-num">0%</div>
-      <div class="loader-sub">INITIALIZING UNHINGED HARDWARE FREEDOM...</div>
+      <div class="loader-prompt" onclick="dismissPreloader()">[ SCROLL DOWN TO ENTER ]</div>
     </div>
   </div>
 
   <!-- Background Canvas & Overlays -->
   <canvas id="fx-canvas"></canvas>
   <div class="vignette"></div>
-  <div id="ascii-fire"></div>
 
-  <!-- Floating Image Hover Preview Container -->
-  <div id="hover-preview">
-    <img id="preview-img" src="" alt="Preview">
-  </div>
-
-  <!-- Main Site Wrapper -->
+  <!-- Main Site Container -->
   <div class="site-wrapper">
     
-    <!-- Navigation Header -->
+    <!-- Fixed Navigation Header -->
     <header>
       <a href="#" class="brand-logo">DREW.WTF®</a>
-      <div class="nav-links">
-        <a href="#manifesto">Manifesto</a>
-        <a href="#services">Services</a>
-        <a href="#repository">QR Slots</a>
-      </div>
-      <div class="header-btns">
-        <button class="action-btn" onclick="triggerRandomLanguage()" title="Cycle Languages">🌐</button>
-        <button class="action-btn" onclick="nextPhase()" title="Cycle Animation (or use Left/Right Arrows)">⇆</button>
+      <div class="header-right">
+        <div class="header-btns">
+          <button class="action-btn" id="audio-btn" onclick="toggleAudioSynth()">🔊 UNMUTE MUSIC</button>
+          <button class="action-btn" onclick="togglePersistentLanguage()" title="Cycle Languages">🌐</button>
+          <button class="action-btn" onclick="nextPhase()" title="Cycle FX">⇆</button>
+        </div>
       </div>
     </header>
 
-    <!-- Simulated ECG Heartbeat Banner -->
+    <!-- LIVE AUDIO METER & ECG MONITOR -->
     <div class="audio-monitor-bar">
       <div class="ecg-container">
         <div class="pulse-dot"></div>
-        <canvas id="ecg-canvas"></canvas>
+        <canvas id="visualizer-canvas"></canvas>
       </div>
       <div class="track-info" id="audio-track-display">
-        SYSTEM AUDIO: [PLAYING] 128 BPM // LOCAL_AI_SYNTH_STREAM.FLAC
+        SYNTH AUDIO: [OFF] // TAP UNMUTE FOR 8-BIT SNES TUNE
       </div>
     </div>
 
     <!-- Hero Section -->
     <section class="hero-section">
-      <div class="hero-tag" id="hero-tag">LOCAL HARDWARE FREEDOM LOG [USE ← → ARROWS TO SWITCH FX]</div>
+      <div class="hero-tag" id="hero-tag">LOCAL HARDWARE FREEDOM LOG [SWIPE OR ← → TO SWITCH FX]</div>
       
-      <div class="hero-giant-title">
-        <span class="hover-trigger" data-img="https://picsum.photos/300/300?random=1">PIRACY.</span>
-        <span class="hover-trigger" data-img="https://picsum.photos/300/300?random=2">VIBE CODE.</span>
-        <span class="hover-trigger" data-img="https://picsum.photos/300/300?random=3">FREEDOM.</span>
+      <!-- WTF MEANING TRANSLATION BANNER -->
+      <div class="wtf-meaning-banner" id="wtf-banner">
+        WTF = "Wow That's Fantastic"
+      </div>
+
+      <!-- SINGLE-LINE HEADING WITH FONT CYCLER -->
+      <div class="title-wrapper">
+        <h1 class="hero-cycling-title font-style-0" id="main-title" onclick="cycleTitleFont()">
+          DREW.WTF
+        </h1>
       </div>
 
       <p class="subline" id="main-subline">
-        This is slop code cooked up with Claude, Gemini, ChatGPT, and Grok all mixed together into one unhinged dynamic experience. You own your computer.
+        Hey, I'm Drew. This is slop code cooked up with Claude, Gemini, ChatGPT, and Grok all mixed together into one unhinged dynamic experience. You own your computer.
       </p>
+
+      <!-- TOUCH / TABLET CONTROLS BAR -->
+      <div class="mobile-fx-bar">
+        <span>BACKGROUND FX: <strong id="fx-mode-label">STARS</strong></span>
+        <div>
+          <button class="action-btn" onclick="prevPhase()" style="display:inline-flex;">← PREV</button>
+          <button class="action-btn" onclick="nextPhase()" style="display:inline-flex; margin-left:0.4rem;">NEXT →</button>
+        </div>
+      </div>
     </section>
 
-    <!-- Manifesto / Case Studies Section -->
-    <div class="section-label" id="manifesto">SELECTED MANIFESTOS</div>
+    <!-- Manifesto Section -->
+    <div class="section-label">SELECTED MANIFESTOS</div>
     
     <div class="portfolio-grid">
       <div class="portfolio-card">
         <div>
-          <div class="card-meta" id="c1-meta">01 // BARE METAL</div>
+          <div class="card-meta">01 // BARE METAL</div>
           <div class="card-title" id="c1-title">Piracy & Vibe Coding</div>
           <div class="card-desc" id="c1-desc">
             You own your computer. Download local weights, bypass corporate walled gardens, and vibe code directly on your bare metal without seeking permission.
           </div>
         </div>
-        <div class="card-img-box">
-          <img src="https://picsum.photos/600/400?random=10" alt="Local Hardware">
-        </div>
       </div>
 
       <div class="portfolio-card">
         <div>
-          <div class="card-meta" id="c2-meta">02 // UNHINGED RIGHT</div>
-          <div class="card-title" id="c2-title">Right-to-Microwave Fireworks</div>
+          <div class="card-meta">02 // UNHINGED RIGHT</div>
+          <div class="card-title" id="c2-title">Right to Overclock & Liquid Cool</div>
           <div class="card-desc" id="c2-desc">
-            If I want to microwave a box of fireworks in my own microwave on my own desk, I have the absolute right to do it. No cloud telemetry, no forced firmware locks.
+            If I want to submerge my motherboard in liquid nitrogen and push 1.5V directly into the silicon on my desk, I have the absolute right to do it. No telemetry, no DRM locks.
           </div>
         </div>
-        <div class="card-img-box">
-          <img src="https://picsum.photos/600/400?random=11" alt="Right to Repair">
-        </div>
       </div>
     </div>
 
-    <!-- Services Accordion Section -->
-    <div class="section-label" id="services">CAPABILITIES & FREEDOMS</div>
-    
-    <div class="services-list">
-      <div class="service-row hover-trigger" data-img="https://picsum.photos/300/300?random=20">
-        <span>BRAND STRATEGY & LOCAL AI</span>
-        <span>→</span>
-      </div>
-      <div class="service-row hover-trigger" data-img="https://picsum.photos/300/300?random=21">
-        <span>ART DIRECTION & SLOP LOGIC</span>
-        <span>→</span>
-      </div>
-      <div class="service-row hover-trigger" data-img="https://picsum.photos/300/300?random=22">
-        <span>EDITORIAL & HARDWARE FREEDOM</span>
-        <span>→</span>
-      </div>
-      <div class="service-row hover-trigger" data-img="https://picsum.photos/300/300?random=23">
-        <span>DIGITAL DESIGN & ZERO TELEMETRY</span>
-        <span>→</span>
-      </div>
-    </div>
-
-    <!-- QR Code Section -->
-    <div class="qr-section" id="repository">
-      <div class="section-label" style="border:none; margin:0 0 1rem 0;">REPOSITORY QR SLOTS</div>
-      <div class="qr-grid">
-        <div class="qr-box">[ QR CODE 01 ]</div>
-        <div class="qr-box">[ QR CODE 02 ]</div>
-        <div class="qr-box">[ QR CODE 03 ]</div>
+    <!-- SOCIAL MEDIA LINKS -->
+    <div class="section-label">SOCIAL MEDIA & REPOSITORIES</div>
+    <div class="socials-section">
+      <div class="socials-grid">
+        <a href="" target="_blank" class="social-link-btn">TWITCH</a>
+        <a href="" target="_blank" class="social-link-btn">DISCORD</a>
+        <a href="" target="_blank" class="social-link-btn">INSTAGRAM</a>
+        <a href="" target="_blank" class="social-link-btn">YOUTUBE</a>
+        <a href="" target="_blank" class="social-link-btn">X / TWITTER</a>
+        <a href="" target="_blank" class="social-link-btn">GITHUB</a>
+        <a href="" target="_blank" class="social-link-btn">SPOTIFY</a>
+        <a href="" target="_blank" class="social-link-btn">KICK</a>
       </div>
     </div>
 
     <!-- Footer -->
     <footer>
-      <div class="footer-top">
-        <div>
-          <div style="font-family:var(--font-mono); font-size:0.8rem; color:var(--text-muted); margin-bottom:0.5rem;">CONTACT US</div>
-          <div style="font-size:1.2rem; font-weight:600;">hello@drew.wtf</div>
-        </div>
-        <div style="font-family:var(--font-mono); font-size:0.8rem; color:var(--text-muted);">
-          LOCAL COMPUTE IS TRUE SOVEREIGNTY.
-        </div>
-      </div>
-
       <div class="footer-brand-giant">DREW.WTF®</div>
-
       <div class="footer-bottom">
-        <div>© 2026 DREW.WTF — ALL RIGHTS RESERVED</div>
+        <div>© 2026 DREW — ALL RIGHTS RESERVED</div>
         <div class="phase-badge" id="phase-badge" onclick="nextPhase()">PHASE NO. 0</div>
       </div>
     </footer>
@@ -668,120 +582,178 @@
   </div>
 
   <script>
-    /* --- PRELOADER COUNTER --- */
+    /* PRELOADER CONTROLLER - STAYS UNTIL SCROLL */
     const preloader = document.getElementById("preloader");
     const loaderNum = document.getElementById("loader-num");
     let count = 0;
+    let preloaderDismissed = false;
 
     const counterInterval = setInterval(() => {
-      count += Math.floor(Math.random() * 8) + 1;
+      count += Math.floor(Math.random() * 8) + 2;
       if (count >= 100) {
         count = 100;
         clearInterval(counterInterval);
-        setTimeout(() => { preloader.classList.add("loaded"); }, 200);
       }
       loaderNum.textContent = count + "%";
     }, 30);
 
-    /* --- FLOATING HOVER PREVIEW IMAGE --- */
-    const hoverPreview = document.getElementById("hover-preview");
-    const previewImg = document.getElementById("preview-img");
-
-    document.querySelectorAll(".hover-trigger").forEach(el => {
-      el.addEventListener("mouseenter", (e) => {
-        const imgSrc = el.getAttribute("data-img");
-        if (imgSrc) {
-          previewImg.src = imgSrc;
-          hoverPreview.classList.add("active");
-        }
-      });
-      el.addEventListener("mouseleave", () => {
-        hoverPreview.classList.remove("active");
-      });
-      el.addEventListener("mousemove", (e) => {
-        hoverPreview.style.left = e.clientX + "px";
-        hoverPreview.style.top = e.clientY + "px";
-      });
-    });
-
-    /* --- ECG MONITOR --- */
-    const ecgCanvas = document.getElementById("ecg-canvas");
-    const ecgCtx = ecgCanvas.getContext("2d");
-    let ecgX = 0;
-    let ecgPoints = [];
-
-    function resizeEcg() {
-      ecgCanvas.width = ecgCanvas.offsetWidth;
-      ecgCanvas.height = ecgCanvas.offsetHeight;
-      ecgPoints = new Array(ecgCanvas.width).fill(ecgCanvas.height / 2);
-    }
-    resizeEcg();
-    window.addEventListener("resize", resizeEcg);
-
-    function drawEcg() {
-      ecgCtx.fillStyle = "rgba(0, 0, 0, 0.15)";
-      ecgCtx.fillRect(0, 0, ecgCanvas.width, ecgCanvas.height);
-
-      ecgX = (ecgX + 2) % ecgCanvas.width;
-      let y = ecgCanvas.height / 2;
-      const mod = ecgX % 70;
-      if (mod > 10 && mod < 15) y -= 12;
-      else if (mod >= 15 && mod < 22) y += 14;
-      else if (mod >= 22 && mod < 28) y -= 18;
-
-      ecgPoints[ecgX] = y;
-
-      ecgCtx.strokeStyle = "#00ff66";
-      ecgCtx.lineWidth = 1.8;
-      ecgCtx.beginPath();
-      for (let i = 0; i < ecgCanvas.width; i++) {
-        if (i === 0) ecgCtx.moveTo(i, ecgPoints[i]);
-        else ecgCtx.lineTo(i, ecgPoints[i]);
+    function dismissPreloader() {
+      if (!preloaderDismissed) {
+        preloaderDismissed = true;
+        preloader.classList.add("dismissed");
       }
-      ecgCtx.stroke();
-      requestAnimationFrame(drawEcg);
     }
-    drawEcg();
 
-    /* --- MULTILINGUAL ENGINE --- */
+    window.addEventListener("scroll", () => { if (window.scrollY > 10) dismissPreloader(); }, { passive: true });
+    window.addEventListener("wheel", dismissPreloader, { passive: true });
+    window.addEventListener("touchmove", dismissPreloader, { passive: true });
+
+    /* WOW THAT'S FANTASTIC TRANSLATIONS */
+    const wtfTranslations = [
+      'WTF = "Wow That\'s Fantastic" (English)',
+      'WTF = "¡Vaya, Eso Es Fantástico!" (Spanish)',
+      'WTF = "Waouh, C\'est Fantastique" (French)',
+      'WTF = "わあ、それは素晴らしい (Japanese)',
+      'WTF = "Wow, Das Ist Phantastisch" (German)',
+      'WTF = "वाह, यह शानदार है" (Hindi)',
+      'WTF = "哇，太太棒了" (Mandarin)',
+      'WTF = "Вау, Это Фантастика" (Russian)',
+      'WTF = "Wow, È Fantastico" (Italian)',
+      'WTF = "와, 정말 환상적이다" (Korean)'
+    ];
+    let wtfIdx = 0;
+    const wtfBanner = document.getElementById("wtf-banner");
+
+    setInterval(() => {
+      wtfIdx = (wtfIdx + 1) % wtfTranslations.length;
+      wtfBanner.style.opacity = 0;
+      setTimeout(() => {
+        wtfBanner.textContent = wtfTranslations[wtfIdx];
+        wtfBanner.style.opacity = 1;
+      }, 200);
+    }, 3000);
+
+    /* CONTINUOUS DREW.WTF FONT CYCLER */
+    const mainTitle = document.getElementById("main-title");
+    const fontClasses = ["font-style-0", "font-style-1", "font-style-2", "font-style-3", "font-style-4"];
+    let currentFontIdx = 0;
+
+    function cycleTitleFont() {
+      mainTitle.classList.remove(fontClasses[currentFontIdx]);
+      currentFontIdx = (currentFontIdx + 1) % fontClasses.length;
+      mainTitle.classList.add(fontClasses[currentFontIdx]);
+    }
+    setInterval(cycleTitleFont, 2500);
+
+    /* PERSISTENT MULTILINGUAL ENGINE */
     const translations = {
       en: {
-        tag: "LOCAL HARDWARE FREEDOM LOG [USE ← → ARROWS TO SWITCH FX]",
-        subline: "This is slop code cooked up with Claude, Gemini, ChatGPT, and Grok all mixed together into one unhinged dynamic experience. You own your computer.",
-        c1Title: "Piracy & Vibe Coding", c1Desc: "You own your computer. Download local weights, bypass corporate walled gardens, and vibe code directly on your bare metal without seeking permission."
+        tag: "LOCAL HARDWARE FREEDOM LOG [SWIPE OR ← → TO SWITCH FX]",
+        subline: "Hey, I'm Drew. This is slop code cooked up with Claude, Gemini, ChatGPT, and Grok all mixed together into one unhinged dynamic experience. You own your computer."
       },
       urdu: {
-        tag: "مقامی ہارڈ ویئر کی آزادی لاگ [FX کے لیے ← → تیر والے بٹن استعمال کریں]",
-        subline: "یہ کلاؤڈ، جیمنی، چیٹ جی پی ٹی اور گرواک کے ساتھ مل کر تیار کردہ کوڈ ہے۔",
-        c1Title: "پائریسی اور وائب کوڈنگ", c1Desc: "آپ اپنے کمپیوٹر کے مالک ہیں۔ مقامی ماڈلز ڈاؤن لوڈ کریں اور اپنی مشین پر براہ راست کوڈ کریں۔"
+        tag: "مقامی ہارڈ ویئر کی آزادی لاگ [FX کے لیے ← → یا سوائپ کریں]",
+        subline: "ہیلو، میں ڈریو ہوں۔ یہ کلاؤڈ، جیمنی، چیٹ جی پی ٹی اور گرواک کے ساتھ مل کر تیار کردہ کوڈ ہے۔"
       },
       mandarin: {
-        tag: "本地硬件自由日志 [使用 ← → 箭头键切换特效]",
-        subline: "这是由 Claude、Gemini、ChatGPT 和 Grok 混合在一起编写的 AI 杂糅代码（Slop Code）。你拥有你的电脑。",
-        c1Title: "盗版与 Vibe Coding", c1Desc: "你拥有你的电脑。下载本地模型，绕过封闭花园，无需许可直接在裸机上编写代码。"
+        tag: "本地硬件自由日志 [使用 ← → 箭头或滑动切换特效]",
+        subline: "嗨，我是 Drew。这是由 Claude、Gemini、ChatGPT 和 Grok 混合在一起编写的 AI 杂糅代码。"
       }
     };
-
     const langKeys = Object.keys(translations);
+    let currentLangIdx = 0;
 
-    function triggerRandomLanguage() {
-      const randomLang = langKeys[Math.floor(Math.random() * langKeys.length)];
-      const data = translations[randomLang];
+    function togglePersistentLanguage() {
+      currentLangIdx = (currentLangIdx + 1) % langKeys.length;
+      const data = translations[langKeys[currentLangIdx]];
       document.getElementById("hero-tag").textContent = data.tag;
       document.getElementById("main-subline").textContent = data.subline;
-      document.getElementById("c1-title").textContent = data.c1Title;
-      document.getElementById("c1-desc").textContent = data.c1Desc;
-
-      setTimeout(() => {
-        const enData = translations.en;
-        document.getElementById("hero-tag").textContent = enData.tag;
-        document.getElementById("main-subline").textContent = enData.subline;
-        document.getElementById("c1-title").textContent = enData.c1Title;
-        document.getElementById("c1-desc").textContent = enData.c1Desc;
-      }, 4000);
     }
 
-    /* --- BACKGROUND CANVAS ANIMATIONS --- */
+    /* 8-BIT SNES CHIPTUNE WEB AUDIO SYNTHESIZER */
+    let audioCtx = null;
+    let isPlayingAudio = false;
+    let synthTimer = null;
+    let synthAudioLevels = new Array(24).fill(0);
+
+    const snesNotes = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25]; // C4-C5 scale
+
+    function playSnesNote(freq, type = "square", duration = 0.15) {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.value = freq;
+      
+      gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    }
+
+    function toggleAudioSynth() {
+      const btn = document.getElementById("audio-btn");
+      const status = document.getElementById("audio-track-display");
+
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+
+      if (!isPlayingAudio) {
+        audioCtx.resume();
+        isPlayingAudio = true;
+        btn.textContent = "🔇 MUTE MUSIC";
+        status.textContent = "SYNTH AUDIO: [PLAYING] // 8-BIT SNES CHIPTUNE STREAM";
+
+        let noteStep = 0;
+        synthTimer = setInterval(() => {
+          const freq = snesNotes[noteStep % snesNotes.length];
+          const bassFreq = snesNotes[noteStep % 4] / 2;
+          playSnesNote(freq, "square", 0.18);
+          playSnesNote(bassFreq, "triangle", 0.25);
+          
+          // Spike visualizer levels on notes
+          for (let i = 0; i < synthAudioLevels.length; i++) {
+            synthAudioLevels[i] = Math.random() * 0.9;
+          }
+          noteStep = (noteStep + Math.floor(Math.random() * 3) + 1) % snesNotes.length;
+        }, 180);
+
+      } else {
+        isPlayingAudio = false;
+        clearInterval(synthTimer);
+        btn.textContent = "🔊 UNMUTE MUSIC";
+        status.textContent = "SYNTH AUDIO: [OFF] // TAP UNMUTE FOR 8-BIT SNES TUNE";
+      }
+    }
+
+    /* CANVAS AUDIO VISUALIZER */
+    const visCanvas = document.getElementById("visualizer-canvas");
+    const visCtx = visCanvas.getContext("2d");
+
+    function drawVisualizer() {
+      visCanvas.width = visCanvas.offsetWidth;
+      visCanvas.height = visCanvas.offsetHeight;
+      
+      visCtx.clearRect(0, 0, visCanvas.width, visCanvas.height);
+      const barCount = 20;
+      const barWidth = visCanvas.width / barCount;
+
+      for (let i = 0; i < barCount; i++) {
+        let level = isPlayingAudio ? (synthAudioLevels[i] || Math.random() * 0.8) : (Math.random() * 0.25 + 0.05);
+        const height = level * visCanvas.height;
+        visCtx.fillStyle = "#00ff66";
+        visCtx.fillRect(i * barWidth, visCanvas.height - height, barWidth - 2, height);
+      }
+      setTimeout(() => { requestAnimationFrame(drawVisualizer); }, 80);
+    }
+    drawVisualizer();
+
+    /* BACKGROUND CANVAS FX & SWIPE CONTROLS */
     const canvas = document.getElementById("fx-canvas");
     const ctx = canvas.getContext("2d");
     let width, height, cx, cy;
@@ -797,10 +769,10 @@
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
 
-    const emojis = ["🍄", "🍆", "✨", "💫", "😈", "👿", "🔥", "⚡", "💀", "☠️", "☣️", "🟢", "👽", "👾"];
+    const emojis = ["🍄", "⚡", "🔥", "💀", "🟢", "👾", "💻"];
     let currentPhase = 0;
     let mode = "stars";
-    const modesList = ["stars", "matrix", "synthgrid", "visualizer", "emojis"];
+    const modesList = ["stars", "matrix", "synthgrid", "emojis"];
 
     let particles = [];
     class Particle {
@@ -825,7 +797,7 @@
 
         if (sx >= 0 && sx <= width && sy >= 0 && sy <= height) {
           if (mode === "emojis") {
-            ctx.font = `${Math.max(12, (1 - this.z / width) * 42)}px serif`;
+            ctx.font = `${Math.max(12, (1 - this.z / width) * 38)}px serif`;
             ctx.fillText(this.char, sx, sy);
           } else {
             const alpha = Math.min(1, (1 - this.z / width) * 1.5);
@@ -837,11 +809,10 @@
       }
     }
 
-    for (let i = 0; i < 450; i++) particles.push(new Particle());
+    for (let i = 0; i < 300; i++) particles.push(new Particle());
 
     const matrixChars = "01100101_#\\/@$%&*!?";
     const matrixDrops = new Array(Math.floor(window.innerWidth / 20)).fill(1);
-    let gridOffset = 0;
 
     function renderFx() {
       ctx.fillStyle = "rgba(8, 8, 8, 0.25)";
@@ -861,22 +832,6 @@
           if (matrixDrops[i] * 20 > height && Math.random() > 0.975) matrixDrops[i] = 0;
           matrixDrops[i]++;
         }
-      } else if (mode === "synthgrid") {
-        gridOffset = (gridOffset + 1.5) % 40;
-        ctx.strokeStyle = "rgba(255, 0, 128, 0.35)";
-        for (let x = 0; x <= width; x += 40) {
-          ctx.beginPath(); ctx.moveTo(x, height / 2); ctx.lineTo(x, height); ctx.stroke();
-        }
-        for (let y = height / 2; y <= height; y += 15) {
-          ctx.beginPath(); ctx.moveTo(0, y + gridOffset); ctx.lineTo(width, y + gridOffset); ctx.stroke();
-        }
-      } else if (mode === "visualizer") {
-        ctx.fillStyle = "rgba(0, 255, 102, 0.4)";
-        const barWidth = width / 30;
-        for (let i = 0; i < 30; i++) {
-          const barHeight = Math.random() * (height * 0.35);
-          ctx.fillRect(i * barWidth, height - barHeight, barWidth - 4, barHeight);
-        }
       }
       requestAnimationFrame(renderFx);
     }
@@ -886,33 +841,29 @@
       currentPhase = (p + modesList.length) % modesList.length;
       mode = modesList[currentPhase];
       document.getElementById("phase-badge").textContent = `PHASE NO. ${currentPhase} [${mode.toUpperCase()}]`;
-      document.getElementById("ascii-fire").style.opacity = mode === "matrix" ? "1" : "0";
+      document.getElementById("fx-mode-label").textContent = mode.toUpperCase();
     }
 
     function nextPhase() { setPhase(currentPhase + 1); }
     function prevPhase() { setPhase(currentPhase - 1); }
 
-    /* KEYBOARD CONTROLS: Left/Right Arrow Keys Cycle Backgrounds */
+    /* Left/Right Arrow Keys */
     window.addEventListener("keydown", (e) => {
-      if (e.key === "ArrowRight") {
-        nextPhase();
-      } else if (e.key === "ArrowLeft") {
-        prevPhase();
-      }
+      if (e.key === "ArrowRight") nextPhase();
+      else if (e.key === "ArrowLeft") prevPhase();
     });
 
-    /* ASCII FIRE ENGINE */
-    const fireContainer = document.getElementById("ascii-fire");
-    const fireChars = [" ", ".", ":", "^", "*", "s", "#", "$", "█"];
-    setInterval(() => {
-      let lines = [];
-      for (let r = 0; r < 4; r++) {
-        let line = "";
-        for (let c = 0; c < 50; c++) line += fireChars[Math.floor(Math.random() * fireChars.length)];
-        lines.push(line);
-      }
-      fireContainer.textContent = lines.join("\n");
-    }, 80);
+    /* Mobile Swipe Touch Support */
+    let touchStartX = 0;
+    window.addEventListener("touchstart", (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    window.addEventListener("touchend", (e) => {
+      const touchEndX = e.changedTouches[0].screenX;
+      if (touchEndX - touchStartX > 60) prevPhase();
+      else if (touchStartX - touchEndX > 60) nextPhase();
+    }, { passive: true });
 
     setPhase(0);
   </script>
