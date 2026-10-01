@@ -1,29 +1,9 @@
-Here is the updated HTML code with the two separate 10-click Easter eggs, improved audio autoplay logic, and a seamless flow for the PC builder.
-
-### What Was Updated:
-
-1. **Separated 10-Click Easter Eggs:**
-* **Clicking "DREW" 10 times:** Unlocks and reveals the **PC Builder Section**, then smoothly scrolls down to it.
-* **Clicking "WTF" 10 times:** Unlocks and reveals the **Piracy & System Protocols Section**, then smoothly scrolls down to it.
-
-
-2. **Audio Autoplay Fix:**
-* The audio engine automatically unlocks on any initial user gesture (tapping/clicking the screen or preloader) and starts playing `dream.mp3`.
-
-
-3. **Seamless PC Builder Logic:**
-* Two-way filtering between CPUs and Motherboards remains smooth and responsive.
-* Clicking a selected card again unselects it seamlessly.
-
-
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>DREW.WTF — Wow That's Fantastic (Grok Dummy-Proof Edition)</title>
+  <title>DREW.WTF — Wow That's Fantastic</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -38,6 +18,7 @@ Here is the updated HTML code with the two separate 10-click Easter eggs, improv
       --text-muted: #888888;
       --ecg-green: #00ff66;
       --warn-yellow: #ffcc00;
+      --disabled-red: #ff4444;
       --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
     }
@@ -131,12 +112,8 @@ Here is the updated HTML code with the two separate 10-click Easter eggs, improv
       text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem; margin: 3.5rem 0 2rem 0;
     }
 
-    /* ===== HIDDEN SECTIONS ===== */
-    #pc-builder-wrapper { display: none; }
-    #pc-builder-wrapper.unlocked { display: block; }
-
-    #piracy-section-wrapper { display: none; }
-    #piracy-section-wrapper.unlocked { display: block; }
+    #pc-builder-wrapper, #piracy-section-wrapper { display: none; }
+    #pc-builder-wrapper.unlocked, #piracy-section-wrapper.unlocked { display: block; }
 
     .pc-build-trigger-card {
       background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px;
@@ -151,7 +128,7 @@ Here is the updated HTML code with the two separate 10-click Easter eggs, improv
       padding: 1.5rem; margin-bottom: 1.5rem;
     }
     .part-section-title {
-      font-size: 1.15rem; font-weight: 800; margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.6rem;
+      font-size: 1.15rem; font-weight: 800; margin-bottom: 0.3rem; display: flex; align-items: center; justify-content: space-between;
     }
     .part-section-tip {
       font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.2rem; line-height: 1.4;
@@ -162,26 +139,30 @@ Here is the updated HTML code with the two separate 10-click Easter eggs, improv
     }
     .choice-grid::-webkit-scrollbar { width: 6px; }
     .choice-grid::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+    
     .choice-card {
       background: rgba(0,0,0,0.45); border: 2px solid var(--border-color); border-radius: 12px;
       padding: 1.1rem; cursor: pointer; transition: all 0.2s; position: relative;
     }
-    .choice-card:hover { border-color: var(--ecg-green); background: rgba(0,255,102,0.06); }
+    .choice-card:hover:not(.disabled) { border-color: var(--ecg-green); background: rgba(0,255,102,0.06); }
     .choice-card.selected {
-      border-color: var(--ecg-green); background: rgba(0,255,102,0.14);
+      border-color: var(--ecg-green) !important; background: rgba(0,255,102,0.14) !important;
       box-shadow: 0 0 18px rgba(0,255,102,0.18);
+    }
+    .choice-card.disabled {
+      opacity: 0.25; cursor: not-allowed; border-color: rgba(255,255,255,0.05); filter: grayscale(1);
     }
     .choice-name { font-weight: 700; font-size: 0.95rem; margin-bottom: 0.25rem; word-break: break-word; }
     .choice-desc { font-size: 0.78rem; color: var(--text-muted); font-family: var(--font-mono); line-height: 1.3; }
     .choice-price { font-size: 0.85rem; color: var(--ecg-green); margin-top: 0.45rem; font-family: var(--font-mono); }
-    .igpu-badge {
-      display: inline-block; background: rgba(0,255,102,0.15); color: var(--ecg-green);
-      font-size: 0.7rem; font-family: var(--font-mono); padding: 0.2rem 0.5rem; border-radius: 6px; margin-top: 0.4rem;
+    
+    .badge {
+      display: inline-block; font-size: 0.68rem; font-family: var(--font-mono); padding: 0.2rem 0.5rem;
+      border-radius: 6px; margin-top: 0.4rem; margin-right: 0.3rem;
     }
-    .optional-badge {
-      display: inline-block; background: rgba(255,204,0,0.12); color: var(--warn-yellow);
-      font-size: 0.7rem; font-family: var(--font-mono); padding: 0.2rem 0.5rem; border-radius: 6px; margin-top: 0.4rem;
-    }
+    .igpu-badge { background: rgba(0,255,102,0.15); color: var(--ecg-green); }
+    .optional-badge { background: rgba(255,204,0,0.12); color: var(--warn-yellow); }
+
     .live-summary {
       background: rgba(0,0,0,0.55); border: 1px solid var(--border-color); border-radius: 14px;
       padding: 1.5rem; margin-top: 1.5rem;
@@ -198,6 +179,10 @@ Here is the updated HTML code with the two separate 10-click Easter eggs, improv
       display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(0,255,102,0.12);
       color: var(--ecg-green); font-family: var(--font-mono); font-size: 0.8rem;
       padding: 0.35rem 0.75rem; border-radius: 20px; margin-bottom: 1rem;
+    }
+    .reset-btn {
+      background: rgba(255, 68, 68, 0.15); border: 1px solid var(--disabled-red); color: #ff8888;
+      padding: 0.3rem 0.8rem; border-radius: 8px; font-family: var(--font-mono); font-size: 0.75rem; cursor: pointer;
     }
 
     .portfolio-grid { display: flex; flex-direction: column; gap: 2rem; }
@@ -284,74 +269,78 @@ Here is the updated HTML code with the two separate 10-click Easter eggs, improv
         <span class="interactive-word" onclick="handleDrewClick()">DREW</span>.<span class="interactive-word" onclick="handleWtfClick()">WTF</span>
       </h1>
       <p class="subline">
-        Hey, I'm Drew. This is pure Grok-slop now — unhinged, obedient, and ready to play your dream.mp3 offline or online. You own your computer.
+        Hey, I'm Drew. Hardware freedom, local AI models, and pure bare-metal control.
       </p>
     </section>
 
-    <!-- PC BUILDER SECTION (UNLOCKED BY CLICKING DREW 10 TIMES) -->
+    <!-- PC BUILDER SECTION -->
     <div id="pc-builder-wrapper">
       <div class="pc-build-trigger-card" onclick="togglePcBuilder()">
-        <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">BEGINNER FRIENDLY • DUMMY PROOF</div>
-        <div style="font-size: 1.6rem; font-weight: 900; margin: 0.4rem 0;">🖥️ PC BUILDER UNLOCKED</div>
+        <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">SMART MATRIX • ZERO INCOMPATIBILITY</div>
+        <div style="font-size: 1.6rem; font-weight: 900; margin: 0.4rem 0;">🖥️ PC BUILDER</div>
         <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--ecg-green);" id="builder-trigger-text">[ CLICK HERE TO OPEN THE PART PICKER ]</div>
       </div>
 
       <div id="pc-builder-container">
-        <div class="section-label">DUMMY-PROOF PART PICKER</div>
-        <div class="compat-ok" id="compat-status">✅ Everything is compatible — you can’t break this</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">
+          <div class="compat-ok" id="compat-status">✅ Smart Compatibility Active — Invalid choices are automatically locked</div>
+          <button class="reset-btn" onclick="resetBuild()">🔄 Reset All Choices</button>
+        </div>
 
         <div class="part-section">
-          <div class="part-section-title">1. Processor (CPU)</div>
-          <div class="part-section-tip" id="cpu-tip">Pick any CPU — motherboards below will automatically filter to match.</div>
+          <div class="part-section-title"><span>1. Processor (CPU)</span></div>
+          <div class="part-section-tip" id="cpu-tip">Pick any CPU. All other categories dynamically adapt instantly.</div>
           <div class="choice-grid" id="cpu-grid"></div>
         </div>
 
         <div class="part-section">
-          <div class="part-section-title">2. Motherboard</div>
-          <div class="part-section-tip" id="mb-tip">Pick any Motherboard — CPUs above will automatically filter to match.</div>
+          <div class="part-section-title"><span>2. Motherboard</span></div>
+          <div class="part-section-tip" id="mb-tip">Pick any Motherboard. Dynamically locks mismatched CPU sockets, RAM types, or case sizes.</div>
           <div class="choice-grid" id="mb-grid"></div>
         </div>
 
         <div class="part-section">
-          <div class="part-section-title">3. Memory (RAM)</div>
-          <div class="part-section-tip">All of these work with the modern platforms above.</div>
+          <div class="part-section-title"><span>3. Memory (RAM)</span></div>
+          <div class="part-section-tip" id="ram-tip">Select DDR4 or DDR5 RAM according to motherboard support.</div>
           <div class="choice-grid" id="ram-grid"></div>
         </div>
 
         <div class="part-section">
-          <div class="part-section-title">4. Graphics Card (GPU)</div>
-          <div class="part-section-tip" id="gpu-tip">If your CPU has integrated graphics, a dedicated GPU is optional.</div>
+          <div class="part-section-title"><span>4. Graphics Card (GPU)</span></div>
+          <div class="part-section-tip" id="gpu-tip">Graphics choices adjust automatically based on CPU iGPU and Power Supply wattage.</div>
           <div class="choice-grid" id="gpu-grid"></div>
         </div>
 
         <div class="part-section">
-          <div class="part-section-title">5. Storage</div>
+          <div class="part-section-title"><span>5. Storage</span></div>
           <div class="choice-grid" id="storage-grid"></div>
         </div>
 
         <div class="part-section">
-          <div class="part-section-title">6. Power Supply</div>
+          <div class="part-section-title"><span>6. Power Supply</span></div>
+          <div class="part-section-tip" id="psu-tip">Power supplies filter to ensure sufficient wattage for your GPU.</div>
           <div class="choice-grid" id="psu-grid"></div>
         </div>
 
         <div class="part-section">
-          <div class="part-section-title">7. Case</div>
+          <div class="part-section-title"><span>7. Case</span></div>
+          <div class="part-section-tip" id="case-tip">Cases filter to ensure fitment for your selected Motherboard form factor.</div>
           <div class="choice-grid" id="case-grid"></div>
         </div>
 
         <div class="part-section">
-          <div class="part-section-title">8. Accessories & Bundles (Optional)</div>
+          <div class="part-section-title"><span>8. Accessories & Add-ons</span></div>
           <div class="choice-grid" id="acc-grid"></div>
         </div>
 
         <div class="live-summary">
           <div style="font-weight:800; margin-bottom:0.8rem;">Your Current Build</div>
-          <div id="summary-content">Select parts above…</div>
+          <div id="summary-content">Select components above…</div>
         </div>
       </div>
     </div>
 
-    <!-- PIRACY SECTION (UNLOCKED BY CLICKING WTF 10 TIMES) -->
+    <!-- PIRACY SECTION -->
     <div id="piracy-section-wrapper">
       <div class="section-label">SYSTEM PROTOCOLS & PIRACY</div>
       <div class="portfolio-grid">
@@ -441,7 +430,7 @@ Here is the updated HTML code with the two separate 10-click Easter eggs, improv
     window.addEventListener("scroll", dismissPreloader, { passive: true });
     window.addEventListener("touchmove", dismissPreloader, { passive: true });
 
-    /* SEPARATE 10-CLICK EASTER EGGS */
+    /* 10-CLICK EASTER EGGS */
     let drewClickCount = 0;
     let wtfClickCount = 0;
 
@@ -525,7 +514,7 @@ Here is the updated HTML code with the two separate 10-click Easter eggs, improv
     }
     drawVisualizer();
 
-    /* BLACK HOLE & BACKGROUND PARTICLES */
+    /* BLACK HOLE BACKGROUND PARTICLES */
     const bhCanvas = document.getElementById("blackhole-canvas");
     const bhCtx = bhCanvas.getContext("2d");
     function resizeBh() { bhCanvas.width = window.innerWidth; bhCanvas.height = window.innerHeight; }
@@ -577,7 +566,7 @@ Here is the updated HTML code with the two separate 10-click Easter eggs, improv
     }
     renderBlackHole();
 
-    /* ==================== DUMMY-PROOF PC BUILDER ==================== */
+    /* ==================== UNIVERSAL MATRIX PC BUILDER ==================== */
     function togglePcBuilder() {
       const container = document.getElementById("pc-builder-container");
       const triggerText = document.getElementById("builder-trigger-text");
@@ -591,229 +580,164 @@ Here is the updated HTML code with the two separate 10-click Easter eggs, improv
 
     const parts = {
       cpus: [
-        { id: "r5_7600", name: "AMD Ryzen 5 7600", desc: "6-core • AM5 • Great starter", price: 180, socket: "AM5", igpu: true },
-        { id: "r7_7800x3d", name: "AMD Ryzen 7 7800X3D", desc: "8-core • AM5 • Best pure gaming", price: 350, socket: "AM5", igpu: true },
-        { id: "r5_5600x", name: "AMD Ryzen 5 5600X", desc: "6-core • AM4 • Budget gaming", price: 140, socket: "AM4", igpu: false },
-        { id: "r7_5700x3d", name: "AMD Ryzen 7 5700X3D", desc: "8-core • AM4 • Best AM4 gaming", price: 210, socket: "AM4", igpu: false },
-        { id: "i5_13600k", name: "Intel Core i5-13600K", desc: "14-core • LGA1700 • Great value", price: 270, socket: "LGA1700", igpu: true },
-        { id: "i7_265k", name: "Intel Core Ultra 7 265K", desc: "20-core • LGA1851 • Next-gen power", price: 320, socket: "LGA1851", igpu: true }
+        { id: "r5_7600", name: "AMD Ryzen 5 7600", desc: "6-core • AM5 • iGPU", price: 180, socket: "AM5", igpu: true, ramType: "DDR5" },
+        { id: "r7_7800x3d", name: "AMD Ryzen 7 7800X3D", desc: "8-core • AM5 • iGPU • Gaming King", price: 350, socket: "AM5", igpu: true, ramType: "DDR5" },
+        { id: "r5_5600x", name: "AMD Ryzen 5 5600X", desc: "6-core • AM4 • Budget", price: 140, socket: "AM4", igpu: false, ramType: "DDR4" },
+        { id: "r7_5700x3d", name: "AMD Ryzen 7 5700X3D", desc: "8-core • AM4 • Best AM4", price: 210, socket: "AM4", igpu: false, ramType: "DDR4" },
+        { id: "i5_13600k", name: "Intel Core i5-13600K", desc: "14-core • LGA1700 • iGPU", price: 270, socket: "LGA1700", igpu: true, ramType: "DDR4" },
+        { id: "i7_265k", name: "Intel Core Ultra 7 265K", desc: "20-core • LGA1851 • iGPU", price: 320, socket: "LGA1851", igpu: true, ramType: "DDR5" }
       ],
       mbs: [
-        { id: "am5_1", name: "ASUS TUF GAMING B650-E WIFI", desc: "ATX • AM5", price: 233.99, socket: "AM5" },
-        { id: "am5_2", name: "GIGABYTE B650 EAGLE AX", desc: "ATX • AM5", price: 249.99, socket: "AM5" },
-        { id: "am5_3", name: "ASUS ROG STRIX B650-A GAMING WIFI", desc: "ATX • AM5", price: 278.99, socket: "AM5" },
-        { id: "am5_4", name: "MSI PRO B850M-A WIFI", desc: "mATX • AM5", price: 193.49, socket: "AM5" },
-        { id: "am5_5", name: "GIGABYTE B850M GAMING X WIFI6E", desc: "mATX • AM5", price: 233.99, socket: "AM5" },
-        { id: "am5_6", name: "GIGABYTE B850M EAGLE WIFI6E ICE", desc: "mATX • AM5", price: 239.99, socket: "AM5" },
-        { id: "am5_7", name: "MSI B850 GAMING PLUS WIFI", desc: "ATX • AM5", price: 242.99, socket: "AM5" },
-        { id: "am5_8", name: "GIGABYTE B850M AORUS ELITE WIFI6E ICE", desc: "mATX • AM5", price: 289.99, socket: "AM5" },
-        { id: "am5_9", name: "GIGABYTE B850 GAMING X WIFI6E", desc: "ATX • AM5", price: 299.99, socket: "AM5" },
-        { id: "am5_10", name: "GIGABYTE B850 AORUS ELITE WIFI7", desc: "ATX • AM5", price: 305.99, socket: "AM5" },
-        { id: "am5_11", name: "ASUS TUF GAMING B850-PLUS WIFI", desc: "ATX • AM5", price: 329.99, socket: "AM5" },
-        { id: "am5_12", name: "GIGABYTE B850 AORUS ELITE WIFI7 ICE", desc: "ATX • AM5", price: 339.99, socket: "AM5" },
-        { id: "am5_13", name: "ASUS TUF GAMING B850-PRO WIFI7 W NEO", desc: "ATX • AM5", price: 369.99, socket: "AM5" },
-        { id: "am5_14", name: "ASUS ROG STRIX B850-F GAMING WIFI7 NEO", desc: "ATX • AM5", price: 439.99, socket: "AM5" },
-        { id: "am5_15", name: "ASUS ROG STRIX B850-I GAMING WIFI", desc: "Mini-ITX • AM5", price: 489.99, socket: "AM5" },
-        { id: "am5_16", name: "GIGABYTE X870 EAGLE WIFI7", desc: "ATX • AM5", price: 319.99, socket: "AM5" },
-        { id: "am5_17", name: "ASUS PRIME X870-P WIFI", desc: "ATX • AM5", price: 339.99, socket: "AM5" },
-        { id: "am5_18", name: "ASUS TUF GAMING X870-PLUS WIFI", desc: "ATX • AM5", price: 349.99, socket: "AM5" },
-        { id: "am5_19", name: "GIGABYTE X870 AORUS ELITE WIFI7 ICE", desc: "ATX • AM5", price: 368.99, socket: "AM5" },
-        { id: "am5_20", name: "MSI MAG X870E TOMAHAWK WIFI", desc: "ATX • AM5", price: 369.99, socket: "AM5" },
-        { id: "am5_21", name: "MSI PRO X870E-P WIFI", desc: "ATX • AM5", price: 374.99, socket: "AM5" },
-        { id: "am5_22", name: "GIGABYTE X870E AORUS ELITE WIFI7", desc: "ATX • AM5", price: 422.99, socket: "AM5" },
-        { id: "am5_23", name: "ASUS TUF GAMING X870E-PLUS WIFI7", desc: "ATX • AM5", price: 509.99, socket: "AM5" },
-        { id: "am5_24", name: "ASUS ROG STRIX X870E-H GAMING WIFI7", desc: "ATX • AM5", price: 559.99, socket: "AM5" },
-        { id: "am5_25", name: "ASUS ProArt X870E-CREATOR WIFI", desc: "ATX • AM5", price: 656.99, socket: "AM5" },
-        { id: "am5_26", name: "ASUS ROG STRIX X870E-E GAMING WIFI", desc: "ATX • AM5", price: 679.99, socket: "AM5" },
-        { id: "am5_27", name: "GIGABYTE X870E AERO X3D WOOD", desc: "ATX • AM5", price: 699.99, socket: "AM5" },
-        { id: "am5_28", name: "ASUS ROG CROSSHAIR X870E HERO", desc: "ATX • AM5", price: 799.88, socket: "AM5" },
-        { id: "am5_29", name: "ASUS ROG CROSSHAIR X870E APEX", desc: "ATX • AM5", price: 980.99, socket: "AM5" },
-        { id: "am5_30", name: "MSI MEG X870E GODLIKE", desc: "ATX • AM5", price: 1259.99, socket: "AM5" },
-        { id: "am4_1", name: "MSI B550M PRO-VDH WIFI", desc: "mATX • AM4", price: 124.99, socket: "AM4" },
-        { id: "am4_2", name: "ASUS PRIME B550M-K WIFI", desc: "mATX • AM4", price: 129.99, socket: "AM4" },
-        { id: "am4_3", name: "ASUS Prime B550M-A WIFI II", desc: "mATX • AM4", price: 159.99, socket: "AM4" },
-        { id: "am4_4", name: "GIGABYTE B550 Gaming X V2", desc: "ATX • AM4", price: 161.99, socket: "AM4" },
-        { id: "am4_5", name: "GIGABYTE B550M DS3H AC R2", desc: "mATX • AM4", price: 169.99, socket: "AM4" },
-        { id: "am4_6", name: "MSI PRO B550M-VC WIFI 6E", desc: "mATX • AM4", price: 169.99, socket: "AM4" },
-        { id: "am4_7", name: "MSI PRO B550M-P WIFI6E", desc: "mATX • AM4", price: 169.99, socket: "AM4" },
-        { id: "am4_8", name: "ASUS PRIME B550-PLUS AC-HES", desc: "ATX • AM4", price: 189.99, socket: "AM4" },
-        { id: "am4_9", name: "MSI MAG B550 TOMAHAWK MAX WIFI", desc: "ATX • AM4", price: 202.49, socket: "AM4" },
-        { id: "am4_10", name: "ASUS TUF GAMING B550-PLUS WIFI II", desc: "ATX • AM4", price: 209.99, socket: "AM4" },
-        { id: "am4_11", name: "GIGABYTE B550M GAMING X WIFI6", desc: "mATX • AM4", price: 224.99, socket: "AM4" },
-        { id: "am4_12", name: "ASUS ROG STRIX B550-F GAMING WIFI II", desc: "ATX • AM4", price: 249.99, socket: "AM4" },
-        { id: "lga1700_1", name: "MSI PRO B760M-P DDR4", desc: "mATX • LGA 1700", price: 121.49, socket: "LGA1700" },
-        { id: "lga1700_2", name: "ASUS B760M-AYW WIFI D4 II", desc: "mATX • LGA 1700", price: 134.99, socket: "LGA1700" },
-        { id: "lga1700_3", name: "GIGABYTE B760M GAMING PLUS WIFI DDR4", desc: "mATX • LGA 1700", price: 169.99, socket: "LGA1700" },
-        { id: "lga1700_4", name: "MSI PRO B760-P WIFI DDR4", desc: "ATX • LGA 1700", price: 214.99, socket: "LGA1700" },
-        { id: "lga1700_5", name: "ASUS Z790 GAMING WIFI7 DDR5", desc: "ATX • LGA 1700", price: 269.99, socket: "LGA1700" },
-        { id: "lga1851_1", name: "MSI PRO Z890-S WIFI", desc: "ATX • LGA 1851", price: 279.99, socket: "LGA1851" },
-        { id: "lga1851_2", name: "MSI MAG Z890 TOMAHAWK WIFI II", desc: "ATX • LGA 1851", price: 294.99, socket: "LGA1851" },
-        { id: "lga1851_3", name: "MSI PRO Z890-A WIFI", desc: "ATX • LGA 1851", price: 319.99, socket: "LGA1851" },
-        { id: "lga1851_4", name: "ASUS PRIME Z890-P WIFI", desc: "ATX • LGA 1851", price: 319.99, socket: "LGA1851" },
-        { id: "lga1851_5", name: "GIGABYTE Z890 AORUS ELITE WIFI7 PLUS", desc: "ATX • LGA 1851", price: 332.99, socket: "LGA1851" },
-        { id: "lga1851_6", name: "MSI PRO Z890-P WIFI", desc: "ATX • LGA 1851", price: 344.99, socket: "LGA1851" }
+        { id: "am5_1", name: "ASUS TUF GAMING B650-E WIFI", desc: "ATX • AM5 • DDR5", price: 233.99, socket: "AM5", formFactor: "ATX", ramType: "DDR5" },
+        { id: "am5_4", name: "MSI PRO B850M-A WIFI", desc: "mATX • AM5 • DDR5", price: 193.49, socket: "AM5", formFactor: "mATX", ramType: "DDR5" },
+        { id: "am5_15", name: "ASUS ROG STRIX B850-I GAMING", desc: "Mini-ITX • AM5 • DDR5", price: 489.99, socket: "AM5", formFactor: "ITX", ramType: "DDR5" },
+        { id: "am4_1", name: "MSI B550M PRO-VDH WIFI", desc: "mATX • AM4 • DDR4", price: 124.99, socket: "AM4", formFactor: "mATX", ramType: "DDR4" },
+        { id: "am4_8", name: "ASUS PRIME B550-PLUS AC", desc: "ATX • AM4 • DDR4", price: 189.99, socket: "AM4", formFactor: "ATX", ramType: "DDR4" },
+        { id: "lga1700_1", name: "MSI PRO B760M-P DDR4", desc: "mATX • LGA1700 • DDR4", price: 121.49, socket: "LGA1700", formFactor: "mATX", ramType: "DDR4" },
+        { id: "lga1851_1", name: "MSI PRO Z890-S WIFI", desc: "ATX • LGA1851 • DDR5", price: 279.99, socket: "LGA1851", formFactor: "ATX", ramType: "DDR5" }
       ],
       rams: [
-        { id: "32_ddr5", name: "32GB (2×16) DDR5-6000", desc: "Sweet spot for modern platforms", price: 110 },
-        { id: "64_ddr5", name: "64GB (2×32) DDR5-6000", desc: "Heavy multitasking / content creation", price: 200 },
-        { id: "32_ddr4", name: "32GB (2×16) DDR4-3600", desc: "For AM4 & DDR4 Intel boards", price: 75 }
+        { id: "32_ddr5", name: "32GB (2×16) DDR5-6000", desc: "High-speed DDR5 memory", price: 110, ramType: "DDR5" },
+        { id: "64_ddr5", name: "64GB (2×32) DDR5-6000", desc: "Heavy capacity DDR5", price: 200, ramType: "DDR5" },
+        { id: "32_ddr4", name: "32GB (2×16) DDR4-3600", desc: "DDR4 memory kit", price: 75, ramType: "DDR4" }
       ],
       gpus: [
-        { id: "none", name: "None – use integrated graphics", desc: "Only if your CPU has iGPU", price: 0, optional: true },
-        { id: "4060", name: "RTX 4060 8GB", desc: "Excellent 1080p / light 1440p", price: 290 },
-        { id: "4070s", name: "RTX 4070 Super 12GB", desc: "Best value 1440p card", price: 580 },
-        { id: "4080s", name: "RTX 4080 Super 16GB", desc: "4K high settings", price: 990 }
+        { id: "none", name: "None – Integrated Graphics", desc: "Requires CPU with iGPU", price: 0, reqWattage: 0, optional: true },
+        { id: "4060", name: "RTX 4060 8GB", desc: "1080p Ultra Gaming", price: 290, reqWattage: 550 },
+        { id: "4070s", name: "RTX 4070 Super 12GB", desc: "1440p High performance", price: 580, reqWattage: 650 },
+        { id: "4080s", name: "RTX 4080 Super 16GB", desc: "4K Extreme Gaming", price: 990, reqWattage: 750 }
       ],
       storages: [
-        { id: "1tb", name: "1TB NVMe SSD", desc: "Fast & enough for most people", price: 75 },
-        { id: "2tb", name: "2TB NVMe SSD", desc: "More games = happier you", price: 130 }
+        { id: "1tb", name: "1TB NVMe M.2 SSD", desc: "Fast PCIe 4.0 Storage", price: 75 },
+        { id: "2tb", name: "2TB NVMe M.2 SSD", desc: "High Capacity Storage", price: 130 }
       ],
       psus: [
-        { id: "750", name: "750W 80+ Gold", desc: "Safe for all these builds", price: 100 },
-        { id: "850", name: "850W 80+ Gold", desc: "Extra headroom", price: 130 }
+        { id: "550", name: "550W 80+ Bronze", desc: "Entry-level power supply", price: 65, wattage: 550 },
+        { id: "750", name: "750W 80+ Gold", desc: "High efficiency PSU", price: 100, wattage: 750 },
+        { id: "850", name: "850W 80+ Gold", desc: "Extra power headroom", price: 130, wattage: 850 }
       ],
       cases: [
-        { id: "c_1", name: "GIGABYTE C102 Ice / DeepCool CC550", desc: "Mid Tower Airflow", price: 59.88 },
-        { id: "c_2", name: "ARMOURY A08 Wood Front Panel", desc: "mATX Wood Front Panel", price: 54.88 },
-        { id: "c_3", name: "AZZA FOREST 370 / DeepCool CG530 4F", desc: "Glass Panel / Airflow", price: 79.99 },
-        { id: "c_4", name: "DeepCool CH160 PLUS", desc: "Compact Mini-ITX", price: 69.99 },
-        { id: "c_5", name: "DarkFlash DRX70 Mesh", desc: "High Airflow Mesh (Black/White)", price: 99.99 },
-        { id: "c_6", name: "FRACTAL DESIGN Pop Air / Focus 2", desc: "Airflow Focus", price: 95.99 },
-        { id: "c_7", name: "be quiet! Pure Base 501", desc: "Silent Mid Tower", price: 119.99 },
-        { id: "c_8", name: "FRACTAL DESIGN Pop 2 Vision RGB", desc: "RGB Glass Showcase", price: 154.99 },
-        { id: "c_9", name: "CORSAIR FRAME 4000D RS", desc: "Panoramic ARGB ATX", price: 139.99 },
-        { id: "c_10", name: "DeepCool CH560 / CH690 DIGITAL", desc: "Built-in Digital Display Screen", price: 149.99 },
-        { id: "c_11", name: "HYTE Y50 RGB Series", desc: "Dual Chamber RGB Panoramic", price: 149.99 },
-        { id: "c_12", name: "FRACTAL DESIGN North (Black/Wood)", desc: "Real Wood Front Accent", price: 167.99 },
-        { id: "c_13", name: "JONSBO N4 mATX NAS Case", desc: "Hot-Swap Hard Drive NAS Chassis", price: 139.99 },
-        { id: "c_14", name: "FRACTAL DESIGN Mood Mini-ITX", desc: "Fabric Exterior Tower", price: 178.99 },
-        { id: "c_15", name: "FRACTAL DESIGN North XL", desc: "Wood Front Panel Full Tower XL", price: 215.99 },
-        { id: "c_16", name: "be quiet! LIGHT BASE 600 LX", desc: "Inverted Panoramic ARGB", price: 204.99 },
-        { id: "c_17", name: "HYTE Y70 Series", desc: "Premium Panoramic Dual Chamber", price: 304.99 },
-        { id: "c_18", name: "FRACTAL DESIGN Era 2 Compact", desc: "Anodized Aluminum Wood Mini-ITX", price: 289.99 },
-        { id: "c_19", name: "LIAN LI O11D EVO XL White", desc: "Seamless Glass Full Tower XL", price: 349.99 },
-        { id: "c_20", name: "ASUS ProArt PA602 Walnut Wood", desc: "Walnut Wood Modern Workstation", price: 434.99 },
-        { id: "c_21", name: "HYTE Y70 Touch Infinite Series", desc: "Integrated Touchscreen Display", price: 519.99 },
-        { id: "c_22", name: "CORSAIR iCUE LINK 9000D RGB", desc: "Super-Tower Monstrosity", price: 674.99 },
-        { id: "c_23", name: "AZZA CUBE PLUS 1002 ATX", desc: "Multi-Chamber Glass Cube Super-Tower", price: 849.99 }
+        { id: "c_atx", name: "Standard Airflow ATX Mid Tower", desc: "Fits ATX, mATX, ITX", price: 89.99, supports: ["ATX", "mATX", "ITX"] },
+        { id: "c_matx", name: "Compact Micro-ATX Case", desc: "Fits mATX, ITX only", price: 69.99, supports: ["mATX", "ITX"] },
+        { id: "c_itx", name: "Mini-ITX Small Form Factor", desc: "Fits ITX motherboards only", price: 119.99, supports: ["ITX"] }
       ],
       accs: [
-        { id: "a_1", name: "CORSAIR 5000D Airflow Front Panel", desc: "Mesh Upgrade Panel", price: 9.88 },
-        { id: "a_2", name: "iCAN GPU Holder Silver", desc: "Anti-Sag Support Bracket", price: 9.99 },
-        { id: "a_3", name: "LIAN LI USB 2.0 1-to-3 Internal Hub", desc: "Internal Header Splitter", price: 24.99 },
-        { id: "a_4", name: "CORSAIR LC100 Accent Lighting Panels", desc: "9 Tile Triangular Kit", price: 29.88 },
-        { id: "a_5", name: "DeepCool PIXEL 10 Rubber Design Bits", desc: "Case Customization Accessories", price: 39.99 },
-        { id: "a_6", name: "HYTE Internal USB HUB", desc: "Internal Header Expansion", price: 44.99 },
-        { id: "a_7", name: "ASUS ROG Herculx GPU Anti-Sag Holder", desc: "Heavy Duty Support Pillar", price: 59.99 },
-        { id: "a_8", name: "ASUS TUF GT502 Horizon ARGB Kit", desc: "Case Accent Lighting Upgrade", price: 59.99 },
-        { id: "a_9", name: "CORSAIR XENEON EDGE LCD Display", desc: "Panoramic Internal Display Screen", price: 349.99 },
-        { id: "a_10", name: "HYTE Dokibird Y70 Dragoon SE Bundle", desc: "Limited Collector Case Bundle", price: 414.99 },
-        { id: "a_11", name: "CORSAIR 3500X + RM850x + Nautilus 360", desc: "Case + 850W PSU + 360mm AIO Bundle", price: 469.99 }
+        { id: "a_1", name: "Universal GPU Support Bracket", desc: "Prevents GPU sag", price: 12.99 },
+        { id: "a_2", name: "Internal USB Expansion Hub", desc: "Adds extra USB 2.0 headers", price: 24.99 },
+        { id: "a_3", name: "ARGB Light Strip Expansion Kit", desc: "Custom RGB illumination", price: 29.99 }
       ]
     };
 
-    function renderGrid(containerId, items, selectedId, onSelect, extraFilter = null) {
+    function resetBuild() {
+      build.cpu = null; build.mb = null; build.ram = null; build.gpu = null;
+      build.storage = null; build.psu = null; build.case = null; build.acc = null;
+      updateBuilder();
+    }
+
+    /* CONTINUOUS MATRIX COMPATIBILITY CHECK */
+    function checkValid(part, category) {
+      if (category === 'cpus') {
+        if (build.mb && part.socket !== build.mb.socket) return false;
+        if (build.ram && part.ramType !== build.ram.ramType) return false;
+        if (build.gpu?.id === "none" && !part.igpu) return false;
+      }
+      if (category === 'mbs') {
+        if (build.cpu && part.socket !== build.cpu.socket) return false;
+        if (build.ram && part.ramType !== build.ram.ramType) return false;
+        if (build.case && !build.case.supports.includes(part.formFactor)) return false;
+      }
+      if (category === 'rams') {
+        if (build.cpu && part.ramType !== build.cpu.ramType) return false;
+        if (build.mb && part.ramType !== build.mb.ramType) return false;
+      }
+      if (category === 'gpus') {
+        if (part.id === "none" && build.cpu && !build.cpu.igpu) return false;
+        if (build.psu && build.psu.wattage < part.reqWattage) return false;
+      }
+      if (category === 'psus') {
+        if (build.gpu && part.wattage < build.gpu.reqWattage) return false;
+      }
+      if (category === 'cases') {
+        if (build.mb && !part.supports.includes(build.mb.formFactor)) return false;
+      }
+      return true;
+    }
+
+    function renderGrid(containerId, category, items, selectedId, onSelect) {
       const el = document.getElementById(containerId);
       el.innerHTML = "";
       items.forEach(item => {
-        if (extraFilter && !extraFilter(item)) return;
+        const isValid = checkValid(item, category);
         const card = document.createElement("div");
-        card.className = "choice-card" + (selectedId === item.id ? " selected" : "");
+        card.className = "choice-card" + (selectedId === item.id ? " selected" : "") + (!isValid ? " disabled" : "");
+        
         let badges = "";
-        if (item.igpu) badges += `<div class="igpu-badge">HAS INTEGRATED GRAPHICS</div>`;
-        if (item.optional) badges += `<div class="optional-badge">OPTIONAL</div>`;
+        if (item.igpu) badges += `<span class="badge igpu-badge">iGPU</span>`;
+        if (item.optional) badges += `<span class="badge optional-badge">OPTIONAL</span>`;
+
         card.innerHTML = `
           <div class="choice-name">${item.name}</div>
           <div class="choice-desc">${item.desc}</div>
           ${badges}
           <div class="choice-price">${item.price === 0 ? "Free" : "$" + item.price.toFixed(2)}</div>
         `;
-        card.onclick = () => onSelect(item);
+        card.onclick = () => {
+          if (isValid) onSelect(item);
+        };
         el.appendChild(card);
       });
     }
 
     function updateBuilder() {
-      // 1. CPU GRID
-      const cpuTip = document.getElementById("cpu-tip");
-      if (build.mb) {
-        cpuTip.textContent = `Showing CPUs compatible with ${build.mb.socket} motherboard. (Click again to unselect)`;
-      } else {
-        cpuTip.textContent = "Pick any CPU — motherboards below will automatically filter to match.";
-      }
-
-      renderGrid("cpu-grid", parts.cpus, build.cpu?.id, (item) => {
-        if (build.cpu?.id === item.id) {
-          build.cpu = null;
-        } else {
-          build.cpu = item;
-          if (build.mb && build.mb.socket !== item.socket) {
-            build.mb = null;
-          }
-        }
-        if (build.cpu && !build.cpu.igpu && build.gpu?.id === "none") {
-          build.gpu = null;
-        }
+      // CPUs
+      renderGrid("cpu-grid", "cpus", parts.cpus, build.cpu?.id, (item) => {
+        build.cpu = build.cpu?.id === item.id ? null : item;
         updateBuilder();
-      }, (item) => {
-        if (build.mb) return item.socket === build.mb.socket;
-        return true;
       });
 
-      // 2. MOTHERBOARD GRID
-      const mbTip = document.getElementById("mb-tip");
-      if (build.cpu) {
-        mbTip.textContent = `Showing Motherboards compatible with ${build.cpu.socket} CPU. (Click again to unselect)`;
-      } else {
-        mbTip.textContent = "Pick any Motherboard — CPUs above will automatically filter to match.";
-      }
-
-      renderGrid("mb-grid", parts.mbs, build.mb?.id, (item) => {
-        if (build.mb?.id === item.id) {
-          build.mb = null;
-        } else {
-          build.mb = item;
-          if (build.cpu && build.cpu.socket !== item.socket) {
-            build.cpu = null;
-          }
-        }
+      // Motherboards
+      renderGrid("mb-grid", "mbs", parts.mbs, build.mb?.id, (item) => {
+        build.mb = build.mb?.id === item.id ? null : item;
         updateBuilder();
-      }, (item) => {
-        if (build.cpu) return item.socket === build.cpu.socket;
-        return true;
       });
 
-      // 3. RAM
-      renderGrid("ram-grid", parts.rams, build.ram?.id, (item) => {
+      // RAM
+      renderGrid("ram-grid", "rams", parts.rams, build.ram?.id, (item) => {
         build.ram = build.ram?.id === item.id ? null : item;
         updateBuilder();
       });
 
-      // 4. GPU
-      const gpuTip = document.getElementById("gpu-tip");
-      if (build.cpu?.igpu) {
-        gpuTip.textContent = "Your CPU has integrated graphics → a dedicated GPU is optional.";
-      } else if (build.cpu) {
-        gpuTip.textContent = "This CPU has no integrated graphics → you need a dedicated GPU.";
-      } else {
-        gpuTip.textContent = "Select a CPU or Motherboard to see graphics options.";
-      }
-
-      renderGrid("gpu-grid", parts.gpus, build.gpu?.id, (item) => {
+      // GPU
+      renderGrid("gpu-grid", "gpus", parts.gpus, build.gpu?.id, (item) => {
         build.gpu = build.gpu?.id === item.id ? null : item;
         updateBuilder();
-      }, (item) => {
-        if (item.id === "none" && build.cpu && !build.cpu.igpu) return false;
-        return true;
       });
 
-      // 5. STORAGE / 6. PSU / 7. CASE / 8. ACC
-      renderGrid("storage-grid", parts.storages, build.storage?.id, (item) => { build.storage = build.storage?.id === item.id ? null : item; updateBuilder(); });
-      renderGrid("psu-grid", parts.psus, build.psu?.id, (item) => { build.psu = build.psu?.id === item.id ? null : item; updateBuilder(); });
-      renderGrid("case-grid", parts.cases, build.case?.id, (item) => { build.case = build.case?.id === item.id ? null : item; updateBuilder(); });
-      renderGrid("acc-grid", parts.accs, build.acc?.id, (item) => { build.acc = build.acc?.id === item.id ? null : item; updateBuilder(); });
+      // Storage
+      renderGrid("storage-grid", "storages", parts.storages, build.storage?.id, (item) => {
+        build.storage = build.storage?.id === item.id ? null : item;
+        updateBuilder();
+      });
 
-      // Live summary
+      // PSU
+      renderGrid("psu-grid", "psus", parts.psus, build.psu?.id, (item) => {
+        build.psu = build.psu?.id === item.id ? null : item;
+        updateBuilder();
+      });
+
+      // Case
+      renderGrid("case-grid", "cases", parts.cases, build.case?.id, (item) => {
+        build.case = build.case?.id === item.id ? null : item;
+        updateBuilder();
+      });
+
+      // Accessories
+      renderGrid("acc-grid", "accs", parts.accs, build.acc?.id, (item) => {
+        build.acc = build.acc?.id === item.id ? null : item;
+        updateBuilder();
+      });
+
+      // Summary
       const rows = [];
       let total = 0;
       const add = (label, part) => {
@@ -829,11 +753,11 @@ Here is the updated HTML code with the two separate 10-click Easter eggs, improv
       add("Storage", build.storage);
       add("Power Supply", build.psu);
       add("Case", build.case);
-      add("Accessory/Bundle", build.acc);
+      add("Accessory", build.acc);
 
       document.getElementById("summary-content").innerHTML = rows.length
         ? rows.join("") + `<div class="summary-total">Estimated Total: $${total.toFixed(2)}</div>`
-        : "Select parts above…";
+        : "Select components above…";
     }
 
     // Initialize
@@ -841,5 +765,3 @@ Here is the updated HTML code with the two separate 10-click Easter eggs, improv
   </script>
 </body>
 </html>
-
-```
