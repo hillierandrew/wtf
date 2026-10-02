@@ -1,169 +1,328 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>drew.wtf</title>
-<style>
-:root{--bg:#050508;--fg:#e0e0e0;--a1:#ff0055;--a2:#00ffcc;--a3:#ffaa00;--f:'Courier New',Courier,monospace}
-body.demonic{--bg:#0a0000;--fg:#ff3333;--a1:#aa0000;--a2:#ff0000;--a3:#ff0000}
-*{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--fg);font-family:var(--f);transition:background 1s,color 1s}
-.ns{user-select:none;-webkit-user-select:none}
-#bg{position:absolute;inset:0;width:100%;height:100%;z-index:1}
-#splash{position:fixed;inset:0;background:radial-gradient(circle,#111118,#000);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity .6s,transform .6s}
-.card{text-align:center;padding:40px;border:1px solid #fff2;border-radius:10px;background:#0008;animation:br 4s infinite ease-in-out}
-@keyframes br{0%,100%{transform:scale(1);box-shadow:0 0 30px #00ffcc22}50%{transform:scale(1.02);box-shadow:0 0 50px #ff005533}}
-.card h1{font-size:3rem;letter-spacing:5px;margin-bottom:20px;color:#fff}
-.card p{color:#888;letter-spacing:2px;animation:bl 1.5s infinite}
-@keyframes bl{0%,100%{opacity:.3}50%{opacity:1}}
-#main{position:relative;z-index:10;width:100%;height:100%;display:flex;align-items:center;justify-content:center}
-.wg{font-size:6rem;font-weight:bold;display:flex;gap:5px}
-@media(min-width:768px){.wg{font-size:10rem}}
-.node{cursor:pointer;display:inline-block;transition:transform .1s,color .2s,text-shadow .2s}
-#nd:hover{color:var(--a1);text-shadow:0 0 20px var(--a1)}
-#nt{color:var(--a2)}#nt:hover{text-shadow:0 0 20px var(--a2)}
-#nw:hover{color:var(--a3);text-shadow:0 0 20px var(--a3)}
-@keyframes shake{0%{transform:translate(0)}20%{transform:translate(-4px,4px) skewX(2deg)}40%{transform:translate(4px,-4px) skewY(-2deg)}60%{transform:translate(-4px,-4px) skewX(-2deg);filter:hue-rotate(45deg)}80%{transform:translate(4px,4px) skewY(2deg)}100%{transform:translate(0)}}
-.shake{animation:shake .15s infinite}
-#mute{position:fixed;right:14px;bottom:14px;z-index:10000;background:#000a;color:#fff;border:1px solid #555;border-radius:6px;padding:8px 12px;font-family:var(--f);cursor:pointer}
-.modal{position:fixed;inset:0;background:#000e;backdrop-filter:blur(10px);z-index:1000;display:none;align-items:center;justify-content:center}
-.modal.show{display:flex}
-.mc{background:#0d0d12;border:1px solid #333;border-radius:8px;width:96%;max-width:1200px;max-height:92vh;padding:24px;overflow-y:auto;position:relative;color:#e0e0e0}
-.x{position:absolute;top:10px;right:16px;background:none;border:0;color:#888;font-size:2rem;cursor:pointer}.x:hover{color:#fff}
-h2{color:#ff0055;margin-bottom:4px}.sub{color:#888;font-size:.85rem;margin-bottom:14px}
-.layout{display:grid;grid-template-columns:1fr 300px;gap:16px}
-@media(max-width:850px){.layout{grid-template-columns:1fr}}
-.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
-.tab{background:#15151a;border:1px solid #333;color:#aaa;padding:6px 10px;border-radius:4px;cursor:pointer;font-family:var(--f);font-size:.8rem}
-.tab.on{border-color:#00ffcc;color:#00ffcc}.tab.has::after{content:" ✓";color:#00ffcc}
-.tools{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
-.tools input,.tools select{background:#000;color:#fff;border:1px solid #333;border-radius:4px;padding:8px;font-family:var(--f);flex:1;min-width:120px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
-.p{background:#15151a;border:1px solid #2a2a33;border-left:4px solid #444;border-radius:6px;padding:10px;cursor:pointer;font-size:.82rem;position:relative}
-.p:hover{border-left-color:#00ffcc}.p.sel{border-color:#00ffcc;background:#00ffcc12}
-.p.dis{opacity:.4;filter:grayscale(1);cursor:not-allowed}.p.dis:hover{border-left-color:#444}
-.p .n{margin-bottom:6px;line-height:1.3;word-break:break-word}.p .pr{color:#00ffcc;font-weight:bold}
-.b{display:inline-block;font-size:.7rem;padding:1px 6px;border-radius:3px;margin-left:4px;background:#333;color:#ddd}
-.b.u{background:#ffaa0033;color:#ffaa00}.b.s{background:#ff005533;color:#ff5588}
-.em{position:absolute;top:8px;right:8px}
-.why{color:#ff7799;font-size:.72rem;margin-top:5px}
-.sum{background:#00ffcc0a;border:1px solid #00ffcc;border-radius:6px;padding:14px;font-size:.82rem;align-self:start;position:sticky;top:0}
-.sum h3{color:#fff;margin-bottom:8px}.sum div.r{display:flex;justify-content:space-between;gap:8px;margin:3px 0;color:#aaa}
-.tot{font-size:1.8rem;color:#00ffcc;font-weight:bold;margin:8px 0}
-.bar{height:8px;background:#222;border-radius:4px;overflow:hidden;margin:6px 0}.bar i{display:block;height:100%;background:#00ffcc}
-.btn{background:#222;color:#fff;border:1px solid #555;padding:8px 12px;border-radius:4px;cursor:pointer;font-family:var(--f);margin:8px 6px 0 0}.btn:hover{background:#444}
-.warn{color:#ffaa00;font-size:.75rem;margin-top:4px}
-.fo a{color:#55aaff}.fo li{background:#111;padding:10px;margin:8px 0;list-style:none;border-left:3px solid #ffaa00}
-</style></head><body>
-<audio id="bgm" src="dream.mp3" loop preload="auto"></audio>
-<div id="splash" class="ns"><div class="card"><h1>drew.wtf</h1><p>[ PRESS SPACE, CLICK, OR SCROLL TO ENTER ]</p></div></div>
-<button id="mute" class="ns" aria-label="Toggle music">♪ on</button>
-<canvas id="bg"></canvas>
-<div id="main" class="ns"><div class="wg"><div id="nd" class="node">drew</div><div id="nt" class="node">.</div><div id="nw" class="node">wtf</div></div></div>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>drew.wtf</title>
+  <style>
+    :root{--bg:#050508;--fg:#e0e0e0;--a1:#ff0055;--a2:#00ffcc;--a3:#ffaa00;--f:'Courier New',Courier,monospace}
+    body.demonic{--bg:#0a0000;--fg:#ff3333;--a1:#aa0000;--a2:#ff0000;--a3:#ff0000}
+    *{margin:0;padding:0;box-sizing:border-box}
+    html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--fg);font-family:var(--f);transition:background 1s,color 1s}
+    .ns{user-select:none;-webkit-user-select:none}
+    #bg{position:absolute;inset:0;width:100%;height:100%;z-index:1}
+    #splash{position:fixed;inset:0;background:radial-gradient(circle,#111118,#000);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity .6s,transform .6s}
+    .card{text-align:center;padding:40px;border:1px solid #fff2;border-radius:10px;background:#0008;animation:br 4s infinite ease-in-out;backdrop-filter:blur(5px)}
+    @keyframes br{0%,100%{transform:scale(1);box-shadow:0 0 30px #00ffcc22}50%{transform:scale(1.02);box-shadow:0 0 50px #ff005533}}
+    .card h1{font-size:3rem;letter-spacing:5px;margin-bottom:20px;color:#fff;text-shadow:0 0 10px rgba(0,255,204,0.5)}
+    .card p{color:#888;letter-spacing:2px;animation:bl 1.5s infinite}
+    @keyframes bl{0%,100%{opacity:.3}50%{opacity:1}}
+    #main{position:relative;z-index:10;width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+    .wg{font-size:6rem;font-weight:bold;display:flex;gap:5px}
+    @media(min-width:768px){.wg{font-size:10rem}}
+    .node{cursor:pointer;display:inline-block;transition:transform .1s,color .2s,text-shadow .2s}
+    #nd:hover{color:var(--a1);text-shadow:0 0 20px var(--a1)}
+    #nt{color:var(--a2)}#nt:hover{text-shadow:0 0 20px var(--a2)}
+    #nw:hover{color:var(--a3);text-shadow:0 0 20px var(--a3)}
+    @keyframes shake{0%{transform:translate(0);}20%{transform:translate(-4px,4px) skewX(2deg);}40%{transform:translate(4px,-4px) skewY(-2deg);}60%{transform:translate(-4px,-4px) skewX(-2deg);filter:hue-rotate(45deg);}80%{transform:translate(4px,4px) skewY(2deg);}100%{transform:translate(0);}}
+    .shake{animation:shake .15s infinite}
+    #controls{position:fixed;right:14px;bottom:14px;z-index:10000;display:flex;gap:8px}
+    .ctrl-btn{background:#000a;color:#fff;border:1px solid #555;border-radius:6px;padding:8px 12px;font-family:var(--f);cursor:pointer}
+    .modal{position:fixed;inset:0;background:#000e;backdrop-filter:blur(10px);z-index:1000;display:none;align-items:center;justify-content:center}
+    .modal.show{display:flex}
+    .mc{background:#0d0d12;border:1px solid #333;border-radius:8px;width:96%;max-width:1200px;max-height:92vh;padding:24px;overflow-y:auto;position:relative;color:#e0e0e0}
+    .x{position:absolute;top:10px;right:16px;background:none;border:0;color:#888;font-size:2rem;cursor:pointer}.x:hover{color:#fff}
+    h2{color:#ff0055;margin-bottom:4px}.sub{color:#888;font-size:.85rem;margin-bottom:14px}
+    .layout{display:grid;grid-template-columns:1fr 300px;gap:16px}
+    @media(max-width:850px){.layout{grid-template-columns:1fr}}
+    .tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+    .tab{background:#15151a;border:1px solid #333;color:#aaa;padding:6px 10px;border-radius:4px;cursor:pointer;font-family:var(--f);font-size:.8rem}
+    .tab.on{border-color:#00ffcc;color:#00ffcc}.tab.has::after{content:" ✓";color:#00ffcc}
+    .tools{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+    .tools input,.tools select{background:#000;color:#fff;border:1px solid #333;border-radius:4px;padding:8px;font-family:var(--f);flex:1;min-width:120px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+    .p{background:#15151a;border:1px solid #2a2a33;border-left:4px solid #444;border-radius:6px;padding:10px;cursor:pointer;font-size:.82rem;position:relative}
+    .p:hover{border-left-color:#00ffcc}.p.sel{border-color:#00ffcc;background:#00ffcc12}
+    .p.dis{opacity:.4;filter:grayscale(1);cursor:not-allowed}.p.dis:hover{border-left-color:#444}
+    .p .n{margin-bottom:6px;line-height:1.3;word-break:break-word}.p .pr{color:#00ffcc;font-weight:bold}
+    .b{display:inline-block;font-size:.7rem;padding:1px 6px;border-radius:3px;margin-left:4px;background:#333;color:#ddd}
+    .b.u{background:#ffaa0033;color:#ffaa00}.b.s{background:#ff005533;color:#ff5588}
+    .em{position:absolute;top:8px;right:8px}
+    .why{color:#ff7799;font-size:.72rem;margin-top:5px}
+    .sum{background:#00ffcc0a;border:1px solid #00ffcc;border-radius:6px;padding:14px;font-size:.82rem;align-self:start;position:sticky;top:0}
+    .sum h3{color:#fff;margin-bottom:8px}.sum div.r{display:flex;justify-content:space-between;gap:8px;margin:3px 0;color:#aaa}
+    .tot{font-size:1.8rem;color:#00ffcc;font-weight:bold;margin:8px 0}
+    .bar{height:8px;background:#222;border-radius:4px;overflow:hidden;margin:6px 0}.bar i{display:block;height:100%;background:#00ffcc}
+    .btn{background:#222;color:#fff;border:1px solid #555;padding:8px 12px;border-radius:4px;cursor:pointer;font-family:var(--f);margin:8px 6px 0 0}.btn:hover{background:#444}
+    .warn{color:#ffaa00;font-size:.75rem;margin-top:4px}
+    .fo a{color:#55aaff}.fo li{background:#111;padding:10px;margin:8px 0;list-style:none;border-left:3px solid #ffaa00}
+    #wave{position:fixed;bottom:0;left:0;width:100%;height:4px;background:#00ffcc22;z-index:999;display:flex}
+    #wave i{height:100%;background:var(--a2);width:0;transition:width 0.05s}
+  </style>
+</head>
+<body>
+  <!-- Audio Context & Music Setup -->
+  <audio id="bgm" src="dream.mp3" loop preload="auto"></audio>
+  <div id="wave"><i id="wbar"></i></div>
 
-<div id="mb" class="modal"><div class="mc"><button class="x" onclick="cm('mb')">&times;</button>
-<h2>// SMART HARDWARE CONFIGURATOR</h2>
-<p class="sub">Pick any part first. Everything else updates: 🟢 compatible, ❌ greyed out with the reason. Prices CAD.</p>
-<div class="layout"><div><div class="tabs" id="tabs"></div>
-<div class="tools"><input id="q" placeholder="Search..." oninput="draw()"><select id="so" onchange="draw()"><option value="n">Sort: name</option><option value="a">Price low-high</option><option value="d">Price high-low</option></select><select id="cond" onchange="draw()"><option value="">New + used</option><option value="new">New only</option><option value="used">Used only</option></select></div>
-<div class="grid" id="grid"></div></div>
-<div class="sum" id="sum"></div></div></div></div>
+  <div id="splash" class="ns">
+    <div class="card">
+      <h1>drew.wtf</h1>
+      <p>[ PRESS SPACE, CLICK, OR SCROLL TO ENTER ]</p>
+    </div>
+  </div>
 
-<div id="mf" class="modal"><div class="mc fo"><button class="x" onclick="cm('mf')">&times;</button>
-<h2>// FREE &amp; OPEN-SOURCE HUB</h2><p class="sub">Legit software worth having. All free.</p>
-<ul>
-<li><b>Office:</b> <a href="https://www.libreoffice.org" target="_blank">LibreOffice</a></li>
-<li><b>3D / video:</b> <a href="https://www.blender.org" target="_blank">Blender</a>, <a href="https://kdenlive.org" target="_blank">Kdenlive</a>, <a href="https://obsproject.com" target="_blank">OBS Studio</a></li>
-<li><b>Images:</b> <a href="https://www.gimp.org" target="_blank">GIMP</a>, <a href="https://krita.org" target="_blank">Krita</a>, <a href="https://inkscape.org" target="_blank">Inkscape</a></li>
-<li><b>Media:</b> <a href="https://www.videolan.org" target="_blank">VLC</a>, <a href="https://jellyfin.org" target="_blank">Jellyfin</a> (self-hosted media server)</li>
-<li><b>Linux:</b> <a href="https://linuxmint.com" target="_blank">Linux Mint</a>, <a href="https://fedoraproject.org" target="_blank">Fedora</a>, <a href="https://ubuntu.com" target="_blank">Ubuntu</a></li>
-<li><b>Self-hosting:</b> <a href="https://immich.app" target="_blank">Immich</a>, <a href="https://nextcloud.com" target="_blank">Nextcloud</a>, <a href="https://www.home-assistant.io" target="_blank">Home Assistant</a></li>
-<li><b>Music:</b> <a href="https://www.audacityteam.org" target="_blank">Audacity</a>, <a href="https://www.musescore.org" target="_blank">MuseScore</a></li>
-</ul></div></div>
+  <div id="controls" class="ns">
+    <button id="mute" class="ctrl-btn" aria-label="Toggle audio">♪ on</button>
+  </div>
 
-<script>
-/* ===== AUDIO ===== */
-const bgm=document.getElementById('bgm'),mute=document.getElementById('mute');
-let fell=false;
-bgm.addEventListener('error',()=>{if(!fell){fell=true;bgm.src='https://raw.githubusercontent.com/hillierandrew/wtf/main/dream.mp3';bgm.load();if(open1)bgm.play().catch(()=>{})}});
-mute.onclick=e=>{e.stopPropagation();bgm.muted=!bgm.muted;mute.textContent=bgm.muted?'♪ off':'♪ on'};
+  <canvas id="bg"></canvas>
 
-/* ===== ENTRY ===== */
-let open1=false;const sp=document.getElementById('splash');
-function unlock(e){if(open1)return;if(e.type==='keydown'&&e.code!=='Space'&&e.code!=='Enter')return;
-open1=true;bgm.volume=.5;bgm.play().catch(()=>{});sp.style.opacity=0;sp.style.transform='scale(1.5)';setTimeout(()=>sp.style.display='none',600);
-['click','keydown','wheel','touchstart'].forEach(t=>removeEventListener(t,unlock));anim()}
-['click','keydown','wheel','touchstart'].forEach(t=>addEventListener(t,unlock));
+  <div id="main" class="ns">
+    <div class="wg">
+      <div id="nd" class="node">drew</div>
+      <div id="nt" class="node">.</div>
+      <div id="nw" class="node">wtf</div>
+    </div>
+  </div>
 
-/* ===== EASTER EGGS & DEMON MODE TOGGLE ===== */
-let demon=false;const c={d:0,t:0,w:0};
-function pulse(el,col){el.style.color=col;el.style.transform='scale(1.2)';setTimeout(()=>{el.style.color='';el.style.transform=''},150)}
-const nd=document.getElementById('nd'),nt=document.getElementById('nt'),nw=document.getElementById('nw');
+  <!-- Hardware Configurator Modal -->
+  <div id="mb" class="modal">
+    <div class="mc">
+      <button class="x" onclick="cm('mb')">&times;</button>
+      <h2>// SMART HARDWARE CONFIGURATOR</h2>
+      <p class="sub">Full compatibility engine active. Select any component to filter matching hardware options live.</p>
+      <div class="layout">
+        <div>
+          <div class="tabs" id="tabs"></div>
+          <div class="tools">
+            <input id="q" placeholder="Search parts..." oninput="draw()">
+            <select id="so" onchange="draw()">
+              <option value="n">Sort: Name</option>
+              <option value="a">Price: Low to High</option>
+              <option value="d">Price: High to Low</option>
+            </select>
+            <select id="cond" onchange="draw()">
+              <option value="">All Conditions</option>
+              <option value="new">New Only</option>
+              <option value="used">Used Only</option>
+            </select>
+            <label style="display:flex;align-items:center;gap:6px;font-size:0.8rem;cursor:pointer;">
+              <input type="checkbox" id="hideSold" onchange="draw()"> Hide Disallowed/Sold Out
+            </label>
+          </div>
+          <div class="grid" id="grid"></div>
+        </div>
+        <div class="sum" id="sum"></div>
+      </div>
+    </div>
+  </div>
 
-nd.onclick=e=>{e.stopPropagation();pulse(nd,'#ff0055');if(++c.d>=10){c.d=0;om('mb');draw()}};
+  <!-- Open-Source Hub Modal -->
+  <div id="mf" class="modal">
+    <div class="mc fo">
+      <button class="x" onclick="cm('mf')">&times;</button>
+      <h2>// FREE &amp; OPEN-SOURCE HUB</h2>
+      <p class="sub">Legit tools, utilities, and operating systems.</p>
+      <ul>
+        <li><b>Office:</b> <a href="https://www.libreoffice.org" target="_blank">LibreOffice</a></li>
+        <li><b>3D / Video:</b> <a href="https://www.blender.org" target="_blank">Blender</a>, <a href="https://kdenlive.org" target="_blank">Kdenlive</a>, <a href="https://obsproject.com" target="_blank">OBS Studio</a></li>
+        <li><b>Images:</b> <a href="https://www.gimp.org" target="_blank">GIMP</a>, <a href="https://krita.org" target="_blank">Krita</a>, <a href="https://inkscape.org" target="_blank">Inkscape</a></li>
+        <li><b>Media:</b> <a href="https://www.videolan.org" target="_blank">VLC</a>, <a href="https://jellyfin.org" target="_blank">Jellyfin</a></li>
+        <li><b>Linux:</b> <a href="https://linuxmint.com" target="_blank">Linux Mint</a>, <a href="https://fedoraproject.org" target="_blank">Fedora</a>, <a href="https://ubuntu.com" target="_blank">Ubuntu</a></li>
+        <li><b>Self-hosting:</b> <a href="https://immich.app" target="_blank">Immich</a>, <a href="https://nextcloud.com" target="_blank">Nextcloud</a>, <a href="https://www.home-assistant.io" target="_blank">Home Assistant</a></li>
+        <li><b>Music:</b> <a href="https://www.audacityteam.org" target="_blank">Audacity</a>, <a href="https://www.musescore.org" target="_blank">MuseScore</a></li>
+      </ul>
+    </div>
+  </div>
 
-nt.onclick=e=>{
-    e.stopPropagation();
-    pulse(nt,demon?'#ff0000':'#00ffcc');
-    if(!demon){
-        if(++c.t>=6){
-            demon=true;
-            c.t=0;
-            document.body.classList.add('demonic');
-            document.getElementById('main').classList.add('shake');
-            nw.textContent='666';
-            bgm.playbackRate=.7;
-        }
-    }else{
-        demon=false;
-        c.t=0;
-        document.body.classList.remove('demonic');
-        document.getElementById('main').classList.remove('shake');
-        nw.textContent='wtf';
-        bgm.playbackRate=1;
-    }
-};
+  <script>
+    /* ===== AUDIO & SYNTH BEEPS ENGINE ===== */
+    const bgm = document.getElementById('bgm'), mute = document.getElementById('mute');
+    let audioCtx = null, analyser = null, dataArray = null;
+    let fell = false;
 
-nw.onclick=e=>{e.stopPropagation();pulse(nw,demon?'#f00':'#ffaa00');if(++c.w>=10){c.w=0;om('mf')}};
-function om(id){document.getElementById(id).classList.add('show')}
-function cm(id){document.getElementById(id).classList.remove('show')}
-
-/* ===== PARTICLES (STAR COUNT INCREASES ON CLICK) ===== */
-const cv=document.getElementById('bg'),cx=cv.getContext('2d');
-function rs(){cv.width=innerWidth;cv.height=innerHeight}addEventListener('resize',rs);rs();
-const ps=Array.from({length:100},()=>({x:Math.random()*cv.width,y:Math.random()*cv.height,vx:(Math.random()-.5)*1.5,vy:(Math.random()-.5)*1.5,s:Math.random()*2}));
-
-// Increase stars on every click
-window.addEventListener('click',e=>{
-    const px=e.clientX||Math.random()*cv.width;
-    const py=e.clientY||Math.random()*cv.height;
-    for(let i=0;i<5;i++){
-        ps.push({
-            x:px+(Math.random()-.5)*20,
-            y:py+(Math.random()-.5)*20,
-            vx:(Math.random()-.5)*2,
-            vy:(Math.random()-.5)*2,
-            s:Math.random()*2.5
-        });
-    }
-});
-
-function anim(){
-    cx.fillStyle=demon?'rgba(10,0,0,.2)':'rgba(5,5,8,.2)';
-    cx.fillRect(0,0,cv.width,cv.height);
-    cx.fillStyle=demon?'#ff1111':'#ffffff';
-    ps.forEach(p=>{
-        p.x+=p.vx;p.y+=p.vy;
-        if(p.x<0||p.x>cv.width)p.vx*=-1;
-        if(p.y<0||p.y>cv.height)p.vy*=-1;
-        cx.beginPath();
-        cx.arc(p.x,p.y,p.s,0,7);
-        cx.fill();
+    bgm.addEventListener('error', () => {
+      if (!fell) {
+        fell = true;
+        bgm.src = 'https://raw.githubusercontent.com/hillierandrew/wtf/main/dream.mp3';
+        bgm.load();
+        if (open1) bgm.play().catch(() => {});
+      }
     });
-    requestAnimationFrame(anim);
-}
 
-/* ===== CATALOG ===== */
-const RAW={
-cpu:{k:'name price f sock w igpu',t:`AMD Ryzen 7 9800X3D 8-Core|619.99||AM5|120|0
+    function initAudioContext() {
+      if (!audioCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AC();
+        analyser = audioCtx.createAnalyser();
+        const source = audioCtx.createMediaElementSource(bgm);
+        source.connect(analyser);
+        analyser.connect(audioCtx.destination);
+        analyser.fftSize = 64;
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+      }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playBeep(freq, duration, type='sine', vol=0.05) {
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch(e) {}
+    }
+
+    mute.onclick = (e) => {
+      e.stopPropagation();
+      bgm.muted = !bgm.muted;
+      mute.textContent = bgm.muted ? '♪ off' : '♪ on';
+      playBeep(400, 0.1);
+    };
+
+    /* ===== ENTRY & UNLOCK ===== */
+    let open1 = false;
+    const sp = document.getElementById('splash');
+
+    function unlock(e) {
+      if (open1) return;
+      if (e.type === 'keydown' && e.code !== 'Space' && e.code !== 'Enter') return;
+      open1 = true;
+      initAudioContext();
+      bgm.volume = .5;
+      bgm.play().catch(() => {});
+      sp.style.opacity = 0;
+      sp.style.transform = 'scale(1.5)';
+      setTimeout(() => sp.style.display = 'none', 600);
+      ['click', 'keydown', 'wheel', 'touchstart'].forEach(t => removeEventListener(t, unlock));
+      anim();
+    }
+    ['click', 'keydown', 'wheel', 'touchstart'].forEach(t => addEventListener(t, unlock));
+
+    /* ===== EASTER EGG NODES ===== */
+    let demon = false;
+    const c = { d: 0, t: 0, w: 0 };
+    function pulse(el, col) {
+      el.style.color = col;
+      el.style.transform = 'scale(1.2)';
+      setTimeout(() => { el.style.color = ''; el.style.transform = ''; }, 150);
+    }
+
+    const nd = document.getElementById('nd'), nt = document.getElementById('nt'), nw = document.getElementById('nw');
+
+    nd.onclick = (e) => {
+      e.stopPropagation();
+      c.d++;
+      playBeep(300 + (c.d * 50), 0.1, 'triangle', 0.1);
+      pulse(nd, '#ff0055');
+      if (c.d >= 10) {
+        c.d = 0;
+        playBeep(880, 0.3, 'sine', 0.15);
+        om('mb');
+        draw();
+      }
+    };
+
+    nt.onclick = (e) => {
+      e.stopPropagation();
+      c.t++;
+      playBeep(200 + (c.t * 80), 0.1, 'sine', 0.1);
+      pulse(nt, '#00ffcc');
+      if (c.t >= 6 && !demon) {
+        demon = true;
+        document.body.classList.add('demonic');
+        document.getElementById('main').classList.add('shake');
+        nw.textContent = '666';
+        bgm.playbackRate = .7;
+        playBeep(80, 0.8, 'sawtooth', 0.2);
+      }
+    };
+
+    nw.onclick = (e) => {
+      e.stopPropagation();
+      c.w++;
+      playBeep(400 + (c.w * 40), 0.1, 'sawtooth', 0.1);
+      pulse(nw, demon ? '#f00' : '#ffaa00');
+      if (c.w >= 10) {
+        c.w = 0;
+        playBeep(600, 0.3, 'sine', 0.15);
+        om('mf');
+      }
+    };
+
+    function om(id) { document.getElementById(id).classList.add('show'); playBeep(550, 0.1); }
+    function cm(id) { document.getElementById(id).classList.remove('show'); playBeep(350, 0.1); }
+
+    /* ===== STARFIELD / RIPPLE CANVAS ===== */
+    const cv = document.getElementById('bg'), cx = cv.getContext('2d');
+    function rs() { cv.width = innerWidth; cv.height = innerHeight; }
+    addEventListener('resize', rs); rs();
+
+    let mouse = { x: cv.width/2, y: cv.height/2 };
+    addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+
+    const ps = Array.from({ length: 120 }, () => ({
+      x: Math.random() * cv.width,
+      y: Math.random() * cv.height,
+      z: Math.random() * cv.width,
+      s: Math.random() * 2
+    }));
+
+    const ripples = [];
+    addEventListener('click', e => {
+      if (open1) ripples.push({ x: e.clientX, y: e.clientY, r: 0, alpha: 1 });
+    });
+
+    function anim() {
+      cx.fillStyle = demon ? 'rgba(10,0,0,.25)' : 'rgba(5,5,8,.25)';
+      cx.fillRect(0, 0, cv.width, cv.height);
+
+      // Starfield movement toward mouse drift
+      cx.fillStyle = demon ? '#ff3333' : '#ccc';
+      ps.forEach(p => {
+        let dx = (mouse.x - cv.width/2) * 0.0002;
+        let dy = (mouse.y - cv.height/2) * 0.0002;
+        p.x += dx * p.z; p.y += dy * p.z;
+        if(p.x < 0) p.x = cv.width; if(p.x > cv.width) p.x = 0;
+        if(p.y < 0) p.y = cv.height; if(p.y > cv.height) p.y = 0;
+
+        cx.beginPath();
+        cx.arc(p.x, p.y, p.s, 0, 7);
+        cx.fill();
+      });
+
+      // Ripple effects
+      ripples.forEach((rp, idx) => {
+        rp.r += 4; rp.alpha -= 0.02;
+        cx.strokeStyle = demon ? `rgba(255,0,0,${rp.alpha})` : `rgba(0,255,204,${rp.alpha})`;
+        cx.lineWidth = 1.5;
+        cx.beginPath(); cx.arc(rp.x, rp.y, rp.r, 0, Math.PI*2); cx.stroke();
+        if(rp.alpha <= 0) ripples.splice(idx, 1);
+      });
+
+      // Real-time audio waveform / heartbeat bar
+      if (analyser && !bgm.paused) {
+        analyser.getByteFrequencyData(dataArray);
+        let avg = dataArray.reduce((a,b)=>a+b, 0) / dataArray.length;
+        document.getElementById('wbar').style.width = (avg * 2.5) + '%';
+      }
+
+      requestAnimationFrame(anim);
+    }
+
+    /* ===== COMPREHENSIVE HARDWARE DATASET ===== */
+    const RAW = {
+      cpu: {
+        k: 'name price f sock w igpu',
+        t: `AMD Ryzen 7 9800X3D 8-Core|619.99||AM5|120|0
 AMD Ryzen 7 9850X3D 8-Core|679.98||AM5|120|0
 AMD Ryzen 7 7800X3D 8-Core|519.98||AM5|120|0
 AMD Ryzen 9 9950X3D 16-Core|929.98||AM5|170|0
@@ -184,8 +343,11 @@ Intel Core i7-14700K 20-Core|539.99||LGA1700|253|1
 Intel Core i5-14600KF 14-Core|329.99||LGA1700|181|0
 Intel Core i5-14600K 14-Core|349.99|p|LGA1700|181|1
 Intel Core i5-14400 10-Core|259.00||LGA1700|148|1
-Intel Core i3-14100 4-Core|189.99||LGA1700|110|1`},
-mb:{k:'name price f sock ddr form',t:`GIGABYTE B650 EAGLE AX ATX|249.99||AM5|5|3
+Intel Core i3-14100 4-Core|189.99||LGA1700|110|1`
+      },
+      mb: {
+        k: 'name price f sock ddr form',
+        t: `GIGABYTE B650 EAGLE AX ATX|249.99||AM5|5|3
 GIGABYTE B650M GAMING PLUS WIFI mATX|179.99|p|AM5|5|2
 ASUS TUF GAMING X870-PLUS WIFI ATX|349.99||AM5|5|3
 GIGABYTE B850 AORUS ELITE WIFI7 ATX|339.99||AM5|5|3
@@ -202,8 +364,11 @@ ASUS ROG STRIX B860-I GAMING WIFI Mini-ITX|309.99||LGA1851|5|1
 MSI PRO B760M-P DDR4 mATX|139.99||LGA1700|4|2
 GIGABYTE B760M GAMING PLUS WIFI DDR4 mATX|169.99||LGA1700|4|2
 ASUS Z790 GAMING WIFI7 DDR5 ATX|269.99||LGA1700|5|3
-ASUS TUF Gaming Z790-Plus WiFi DDR5 ATX|369.99|p|LGA1700|5|3`},
-ram:{k:'name price f ddr',t:`G.SKILL Ripjaws V 32GB (2x16GB) DDR4 3200|379.99||4
+ASUS TUF Gaming Z790-Plus WiFi DDR5 ATX|369.99|p|LGA1700|5|3`
+      },
+      ram: {
+        k: 'name price f ddr',
+        t: `G.SKILL Ripjaws V 32GB (2x16GB) DDR4 3200|379.99||4
 CORSAIR VENGEANCE LPX 32GB (2x16GB) DDR4 3200|435.99||4
 Kingston FURY Beast 16GB (2x8GB) DDR4 3200|259.99|p|4
 CORSAIR VENGEANCE RGB 32GB (2x16GB) DDR5 6000 CL36|799.99||5
@@ -212,8 +377,11 @@ TEAMGROUP T-FORCE VULCAN 32GB (2x16GB) DDR5 6000|759.99||5
 G.SKILL Ripjaws S5 32GB (2x16GB) DDR5 6000|729.99||5
 KLEVV BOLT V 32GB (2x16GB) DDR5 6000|719.99||5
 CORSAIR VENGEANCE RGB 64GB (2x32GB) DDR5 6000|1779.99||5
-G.SKILL Trident Z5 Neo RGB 64GB (2x32GB) DDR5 6000|2129.99||5`},
-gpu:{k:'name price f rec w tag',t:`GIGABYTE AORUS GeForce RTX 5090 INFINITY 32GB|8499.00|x|1000|575|
+G.SKILL Trident Z5 Neo RGB 64GB (2x32GB) DDR5 6000|2129.99||5`
+      },
+      gpu: {
+        k: 'name price f rec w tag',
+        t: `GIGABYTE AORUS GeForce RTX 5090 INFINITY 32GB|8499.00|x|1000|575|
 ASUS PRIME GeForce RTX 5080 16GB GDDR7|2229.99||850|360|
 MSI GeForce RTX 5070 Ti 16G SHADOW 3X OC|1689.99||750|300|
 GIGABYTE GeForce RTX 5070 GAMING OC 12G|1299.00||650|250|
@@ -225,8 +393,11 @@ GIGABYTE Radeon RX 9070 XT GAMING OC|1049.00||750|304|
 XFX Swift AMD Radeon RX 9070 GRE 12GB|1049.00||700|220|
 SAPPHIRE PULSE AMD Radeon RX 9060 XT 16GB|849.99||600|180|
 ASUS TURBO Radeon AI PRO R9700|2839.99||750|300|Workstation
-GIGABYTE GeForce GT 1030 Low Profile|159.99|p|300|30|`},
-ssd:{k:'name price f',t:`WD Black SN850X 1TB PCIe Gen4 NVMe M.2|329.99|
+GIGABYTE GeForce GT 1030 Low Profile|159.99|p|300|30|`
+      },
+      ssd: {
+        k: 'name price f',
+        t: `WD Black SN850X 1TB PCIe Gen4 NVMe M.2|329.99|
 WD Black SN850X 2TB PCIe Gen4 NVMe M.2|559.99|
 WD Black SN850X 2TB PCIe Gen4 NVMe M.2 (Open Box)|503.99|pu
 Samsung 990 Pro 2TB M.2 NVMe PCIe 4.0|649.99|
@@ -234,8 +405,11 @@ Samsung 990 Pro 4TB M.2 NVMe PCIe 4.0|1499.99|p
 Samsung 9100 PRO 1TB M.2 NVMe PCIe Gen5|464.99|
 Kingston NV3 1TB NVMe PCIe 4x4|229.99|
 Lexar NM790 2TB M.2|429.99|
-Kingston A400 480GB SATA3 2.5"|164.99|`},
-hdd:{k:'name price f',t:`Seagate BarraCuda 8TB 3.5" SATA|344.99|
+Kingston A400 480GB SATA3 2.5"|164.99|`
+      },
+      hdd: {
+        k: 'name price f',
+        t: `Seagate BarraCuda 8TB 3.5" SATA|344.99|
 Seagate BarraCuda 24TB Internal|1034.99|
 Seagate BarraCuda 4TB Internal|224.99|p
 Seagate BarraCuda 8TB 3.5" SATA (Open Box)|310.49|pu
@@ -243,8 +417,11 @@ Seagate IronWolf 4TB NAS|264.99|
 WD Red Plus 8TB NAS|529.99|
 WD Blue 4TB|259.98|
 Toshiba N300 Pro 8TB NAS|529.99|
-WD Red Pro 16TB|1089.99|`},
-cooler:{k:'name price f rad',t:`CORSAIR NAUTILUS 360 RS ARGB AIO|184.99||360
+WD Red Pro 16TB|1089.99|`
+      },
+      cooler: {
+        k: 'name price f rad',
+        t: `CORSAIR NAUTILUS 360 RS ARGB AIO|184.99||360
 Arctic Liquid Freezer III PRO 360 AIO|189.99||360
 Arctic Liquid Freezer III PRO 420 AIO|209.99||420
 DeepCool MYSTIQUE 240 LCD AIO|199.99||240
@@ -255,8 +432,11 @@ be quiet! Dark Rock 5 Air Cooler|109.99|p|0
 DeepCool AK400 G2 Air Cooler|34.99||0
 DeepCool ASSASSIN IV WH Air Cooler|79.88|p|0
 Cooler Master HYPER 212 Spectrum V3|34.99|p|0
-iCAN 4-Heatpipe CPU Cooler (Open Box)|16.99|pu|0`},
-psu:{k:'name price f w sfx',t:`Coolmax I-400 400W ATX|31.99|x|400|0
+XXXX 4-Heatpipe CPU Cooler (Open Box)|16.99|pu|0`
+      },
+      psu: {
+        k: 'name price f w sfx',
+        t: `Coolmax I-400 400W ATX|31.99|x|400|0
 THERMALTAKE Smart White 500W|59.99||500|0
 AZZA PSAZ-550W ATX|54.99|p|550|0
 MSI MAG A650BN 650W Bronze|99.99|p|650|0
@@ -270,8 +450,11 @@ CORSAIR RM1000x 1000W Gold|264.99||1000|0
 MSI MPG A1000GS 1000W Gold|289.99||1000|0
 Super Flower Leadex VII XP 1200W Platinum|204.99|p|1200|0
 ASUS ROG STRIX 1200W Platinum|339.99|p|1200|0
-CORSAIR HX1500i 1500W Platinum|489.99||1500|0`},
-case:{k:'name price f board rad sfxo',t:`CORSAIR FRAME 4000D RS ARGB (ATX)|124.99||3|360|0
+CORSAIR HX1500i 1500W Platinum|489.99||1500|0`
+      },
+      case: {
+        k: 'name price f board rad sfxo',
+        t: `CORSAIR FRAME 4000D RS ARGB (ATX)|124.99||3|360|0
 CORSAIR 3500X Tempered Glass (ATX)|129.99||3|360|0
 FRACTAL DESIGN Pop Air (ATX)|95.99||3|360|0
 HYTE Y70 (ATX)|304.99||3|360|0
@@ -285,59 +468,134 @@ DeepCool CH260 (Micro-ATX)|104.99||2|240|0
 ASUS Prime AP201 (Micro-ATX)|109.99|p|2|240|0
 THERMALTAKE S100 TG (Micro-ATX)|74.99|p|2|240|0
 DeepCool CH170 DIGITAL (Mini-ITX)|129.99|p|1|240|1
-FRACTAL DESIGN Terra (Mini-ITX)|279.99|p|1|240|1`}
-};
-const LAB={cpu:'CPU',mb:'Motherboard',ram:'RAM',gpu:'GPU',psu:'PSU',cooler:'Cooler',case:'Case',ssd:'SSD',hdd:'HDD'};
-const FN={1:'Mini-ITX',2:'mATX',3:'ATX',4:'E-ATX'};
-const CAT={};let id=0;
-for(const k in RAW){const r=RAW[k],ks=r.k.split(' ');CAT[k]=r.t.split('\n').map(l=>{const v=l.split('|'),o={id:k+(id++),cat:k};ks.forEach((q,i)=>{o[q]=v[i]===undefined?'':v[i]});
-o.price=+o.price;o.f=o.f||'';o.sold=o.f.includes('x');o.used=o.f.includes('u');o.pick=o.f.includes('p');
-['w','rec','ddr','form','board','rad','igpu','sfx','sfxo'].forEach(q=>{if(o[q]!==undefined&&o[q]!=='')o[q]=+o[q]});return o})}
-const clean=s=>s.replace(/\(?open box\)?/ig,m=>m.startsWith('(')?'(Used)':'Used').replace(/ican/ig,'XXXX').replace(/armoury/ig,'XXXXXXX');
+FRACTAL DESIGN Terra (Mini-ITX)|279.99|p|1|240|1`
+      }
+    };
 
-/* ===== COMPATIBILITY ===== */
-const S={};let tab='cpu';
-function pair(a,b){
-const [x,y]=a.cat<b.cat?[a,b]:[b,a];
-const M={cpu:a.cat==='cpu'?a:b,mb:a.cat==='mb'?a:b,ram:a.cat==='ram'?a:b,psu:a.cat==='psu'?a:b,gpu:a.cat==='gpu'?a:b,case:a.cat==='case'?a:b,cooler:a.cat==='cooler'?a:b};
-const k=[a.cat,b.cat].sort().join('-');
-if(k==='cpu-mb'&&M.cpu.sock!==M.mb.sock)return M.cpu.sock+' CPU needs a '+M.cpu.sock+' board (this is '+M.mb.sock+')';
-if(k==='mb-ram'&&M.ram.ddr!==M.mb.ddr)return 'Board uses DDR'+M.mb.ddr+', RAM is DDR'+M.ram.ddr;
-if(k==='case-mb'&&M.mb.form>M.case.board)return FN[M.mb.form]+' board does not fit a '+FN[M.case.board]+'-max case';
-if(k==='case-cooler'&&M.cooler.rad>M.case.rad)return M.cooler.rad+'mm radiator exceeds case limit ('+M.case.rad+'mm)';
-if(k==='case-psu'&&M.case.sfxo&&!M.psu.sfx)return 'Case only takes SFX power supplies';
-if(k==='gpu-psu'&&M.psu.w<M.gpu.rec)return 'Needs '+M.gpu.rec+'W+ PSU (this is '+M.psu.w+'W)';
-return null}
-function why(p){const r=[];for(const c in S){if(c===p.cat)continue;const m=pair(p,S[c]);if(m)r.push(m)}return r}
+    const LAB = { cpu: 'CPU', mb: 'Motherboard', ram: 'RAM', gpu: 'GPU', psu: 'PSU', cooler: 'Cooler', case: 'Case', ssd: 'SSD', hdd: 'HDD' };
+    const FN = { 1: 'Mini-ITX', 2: 'mATX', 3: 'ATX', 4: 'E-ATX' };
+    const CAT = {}; let id = 0;
 
-/* ===== BUILDER UI ===== */
-const $=i=>document.getElementById(i),usd=n=>'$'+n.toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
-function draw(){
-$('tabs').innerHTML=Object.keys(LAB).map(k=>`<button class="tab ${k===tab?'on':''} ${S[k]?'has':''}" onclick="tab='${k}';draw()">${LAB[k]}</button>`).join('');
-const q=$('q').value.toLowerCase(),so=$('so').value,cd=$('cond').value,others=Object.keys(S).filter(k=>k!==tab).length;
-let L=CAT[tab].filter(p=>(!q||clean(p.name).toLowerCase().includes(q))&&(cd===''||(cd==='used')===p.used));
-L.sort((a,b)=>so==='a'?a.price-b.price:so==='d'?b.price-a.price:a.name.localeCompare(b.name));
-$('grid').innerHTML=L.map(p=>{const w=why(p),bad=w.length>0,dis=p.sold||bad,sel=S[tab]&&S[tab].id===p.id;
-const em=bad?'❌':(others?'🟢':'');
-return `<div class="p ${sel?'sel':''} ${dis&&!sel?'dis':''}" ${dis&&!sel?'':`onclick="pick('${p.id}')"`} title="${w.join('; ')}">
-<span class="em">${em}</span><div class="n">${clean(p.name)}</div><span class="pr">${usd(p.price)}</span>
-${p.used?'<span class="b u">Used</span>':''}${p.sold?'<span class="b s">Sold out</span>':p.pick?'<span class="b">Pickup only</span>':''}${p.tag?`<span class="b">${p.tag}</span>`:''}
-${bad?`<div class="why">${w[0]}</div>`:''}</div>`}).join('')||'<p class="sub">No matches.</p>';
-summary()}
-function pick(i){const p=CAT[tab].find(x=>x.id===i);if(S[tab]&&S[tab].id===i)delete S[tab];else S[tab]=p;
-for(const c in S){if(c!==tab&&pair(S[tab]||S[c],S[c])&&S[tab]&&pair(S[tab],S[c]))delete S[c]}draw()}
-function summary(){
-const it=Object.values(S),tot=it.reduce((a,b)=>a+b.price,0),need=(S.cpu?S.cpu.w:0)+(S.gpu?S.gpu.w:0)+100,psu=S.psu?S.psu.w:0;
-const pct=psu?Math.min(100,need/psu*100):0,W=[];
-if(S.psu&&need>psu)W.push('⚠️ Estimated draw exceeds PSU rating');else if(S.psu&&need>psu*.8)W.push('🟡 Tight PSU headroom (<20%)');
-if(S.cpu&&!S.cpu.igpu&&!S.gpu)W.push('⚠️ This CPU has no integrated graphics: add a GPU');
-if(S.gpu&&S.gpu.rec>=750&&S.psu&&S.psu.w<1000)W.push('ℹ️ High-end GPU: check for 12V-2x6 cable');
-$('sum').innerHTML=`<h3>SYSTEM TOTAL</h3>${Object.keys(LAB).map(k=>`<div class="r"><span>${LAB[k]}</span><span>${S[k]?usd(S[k].price):'-'}</span></div>`).join('')}
-<div class="tot">${usd(tot)}</div><div class="r"><span>Est. draw (CPU+GPU+100W)</span><span>${need}W</span></div>
-<div class="bar"><i style="width:${pct}%;background:${pct>100?'#f05':pct>80?'#fa0':'#0fc'}"></i></div>
-<div class="r"><span>PSU</span><span>${psu?psu+'W':'-'}</span></div>${W.filter(Boolean).map(w=>`<div class="warn">${w}</div>`).join('')}
-<button class="btn" onclick="cp()">Copy build</button><button class="btn" onclick="for(const k in S)delete S[k];draw()">Reset</button>
-<div class="warn">Power figures are estimates.</div>`}
-function cp(){const t=Object.keys(LAB).filter(k=>S[k]).map(k=>LAB[k]+': '+clean(S[k].name)+' - '+usd(S[k].price)).join('\n')+'\nTotal: '+usd(Object.values(S).reduce((a,b)=>a+b.price,0));
-navigator.clipboard.writeText(t).then(()=>alert('Build copied'))}
-</script></body></html>
+    for (const k in RAW) {
+      const r = RAW[k], ks = r.k.split(' ');
+      CAT[k] = r.t.split('\n').map(l => {
+        const v = l.split('|'), o = { id: k + (id++), cat: k };
+        ks.forEach((q, i) => { o[q] = v[i] === undefined ? '' : v[i]; });
+        o.price = +o.price; o.f = o.f || ''; o.sold = o.f.includes('x'); o.used = o.f.includes('u'); o.pick = o.f.includes('p');
+        ['w', 'rec', 'ddr', 'form', 'board', 'rad', 'igpu', 'sfx', 'sfxo'].forEach(q => {
+          if (o[q] !== undefined && o[q] !== '') o[q] = +o[q];
+        });
+        return o;
+      });
+    }
+
+    // Name formatting & cleaning rules (iCAN->XXXX, ARMOURY->XXXXXXX, Open Box->Used)
+    const clean = s => s.replace(/\(?open box\)?/ig, m => m.startsWith('(') ? '(Used)' : 'Used')
+                         .replace(/ican/ig, 'XXXX').replace(/armoury/ig, 'XXXXXXX');
+
+    /* ===== ADVANCED DUAL-WAY COMPATIBILITY MATRIX ===== */
+    const S = {}; let tab = 'cpu';
+
+    function pair(a, b) {
+      const [x, y] = a.cat < b.cat ? [a, b] : [b, a];
+      const k = [a.cat, b.cat].sort().join('-');
+      const M = { cpu: a.cat==='cpu'?a:b, mb: a.cat==='mb'?a:b, ram: a.cat==='ram'?a:b, psu: a.cat==='psu'?a:b, gpu: a.cat==='gpu'?a:b, case: a.cat==='case'?a:b, cooler: a.cat==='cooler'?a:b };
+
+      if (k === 'cpu-mb' && M.cpu.sock !== M.mb.sock) return M.cpu.sock + ' CPU requires matching board socket (is ' + M.mb.sock + ')';
+      if (k === 'mb-ram' && M.ram.ddr !== M.mb.ddr) return 'Board uses DDR' + M.mb.ddr + ', RAM is DDR' + M.ram.ddr;
+      if (k === 'case-mb' && M.mb.form > M.case.board) return FN[M.mb.form] + ' board exceeds case limit (' + FN[M.case.board] + ')';
+      if (k === 'case-cooler' && M.cooler.rad > M.case.rad) return M.cooler.rad + 'mm radiator exceeds case limit (' + M.case.rad + 'mm)';
+      if (k === 'case-psu' && M.case.sfxo && !M.psu.sfx) return 'Case requires an SFX power supply';
+      if (k === 'gpu-psu' && M.psu.w < M.gpu.rec) return 'Requires ' + M.gpu.rec + 'W+ PSU (is ' + M.psu.w + 'W)';
+      return null;
+    }
+
+    function why(p) {
+      const r = [];
+      for (const c in S) {
+        if (c === p.cat) continue;
+        const m = pair(p, S[c]);
+        if (m) r.push(m);
+      }
+      return r;
+    }
+
+    /* ===== BUILDER INTERFACE RENDERING ===== */
+    const $= i => document.getElementById(i), usd = n => '$' + n.toLocaleString('en-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    function draw() {
+      $('tabs').innerHTML = Object.keys(LAB).map(k => `<button class="tab ${k === tab ? 'on' : ''} ${S[k] ? 'has' : ''}" onclick="tab='${k}';playBeep(300,0.05);draw()">${LAB[k]}</button>`).join('');
+      
+      const q = $('q').value.toLowerCase(), so =$('so').value, cd = $('cond').value, hideS =$('hideSold').checked, others = Object.keys(S).filter(k => k !== tab).length;
+      
+      let L = CAT[tab].filter(p => (!q || clean(p.name).toLowerCase().includes(q)) && (cd === '' || (cd === 'used') === p.used));
+      L.sort((a, b) => so === 'a' ? a.price - b.price : so === 'd' ? b.price - a.price : a.name.localeCompare(b.name));
+
+      $('grid').innerHTML = L.map(p => {
+        const w = why(p), bad = w.length > 0, dis = p.sold || bad, sel = S[tab] && S[tab].id === p.id;
+        if (hideS && (p.sold || bad)) return '';
+        const em = bad ? '❌' : (others ? '🟢' : '');
+
+        return `<div class="p ${sel ? 'sel' : ''} ${dis && !sel ? 'dis' : ''}" ${dis && !sel ? `onclick="playBeep(120,0.1,'sawtooth')"` : `onclick="playBeep(450,0.05);pick('${p.id}')"`} title="${w.join('; ')}">
+          <span class="em">${em}</span>
+          <div class="n">${clean(p.name)}</div>
+          <span class="pr">${usd(p.price)}</span>
+          ${p.used ? '<span class="b u">Used</span>' : ''}
+          ${p.sold ? '<span class="b s">Disallowed / Sold Out</span>' : p.pick ? '<span class="b">Store Exclusive</span>' : ''}
+          ${bad ? `<div class="why">${w[0]}</div>` : ''}
+        </div>`;
+      }).join('') || '<p class="sub">No components found matching filters.</p>';
+      
+      summary();
+    }
+
+    function pick(i) {
+      const p = CAT[tab].find(x => x.id === i);
+      if (S[tab] && S[tab].id === i) delete S[tab];
+      else S[tab] = p;
+
+      // Clean dangling incompatible selections automatically
+      for (const c in S) {
+        if (c !== tab && pair(S[tab] || S[c], S[c]) && S[tab] && pair(S[tab], S[c])) delete S[c];
+      }
+      draw();
+    }
+
+    function summary() {
+      const it = Object.values(S), tot = it.reduce((a, b) => a + b.price, 0);
+      const need = (S.cpu ? S.cpu.w : 0) + (S.gpu ? S.gpu.w : 0) + 100, psu = S.psu ? S.psu.w : 0;
+      const pct = psu ? Math.min(100, need / psu * 100) : 0, W = [];
+
+      if (S.psu && need > psu) W.push('⚠️ Estimated power draw exceeds PSU limit');
+      else if (S.psu && need > psu * .8) W.push('🟡 Tight power headroom (<20%)');
+      if (S.cpu && !S.cpu.igpu && !S.gpu) W.push('⚠️ CPU lacks integrated graphics: dedicated GPU needed');
+      if (S.gpu && S.gpu.rec >= 750 && S.psu && S.psu.w < 1000) W.push('ℹ️ High-draw GPU: verify 12V-2x6 cable readiness');
+
+      $('sum').innerHTML = `<h3>SYSTEM TOTAL</h3>` +
+        Object.keys(LAB).map(k => `<div class="r"><span>${LAB[k]}</span><span>${S[k] ? usd(S[k].price) : '-'}</span></div>`).join('') +
+        `<div class="tot">${usd(tot)}</div>` +
+        `<div class="r"><span>Est. Power Draw (CPU+GPU+100W)</span><span>${need}W</span></div>` +
+        `<div class="bar"><i style="width:${pct}%;background:${pct > 100 ? '#f05' : pct > 80 ? '#fa0' : '#0fc'}"></i></div>` +
+        `<div class="r"><span>Selected PSU</span><span>${psu ? psu + 'W' : '-'}</span></div>` +
+        W.map(w => `<div class="warn">${w}</div>`).join('') +
+        `<button class="btn" onclick="playBeep(500,0.1);cp()">Copy build list</button>` +
+        `<button class="btn" onclick="playBeep(500,0.1);dlTxt()">Download .txt</button>` +
+        `<button class="btn" onclick="playBeep(200,0.1);for(const k in S)delete S[k];draw()">Reset</button>` +
+        `<div class="warn" style="margin-top:10px;">Power configurations &amp; specs are estimated profiles.</div>`;
+    }
+
+    function cp() {
+      const t = Object.keys(LAB).filter(k => S[k]).map(k => LAB[k] + ': ' + clean(S[k].name) + ' - ' + usd(S[k].price)).join('\n') + '\nTotal: ' + usd(Object.values(S).reduce((a, b) => a + b.price, 0));
+      navigator.clipboard.writeText(t).then(() => alert('Build list copied to clipboard.'));
+    }
+
+    function dlTxt() {
+      const t = Object.keys(LAB).filter(k => S[k]).map(k => LAB[k] + ': ' + clean(S[k].name) + ' - ' + usd(S[k].price)).join('\n') + '\nTotal: ' + usd(Object.values(S).reduce((a, b) => a + b.price, 0));
+      const blob = new Blob([t], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'drew.wtf-build.txt'; a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>
