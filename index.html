@@ -85,29 +85,83 @@ const bgm=document.getElementById('bgm'),mute=document.getElementById('mute');
 let fell=false;
 bgm.addEventListener('error',()=>{if(!fell){fell=true;bgm.src='https://raw.githubusercontent.com/hillierandrew/wtf/main/dream.mp3';bgm.load();if(open1)bgm.play().catch(()=>{})}});
 mute.onclick=e=>{e.stopPropagation();bgm.muted=!bgm.muted;mute.textContent=bgm.muted?'♪ off':'♪ on'};
+
 /* ===== ENTRY ===== */
 let open1=false;const sp=document.getElementById('splash');
 function unlock(e){if(open1)return;if(e.type==='keydown'&&e.code!=='Space'&&e.code!=='Enter')return;
 open1=true;bgm.volume=.5;bgm.play().catch(()=>{});sp.style.opacity=0;sp.style.transform='scale(1.5)';setTimeout(()=>sp.style.display='none',600);
 ['click','keydown','wheel','touchstart'].forEach(t=>removeEventListener(t,unlock));anim()}
 ['click','keydown','wheel','touchstart'].forEach(t=>addEventListener(t,unlock));
-/* ===== EASTER EGGS ===== */
+
+/* ===== EASTER EGGS & DEMON MODE TOGGLE ===== */
 let demon=false;const c={d:0,t:0,w:0};
 function pulse(el,col){el.style.color=col;el.style.transform='scale(1.2)';setTimeout(()=>{el.style.color='';el.style.transform=''},150)}
 const nd=document.getElementById('nd'),nt=document.getElementById('nt'),nw=document.getElementById('nw');
+
 nd.onclick=e=>{e.stopPropagation();pulse(nd,'#ff0055');if(++c.d>=10){c.d=0;om('mb');draw()}};
-nt.onclick=e=>{e.stopPropagation();pulse(nt,'#00ffcc');if(++c.t>=6&&!demon){demon=true;document.body.classList.add('demonic');document.getElementById('main').classList.add('shake');nw.textContent='666';bgm.playbackRate=.7}};
+
+nt.onclick=e=>{
+    e.stopPropagation();
+    pulse(nt,demon?'#ff0000':'#00ffcc');
+    if(!demon){
+        if(++c.t>=6){
+            demon=true;
+            c.t=0;
+            document.body.classList.add('demonic');
+            document.getElementById('main').classList.add('shake');
+            nw.textContent='666';
+            bgm.playbackRate=.7;
+        }
+    }else{
+        demon=false;
+        c.t=0;
+        document.body.classList.remove('demonic');
+        document.getElementById('main').classList.remove('shake');
+        nw.textContent='wtf';
+        bgm.playbackRate=1;
+    }
+};
+
 nw.onclick=e=>{e.stopPropagation();pulse(nw,demon?'#f00':'#ffaa00');if(++c.w>=10){c.w=0;om('mf')}};
 function om(id){document.getElementById(id).classList.add('show')}
 function cm(id){document.getElementById(id).classList.remove('show')}
-/* ===== PARTICLES ===== */
+
+/* ===== PARTICLES (STAR COUNT INCREASES ON CLICK) ===== */
 const cv=document.getElementById('bg'),cx=cv.getContext('2d');
 function rs(){cv.width=innerWidth;cv.height=innerHeight}addEventListener('resize',rs);rs();
 const ps=Array.from({length:100},()=>({x:Math.random()*cv.width,y:Math.random()*cv.height,vx:(Math.random()-.5)*1.5,vy:(Math.random()-.5)*1.5,s:Math.random()*2}));
-function anim(){cx.fillStyle=demon?'rgba(10,0,0,.2)':'rgba(5,5,8,.2)';cx.fillRect(0,0,cv.width,cv.height);cx.fillStyle=demon?'#660000':'#333';
-ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>cv.width)p.vx*=-1;if(p.y<0||p.y>cv.height)p.vy*=-1;cx.beginPath();cx.arc(p.x,p.y,p.s,0,7);cx.fill()});requestAnimationFrame(anim)}
 
-/* ===== CATALOG (in-stock subset of Canada Computers pages; flags x=sold out, p=pickup only, u=used) ===== */
+// Increase stars on every click
+window.addEventListener('click',e=>{
+    const px=e.clientX||Math.random()*cv.width;
+    const py=e.clientY||Math.random()*cv.height;
+    for(let i=0;i<5;i++){
+        ps.push({
+            x:px+(Math.random()-.5)*20,
+            y:py+(Math.random()-.5)*20,
+            vx:(Math.random()-.5)*2,
+            vy:(Math.random()-.5)*2,
+            s:Math.random()*2.5
+        });
+    }
+});
+
+function anim(){
+    cx.fillStyle=demon?'rgba(10,0,0,.2)':'rgba(5,5,8,.2)';
+    cx.fillRect(0,0,cv.width,cv.height);
+    cx.fillStyle=demon?'#ff1111':'#ffffff';
+    ps.forEach(p=>{
+        p.x+=p.vx;p.y+=p.vy;
+        if(p.x<0||p.x>cv.width)p.vx*=-1;
+        if(p.y<0||p.y>cv.height)p.vy*=-1;
+        cx.beginPath();
+        cx.arc(p.x,p.y,p.s,0,7);
+        cx.fill();
+    });
+    requestAnimationFrame(anim);
+}
+
+/* ===== CATALOG ===== */
 const RAW={
 cpu:{k:'name price f sock w igpu',t:`AMD Ryzen 7 9800X3D 8-Core|619.99||AM5|120|0
 AMD Ryzen 7 9850X3D 8-Core|679.98||AM5|120|0
@@ -240,10 +294,11 @@ for(const k in RAW){const r=RAW[k],ks=r.k.split(' ');CAT[k]=r.t.split('\n').map(
 o.price=+o.price;o.f=o.f||'';o.sold=o.f.includes('x');o.used=o.f.includes('u');o.pick=o.f.includes('p');
 ['w','rec','ddr','form','board','rad','igpu','sfx','sfxo'].forEach(q=>{if(o[q]!==undefined&&o[q]!=='')o[q]=+o[q]});return o})}
 const clean=s=>s.replace(/\(?open box\)?/ig,m=>m.startsWith('(')?'(Used)':'Used').replace(/ican/ig,'XXXX').replace(/armoury/ig,'XXXXXXX');
+
 /* ===== COMPATIBILITY ===== */
 const S={};let tab='cpu';
-function pair(a,b){ // returns reason if incompatible
-const [x,y]=a.cat<b.cat?[a,b]:[b,a];const t=x.cat+'-'+y.cat;
+function pair(a,b){
+const [x,y]=a.cat<b.cat?[a,b]:[b,a];
 const M={cpu:a.cat==='cpu'?a:b,mb:a.cat==='mb'?a:b,ram:a.cat==='ram'?a:b,psu:a.cat==='psu'?a:b,gpu:a.cat==='gpu'?a:b,case:a.cat==='case'?a:b,cooler:a.cat==='cooler'?a:b};
 const k=[a.cat,b.cat].sort().join('-');
 if(k==='cpu-mb'&&M.cpu.sock!==M.mb.sock)return M.cpu.sock+' CPU needs a '+M.cpu.sock+' board (this is '+M.mb.sock+')';
@@ -254,6 +309,7 @@ if(k==='case-psu'&&M.case.sfxo&&!M.psu.sfx)return 'Case only takes SFX power sup
 if(k==='gpu-psu'&&M.psu.w<M.gpu.rec)return 'Needs '+M.gpu.rec+'W+ PSU (this is '+M.psu.w+'W)';
 return null}
 function why(p){const r=[];for(const c in S){if(c===p.cat)continue;const m=pair(p,S[c]);if(m)r.push(m)}return r}
+
 /* ===== BUILDER UI ===== */
 const $=i=>document.getElementById(i),usd=n=>'$'+n.toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
 function draw(){
@@ -275,7 +331,6 @@ const it=Object.values(S),tot=it.reduce((a,b)=>a+b.price,0),need=(S.cpu?S.cpu.w:
 const pct=psu?Math.min(100,need/psu*100):0,W=[];
 if(S.psu&&need>psu)W.push('⚠️ Estimated draw exceeds PSU rating');else if(S.psu&&need>psu*.8)W.push('🟡 Tight PSU headroom (<20%)');
 if(S.cpu&&!S.cpu.igpu&&!S.gpu)W.push('⚠️ This CPU has no integrated graphics: add a GPU');
-if(S.cpu&&S.cpu.sock==='LGA1700'&&S.mb&&S.mb.ddr===4&&S.ram&&0)W.push('');
 if(S.gpu&&S.gpu.rec>=750&&S.psu&&S.psu.w<1000)W.push('ℹ️ High-end GPU: check for 12V-2x6 cable');
 $('sum').innerHTML=`<h3>SYSTEM TOTAL</h3>${Object.keys(LAB).map(k=>`<div class="r"><span>${LAB[k]}</span><span>${S[k]?usd(S[k].price):'-'}</span></div>`).join('')}
 <div class="tot">${usd(tot)}</div><div class="r"><span>Est. draw (CPU+GPU+100W)</span><span>${need}W</span></div>
