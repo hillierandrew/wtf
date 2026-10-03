@@ -15,11 +15,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .card p{color:#888;letter-spacing:2px;animation:bl 1.5s infinite}
 @keyframes bl{0%,100%{opacity:.3}50%{opacity:1}}
 #main{position:relative;z-index:10;width:100%;height:100%;display:flex;align-items:center;justify-content:center}
-.wg{font-size:6rem;font-weight:bold;display:flex;gap:5px}
+.wg{font-size:6rem;font-weight:bold;display:flex;align-items:baseline;gap:2px}
 @media(min-width:768px){.wg{font-size:10rem}}
 .node{cursor:pointer;display:inline-block;transition:transform .1s,color .2s,text-shadow .2s}
 #nd:hover{color:var(--a1);text-shadow:0 0 20px var(--a1)}
-#nt{color:var(--a2)}#nt:hover{text-shadow:0 0 20px var(--a2)}
+#nt{color:var(--a2);font-size:0.2em;vertical-align:baseline;line-height:0;display:inline-block;position:relative;top:-0.1em}
+#nt:hover{text-shadow:0 0 20px var(--a2)}
 #nw:hover{color:var(--a3);text-shadow:0 0 20px var(--a3)}
 @keyframes shake{0%{transform:translate(0)}20%{transform:translate(-4px,4px) skewX(2deg)}40%{transform:translate(4px,-4px) skewY(-2deg)}60%{transform:translate(-4px,-4px) skewX(-2deg);filter:hue-rotate(45deg)}80%{transform:translate(4px,4px) skewY(2deg)}100%{transform:translate(0)}}
 .shake{animation:shake .15s infinite}
@@ -150,16 +151,35 @@ const RM=matchMedia('(prefers-reduced-motion:reduce)').matches;let bass=0,ms={x:
 const stars=Array.from({length:RM?60:260},()=>({x:(Math.random()-.5)*2,y:(Math.random()-.5)*2,z:Math.random(),t:Math.random()*6}));
 addEventListener('pointermove',e=>{ms.x=e.clientX/innerWidth-.5;ms.y=e.clientY/innerHeight-.5});
 addEventListener('pointerdown',e=>{if(open1)rip.push({x:e.clientX,y:e.clientY,r:0})});
-let mode=0;const C=()=>demon?'255,40,40':'0,255,204',dr=[],nodes=Array.from({length:70},()=>({x:Math.random(),y:Math.random(),vx:(Math.random()-.5)*.0006,vy:(Math.random()-.5)*.0006})),EM=['🎃','🦇','👻','🕸','🕯'],fl=Array.from({length:34},()=>({x:Math.random(),y:Math.random(),s:14+Math.random()*26,e:EM[Math.random()*5|0],p:Math.random()*6}));
+let mode=0;const C=()=>demon?'255,40,40':'0,255,204',dr=[],nodes=Array.from({length:70},()=>({x:Math.random(),y:Math.random(),vx:(Math.random()-.5)*.0006,vy:(Math.random()-.5)*.0006})),EM=['🎃','🦇','👻','🕸','🕯'],fl=Array.from({length:34},()=>({x:Math.random(),y:Math.random(),s:14+Math.random()*26,e:EM[Math.random()*5|0],p:Math.random()*6})),orbs=Array.from({length:45},()=>({x:Math.random(),y:Math.random(),r:1+Math.random()*3,vx:(Math.random()-.5)*.001,vy:(Math.random()-.5)*.001,c:Math.random()}));
 const MODES=[
 (W,H,t)=>{stars.forEach(s=>{s.z-=.0008*(1+bass*3)*(demon?3:1);if(s.z<=0){s.z=1;s.x=(Math.random()-.5)*2;s.y=(Math.random()-.5)*2}
 const k=1/s.z,x=W/2+s.x*W*.25*k-ms.x*60*(1-s.z),y=H/2+s.y*H*.25*k-ms.y*60*(1-s.z),a=Math.min(1,(1-s.z)*1.4)*(.6+.4*Math.sin(t*3+s.t)),j=demon?Math.random()*2:0;
 cx.fillStyle=demon?`rgba(255,${60+Math.random()*40|0},60,${a})`:`rgba(200,230,255,${a})`;cx.beginPath();cx.arc(x+j,y+j,(1-s.z)*2.2+.3,0,7);cx.fill()})},
 (W,H)=>{const n=Math.ceil(W/16);while(dr.length<n)dr.push(Math.random()*H/16);cx.font='15px monospace';cx.fillStyle=demon?'#ff3030':'#00ffcc';dr.forEach((y,i)=>{cx.fillText(String.fromCharCode(12448+Math.random()*96|0),i*16,y*16);dr[i]=y*16>H&&Math.random()>.975?0:y+1+bass*2})},
 (W,H)=>{nodes.forEach(n=>{n.x=(n.x+n.vx*(1+bass*8)+1)%1;n.y=(n.y+n.vy*(1+bass*8)+1)%1});cx.lineWidth=1;nodes.forEach((a,i)=>{cx.fillStyle=demon?'#f33':'#ff0055';cx.beginPath();cx.arc(a.x*W,a.y*H,2+bass*3,0,7);cx.fill();for(let j=i+1;j<nodes.length;j++){const b=nodes[j],d=Math.hypot((a.x-b.x)*W,(a.y-b.y)*H);if(d<130){cx.strokeStyle=`rgba(${C()},${(1-d/130)*.6})`;cx.beginPath();cx.moveTo(a.x*W,a.y*H);cx.lineTo(b.x*W,b.y*H);cx.stroke()}}})},
-(W,H,t)=>{cx.lineWidth=36;for(let k=0;k<4;k++){cx.strokeStyle=`hsla(${demon?k*12:150+k*55},100%,60%,.16)`;cx.beginPath();for(let x=0;x<=W;x+=10){const y=H*.45+k*34+Math.sin(x*.004+t*(.4+k*.15)+k)*H*(.1+bass*.12);x?cx.lineTo(x,y):cx.moveTo(x,y)}cx.stroke()}},
+(W,H,t)=>{cx.lineWidth=36;for(let k=0;k<4;k++){cx.strokeStyle=`hsla(${demon?k*12:150+k*55},100%,60%,.16)`;cx.beginPath();for(let x=0;x<=W;x+=10){const y=H*.45+k*34+Math.sin(x*.004+t*(.4+k*.15)+k)*H*.1;x?cx.lineTo(x,y):cx.moveTo(x,y)}cx.stroke()}},
 (W,H,t)=>{fl.forEach(o=>{o.y-=.0007+bass*.003;if(o.y<-.1){o.y=1.1;o.x=Math.random()}cx.globalAlpha=.75;cx.font=o.s+'px serif';cx.fillText(o.e,o.x*W+Math.sin(t+o.p)*30,o.y*H)});cx.globalAlpha=1;cx.fillStyle='rgba(255,122,0,.8)';for(let i=0;i<40;i++)cx.fillRect((i*97+t*30*(1+i%3))%W,H-((i*53+t*60)%H),2,2)}
 ];
+function drawBackgroundExtras(W, H, t) {
+  orbs.forEach(o => {
+    o.x = (o.x + o.vx * (1 + bass * 4) + 1) % 1;
+    o.y = (o.y + o.vy * (1 + bass * 4) + 1) % 1;
+    cx.fillStyle = demon ? `rgba(255,0,0,${0.3+0.3*Math.sin(t+o.c*10)})` : `rgba(0,255,204,${0.2+0.3*Math.cos(t+o.c*10)})`;
+    cx.beginPath();
+    cx.arc(o.x * W, o.y * H, o.r * (1 + bass * 2), 0, 7);
+    cx.fill();
+  });
+  cx.strokeStyle = demon ? 'rgba(255,0,0,0.05)' : 'rgba(0,255,204,0.05)';
+  cx.lineWidth = 1;
+  cx.beginPath();
+  let rMax = Math.min(W, H) * (0.3 + 0.1 * Math.sin(t * 0.5));
+  cx.arc(W / 2 + ms.x * 40, H / 2 + ms.y * 40, rMax, 0, Math.PI * 2);
+  cx.stroke();
+  cx.beginPath();
+  cx.arc(W / 2 + ms.x * 40, H / 2 + ms.y * 40, rMax * 0.6, 0, Math.PI * 2);
+  cx.stroke();
+}
 cv.addEventListener('pointerdown',e=>{if(!open1)return;mode=(mode+1)%MODES.length;cx.globalAlpha=.18;cx.fillStyle='#fff';cx.fillRect(0,0,cv.width,cv.height);cx.globalAlpha=1;beep(480+mode*110,.07,'triangle',.05)});
 function anim(){const W=cv.width,H=cv.height,t=performance.now()/1000,N=64,lv=[],idle=bgm.paused||bgm.muted;
 if(an&&!idle){an.getByteFrequencyData(fd);for(let i=0;i<N;i++)lv.push(fd[i]/255);bass=(fd[1]+fd[2]+fd[3]+fd[4])/1020}
@@ -167,6 +187,7 @@ else{const b=idle?0:Math.pow(Math.max(0,Math.sin(t*Math.PI*2*1.9)),6);bass=bass*
 wg.style.setProperty('--beat',bass.toFixed(3));
 cx.fillStyle=demon?'rgba(10,0,0,.3)':'rgba(5,5,8,.3)';cx.fillRect(0,0,W,H);
 MODES[mode](W,H,t);
+drawBackgroundExtras(W, H, t);
 rip=rip.filter(r=>(r.r+=6)<300);rip.forEach(r=>{cx.strokeStyle=`rgba(${C()},${1-r.r/300})`;cx.beginPath();cx.arc(r.x,r.y,r.r,0,7);cx.stroke()});
 const mw=mc2.width,mh=64;mx.clearRect(0,0,mw,mh);mx.strokeStyle=demon?'#f00':'#0fc';mx.lineWidth=2;mx.shadowBlur=10;mx.shadowColor=mx.strokeStyle;mx.beginPath();
 for(let i=0;i<N;i++){const x=i/(N-1)*mw,y=mh/2-(i%2?1:-1)*lv[i]*mh*.45;i?mx.lineTo(x,y):mx.moveTo(x,y)}mx.stroke();requestAnimationFrame(anim)}
@@ -448,7 +469,7 @@ CORSAIR FRAME 4000D RS (ATX)|104.99|p|3|360|0
 CORSAIR AIR 5400 RS-R ARGB (ATX)|309.99||3|420|0
 CORSAIR iCUE LINK 3500X RGB (ATX)|209.99||3|360|0
 FRACTAL DESIGN North (ATX)|167.99||3|360|0
-FRACTAL DESIGN North XL (ATX)|215.99||3|420|0
+FRACTAL DESIGN North XL (ATX)|215.99||4|420|0
 FRACTAL DESIGN Meshify 3 (ATX)|159.99||3|360|0
 FRACTAL DESIGN Define 7 (ATX)|209.99||3|420|0
 FRACTAL DESIGN Pop 2 Air (ATX)|139.99||3|360|0
@@ -550,9 +571,8 @@ ps:[
 ["Repair system files (admin)","sfc /scannow"],["Repair Windows image (admin)","DISM /Online /Cleanup-Image /RestoreHealth"],["Top 10 CPU hogs","Get-Process | Sort CPU -Descending | Select -First 10 Name,CPU,WS"],
 ["Network config","Get-NetIPConfiguration"],["Flush DNS","ipconfig /flushdns"],["Check activation status","slmgr /xpr"],["Restore point before changes (admin)","Checkpoint-Computer -Description 'before-build' -RestorePointType MODIFY_SETTINGS"],
 ["Power / battery report (admin)","powercfg /energy"]]};
-const SW='<ul><li><b>Office:</b> <a href="https://www.libreoffice.org" target="_blank">LibreOffice</a></li><li><b>3D / video:</b> <a href="https://www.blender.org" target="_blank">Blender</a>, <a href="https://kdenlive.org" target="_blank">Kdenlive</a>, <a href="https://obsproject.com" target="_blank">OBS Studio</a></li><li><b>Images:</b> <a href="https://www.gimp.org" target="_blank">GIMP</a>, <a href="https://krita.org" target="_blank">Krita</a>, <a href="https://inkscape.org" target="_blank">Inkscape</a></li><li><b>Media:</b> <a href="https://www.videolan.org" target="_blank">VLC</a>, <a href="https://jellyfin.org" target="_blank">Jellyfin</a></li><li><b>Linux:</b> <a href="https://cachyos.org" target="_blank">CachyOS</a>, <a href="https://linuxmint.com" target="_blank">Linux Mint</a>, <a href="https://fedoraproject.org" target="_blank">Fedora</a></li><li><b>Self-hosting:</b> <a href="https://immich.app" target="_blank">Immich</a>, <a href="https://nextcloud.com" target="_blank">Nextcloud</a>, <a href="https://www.home-assistant.io" target="_blank">Home Assistant</a></li><li><b>PC testing:</b> <a href="https://www.memtest.org" target="_blank">MemTest86</a>, <a href="https://www.hwinfo.com" target="_blank">HWiNFO</a>, <a href="https://crystalmark.info" target="_blank">CrystalDiskInfo</a></li></ul>';
+const SW='<ul><li><b>Office:</b> <a href="https://www.libreoffice.org" target="_blank">LibreOffice</a></li><li><b>3D / video:</b> <a href="https://www.blender.org" target="_blank">Blender</a>, <a href="https://kdenlive.org" target="_blank">Kdenlive</a>, <a href="https://obsproject.com" target="_blank">OBS Studio</a></li><li><b>Images:</b> <a href="https://www.gimp.org" target="_blank">GIMP</a>, <a href="https://krita.org" target="_blank">Krita</a>, <a href="https://inkscape.org" target="_blank">Inkscape</a></li><li><b>Media:</b> <a href="https://www.videolan.org" target="_blank">VLC</a>, <a href="https://jellyfin.org" target="_blank">In.org</a></li><li><b>Linux:</b> <a href="https://cachyos.org" target="_blank">CachyOS</a>, <a href="https://linuxmint.com" target="_blank">Linux Mint</a>, <a href="https://fedoraproject.org" target="_blank">Fedora</a></li><li><b>Self-hosting:</b> <a href="https://immich.app" target="_blank">Immich</a>, <a href="https://nextcloud.com" target="_blank">Nextcloud</a>, <a href="https://www.home-assistant.io" target="_blank">Home Assistant</a></li><li><b>PC testing:</b> <a href="https://www.memtest.org" target="_blank">MemTest86</a>, <a href="https://www.hwinfo.com" target="_blank">HWiNFO</a>, <a href="https://crystalmark.info" target="_blank">CrystalDiskInfo</a></li></ul>';
 function fshow(){ftab(tabF)}
 function ftab(t){tabF=t;tick();$('ft').innerHTML=[['lx','Konsole / Linux'],['ps','PowerShell / Windows'],['sw','Free software']].map(a=>`<button class="tab ${a[0]===t?'on':''}" onclick="ftab('${a[0]}')">${a[1]}</button>`).join('');
-if(t==='sw'){$('fb').innerHTML=SW;return}
-$('fb').innerHTML=`<div class="padbox"><b>${t==='lx'?'Your Konsole commands':'Your PowerShell commands'}</b><textarea id="pad" rows="4" spellcheck="false" autocapitalize="off" autocorrect="off" placeholder="Type or paste commands here...">${esc(ld('pad_'+t))}</textarea><button class="btn" onclick="cpy($('pad').value,this)">Copy</button><button class="btn" onclick="sv('${t}');cpy('',null)">Save</button><button class="btn" onclick="$('pad').value='';sv('${t}')">Clear</button></div>`+CM[t].map((c,i)=>`<div class="cmd"><div class="ct">${esc(c[0])}</div><pre>${esc(c[1])}</pre><button class="btn" onclick="cpy(CM['${t}'][${i}][1],this)">Copy</button></div>`).join('')}
+if(t==='sw'){$('fb').innerHTML=SW;return}$('fb').innerHTML=`<div class="padbox"><b>${t==='lx'?'Your Konsole commands':'Your PowerShell commands'}</b><textarea id="pad" rows="4" spellcheck="false" autocapitalize="off" autocorrect="off" placeholder="Type or paste commands here...">${esc(ld('pad_'+t))}</textarea><button class="btn" onclick="cpy($('pad').value,this)">Copy</button><button class="btn" onclick="sv('${t}');cpy('',null)">Save</button><button class="btn" onclick="$('pad').value='';sv('${t}')">Clear</button></div>`+CM[t].map((c,i)=>`<div class="cmd"><div class="ct">${esc(c[0])}</div><pre>${esc(c[1])}</pre><button class="btn" onclick="cpy(CM['${t}'][${i}][1],this)">Copy</button></div>`).join('')}
 </script></body></html>
