@@ -1171,4 +1171,612 @@ CAT.hdd=parseRows(HDD,['name','price','cap'],'hdd',true);
 CAT.cooler=parseRows(COOLER,['name','price','sockets_str','height','tdp_rating'],'cooler',false);
 CAT.fan=parseRows(FAN,['name','price'],'fan',true);
 
-var LABELS={cpu:'CPU',mb:'Motherboard',ram:'Memory',gpu:'Graphics Card',psu:'Power Supply',case:'Case',cooler:'CPU Cooler',ssd:'SSD',hdd:'Hard Drive',fan:'F
+var LABELS={cpu:'CPU',mb:'Motherboard',ram:'Memory',gpu:'Graphics Card',psu:'Power Supply',case:'Case',cooler:'CPU Cooler',ssd:'SSD',hdd:'Hard Drive',fan:'Fans & Accessories'};
+
+/* ===== COMPAT ENGINE (FIXED — handles arrays from multi-select) ===== */
+function firstPart(x){
+  if (!x) return null;
+  if (Array.isArray(x)) return x.length > 0 ? x[0] : null;
+  return x;
+}
+function formRank(f){ return {'ITX':1,'mATX':2,'ATX':3,'E-ATX':4}[f]||0; }
+function caseFits(caseForm, mbForm){ return formRank(caseForm) >= formRank(mbForm); }
+function checkPair(newPart, cat, existing){
+  var e={};
+  ['cpu','mb','ram','gpu','psu','case','cooler'].forEach(function(k){ e[k]=firstPart(existing[k]); });
+  var r=null;
+  if (cat==='cpu'){
+    if (e.mb && newPart.socket!==e.mb.socket) r='Socket '+newPart.socket+' ≠ board '+e.mb.socket;
+    else if (e.cooler && e.cooler.sockets && e.cooler.sockets.indexOf(newPart.socket)===-1) r='Cooler doesn\'t fit '+newPart.socket;
+  } else if (cat==='mb'){
+    if (e.cpu && newPart.socket!==e.cpu.socket) r='Board socket '+newPart.socket+' ≠ CPU '+e.cpu.socket;
+    else if (e.ram && newPart.ram_type!==e.ram.ram_type) r='Board needs '+newPart.ram_type+', RAM is '+e.ram.ram_type;
+    else if (e.case && !caseFits(e.case.form, newPart.form)) r=newPart.form+' board won\'t fit '+e.case.form+' case';
+  } else if (cat==='ram'){
+    if (e.mb && newPart.ram_type!==e.mb.ram_type) r='Board needs '+e.mb.ram_type+', this RAM is '+newPart.ram_type;
+  } else if (cat==='gpu'){
+    if (e.case && e.case.max_gpu_mm<newPart.length) r='GPU is '+newPart.length+'mm, case fits '+e.case.max_gpu_mm+'mm';
+  } else if (cat==='case'){
+    if (e.mb && !caseFits(newPart.form, e.mb.form)) r='Case too small for '+e.mb.form+' board';
+    else if (e.gpu && newPart.max_gpu_mm<e.gpu.length) r='Case fits '+newPart.max_gpu_mm+'mm GPU, need '+e.gpu.length+'mm';
+    else if (e.cooler && newPart.max_cooler_mm<e.cooler.height) r='Case fits '+newPart.max_cooler_mm+'mm cooler, need '+e.cooler.height+'mm';
+  } else if (cat==='cooler'){
+    if (e.cpu && newPart.sockets && newPart.sockets.indexOf(e.cpu.socket)===-1) r='Cooler doesn\'t fit '+e.cpu.socket;
+    else if (e.case && e.case.max_cooler_mm<newPart.height) r='Cooler is '+newPart.height+'mm, case fits '+e.case.max_cooler_mm+'mm';
+  } else if (cat==='psu'){
+    var need=100;
+    if (e.cpu && e.cpu.tdp) need += e.cpu.tdp;
+    if (e.gpu && e.gpu.tdp) need += e.gpu.tdp;
+    var want=Math.ceil(need*1.25);
+    if (newPart.watts < want) r='Need ~'+want+'W, this is '+newPart.watts+'W';
+  }
+  return r;
+}
+function checkBuildIssues(){
+  var issues=[];
+  var keys=['cpu','mb','ram','gpu','psu','case','cooler'];
+  for (var i=0;i<keys.length;i++){
+    for (var j=i+1;j<keys.length;j++){
+      if (S[keys[i]] && S[keys[j]]){
+        var ob={}; ob[keys[j]]=S[keys[j]];
+        var r=checkPair(S[keys[i]], keys[i], ob);
+        if (r) issues.push(r);
+      }
+    }
+  }
+  return issues;
+}
+function isCompatibleWith(part, cat){
+  if (Object.keys(S).length===0) return {ok:true};
+  var r=checkPair(part, cat, S);
+  return r ? {ok:false, reason:r} : {ok:true};
+}
+
+/* STATE */
+var S={};
+var currentTab='cpu';
+var currentTool='linux';
+var onlyCompatible=true;
+
+function usd(n){ return '$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function findPart(cat, needle){
+  var list=CAT[cat]; if (!list) return null;
+  var n=needle.toLowerCase();
+  for (var i=0;i<list.length;i++){ if (list[i].name.toLowerCase().indexOf(n)!==-1) return list[i]; }
+  return null;
+}
+
+/* ===== PREBUILTS — 43 (gaming + work + creative) ===== */
+var PREBUILTS=[
+{name:'CS2 / Counter-Strike 2',emoji:'🎯',tag:'game',desc:'240Hz competitive',picks:{cpu:'9800X3D',mb:'X870E-E',ram:'VULCAN 32GB',gpu:'RTX 5070 GAMING OC',psu:'RM850x',cooler:'NAUTILUS 360 RS ARGB',case:'O11 Dynamic EVO RGB',ssd:'SN850X 1TB'}},
+{name:'Dota 2',emoji:'⚔️',tag:'game',desc:'High-refresh MOBA',picks:{cpu:'7800X3D',mb:'B650 EAGLE',ram:'VULCAN 32GB',gpu:'RTX 5070 GAMING OC',psu:'MAG A750GL',cooler:'AK400 G2 Air',case:'Pop Air Black',ssd:'NV3 1TB'}},
+{name:'PUBG Battlegrounds',emoji:'🪂',tag:'game',desc:'1440p high FPS',picks:{cpu:'9800X3D',mb:'X870E-E',ram:'Vengeance RGB 32GB',gpu:'RTX 5070 Ti VENTUS',psu:'RM850x',cooler:'NAUTILUS 360 RS ARGB',case:'North XL Black',ssd:'SN850X 2TB'}},
+{name:'Apex Legends',emoji:'🦾',tag:'game',desc:'240Hz movement shooter',picks:{cpu:'9800X3D',mb:'X870E-E',ram:'VULCAN 32GB',gpu:'RTX 5070 GAMING OC',psu:'RM850x',cooler:'NAUTILUS 360 RS ARGB',case:'O11 Dynamic EVO RGB',ssd:'SN850X 1TB'}},
+{name:'GTA V / GTA VI Ready',emoji:'🚗',tag:'game',desc:'Future-proofed',picks:{cpu:'9800X3D',mb:'X870E-E',ram:'Vengeance RGB 32GB',gpu:'RTX 5080 OC SFF',psu:'HX1000i',cooler:'NAUTILUS 360 RS ARGB',case:'North XL Black',ssd:'SN850X 4TB'}},
+{name:'Destiny 2',emoji:'🌌',tag:'game',desc:'1440p raiding 144Hz',picks:{cpu:'9800X3D',mb:'X870E-E',ram:'Vengeance RGB 32GB',gpu:'RTX 5070 Ti GAMING OC',psu:'RM850x',cooler:'NAUTILUS 360 RS ARGB',case:'O11 Dynamic EVO RGB',ssd:'SN850X 2TB'}},
+{name:'Rust',emoji:'🏚️',tag:'game',desc:'Big world, big RAM',picks:{cpu:'9800X3D',mb:'X870E-E',ram:'Vengeance 64GB',gpu:'RTX 5070 Ti VENTUS',psu:'RM850x',cooler:'NAUTILUS 360 RS ARGB',case:'North XL Black',ssd:'990 Pro 2TB'}},
+{name:'Rainbow Six Siege',emoji:'🌈',tag:'game',desc:'Competitive 240Hz',picks:{cpu:'7800X3D',mb:'B650 EAGLE',ram:'VULCAN 32GB',gpu:'RTX 5070 GAMING OC',psu:'MAG A850GL',cooler:'AK620 Air',case:'H5 Flow Compact',ssd:'NV3 2TB'}},
+{name:'Call of Duty Warzone',emoji:'💥',tag:'game',desc:'1440p warzone grinder',picks:{cpu:'9800X3D',mb:'X870E-E',ram:'Vengeance RGB 32GB',gpu:'RTX 5070 Ti VENTUS',psu:'RM850x',cooler:'NAUTILUS 360 RS ARGB',case:'O11 Dynamic EVO RGB',ssd:'SN850X 2TB'}},
+{name:'Team Fortress 2',emoji:'🧢',tag:'game',desc:'Ancient game, modern frames',picks:{cpu:'7600X',mb:'B650 EAGLE',ram:'Ripjaws V 32GB',gpu:'RTX 5060 8GB OC',psu:'MAG A650BN',cooler:'AK400 G2 Air',case:'Pop Air Black',ssd:'NV3 1TB'}},
+{name:"Baldur's Gate 3",emoji:'🎲',tag:'game',desc:'Ultra settings, Act 3 smooth',picks:{cpu:'9800X3D',mb:'X870E-E',ram:'Vengeance 64GB',gpu:'RTX 5070 Ti GAMING OC',psu:'RM850x',cooler:'NAUTILUS 360 RS ARGB',case:'North XL Black',ssd:'990 Pro 2TB'}},
+{name:'Elden Ring',emoji:'⚜️',tag:'game',desc:'Perfect 60fps locked',picks:{cpu:'9800X3D',mb:'B650 EAGLE',ram:'Trident Z5 Neo RGB 32GB',gpu:'RTX 5070 Ti GAMING OC',psu:'RM850x',cooler:'AK620 Air',case:'North XL Black',ssd:'SN850X 2TB'}},
+{name:'Cyberpunk 2077 RT',emoji:'🌃',tag:'game',desc:'Max RT + Path Tracing',picks:{cpu:'9950X3D',mb:'X870E-E',ram:'Vengeance RGB 32GB',gpu:'RTX 5080 GAMING OC',psu:'HX1000i',cooler:'TITAN 360 RX LCD',case:'O11 Dynamic EVO RGB',ssd:'990 Pro 2TB'}},
+{name:'Red Dead Redemption 2',emoji:'🐎',tag:'game',desc:'4K cinematic cowboy',picks:{cpu:'9800X3D',mb:'X870E-E',ram:'Vengeance RGB 32GB',gpu:'RTX 5080 OC SFF',psu:'HX1000i',cooler:'NAUTILUS 360 RS ARGB',case:'North XL Black',ssd:'SN850X 4TB'}},
+{name:'Hogwarts Legacy',emoji:'🪄',tag:'game',desc:'Ultra + ray tracing',picks:{cpu:'9800X3D',mb:'X870E-E',ram:'Vengeance RGB 32GB',gpu:'RTX 5070 Ti GAMING OC',psu:'RM850x',cooler:'NAUTILUS 360 RS ARGB',case:'North XL Black',ssd:'990 Pro 2TB'}},
+{name:'Starfield',emoji:'🚀',tag:'game',desc:'Smooth space exploration',picks:{cpu:'9800X3D',mb:'X870E-E',ram:'Vengeance 64GB',gpu:'RTX 5080 OC SFF',psu:'HX1000i',cooler:'TITAN 360 RX LCD',case:'North XL Black',ssd:'990 Pro 4TB'}},
+{name:'Fortnite (UE5)',emoji:'🪁',tag:'game',desc:'Nano+Lumen 1440p comp',picks:{cpu:'7800X3D',mb:'B650 EAGLE',ram:'VULCAN 32GB',gpu:'RTX 5070 GAMING OC',psu:'MAG A850GL',cooler:'AK620 Air',case:'H5 Flow Compact',ssd:'NV3 2TB'}},
+{name:'Minecraft RTX / Java',emoji:'⛏️',tag:'game',desc:'Shaders + mods + RTX',picks:{cpu:'9800X3D',mb:'B650 EAGLE',ram:'Trident Z5 Neo RGB 32GB',gpu:'RTX 5070 Ti GAMING OC',psu:'RM850x',cooler:'AK620 Air',case:'North XL Black',ssd:'SN850X 2TB'}},
+{name:'Valorant',emoji:'🎯',tag:'game',desc:'500+ FPS competitive',picks:{cpu:'9800X3D',mb:'B650 EAGLE',ram:'VULCAN 32GB',gpu:'RTX 5070 GAMING OC',psu:'MAG A750GL',cooler:'AK400 G2 Air',case:'H5 Flow Compact',ssd:'NV3 1TB'}},
+{name:'Escape from Tarkov',emoji:'🎖️',tag:'game',desc:'32GB RAM minimum',picks:{cpu:'9800X3D',mb:'X870E-E',ram:'Vengeance 64GB',gpu:'RTX 5070 Ti VENTUS',psu:'RM850x',cooler:'NAUTILUS 360 RS ARGB',case:'North XL Black',ssd:'990 Pro 2TB'}},
+{name:'Overwatch 2',emoji:'⚡',tag:'game',desc:'Fast 240Hz hero shooter',picks:{cpu:'9800X3D',mb:'B650 EAGLE',ram:'VULCAN 32GB',gpu:'RTX 5070 GAMING OC',psu:'MAG A850GL',cooler:'AK620 Air',case:'H5 Flow Compact',ssd:'NV3 1TB'}},
+{name:'Microsoft Flight Simulator',emoji:'✈️',tag:'game',desc:'Photoreal at 4K',picks:{cpu:'9950X3D',mb:'X870E-E',ram:'Vengeance 64GB',gpu:'RTX 5080 OC SFF',psu:'HX1000i',cooler:'NAUTILUS 360 RS ARGB',case:'North XL Black',ssd:'990 Pro 4TB'},extras:[['hdd','BarraCuda 8TB']]},
+{name:'Sim Racing / iRacing',emoji:'🏁',tag:'game',desc:'Triple monitor ready',picks:{cpu:'9800X3D',mb:'X870E-E',ram:'Vengeance RGB 32GB',gpu:'RTX 5080 GAMING OC',psu:'HX1000i',cooler:'NAUTILUS 360 RS ARGB',case:'O11 Dynamic EVO RGB',ssd:'SN850X 2TB'}},
+{name:'Cities: Skylines II',emoji:'🏙️',tag:'game',desc:'Massive RAM for big cities',picks:{cpu:'9950X',mb:'X870E-E',ram:'Vengeance 96GB',gpu:'RTX 5070 Ti GAMING OC',psu:'HX1000i',cooler:'NAUTILUS 360 RS ARGB',case:'North XL Black',ssd:'990 Pro 4TB'}},
+{name:'Emulation / Retro',emoji:'🕹️',tag:'game',desc:'RPCS3, Yuzu, MAME',picks:{cpu:'7800X3D',mb:'B650 EAGLE',ram:'VULCAN 32GB',gpu:'RTX 5060 Ti 16GB',psu:'MAG A750GL',cooler:'AK400 G2 Air',case:'Pop Air Black',ssd:'NV3 2TB'}},
+{name:'BeamNG.drive',emoji:'🚙',tag:'game',desc:'Physics simulation beast',picks:{cpu:'9800X3D',mb:'B650 EAGLE',ram:'Vengeance 64GB',gpu:'RTX 5070 Ti GAMING OC',psu:'RM850x',cooler:'NAUTILUS 360 RS ARGB',case:'North XL Black',ssd:'SN850X 2TB'}},
+{name:'AutoCAD / CAD Workstation',emoji:'📐',tag:'work',desc:'Certified pro GPU, 64GB RAM',picks:{cpu:'9950X',mb:'ProArt X870E-CREATOR',ram:'Vengeance 64GB',gpu:'NVIDIA RTX 4000 Ada Professional',psu:'HX1000i',cooler:'ASUS ProArt LC 360',case:'Asus ProArt PA602',ssd:'990 Pro 2TB'}},
+{name:'SolidWorks / Mechanical CAD',emoji:'⚙️',tag:'work',desc:'Certified driver, ECC-like stability',picks:{cpu:'9950X',mb:'ProArt X870E-CREATOR',ram:'Vengeance 96GB',gpu:'NVIDIA RTX 4000 Ada Professional',psu:'HX1000i',cooler:'ASUS ProArt LC 360',case:'Asus ProArt PA602',ssd:'990 Pro 4TB'}},
+{name:'Revit / BIM / Architecture',emoji:'🏛️',tag:'work',desc:'Multi-core + GPU rendering',picks:{cpu:'9950X3D',mb:'ProArt X870E-CREATOR',ram:'Vengeance 96GB',gpu:'RTX 5080 OC SFF',psu:'HX1000i',cooler:'ASUS ProArt LC 360',case:'Asus ProArt PA602',ssd:'990 Pro 4TB'},extras:[['hdd','BarraCuda 8TB']]},
+{name:'Data Science / ML Training',emoji:'📊',tag:'work',desc:'24GB VRAM for LLM training',picks:{cpu:'9950X',mb:'X870E-E',ram:'Vengeance 96GB',gpu:'ASRock Radeon AI PRO R9700 Creator',psu:'HX1500i',cooler:'NAUTILUS 360 RS ARGB',case:'Define 7 Black',ssd:'990 Pro 4TB'},extras:[['ssd','990 Pro 2TB']]},
+{name:'AI Inference Server',emoji:'🤖',tag:'work',desc:'48GB+ VRAM inference box',picks:{cpu:'9950X3D',mb:'MEG X870E GODLIKE',ram:'Vengeance 96GB',gpu:'NVIDIA RTX PRO 6000 Blackwell 96GB',psu:'Corsair WS3000 Workstation',cooler:'NAUTILUS 360 RS ARGB',case:'Corsair iCUE LINK 9000D AIRFLOW',ssd:'990 Pro 4TB'},extras:[['hdd','BarraCuda 20TB']]},
+{name:'Software Development',emoji:'💻',tag:'work',desc:'Compile fast, run VMs',picks:{cpu:'9950X',mb:'X870E-E',ram:'Vengeance 96GB',gpu:'RTX 5070 Ti GAMING OC',psu:'HX1000i',cooler:'NAUTILUS 360 RS ARGB',case:'Define 7 Black',ssd:'990 Pro 4TB'},extras:[['hdd','BarraCuda 4TB']]},
+{name:'Virtual Machines / Homelab',emoji:'🖥️',tag:'work',desc:'128GB RAM, lots of storage',picks:{cpu:'9950X',mb:'X870E-E',ram:'Kingston FURY Beast 128GB DDR5',gpu:'RTX 5060 8GB OC',psu:'HX1000i',cooler:'NAUTILUS 360 RS ARGB',case:'Define 7 Black',ssd:'990 Pro 4TB'},extras:[['hdd','WD Red Pro 20TB'],['hdd','BarraCuda 24TB']]},
+{name:'NAS / Media Server',emoji:'💾',tag:'work',desc:'Plex/Jellyfin + big storage',picks:{cpu:'9900X',mb:'X870E-E',ram:'Vengeance 64GB',gpu:'RTX 5060 8GB OC',psu:'RM850x',cooler:'AK620 Air',case:'Fractal Design Define 7 Black',ssd:'SN850X 1TB'},extras:[['hdd','WD Red Pro 20TB'],['hdd','WD Red Pro 20TB'],['hdd','WD Red Pro 20TB'],['hdd','WD Red Pro 20TB']]},
+{name:'Music Production (DAW)',emoji:'🎵',tag:'create',desc:'Low-latency audio interface ready',picks:{cpu:'9950X',mb:'X870E-E',ram:'Vengeance 64GB',gpu:'RTX 5060 8GB OC',psu:'RM850x',cooler:'be quiet! Dark Rock Pro 5',case:'Fractal Design Define 7 Black',ssd:'Samsung 990 Pro 4TB'},extras:[['hdd','BarraCuda 4TB']]},
+{name:'Photo Editing / Lightroom',emoji:'📸',tag:'create',desc:'Fast storage + 64GB for ACR',picks:{cpu:'9950X',mb:'X870E-E',ram:'Vengeance 64GB',gpu:'RTX 5070 Ti GAMING OC',psu:'RM850x',cooler:'ASUS ProArt LC 360',case:'Asus ProArt PA602',ssd:'990 Pro 4TB'},extras:[['hdd','BarraCuda 8TB']]},
+{name:'8K Video Editing',emoji:'🎞️',tag:'create',desc:'Premiere/DaVinci 8K real-time',picks:{cpu:'9950X3D',mb:'ProArt X870E-CREATOR',ram:'Corsair Dominator Titanium 96GB',gpu:'RTX 5080 GAMING OC',psu:'Corsair WS3000 Workstation',cooler:'ASUS ProArt LC 360',case:'Asus ProArt PA602',ssd:'Samsung 9100 PRO 4TB'},extras:[['ssd','9100 PRO 4TB'],['hdd','BarraCuda 20TB']]},
+{name:'Blender / 3D Rendering',emoji:'🧊',tag:'create',desc:'GPU-rendered scenes fast',picks:{cpu:'9950X',mb:'X870E-E',ram:'Vengeance 96GB',gpu:'RTX 5080 OC SFF',psu:'HX1500i',cooler:'TITAN 360 RX LCD',case:'Define 7 Black',ssd:'990 Pro 2TB'},extras:[['hdd','WD Red Pro 18TB']]},
+{name:'Streaming / Content Creator',emoji:'📡',tag:'create',desc:'Game + encode + chat simultaneously',picks:{cpu:'9950X',mb:'X870E-E',ram:'Vengeance 64GB',gpu:'RTX 5080 OC SFF',psu:'HX1000i',cooler:'NAUTILUS 360 RS ARGB',case:'North XL Black',ssd:'990 Pro 2TB'},extras:[['hdd','BarraCuda 4TB']]},
+{name:'Budget 1080p Starter',emoji:'💰',tag:'game',desc:'Best bang for the buck',picks:{cpu:'7600X',mb:'B650 EAGLE',ram:'VULCAN 32GB',gpu:'RTX 5050 8GB GDDR6',psu:'MAG A750GL',cooler:'AK400 G2 Air',case:'CG530 4F ATX',ssd:'SN850X 1TB'}},
+{name:'General Office / Work',emoji:'📋',tag:'work',desc:'Fast, quiet, reliable',picks:{cpu:'Ryzen 5 8600G',mb:'B650 EAGLE',ram:'Ripjaws V 16GB',gpu:'RTX 3050 WINDFORCE 6G',psu:'MAG A650BN',cooler:'AK400 G2 Air',case:'Fractal Design Focus G Black',ssd:'NV3 1TB'}},
+{name:'Flagship No-Compromise',emoji:'👑',tag:'game',desc:'9950X3D2 + RTX 5090 + 96GB',picks:{cpu:'9950X3D2 Dual',mb:'MEG X870E GODLIKE',ram:'Trident Z5 Neo RGB 64GB',gpu:'AORUS RTX 5090 INFINITY',psu:'MEG Ai1600T',cooler:'RYUJIN III 360 ARGB EXTREME',case:'iCUE LINK 9000D AIRFLOW',ssd:'9100 PRO 4TB'}}
+];
+
+/* ===== REMOVE FROM BUILD ===== */
+function removeFromBuild(cat, id){
+  var s=S[cat];
+  if (!s) return;
+  if (Array.isArray(s)){
+    if (id){
+      for (var i=0;i<s.length;i++){
+        if (s[i].id===id){
+          if (s[i].qty>1) s[i].qty--;
+          else s.splice(i,1);
+          break;
+        }
+      }
+      if (s.length===0) delete S[cat];
+    } else delete S[cat];
+  } else delete S[cat];
+  clickSnd();
+  renderBuilder();
+}
+
+/* ===== RENDER ===== */
+function renderPrebuiltGrid(){
+  var el=$('prebuiltGrid');
+  el.innerHTML=PREBUILTS.map(function(pb){
+    var tagClass = pb.tag === 'game' ? 'game' : pb.tag === 'work' ? 'work' : 'create';
+    var tagText = pb.tag === 'game' ? 'Gaming' : pb.tag === 'work' ? 'Work' : 'Creative';
+    return '<button class="pb-card" data-pb="'+pb.name+'"><div class="pb-emoji">'+pb.emoji+'</div><span class="pb-tag '+tagClass+'">'+tagText+'</span><div class="pb-name">'+pb.name+'</div><div class="pb-desc">'+pb.desc+'</div></button>';
+  }).join('');
+}
+function renderTabs(){
+  var el=$('catTabs');
+  el.innerHTML=Object.keys(LABELS).map(function(k){
+    var has=S[k] && (Array.isArray(S[k]) ? S[k].length>0 : true);
+    var price=0;
+    if (S[k]){
+      if (Array.isArray(S[k])) S[k].forEach(function(x){ price+=x.price*x.qty; });
+      else price+=S[k].price;
+    }
+    var hint=has ? '<span class="price-hint">'+usd(price)+'</span>' : '';
+    return '<button class="cat '+(k===currentTab?'on':'')+'" data-tab="'+k+'">'+LABELS[k]+hint+(has?' <span class="dotb"></span>':'')+'</button>';
+  }).join('');
+}
+function renderGrid(){
+  var q=($('searchInput').value||'').toLowerCase();
+  var so=$('sortSelect').value;
+  var L=CAT[currentTab].filter(function(p){ return !q || p.name.toLowerCase().indexOf(q)!==-1; });
+  L.sort(function(a,b){ if (so==='a') return a.price-b.price; if (so==='d') return b.price-a.price; return a.name.localeCompare(b.name); });
+  var el=$('partsGrid');
+  if (!L.length){ el.innerHTML='<div style="grid-column:1/-1;padding:60px 20px;text-align:center;color:var(--muted);font-size:1rem">No parts match that search</div>'; return; }
+  el.innerHTML=L.map(function(p){
+    var sel=false, qty=0;
+    if (p.multi){ if (S[p.cat]) S[p.cat].forEach(function(x){ if (x.id===p.id){ sel=true; qty=x.qty; } }); }
+    else if (S[p.cat] && S[p.cat].id===p.id) sel=true;
+    var compat=onlyCompatible ? isCompatibleWith(p,currentTab) : {ok:true};
+    var incompat=!compat.ok && !sel;
+    var meta=[];
+    if (currentTab==='cpu'){ meta.push(p.socket); meta.push(p.tdp+'W'); meta.push(p.ram_type); }
+    else if (currentTab==='mb'){ meta.push(p.socket); meta.push(p.form); meta.push(p.ram_type); }
+    else if (currentTab==='ram'){ meta.push(p.ram_type); meta.push(p.cap+'GB'); }
+    else if (currentTab==='gpu'){ meta.push(p.vram+'GB'); meta.push(p.length+'mm'); meta.push(p.tdp+'W'); }
+    else if (currentTab==='psu'){ meta.push(p.watts+'W'); }
+    else if (currentTab==='case'){ meta.push('up to '+p.form); meta.push('GPU '+p.max_gpu_mm+'mm'); meta.push('Cooler '+p.max_cooler_mm+'mm'); }
+    else if (currentTab==='ssd'||currentTab==='hdd'){ meta.push(p.cap>=1000 ? (p.cap/1000)+'TB' : p.cap+'GB'); }
+    else if (currentTab==='cooler'){ meta.push(p.height+'mm'); meta.push(p.tdp_rating+'W TDP'); }
+    var addLabel=p.multi ? (sel ? '×'+qty : '+') : (sel ? '✓' : '+');
+    return '<button type="button" class="part '+(sel?'sel':'')+' '+(incompat?'incompat':'')+'" data-pick="'+p.id+'"><div class="part-body"><div class="part-name">'+p.name+'</div><div class="part-meta">'+meta.map(function(m){ return '<span>'+m+'</span>'; }).join('')+'</div>'+(incompat?'<div class="part-warn">⚠ '+compat.reason+'</div>':'')+'<div class="part-price">'+usd(p.price)+'</div></div><div class="part-add">'+addLabel+'</div></button>';
+  }).join('');
+}
+function renderSummary(){
+  var total=0, count=0, rows='';
+  Object.keys(LABELS).forEach(function(k){
+    var s=S[k];
+    if (!s || (Array.isArray(s) && s.length===0)){
+      rows+='<div class="sum-item empty"><div class="hd"><span class="k">'+LABELS[k]+'</span><span class="v">—</span></div></div>';
+    } else if (Array.isArray(s)){
+      var sub=0;
+      var partRows = s.map(function(it){
+        sub += it.price*it.qty; total += it.price*it.qty; count += it.qty;
+        return '<div class="sum-part-row"><span class="sum-part-name">'+it.name+(it.qty>1?'<span class="qty">×'+it.qty+'</span>':'')+'</span><button class="remove-x" data-remove-cat="'+k+'" data-remove-id="'+it.id+'" aria-label="Remove">×</button></div>';
+      }).join('');
+      rows+='<div class="sum-item"><div class="hd"><span class="k">'+LABELS[k]+'</span><span class="v">'+usd(sub)+'</span></div>'+partRows+'</div>';
+    } else {
+      total += s.price; count += 1;
+      rows+='<div class="sum-item"><div class="hd"><span class="k">'+LABELS[k]+'</span><span class="v">'+usd(s.price)+'</span></div><div class="sum-part-row"><span class="sum-part-name">'+s.name+'</span><button class="remove-x" data-remove-cat="'+k+'" aria-label="Remove">×</button></div></div>';
+    }
+  });
+  $('summarySide').innerHTML='<div class="summary-hd">Your Build <span class="pill">'+count+(count===1?' item':' items')+'</span></div><div class="summary-bd">'+rows+'</div><div class="summary-ft"><div class="sum-total"><span class="k">Total</span><span class="v">'+usd(total)+'</span></div><button class="btn-clear" id="clearSide">Clear Build</button></div>';
+  $('summaryMobile').innerHTML=rows;
+  $('bbCount').textContent=count+(count===1?' item':' items');
+  $('bbTotal').textContent=usd(total);
+  $('bsTotal').textContent=usd(total);
+  if (count>0) $('buildBar').classList.add('on');
+  else { $('buildBar').classList.remove('on'); $('bottomSheet').classList.remove('on'); }
+  var cs=$('clearSide');
+  if (cs) cs.addEventListener('click', clearBuild);
+}
+function renderCompatAlert(){
+  var issues=checkBuildIssues();
+  var el=$('compatAlert');
+  if (!issues.length){ el.innerHTML=''; return; }
+  el.innerHTML='<div class="compat-alert"><span class="ico">⚠️</span><div><strong>Heads up</strong><ul>'+issues.map(function(i){ return '<li>'+i+'</li>'; }).join('')+'</ul></div></div>';
+}
+function renderBuilder(){ renderTabs(); renderGrid(); renderSummary(); renderCompatAlert(); }
+
+function pick(id){
+  var p=null;
+  for (var i=0;i<CAT[currentTab].length;i++){ if (CAT[currentTab][i].id===id){ p=CAT[currentTab][i]; break; } }
+  if (!p) return;
+  var already=false;
+  if (p.multi && S[currentTab]) S[currentTab].forEach(function(x){ if (x.id===p.id) already=true; });
+  if (!p.multi && S[currentTab] && S[currentTab].id===p.id) already=true;
+  if (!already){
+    var compat=isCompatibleWith(p,currentTab);
+    if (!compat.ok){ errorSnd(); return; }
+  }
+  clickSnd();
+  if (p.multi){
+    S[currentTab]=S[currentTab]||[];
+    var ex=null;
+    S[currentTab].forEach(function(x){ if (x.id===p.id) ex=x; });
+    if (ex) ex.qty++;
+    else S[currentTab].push(Object.assign({},p,{qty:1}));
+  } else {
+    if (S[currentTab] && S[currentTab].id===p.id) delete S[currentTab];
+    else S[currentTab]=p;
+  }
+  renderBuilder();
+}
+function clearBuild(){ Object.keys(S).forEach(function(k){ delete S[k]; }); renderBuilder(); clickSnd(); }
+function loadPrebuilt(pb){
+  Object.keys(S).forEach(function(k){ delete S[k]; });
+  Object.keys(pb.picks).forEach(function(cat){
+    var p=findPart(cat, pb.picks[cat]);
+    if (!p) return;
+    if (p.multi) S[cat]=[Object.assign({},p,{qty:1})];
+    else S[cat]=p;
+  });
+  if (pb.extras){
+    pb.extras.forEach(function(pair){
+      var p=findPart(pair[0], pair[1]);
+      if (!p) return;
+      if (p.multi){
+        S[pair[0]]=S[pair[0]]||[];
+        var ex=null;
+        S[pair[0]].forEach(function(x){ if (x.id===p.id) ex=x; });
+        if (ex) ex.qty++;
+        else S[pair[0]].push(Object.assign({},p,{qty:1}));
+      } else S[pair[0]]=p;
+    });
+  }
+  clickSnd();
+  $('builderWelcome').style.display='none';
+  $('builderBuild').style.display='flex';
+  $('backBtn').classList.add('show');
+  renderBuilder();
+}
+
+/* TOOLBOX */
+var CMDS={
+  linux:[
+    ['CPU Temp & Fans','sensors'],
+    ['CPU Model, Cores, Cache','lscpu'],
+    ['RAM Usage','free -h'],
+    ['RAM Size, Speed, Slots','sudo lshw -C memory | grep -E "size|speed|description"'],
+    ['Full Hardware Summary','sudo inxi -Fzxxx'],
+    ['GPU & Kernel Driver','lspci -nnk | grep -iA3 vga'],
+    ['Disk Space','df -h'],
+    ['Block Devices','lsblk -o NAME,SIZE,TYPE,MOUNTPOINT,FSTYPE'],
+    ['Top 10 by RAM','ps aux --sort=-%mem | head -n 11'],
+    ['Top 10 by CPU','ps aux --sort=-%cpu | head -n 11'],
+    ['USB Devices','lsusb'],
+    ['PCI Devices','lspci'],
+    ['Network Interfaces','ip -br a'],
+    ['Uptime & Load','uptime -p && cat /proc/loadavg'],
+    ['Kernel & Distro','uname -a && cat /etc/os-release'],
+    ['Motherboard & BIOS','sudo dmidecode -t baseboard -t bios'],
+    ['SMART Disk Health','sudo smartctl -a /dev/sda'],
+    ['Live Sensors','watch -n 1 sensors'],
+    ['Fan Speeds','sensors | grep -i fan'],
+    ['Disk I/O Stats','iostat -x 1 3'],
+    ['Listening Ports','sudo ss -tulpn'],
+    ['Logged-in Users','w'],
+    ['GPU Utilization','nvidia-smi'],
+    ['CPU Freq Live','watch -n 1 "grep MHz /proc/cpuinfo"']
+  ],
+  powershell:[
+    ['CPU Temperature','Get-CimInstance -Namespace root\\wmi -ClassName MSAcpi_ThermalZoneTemperature | Select CurrentTemperature'],
+    ['CPU Model & Cores','Get-CimInstance Win32_Processor | Select Name,NumberOfCores,MaxClockSpeed'],
+    ['RAM Size, Speed, Part','Get-CimInstance Win32_PhysicalMemory | Select Manufacturer,Capacity,Speed,PartNumber'],
+    ['Full System Report','Get-ComputerInfo'],
+    ['GPU Model, VRAM, Driver','Get-CimInstance Win32_VideoController | Select Name,AdapterRAM,DriverVersion'],
+    ['Free Disk Space','Get-PSDrive -PSProvider FileSystem'],
+    ['Top 10 by RAM','Get-Process | Sort-Object WorkingSet -Descending | Select-Object -First 10 Name,WorkingSet'],
+    ['Top 10 by CPU','Get-Process | Sort-Object CPU -Descending | Select-Object -First 10 Name,CPU'],
+    ['Motherboard','Get-CimInstance Win32_BaseBoard | Select Manufacturer,Product,SerialNumber'],
+    ['BIOS Version & Date','Get-CimInstance Win32_BIOS | Select Manufacturer,SMBIOSBIOSVersion,ReleaseDate'],
+    ['USB Devices','Get-PnpDevice -Class USB | Select FriendlyName,Status'],
+    ['Network Adapters','Get-NetAdapter | Select Name,Status,LinkSpeed'],
+    ['System Uptime','(Get-Date) - (Get-CimInstance Win32_OperatingSystem).LastBootUpTime'],
+    ['Physical Disk Health','Get-PhysicalDisk | Select FriendlyName,MediaType,Size,HealthStatus'],
+    ['Startup Programs','Get-CimInstance Win32_StartupCommand | Select Name,Command,Location'],
+    ['Installed Updates','Get-HotFix | Select HotFixID,InstalledOn'],
+    ['Battery Status','Get-CimInstance Win32_Battery | Select EstimatedChargeRemaining,BatteryStatus'],
+    ['Full Spec Dump','systeminfo'],
+    ['DirectX Report','dxdiag /t $env:TEMP\\dxdiag.txt; Get-Content $env:TEMP\\dxdiag.txt'],
+    ['Windows Activation','Get-CimInstance SoftwareLicensingProduct -Filter "PartialProductKey IS NOT NULL" | Select Name,LicenseStatus'],
+    ['Installed Programs','Get-ItemProperty HKLM:\\Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\* | Select DisplayName,DisplayVersion'],
+    ['Windows Errors','Get-EventLog -LogName System -EntryType Error -Newest 10'],
+    ['GPU Live','while ($true) { nvidia-smi; Start-Sleep 2 }'],
+    ['WLAN Profiles','netsh wlan show profiles'],
+    ['Reset Network','ipconfig /flushdns; netsh winsock reset; netsh int ip reset']
+  ]
+};
+function renderToolbox(){
+  $('toolsTabs').innerHTML='<button class="'+(currentTool==='linux'?'on':'')+'" data-tool="linux">🐧 Linux</button><button class="'+(currentTool==='powershell'?'on':'')+'" data-tool="powershell">🪟 PowerShell</button>';
+  $('toolsList').innerHTML=CMDS[currentTool].map(function(c){
+    return '<div class="cmd" data-cmd="'+c[1].replace(/"/g,'&quot;')+'"><div class="cmd-t">'+c[0]+'</div><pre>'+c[1]+'</pre></div>';
+  }).join('');
+}
+
+/* BACKGROUND */
+var cv=$('bg'), cx=cv.getContext('2d');
+var mc=$('meter'), mx=mc.getContext('2d');
+var W=0, H=0;
+function resize(){
+  var dpr=Math.min(window.devicePixelRatio||1, 2);
+  W=window.innerWidth; H=window.innerHeight;
+  cv.width=W*dpr; cv.height=H*dpr;
+  cv.style.width=W+'px'; cv.style.height=H+'px';
+  cx.setTransform(dpr,0,0,dpr,0,0);
+  mc.width=W*dpr; mc.height=20*dpr;
+  mc.style.width=W+'px'; mc.style.height='20px';
+  mx.setTransform(dpr,0,0,dpr,0,0);
+}
+window.addEventListener('resize',resize);
+resize();
+
+var mode=0, particles=[], stars=[], vortex=[], dr=[];
+function initParticles(){
+  particles=[]; stars=[]; vortex=[]; dr=[];
+  for (var i=0;i<60;i++) particles.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*1.6+.4});
+  for (var i=0;i<200;i++) stars.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.4+.2,a:Math.random()});
+  for (var i=0;i<180;i++) vortex.push({a:Math.random()*Math.PI*2,r:Math.random(),v:.008+Math.random()*.02});
+  for (var i=0;i<Math.ceil(W/20);i++) dr.push({y:Math.random()*H, sp: 2+Math.random()*4});
+}
+initParticles();
+
+function accentC(){ return document.body.classList.contains('demonic') ? [255,45,85] : [0,224,176]; }
+var vibes=[];
+function buildVibes(){
+  var c=accentC();
+  var ac='rgba('+c[0]+','+c[1]+','+c[2]+',';
+  vibes=[
+    function(t,b){ var g=cx.createRadialGradient(W*(.5+Math.sin(t*.18)*.18), H*(.4+Math.cos(t*.14)*.15), 0, W*.5, H*.5, Math.max(W,H)*(.7+b*.2)); g.addColorStop(0, ac+(.14+b*.15)+')'); g.addColorStop(1, ac+'0)'); cx.fillStyle=g; cx.fillRect(0,0,W,H); var g2=cx.createRadialGradient(W*(.3+Math.cos(t*.12)*.2), H*(.7+Math.sin(t*.17)*.15), 0, W*.5, H*.5, Math.max(W,H)*.6); g2.addColorStop(0, ac+(.1+b*.1)+')'); g2.addColorStop(1, ac+'0)'); cx.fillStyle=g2; cx.fillRect(0,0,W,H); },
+    function(t,b){ particles.forEach(function(d){ d.x+=d.vx*(1+b); d.y+=d.vy*(1+b); if(d.x<0)d.x=W; if(d.x>W)d.x=0; if(d.y<0)d.y=H; if(d.y>H)d.y=0; }); for (var i=0;i<particles.length;i++){ var a=particles[i]; cx.beginPath(); cx.arc(a.x,a.y,a.r*(1+b*.5),0,7); cx.fillStyle=ac+'.5)'; cx.fill(); for (var j=i+1;j<particles.length;j++){ var bb=particles[j], dx=a.x-bb.x, dy=a.y-bb.y, d=dx*dx+dy*dy; if (d<16000){ cx.strokeStyle=ac+((1-d/16000)*.22)+')'; cx.lineWidth=.6; cx.beginPath(); cx.moveTo(a.x,a.y); cx.lineTo(bb.x,bb.y); cx.stroke(); } } } },
+    function(t,b){ var gs=60-b*20; cx.strokeStyle=ac+'.05)'; cx.lineWidth=1; for (var x=0;x<=W;x+=gs){ cx.beginPath(); cx.moveTo(x,0); cx.lineTo(x,H); cx.stroke(); } for (var y=0;y<=H;y+=gs){ cx.beginPath(); cx.moveTo(0,y); cx.lineTo(W,y); cx.stroke(); } var sy=(t*50*(1+b*2))%(H+200)-100; var g=cx.createLinearGradient(0,sy-100,0,sy+100); g.addColorStop(0,ac+'0)'); g.addColorStop(.5,ac+(.1+b*.15)+')'); g.addColorStop(1,ac+'0)'); cx.fillStyle=g; cx.fillRect(0,sy-100,W,200); },
+    function(t,b){ cx.lineWidth=1.5+b*2; for (var i=0;i<5;i++){ cx.beginPath(); for (var x=0;x<=W;x+=12){ var y=H*.5+Math.sin(x*(.01+i*.002)+t*(1+b*2)+i)*60*(1+b)+Math.cos(x*.005+t)*30; if (x===0) cx.moveTo(x,y); else cx.lineTo(x,y); } cx.strokeStyle=ac+(.18+b*.15-i*.015)+')'; cx.stroke(); } },
+    function(t,b){ var sp=.002*(1+b*8); cx.fillStyle=ac+'.85)'; for (var i=0;i<stars.length;i++){ var s=stars[i]; s.a-=sp; if (s.a<=0){ s.a=1; s.x=Math.random()*W; s.y=Math.random()*H; } var k=1/s.a; var x=W/2+(s.x-W/2)*k*.3; var y=H/2+(s.y-H/2)*k*.3; cx.fillRect(x,y,(1-s.a)*3,(1-s.a)*3); } },
+    function(t,b){ cx.lineWidth=2+b*3; for (var i=1;i<=6;i++){ cx.strokeStyle=ac+(.08+(1-i/6)*.1+b*.1)+')'; var r=i*80+Math.sin(t*2+i)*30+b*40; cx.beginPath(); cx.arc(W/2,H/2,r,0,7); cx.stroke(); } },
+    function(t,b){ vortex.forEach(function(p){ p.a+=p.v*(1+b*2); p.r-=.003; if (p.r<=0) p.r=1; var rad=p.r*Math.max(W,H); cx.beginPath(); cx.arc(W/2+Math.cos(p.a+t)*rad, H/2+Math.sin(p.a+t)*rad, 1.6+b*2, 0, 7); cx.fillStyle=ac+((1-p.r)*.6)+')'; cx.fill(); }); },
+    function(t,b){ cx.lineWidth=3+b*4; cx.beginPath(); for (var x=0;x<=W;x+=15){ var y=H/2+Math.sin(x*.01+t*3)*90*(1+b)+Math.cos(x*.02-t)*40; if (x===0) cx.moveTo(x,y); else cx.lineTo(x,y); } cx.strokeStyle=ac+(.45+b*.35)+')'; cx.stroke(); },
+    function(t,b){ var s=50-b*15; for (var x=0;x<W;x+=s){ for (var y=0;y<H;y+=s){ var w=Math.sin(x*.01+t*2)+Math.cos(y*.01+t*2); cx.fillStyle=ac+Math.max(0,w*(.1+b*.15))+')'; cx.fillRect(x+1,y+1,s-2,s-2); } } },
+    function(t,b){ for (var i=1;i<=10;i++){ cx.strokeStyle=ac+(.08+b*.1)+')'; cx.lineWidth=1+b; cx.beginPath(); var rx=W/4+Math.sin(t+i)*100, ry=H/4+Math.cos(t*1.2+i)*100; cx.ellipse(W/2,H/2,rx*i*.3*(1+b*.4),ry*i*.3*(1+b*.4),t+i,0,7); cx.stroke(); } },
+    function(t,b){ cx.lineWidth=1.5+b*3; for (var i=0;i<16;i++){ var a=t+i*(Math.PI/8); cx.strokeStyle=ac+(.08+b*.12)+')'; cx.beginPath(); cx.moveTo(W/2,H/2); cx.lineTo(W/2+Math.cos(a)*Math.max(W,H)*(1+b*.3), H/2+Math.sin(a)*Math.max(W,H)*(1+b*.3)); cx.stroke(); } },
+    function(t,b){ for (var i=0;i<5;i++){ cx.strokeStyle=ac+(.1+b*.15)+')'; cx.lineWidth=2+b*3; cx.beginPath(); for (var x=0;x<=W;x+=20){ var y=H/2+Math.sin(x*.008+t*2+i*.7)*100*(1+b)+i*30-60; if (x===0) cx.moveTo(x,y); else cx.lineTo(x,y); } cx.stroke(); } },
+    function(t,b){ cx.font=(14+b*4)+'px monospace'; for (var i=0;i<dr.length;i++){ cx.fillStyle=ac+(.3+b*.4)+')'; cx.fillText(String.fromCharCode(12448+Math.random()*96|0), i*20, dr[i].y); dr[i].y+=dr[i].sp*(1+b*3); if (dr[i].y>H) dr[i].y=0; } },
+    function(t,b){ var s=40-b*10, h=s*Math.sqrt(3)/2; cx.strokeStyle=ac+(.1+b*.15)+')'; cx.lineWidth=1+b; for (var y=0;y<H+s;y+=h){ for (var x=0;x<W+s;x+=s*1.5){ var off=(Math.floor(y/h)%2)?s*.75:0; cx.beginPath(); for (var a=0;a<6;a++){ var ang=Math.PI/3*a+Math.PI/6; var px=x+off+Math.cos(ang)*s/2; var py=y+Math.sin(ang)*s/2; if (a===0) cx.moveTo(px,py); else cx.lineTo(px,py); } cx.closePath(); cx.stroke(); } } },
+    function(t,b){ var s=60-b*20; cx.save(); cx.translate((t*30*(1+b*3))%s,0); cx.strokeStyle=ac+(.08+b*.12)+')'; cx.lineWidth=2+b*3; for (var x=-H;x<W+H;x+=s){ cx.beginPath(); cx.moveTo(x,0); cx.lineTo(x+H,H); cx.stroke(); } cx.restore(); },
+    function(t,b){ var g=cx.createRadialGradient(W/2,H/2,0,W/2,H/2,Math.max(W,H)*(.5+Math.sin(t*2)*.15+b*.3)); g.addColorStop(0,ac+(.15+b*.2)+')'); g.addColorStop(1,ac+'0)'); cx.fillStyle=g; cx.fillRect(0,0,W,H); },
+    function(t,b){ cx.lineWidth=1+b; particles.forEach(function(p){ p.y+=(2+b*8); if (p.y>H){ p.y=-10; p.x=Math.random()*W; } cx.strokeStyle=ac+(.3+b*.4)+')'; cx.beginPath(); cx.moveTo(p.x,p.y); cx.lineTo(p.x,p.y-20*(1+b)); cx.stroke(); }); },
+    function(t,b){ cx.lineWidth=2+b*2; for (var i=0;i<8;i++){ cx.strokeStyle=ac+(.08+b*.1)+')'; var sz=i*80+Math.sin(t*2+i)*(20+b*40); cx.strokeRect(W/2-sz/2,H/2-sz/2,sz,sz); } },
+    function(t,b){ for (var i=0;i<8;i++){ cx.beginPath(); for (var x=0;x<=W;x+=10){ var y=H/9*(i+1)+Math.sin(x*.02+t*3+i*.5)*(20+b*40); if (x===0) cx.moveTo(x,y); else cx.lineTo(x,y); } cx.strokeStyle=ac+(.15+b*.15)+')'; cx.lineWidth=1.5; cx.stroke(); } },
+    function(t,b){ for (var i=0;i<8;i++){ var ox=W/2+Math.sin(t*.7+i*1.2)*W*.4; var oy=H/2+Math.cos(t*.9+i*1.4)*H*.4; var g=cx.createRadialGradient(ox,oy,0,ox,oy,80+b*60); g.addColorStop(0,ac+(.2+b*.2)+')'); g.addColorStop(1,ac+'0)'); cx.fillStyle=g; cx.beginPath(); cx.arc(ox,oy,80+b*60,0,7); cx.fill(); } },
+    function(t,b){ cx.strokeStyle=ac+(.5+b*.3)+')'; cx.lineWidth=1.5+b*2; for (var k=0;k<3;k++){ cx.beginPath(); for (var x=0;x<=W;x+=8){ var ph=x*.02+t*3+k*2.1; var y=H/2+Math.sin(ph)*(120+b*60); if (x===0) cx.moveTo(x,y); else cx.lineTo(x,y); } cx.stroke(); } },
+    function(t,b){ cx.strokeStyle=ac+(.6+b*.4)+')'; cx.lineWidth=1+b*2; for (var i=0;i<3;i++){ cx.beginPath(); var x=Math.random()*W, y=0; cx.moveTo(x,y); while (y<H){ x+=(Math.random()-.5)*40; y+=20+Math.random()*30; cx.lineTo(x,y); } cx.stroke(); } },
+    function(t,b){ var s=30; for (var x=0;x<W;x+=s){ for (var y=0;y<H;y+=s){ var d=Math.hypot(x-W/2,y-H/2); var ph=Math.sin(d*.01-t*3); var r=1+Math.max(0,ph)*(2+b*4); cx.beginPath(); cx.arc(x,y,r,0,7); cx.fillStyle=ac+(.3+b*.4)+')'; cx.fill(); } } },
+    function(t,b){ var a=t*(1+b*2); var g=cx.createRadialGradient(W/2,H/2,0,W/2,H/2,Math.max(W,H)*.7); g.addColorStop(0,ac+'0)'); g.addColorStop(1,ac+(.15+b*.2)+')'); cx.fillStyle=g; cx.beginPath(); cx.moveTo(W/2,H/2); cx.arc(W/2,H/2,Math.max(W,H)*.7,a,a+Math.PI/3); cx.closePath(); cx.fill(); cx.strokeStyle=ac+(.5+b*.3)+')'; cx.lineWidth=1+b; cx.beginPath(); cx.moveTo(W/2,H/2); cx.lineTo(W/2+Math.cos(a)*Math.max(W,H)*.7,H/2+Math.sin(a)*Math.max(W,H)*.7); cx.stroke(); },
+    function(t,b){ var sides=5+Math.floor(b*3); cx.strokeStyle=ac+(.4+b*.3)+')'; cx.lineWidth=1.5+b*2; for (var k=0;k<4;k++){ var r=80+k*70+b*50; cx.beginPath(); for (var i=0;i<=sides;i++){ var ang=(Math.PI*2/sides)*i+t*(1+k*.3); var x=W/2+Math.cos(ang)*r, y=H/2+Math.sin(ang)*r; if (i===0) cx.moveTo(x,y); else cx.lineTo(x,y); } cx.stroke(); } },
+    function(t,b){ for (var i=0;i<50;i++){ var x=(Math.sin(i*12.9898+t*.3)*43758.5453%1+1)%1*W; var y=(Math.sin(i*78.233+t*.4)*43758.5453%1+1)%1*H; var r=1+Math.abs(Math.sin(t+i))*(2+b*4); cx.fillStyle=ac+(.2+b*.3)+')'; cx.beginPath(); cx.arc(x,y,r,0,7); cx.fill(); } },
+    function(t,b){ var s=40; cx.strokeStyle=ac+(.15+b*.15)+')'; cx.lineWidth=1+b; for (var x=0;x<W;x+=s){ cx.beginPath(); for (var y=0;y<=H;y+=8){ var disp=Math.sin(y*.02+t*2)*10*(1+b); if (y===0) cx.moveTo(x+disp,y); else cx.lineTo(x+disp,y); } cx.stroke(); } },
+    function(t,b){ for (var i=0;i<5;i++){ var phase=(t*(1+b*2)+i*.3)%2; if (phase>1) continue; cx.strokeStyle=ac+((1-phase)*.4)+')'; cx.lineWidth=(1-phase)*3; cx.beginPath(); cx.arc(W/2,H/2,phase*Math.max(W,H),0,7); cx.stroke(); } },
+    function(t,b){ var s=60; cx.strokeStyle=ac+(.08+b*.1)+')'; cx.lineWidth=1; for (var x=0;x<W;x+=s){ for (var y=0;y<H;y+=s){ cx.beginPath(); cx.moveTo(x,y); cx.lineTo(x+s,y); cx.lineTo(x+s/2,y+s); cx.closePath(); cx.stroke(); } } },
+    function(t,b){ cx.strokeStyle=ac+(.4+b*.3)+')'; cx.lineWidth=2+b; cx.beginPath(); for (var i=0;i<300;i++){ var ang=i*.1+t*(1+b*2); var r=i*.8*(1+b*.3); var x=W/2+Math.cos(ang)*r, y=H/2+Math.sin(ang)*r; if (i===0) cx.moveTo(x,y); else cx.lineTo(x,y); } cx.stroke(); },
+    function(t,b){ var s=40; for (var x=0;x<W;x+=s){ for (var y=0;y<H;y+=s){ var on=((x/s+y/s)%2)===0; if (on){ var pulse=.04+Math.abs(Math.sin(t*3+x*.02+y*.02))*.15+b*.15; cx.fillStyle=ac+pulse+')'; cx.fillRect(x,y,s,s); } } } },
+    function(t,b){ var x=(Math.sin(t*1.3)*.5+.5)*W; var y=(Math.sin(t*1.7)*.5+.5)*H; var r=40+b*80; var g=cx.createRadialGradient(x,y,0,x,y,r*2); g.addColorStop(0,ac+(.5+b*.3)+')'); g.addColorStop(1,ac+'0)'); cx.fillStyle=g; cx.beginPath(); cx.arc(x,y,r*2,0,7); cx.fill(); },
+    function(t,b){ var bars=40; var bw=W/bars; for (var i=0;i<bars;i++){ var amp=(Math.sin(t*3+i*.4)*.5+.5)*(1+b*3); var h=amp*H*.3; cx.fillStyle=ac+(.25+amp*.3)+')'; cx.fillRect(i*bw+2,H/2-h,bw-4,h*2); } },
+    function(t,b){ cx.strokeStyle=ac+(.15+b*.15)+')'; cx.lineWidth=1+b*.5; for (var i=0;i<8;i++){ cx.beginPath(); var baseY=H/8*(i+1); for (var x=0;x<=W;x+=10){ var y=baseY+Math.sin(x*.01+t+i)*30*(1+b)+Math.sin(x*.03+t*1.5+i)*15; if (x===0) cx.moveTo(x,y); else cx.lineTo(x,y); } cx.stroke(); } },
+    function(t,b){ for (var i=0;i<30;i++){ var x=W/2+Math.sin(t*.4+i*1.7)*W*.45; var y=H/2+Math.cos(t*.55+i*1.3)*H*.45; var r=2+Math.abs(Math.sin(t*2+i))*(4+b*6); cx.fillStyle=ac+(.4+Math.abs(Math.sin(t+i))*.5)+')'; cx.beginPath(); cx.arc(x,y,r,0,7); cx.fill(); } },
+    function(t,b){ var s=20; for (var x=0;x<W;x+=s){ for (var y=0;y<H;y+=s){ var n=Math.sin(x*.1+y*.1+t*3); if (n>.7-b*.5){ cx.fillStyle=ac+(.15+b*.2)+')'; cx.fillRect(x,y,s-1,s-1); } } } },
+    function(t,b){ var a=t*.8; for (var i=0;i<5;i++){ cx.strokeStyle=ac+(.2+i*.08)+')'; cx.lineWidth=2+i+b*2; cx.beginPath(); for (var x=0;x<=W;x+=8){ var y=H/2+Math.sin(x*.008+a+i*.3)*80*(1+b)+i*20-40; if (x===0) cx.moveTo(x,y); else cx.lineTo(x,y); } cx.stroke(); } },
+    function(t,b){ cx.save(); cx.translate(W/2,H/2); cx.rotate(t*(.2+b)); for (var i=0;i<200;i++){ var a=i*.3; var r=i*2*(1+b*.2); var x=Math.cos(a)*r, y=Math.sin(a)*r; var alpha=Math.max(0,1-r/(Math.max(W,H)*.7)); if (alpha<0) break; cx.fillStyle=ac+(alpha*.4)+')'; cx.beginPath(); cx.arc(x,y,1+alpha*2,0,7); cx.fill(); } cx.restore(); },
+    function(t,b){ for (var x=0;x<W;x+=20){ for (var y=0;y<H;y+=30){ var l=4+Math.abs(Math.sin(t*3+x))*(15+b*20); cx.strokeStyle=ac+(.2+b*.3)+')'; cx.lineWidth=1; cx.beginPath(); cx.moveTo(x,y); cx.lineTo(x,y+l); cx.stroke(); } } },
+    function(t,b){ cx.strokeStyle=ac+(.15+b*.15)+')'; cx.lineWidth=1+b; var s=40; for (var x=0;x<W;x+=s){ for (var y=0;y<H;y+=s){ cx.beginPath(); cx.moveTo(x,y); cx.lineTo(x+s,y+s); cx.stroke(); cx.beginPath(); cx.moveTo(x+s,y); cx.lineTo(x,y+s); cx.stroke(); } } },
+    function(t,b){ for (var i=0;i<40;i++){ var seed=i*7.31; var x=(Math.sin(seed)*43758.5453%1+1)%1*W; var y=(Math.sin(seed*2.1+t*.2)*43758.5453%1+1)%1*H; var r=Math.abs(Math.sin(t*.5+i*.7))*(10+b*20); cx.fillStyle=ac+(.15+b*.15)+')'; cx.beginPath(); cx.arc(x,y,r,0,7); cx.fill(); } }
+  ];
+}
+buildVibes();
+
+var bass=0, bassAvg=0;
+function animLoop(){
+  var t=performance.now()/1000;
+  var bgm=$('bgm');
+  var idle=!bgm || bgm.paused || bgm.muted;
+  if (analyser && !idle && freqData){
+    analyser.getByteFrequencyData(freqData);
+    var bassVal=(freqData[1]+freqData[2]+freqData[3]+freqData[4]+freqData[5])/1275;
+    bass=bass*.7+bassVal*.3;
+    bassAvg=bassAvg*.95+bass*.05;
+  } else if (!idle){ bass=Math.pow(Math.max(0,Math.sin(t*Math.PI*2*1.8)),5)*.8; bassAvg=bassAvg*.95+bass*.05; }
+  else { bass=bass*.9; bassAvg=bassAvg*.95; }
+  var beat=Math.max(0, bass-bassAvg)*2;
+  var hm=$('heroMark');
+  if (hm) hm.style.transform='scale('+(1+beat*.08)+')';
+  cx.fillStyle='rgba(5,7,12,.25)'; cx.fillRect(0,0,W,H);
+  try { vibes[mode](t, bass); } catch(_){}
+  var mw=mc.width/(window.devicePixelRatio||1), mh=20;
+  mx.clearRect(0,0,mw,mh);
+  var c=accentC();
+  mx.strokeStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(.6+bass*.4)+')';
+  mx.lineWidth=1.5+bass*3;
+  mx.beginPath();
+  var N=50;
+  for (var i=0;i<N;i++){
+    var x=i/(N-1)*mw;
+    var y=mh/2-Math.sin(t*3+i*.4)*bass*mh*.4-Math.sin(t*5.5+i)*bass*mh*.2;
+    if (i) mx.lineTo(x,y); else mx.moveTo(x,y);
+  }
+  mx.stroke();
+  requestAnimationFrame(animLoop);
+}
+function cycleVibe(dir){ mode=(mode+dir+vibes.length)%vibes.length; $('vibeNum').textContent=mode+1; clickSnd(); }
+
+/* SECRET CLICKS */
+var cntDew=0, cntR=0, cntWtf=0;
+document.querySelectorAll('.hero-mark .ltr').forEach(function(el){
+  el.addEventListener('click',function(e){
+    e.stopPropagation();
+    var k=el.getAttribute('data-k');
+    clickSnd();
+    el.style.color='var(--accent)';
+    setTimeout(function(){ el.style.color=''; }, 200);
+    if (k==='r'){ cntR++; if (cntR>=6){ cntR=0; startPrank(); } }
+    else { cntDew++; if (cntDew>=3){ cntDew=0; openSheet('builder'); } }
+  });
+});
+document.querySelector('.hero-mark .dot').addEventListener('click',function(e){
+  e.stopPropagation(); toggleDemon();
+});
+document.querySelector('.hero-mark .wtf').addEventListener('click',function(e){
+  e.stopPropagation();
+  clickSnd();
+  cntWtf++;
+  if (cntWtf>=6){ cntWtf=0; openSheet('toolbox'); renderToolbox(); }
+});
+
+function openSheet(id){
+  var s=$(id); if (!s) return;
+  s.classList.add('on');
+  if (id==='builder'){
+    if (Object.keys(S).length>0){
+      $('builderWelcome').style.display='none';
+      $('builderBuild').style.display='flex';
+      $('backBtn').classList.add('show');
+      renderBuilder();
+    } else {
+      $('builderWelcome').style.display='flex';
+      $('builderBuild').style.display='none';
+      $('backBtn').classList.remove('show');
+      renderPrebuiltGrid();
+    }
+  }
+  if (id==='toolbox') renderToolbox();
+}
+function closeSheet(id){ var s=$(id); if (s) s.classList.remove('on'); }
+
+/* WIRING */
+$('muteBtn').addEventListener('click', function(){ setMute(!muted); });
+$('vibeNext').addEventListener('click', function(e){ e.stopPropagation(); cycleVibe(1); });
+$('vibePrev').addEventListener('click', function(e){ e.stopPropagation(); cycleVibe(-1); });
+
+document.addEventListener('pointerdown', function(e){
+  if (document.getElementById('splash')) return;
+  if (e.target.closest('button') || e.target.closest('.sheet') || e.target.closest('.hero-mark') ||
+      e.target.closest('#ouija') || e.target.closest('#dock') ||
+      e.target.closest('.bottom-sheet') || e.target.closest('.build-bar')) return;
+  cycleVibe(1);
+}, true);
+
+document.querySelectorAll('[data-close]').forEach(function(el){
+  el.addEventListener('click', function(){ closeSheet(el.getAttribute('data-close')); });
+});
+window.addEventListener('keydown', function(e){
+  if (e.key === 'Escape'){
+    document.querySelectorAll('.sheet.on').forEach(function(s){ s.classList.remove('on'); });
+    $('bottomSheet').classList.remove('on');
+  }
+});
+
+$('startScratch').addEventListener('click', function(){
+  $('builderWelcome').style.display='none';
+  $('builderBuild').style.display='flex';
+  $('backBtn').classList.add('show');
+  renderBuilder();
+});
+$('showPrebuilts').addEventListener('click', function(){
+  var g=$('prebuiltGrid');
+  if (g.style.display==='none'){
+    renderPrebuiltGrid();
+    g.style.display='grid';
+    this.querySelector('.cta-title').textContent='Hide prebuilts';
+  } else { g.style.display='none'; this.querySelector('.cta-title').textContent='Start from a prebuilt'; }
+});
+$('backBtn').addEventListener('click', function(){
+  $('builderWelcome').style.display='flex';
+  $('builderBuild').style.display='none';
+  $('backBtn').classList.remove('show');
+});
+
+document.body.addEventListener('click', function(e){
+  // Remove from build (works in both sidebar and mobile sheet)
+  var rb=e.target.closest('[data-remove-cat]');
+  if (rb){ removeFromBuild(rb.getAttribute('data-remove-cat'), rb.getAttribute('data-remove-id')); return; }
+
+  var pb=e.target.closest('[data-pb]');
+  if (pb){ var name=pb.getAttribute('data-pb'); var found=null; PREBUILTS.forEach(function(x){ if (x.name===name) found=x; }); if (found) loadPrebuilt(found); return; }
+
+  var tab=e.target.closest('[data-tab]'); if (tab){ currentTab=tab.getAttribute('data-tab'); renderBuilder(); return; }
+  var p=e.target.closest('[data-pick]'); if (p){ if (p.classList.contains('incompat')){ errorSnd(); return; } pick(p.getAttribute('data-pick')); return; }
+  var tool=e.target.closest('[data-tool]'); if (tool){ currentTool=tool.getAttribute('data-tool'); renderToolbox(); return; }
+  var cmd=e.target.closest('.cmd');
+  if (cmd){
+    var txt=cmd.getAttribute('data-cmd') || cmd.querySelector('pre').textContent;
+    copyText(txt);
+    cmd.classList.add('copied');
+    setTimeout(function(){ cmd.classList.remove('copied'); }, 900);
+    return;
+  }
+  if (e.target.closest('#clearBtnMobile') || e.target.closest('#clearSide')){ clearBuild(); return; }
+});
+
+$('searchInput').addEventListener('input', renderGrid);
+$('sortSelect').addEventListener('change', renderGrid);
+$('compatToggle').addEventListener('click', function(){
+  onlyCompatible=!onlyCompatible;
+  this.classList.toggle('on', onlyCompatible);
+  this.textContent=onlyCompatible ? '✓ Only compatible' : '⚠ Show all';
+  renderGrid();
+});
+
+$('bbBtn').addEventListener('click', function(){ $('bottomSheet').classList.add('on'); });
+$('bsClose').addEventListener('click', function(){ $('bottomSheet').classList.remove('on'); });
+$('bsHandle').addEventListener('click', function(){ $('bottomSheet').classList.remove('on'); });
+
+function copyText(txt){
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(function(){ beep(1400,.1,'triangle',.05); }).catch(function(){ fallbackCopy(txt); });
+    } else fallbackCopy(txt);
+  } catch(_){ fallbackCopy(txt); }
+}
+function fallbackCopy(txt){
+  try {
+    var ta=document.createElement('textarea');
+    ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    beep(1400,.1,'triangle',.05);
+  } catch(_){}
+}
+
+/* BOOT */
+function bootApp(){
+  try { initAudio(); } catch(_){}
+  chime();
+  requestAnimationFrame(animLoop);
+}
+window.bootApp = bootApp;
+
+/* INIT */
+buildOuija();
+renderToolbox();
+renderPrebuiltGrid();
+renderBuilder();
+
+})();
+</script>
+</body>
+</html>
