@@ -3,7 +3,7 @@
 <title>drew.wtf</title>
 <style>
 :root{--bg:#050508;--fg:#e0e0e0;--a1:#ff0055;--a2:#00ffcc;--a3:#ffaa00;--f:'Courier New',Courier,monospace}
-body.demonic{--bg:#0a0000;--fg:#ff3333;--a1:#aa0000;--a2:#ff0000;--a3:#ff0000}
+body.demonic{--bg:#050000;--fg:#ff3333;--a1:#aa0000;--a2:#ff0000;--a3:#ff0000}
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--fg);font-family:var(--f);transition:background 1s,color 1s, transform 1s}
 .ns{user-select:none;-webkit-user-select:none}
@@ -41,6 +41,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .splash-prompt {
   color: #888; font-size: 0.75rem; letter-spacing: 0.4rem; margin-right: -0.4rem; text-transform: uppercase;
   animation: promptBlink 2s infinite; border-top: 1px solid #222; padding-top: 20px; width: 100%; text-align: center;
+  white-space: nowrap; /* Fixes off-center bracket wrapping */
 }
 .splash-overlay { position: absolute; inset: 0; background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.3) 2px, rgba(0,0,0,0.3) 4px); pointer-events: none; z-index: 10; opacity: 0.5; }
 @keyframes spinMaster { 100% { transform: rotateZ(360deg) rotateX(360deg); } }
@@ -79,16 +80,16 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 
 /* ===== OUIJA BOARD ===== */
 #ouija {
-  position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%);
-  display: none; flex-direction: column; gap: 2vh; opacity: 0; transition: opacity 1.5s;
-  text-align: center; color: #a00; font-family: 'Times New Roman', serif; text-shadow: 0 0 15px #f00; z-index: 15;
+  position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%); width: 90vw; max-width: 800px;
+  display: none; flex-direction: column; opacity: 0; transition: opacity 1.5s;
+  text-align: center; color: #b18862; font-family: 'Times New Roman', serif; z-index: 15;
 }
-.demonic #main .wg { transform: translateY(-30vh) scale(0.6); }
+.demonic #main .wg { transform: translateY(-35vh) scale(0.5); }
 .demonic #ouija { display: flex; opacity: 1; pointer-events: auto; }
-.ouija-row { display: flex; justify-content: center; gap: 3vw; font-size: clamp(1.5rem, 3vw, 2.5rem); flex-wrap: wrap; }
-.ouija-btn { cursor: pointer; transition: 0.2s; padding: 5px 15px; border-radius: 50%; }
-.ouija-btn:hover { color: #f00; text-shadow: 0 0 30px #f00, 0 0 10px #fff; transform: scale(1.3); background: rgba(255,0,0,0.1); }
-#ouija_out { font-family: var(--f); color: #fff; text-shadow: 0 0 10px #f00; font-size: 1.2rem; min-height: 2rem; margin-top: 20px; letter-spacing: 5px; }
+.ouija-row { display: flex; justify-content: center; align-items: flex-end; }
+.ouija-btn { cursor: pointer; transition: 0.2s; font-size: clamp(1.2rem, 3vw, 2.5rem); font-weight: bold; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
+.ouija-btn:hover { color: #f00; text-shadow: 0 0 20px #f00, 0 0 40px #f00; transform: scale(1.4) !important; background: rgba(255,0,0,0.1); border-radius: 10px; }
+#ouija_out { font-family: var(--f); color: #fff; text-shadow: 0 0 10px #f00; font-size: 1.2rem; min-height: 2rem; margin-top: 30px; letter-spacing: 5px; }
 
 /* ===== PRANK SCREEN ===== */
 #prank { display:none; position:fixed; inset:0; background:#000; color:#0f0; font-family:var(--f); z-index:100000; padding:5vw; font-size:3vh; text-shadow:0 0 10px #0f0; }
@@ -107,7 +108,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 h2{background:linear-gradient(90deg,#ff0055,#ff9a00,#00ffcc);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:1.6rem;letter-spacing:2px;margin-bottom:4px;}
 h2 .tg{display:block;font-size:.7rem;letter-spacing:3px;color:#8a8aa0;-webkit-text-fill-color:#8a8aa0;margin-top:2px;text-transform:uppercase}
 .sub{color:#888;font-size:.85rem;margin-bottom:14px}
-.layout{display:grid;grid-template-columns:1fr 300px;gap:16px}
+.layout{display:grid;grid-template-columns:1fr 340px;gap:20px}
 @media(max-width:850px){.layout{grid-template-columns:1fr}}
 .tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
 .tab{background:#15151a;border:1px solid #333;color:#aaa;padding:8px 14px;border-radius:999px;cursor:pointer;font-family:var(--f);font-size:.8rem;transition:all 0.2s;}
@@ -125,10 +126,17 @@ h2 .tg{display:block;font-size:.7rem;letter-spacing:3px;color:#8a8aa0;-webkit-te
 .b.u{background:#ffaa0033;color:#ffaa00}.b.s{background:#ff005533;color:#ff5588}
 .em{position:absolute;top:8px;right:8px}
 .why{color:#ff7799;font-size:.72rem;margin-top:5px}
-.sum{background:linear-gradient(160deg,rgba(0,255,204,0.05),rgba(255,0,85,0.05));border:1px solid rgba(0,255,204,0.2);border-radius:12px;padding:16px;font-size:.82rem;align-self:start;position:sticky;top:0;backdrop-filter:blur(8px)}
-.sum h3{color:#fff;margin-bottom:12px;font-size:1.1rem;letter-spacing:1px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:8px;}
-.sum div.r{display:flex;justify-content:space-between;gap:8px;margin:5px 0;color:#aaa}
-.tot{font-size:2rem;color:#00ffcc;font-weight:bold;margin:12px 0;text-shadow:0 0 15px rgba(0,255,204,0.4);}
+
+/* Enhanced Summary UI */
+.sum{background:linear-gradient(160deg,rgba(0,255,204,0.05),rgba(255,0,85,0.05));border:1px solid rgba(0,255,204,0.2);border-radius:12px;padding:20px;font-size:.85rem;align-self:start;position:sticky;top:0;backdrop-filter:blur(8px)}
+.sum h3{color:#fff;margin-bottom:15px;font-size:1.1rem;letter-spacing:1px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:10px;}
+.sum-item { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 8px 0; }
+.sum-row { display:flex; justify-content:space-between; margin-bottom: 4px; }
+.sum-cat { color: #888; font-weight: bold; }
+.sum-price { color: #aaa; }
+.sum-name { color: #0fc; font-size: 0.8rem; display: block; line-height: 1.3; }
+
+.tot{font-size:2.2rem;color:#00ffcc;font-weight:bold;margin:15px 0 5px;text-shadow:0 0 15px rgba(0,255,204,0.4);}
 .bar{height:6px;background:#222;border-radius:3px;overflow:hidden;margin:8px 0}.bar i{display:block;height:100%;background:#00ffcc}
 .btn{background:#222;color:#fff;border:1px solid #555;padding:8px 16px;border-radius:6px;cursor:pointer;font-family:var(--f);margin:8px 6px 0 0;transition:all 0.2s;}.btn:hover{background:#333;border-color:#00ffcc;color:#00ffcc;}
 .vs-btn{background:rgba(255,0,85,0.1);border-color:#ff0055;color:#ff0055}.vs-btn.on{background:#ff0055;color:#000;font-weight:bold;box-shadow:0 0 15px rgba(255,0,85,0.5);}
@@ -188,27 +196,21 @@ html,body{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
   </div>
   
   <div id="ouija">
-    <div class="ouija-row">
+    <div class="ouija-row" style="justify-content:space-between; width:100%; font-size:3rem; margin-bottom:10px;">
       <div class="ouija-btn" onclick="oj('YES')">YES</div>
       <div class="ouija-btn" onclick="oj('NO')">NO</div>
     </div>
-    <div class="ouija-row">
-      <div class="ouija-btn" onclick="oj('A')">A</div><div class="ouija-btn" onclick="oj('B')">B</div><div class="ouija-btn" onclick="oj('C')">C</div><div class="ouija-btn" onclick="oj('D')">D</div><div class="ouija-btn" onclick="oj('E')">E</div><div class="ouija-btn" onclick="oj('F')">F</div><div class="ouija-btn" onclick="oj('G')">G</div>
+    <div class="ouija-row" id="o_arch1" style="gap:1.5vw;"></div>
+    <div class="ouija-row" id="o_arch2" style="margin-top:10px; gap:1.5vw;"></div>
+    <div class="ouija-row" style="margin-top:40px; gap:2.5vw;">
+      <div class="ouija-btn" onclick="oj('1')">1</div><div class="ouija-btn" onclick="oj('2')">2</div>
+      <div class="ouija-btn" onclick="oj('3')">3</div><div class="ouija-btn" onclick="oj('4')">4</div>
+      <div class="ouija-btn" onclick="oj('5')">5</div><div class="ouija-btn" onclick="oj('6')">6</div>
+      <div class="ouija-btn" onclick="oj('7')">7</div><div class="ouija-btn" onclick="oj('8')">8</div>
+      <div class="ouija-btn" onclick="oj('9')">9</div><div class="ouija-btn" onclick="oj('0')">0</div>
     </div>
-    <div class="ouija-row">
-      <div class="ouija-btn" onclick="oj('H')">H</div><div class="ouija-btn" onclick="oj('I')">I</div><div class="ouija-btn" onclick="oj('J')">J</div><div class="ouija-btn" onclick="oj('K')">K</div><div class="ouija-btn" onclick="oj('L')">L</div><div class="ouija-btn" onclick="oj('M')">M</div><div class="ouija-btn" onclick="oj('N')">N</div>
-    </div>
-    <div class="ouija-row">
-      <div class="ouija-btn" onclick="oj('O')">O</div><div class="ouija-btn" onclick="oj('P')">P</div><div class="ouija-btn" onclick="oj('Q')">Q</div><div class="ouija-btn" onclick="oj('R')">R</div><div class="ouija-btn" onclick="oj('S')">S</div><div class="ouija-btn" onclick="oj('T')">T</div>
-    </div>
-    <div class="ouija-row">
-      <div class="ouija-btn" onclick="oj('U')">U</div><div class="ouija-btn" onclick="oj('V')">V</div><div class="ouija-btn" onclick="oj('W')">W</div><div class="ouija-btn" onclick="oj('X')">X</div><div class="ouija-btn" onclick="oj('Y')">Y</div><div class="ouija-btn" onclick="oj('Z')">Z</div>
-    </div>
-    <div class="ouija-row">
-      <div class="ouija-btn" onclick="oj('1')">1</div><div class="ouija-btn" onclick="oj('2')">2</div><div class="ouija-btn" onclick="oj('3')">3</div><div class="ouija-btn" onclick="oj('4')">4</div><div class="ouija-btn" onclick="oj('5')">5</div><div class="ouija-btn" onclick="oj('6')">6</div><div class="ouija-btn" onclick="oj('7')">7</div><div class="ouija-btn" onclick="oj('8')">8</div><div class="ouija-btn" onclick="oj('9')">9</div><div class="ouija-btn" onclick="oj('0')">0</div>
-    </div>
-    <div class="ouija-row">
-      <div class="ouija-btn" onclick="oj('GOODBYE')">GOODBYE</div>
+    <div class="ouija-row" style="margin-top:50px;">
+      <div class="ouija-btn" style="font-size:2.5rem; letter-spacing:8px;" onclick="oj('GOODBYE')">GOODBYE</div>
     </div>
     <div id="ouija_out">...</div>
   </div>
@@ -268,36 +270,39 @@ function unlock(e){
 }
 ['click','keydown','wheel','touchend','pointerup'].forEach(t=>addEventListener(t,unlock));
 
-/* ===== INTERACTION LOGIC ===== */
+/* ===== CLICK COUNTERS & EASTER EGGS ===== */
 function pulse(el,col){el.style.color=col;el.style.transform='scale(1.2)';setTimeout(()=>{el.style.color='';el.style.transform=''},150)}
 function om(id){document.getElementById(id).classList.add('show')}
 function cm(id){document.getElementById(id).classList.remove('show')}
 
-// Main Nav
-const mapBuilder = e => { e.stopPropagation(); pulse(e.target,'#ff0055'); chime(); om('mb'); draw(); };
-document.getElementById('n_d').onclick = mapBuilder;
-document.getElementById('n_e').onclick = mapBuilder;
-document.getElementById('n_w').onclick = mapBuilder;
-document.getElementById('n_wtf').onclick = e => { e.stopPropagation(); pulse(e.target, '#ffaa00'); chime(); om('mf'); fshow(); };
+let clk_dew = 0, clk_r = 0, clk_wtf = 0;
 
-// RIZWAN PROTOCOL (3 CLICKS on R)
-let rClicks = 0, pranking = false;
+// PC Maker (10 clicks on D E W combined)
+const checkDew = (e) => {
+  e.stopPropagation(); pulse(e.target,'#ff0055'); chime();
+  clk_dew++; if(clk_dew >= 10) { clk_dew=0; om('mb'); draw(); }
+};
+document.getElementById('n_d').onclick = checkDew;
+document.getElementById('n_e').onclick = checkDew;
+document.getElementById('n_w').onclick = checkDew;
+
+// Linux/Powershell Toolbox (10 clicks on WTF)
+document.getElementById('n_wtf').onclick = e => {
+  e.stopPropagation(); pulse(e.target, '#ffaa00'); chime();
+  clk_wtf++; if(clk_wtf >= 10) { clk_wtf=0; om('mf'); fshow(); }
+};
+
+// Rizwan Protocol (6 clicks on R)
+let pranking = false;
 document.getElementById('n_r').onclick = e => {
   e.stopPropagation(); pulse(e.target,'#f00'); chime(); 
-  rClicks++;
-  if(rClicks >= 3) {
-    rClicks = 0; cm('mb'); startRizwan();
-  } else {
-    om('mb'); draw();
-  }
+  clk_r++; if(clk_r >= 6) { clk_r = 0; cm('mb'); startRizwan(); }
 };
 
 function startRizwan() {
-  if(pranking) return;
-  pranking = true;
+  if(pranking) return; pranking = true;
   const p = document.getElementById('prank'), log = document.getElementById('p_log'), cd = document.getElementById('p_cd');
-  p.style.display = 'block'; log.innerHTML = ''; cd.innerHTML = '';
-  bgm.pause();
+  p.style.display = 'block'; log.innerHTML = ''; cd.innerHTML = ''; bgm.pause();
   const steps = [
     {t: "INITIALIZING PROTOCOL...", d: 1000}, {t: "COPYING PHONE CONTENTS <span class='pbar'></span>", d: 2000},
     {t: "UPLOADING TO RUSSIA <span class='pbar'></span>", d: 2000}, {t: "DELETING LOCAL DATA <span class='pbar'></span>", d: 1500},
@@ -324,21 +329,32 @@ function startRizwan() {
   nextStep();
 }
 
-// DEMON MODE & OUIJA
+// OUIJA BOARD BUILDER
+const mkArch = (id, str) => {
+  let html = '';
+  for(let i=0; i<str.length; i++) {
+    let deg = (i/(str.length-1)) * 60 - 30; // Rotate -30 to +30 degrees
+    let y = Math.pow(deg, 2) * 0.05; // Parabolic dip
+    html += `<div class="ouija-btn" style="transform:translateY(${y}px) rotate(${deg}deg)" onclick="oj('${str[i]}')">${str[i]}</div>`;
+  }
+  document.getElementById(id).innerHTML = html;
+};
+mkArch('o_arch1', 'ABCDEFGHIJKLM');
+mkArch('o_arch2', 'NOPQRSTUVWXYZ');
+
+// DEMON MODE & OUIJA LOGIC (6 clicks on Pumpkin)
 let demon=false;const c={t:0};
 document.getElementById('n_dot').onclick = e => {
   e.stopPropagation(); pulse(e.target,'');
   if(demon){
     demon=false;c.t=0;document.body.classList.remove('demonic');
     document.getElementById('main').classList.remove('shake');bgm.playbackRate=1;chime();
-    document.getElementById('ouija_out').innerText = '...';
-    return;
+    document.getElementById('ouija_out').innerText = '...'; return;
   }
   c.t++;beep(110+c.t*45,.12,'sawtooth',.07);
   if(c.t>=6){
     c.t=0;demon=true;sting();
-    document.body.classList.add('demonic');
-    document.getElementById('main').classList.add('shake');
+    document.body.classList.add('demonic'); document.getElementById('main').classList.add('shake');
     bgm.playbackRate=.7;
   }
 };
@@ -363,7 +379,7 @@ addEventListener('keydown', e => {
 });
 
 
-/* ===== CANVAS ENGINE & 6 ANIMATIONS ===== */
+/* ===== CANVAS ENGINE & 7 VIBRANT ANIMATIONS ===== */
 const cv=document.getElementById('bg'),cx=cv.getContext('2d'),mc2=document.getElementById('meter'),mx=mc2.getContext('2d');
 function rs(){cv.width=innerWidth;cv.height=innerHeight;mc2.width=innerWidth;mc2.height=64}addEventListener('resize',rs);rs();
 let bass=0,ms={x:0,y:0},rip=[];
@@ -441,6 +457,31 @@ const MODES=[
       cx.fillStyle = `rgba(${C()}, ${1-p.r})`;
       cx.beginPath(); cx.arc(x,y, 2+bass*4, 0, 7); cx.fill();
     });
+  },
+  // 6: RGB Oscilloscope Wave
+  (W,H,t)=>{
+    cx.lineWidth = 4 + bass*5;
+    cx.beginPath();
+    for(let x=0; x<=W; x+=10) {
+      let y = H/2 + Math.sin(x*0.01 + t*3)*100*(1+bass) + Math.cos(x*0.02 - t*2)*50;
+      let hue = demon ? 0 : (t*100 + x*0.1)%360; // Vibrant color cycle
+      cx.strokeStyle = `hsla(${hue}, 100%, 60%, 0.8)`;
+      x===0 ? cx.moveTo(x,y) : cx.lineTo(x,y);
+    }
+    cx.stroke();
+  },
+  // 7: Neon Dancefloor Grid
+  (W,H,t)=>{
+    const s = 50;
+    for(let x=0; x<W; x+=s) {
+      for(let y=0; y<H; y+=s) {
+        let wave = Math.sin(x*0.01 + t*2) + Math.cos(y*0.01 + t*2);
+        let hue = demon ? (wave>0?0:20) : (t*50 + x*0.1 + y*0.1)%360;
+        let alpha = Math.max(0, wave * (0.2 + bass*0.6));
+        cx.fillStyle = `hsla(${hue}, 100%, 60%, ${alpha})`;
+        cx.fillRect(x+1, y+1, s-2, s-2);
+      }
+    }
   }
 ];
 
@@ -450,6 +491,13 @@ function chAnim(dir) {
   cx.globalAlpha=.18;cx.fillStyle='#fff';cx.fillRect(0,0,cv.width,cv.height);cx.globalAlpha=1;
   beep(480+mode*110,.07,'triangle',.05);
 }
+
+// Arrow Key control
+addEventListener('keydown', e => {
+  if(!open1 || document.querySelector('.modal.show')) return;
+  if(e.code === 'ArrowRight' || e.code === 'ArrowDown') chAnim(1);
+  else if(e.code === 'ArrowLeft' || e.code === 'ArrowUp') chAnim(-1);
+});
 
 function anim(){
   const W=cv.width,H=cv.height,t=performance.now()/1000,N=64,lv=[],idle=bgm.paused||bgm.muted;
@@ -594,11 +642,27 @@ function renderVS(a, b) {
 function summary(){
   if(pbMode) { $('sum').innerHTML = `<h3>PREBUILTS</h3><p style="color:#aaa;">Select a pre-configured template.</p>`; return; }
   if(vsMode) { $('sum').innerHTML = `<h3>VS MODE</h3><p style="color:#aaa;">Select 2 items to compare.</p>`; return; }
+  
   const it=Object.values(S),tot=it.reduce((a,b)=>a+b.price,0),need=(S.cpu?S.cpu.w:0)+(S.gpu?S.gpu.w:0)+100,psu=S.psu?S.psu.w:0;
-  $('sum').innerHTML=`<h3>SYSTEM TOTAL</h3>${Object.keys(LAB).map(k=>`<div class="r"><span>${LAB[k]}</span><span>${S[k]?usd(S[k].price):'-'}</span></div>`).join('')}
+  
+  let sumHTML = `<h3>SYSTEM TOTAL</h3>`;
+  Object.keys(LAB).forEach(k => {
+    if(!S[k]) {
+      sumHTML += `<div class="sum-item"><div class="sum-row"><span class="sum-cat">${LAB[k]}</span><span class="sum-price">-</span></div></div>`;
+    } else {
+      sumHTML += `<div class="sum-item">
+        <div class="sum-row"><span class="sum-cat">${LAB[k]}</span><span class="sum-price">${usd(S[k].price)}</span></div>
+        <span class="sum-name">${S[k].name}</span>
+      </div>`;
+    }
+  });
+
+  sumHTML += `
   <div class="tot">${usd(tot)}</div><div class="r"><span>Est. draw</span><span>${need}W</span></div>
   <div class="bar"><i style="width:${psu?Math.min(100,need/psu*100):0}%;background:#0fc"></i></div>
   <button class="btn" style="width:100%; margin-top:15px;" onclick="for(const k in S)delete S[k];draw()">RESET BUILD</button>`;
+  
+  $('sum').innerHTML = sumHTML;
 }
 
 /* Toolbox */
