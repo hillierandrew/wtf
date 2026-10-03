@@ -15,8 +15,10 @@ html,body{width:100%;height:100%;height:100dvh;overflow:hidden;background:var(--
 #spirit-cursor{position:fixed;width:40px;height:40px;border:2px solid #ff0000;border-radius:50%;pointer-events:none;z-index:999999;transform:translate(-50%,-50%);box-shadow:0 0 15px #ff0000,inset 0 0 10px #ff0000;display:none}
 body.demonic #spirit-cursor{display:block}
 
+/* SPLASH — bulletproof */
 #splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at center,#0a0a0f 0%,#000 100%);cursor:pointer;transition:opacity .8s ease;width:100vw;height:100vh;height:100dvh;pointer-events:auto;-webkit-tap-highlight-color:transparent}
-.splash-content{display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2;width:90%;text-align:center}
+.splash-content{display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2;width:90%;text-align:center;pointer-events:none}
+.splash-content button,.splash-content a{pointer-events:auto}
 .gyro{position:relative;width:130px;height:130px;transform-style:preserve-3d;animation:floatOrb 6s ease-in-out infinite,spinMaster 20s linear infinite;margin-bottom:30px}
 .ring{position:absolute;inset:0;border-radius:50%;box-shadow:0 0 15px rgba(0,255,204,.1);border:1px solid rgba(0,255,204,.4)}
 .ring:nth-child(1){transform:rotateX(60deg);animation:spinX 8s linear infinite;border-color:rgba(255,0,85,.5)}
@@ -24,7 +26,10 @@ body.demonic #spirit-cursor{display:block}
 .ring:nth-child(3){transform:rotateX(45deg) rotateY(45deg);animation:spinZ 10s linear infinite}
 .gyro-core{position:absolute;top:50%;left:50%;width:16px;height:16px;transform:translate(-50%,-50%);background:#0fc;border-radius:50%;box-shadow:0 0 30px #0fc}
 .splash-title{font-size:clamp(2rem,8vw,3.5rem);font-weight:300;letter-spacing:.3rem;margin-bottom:15px;color:#fff;text-transform:uppercase}
-.splash-prompt{color:#0fc;font-size:.75rem;letter-spacing:.15rem;text-transform:uppercase;border-top:1px solid #333;padding-top:15px;width:100%;text-align:center}
+.splash-prompt{color:#0fc;font-size:.75rem;letter-spacing:.15rem;text-transform:uppercase;border-top:1px solid #333;padding-top:15px;width:100%;text-align:center;margin-bottom:24px}
+.splash-cta{display:inline-block;padding:14px 36px;border:2px solid #0fc;color:#0fc;background:rgba(0,255,204,.08);border-radius:999px;font-family:var(--f);font-size:.9rem;letter-spacing:.25em;text-transform:uppercase;cursor:pointer;transition:all .2s;animation:ctaPulse 2s ease-in-out infinite}
+.splash-cta:hover{background:#0fc;color:#000;box-shadow:0 0 30px #0fc}
+@keyframes ctaPulse{0%,100%{box-shadow:0 0 20px rgba(0,255,204,.3)}50%{box-shadow:0 0 40px rgba(0,255,204,.7)}}
 @keyframes spinMaster{100%{transform:rotateZ(360deg) rotateX(360deg)}}
 @keyframes spinX{100%{transform:rotateX(420deg)}}
 @keyframes spinY{100%{transform:rotateY(420deg)}}
@@ -78,11 +83,10 @@ h2 .tg{display:block;font-size:.55rem;letter-spacing:2px;color:#8a8aa0;-webkit-t
 .tools input,.tools select{background:#000;color:#fff;border:1px solid #333;border-radius:6px;padding:8px;font-family:var(--f);flex:1;min-width:110px;font-size:.8rem}
 .grid{display:grid;grid-template-columns:1fr;gap:8px;padding-bottom:20px}
 @media(min-width:600px){.grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}}
-.p{background:linear-gradient(160deg,#171724,#101018);border:1px solid #2a2a33;border-left:4px solid #444;border-radius:8px;padding:12px;cursor:pointer;font-size:.8rem;position:relative;text-align:left}
+.p{background:linear-gradient(160deg,#171724,#101018);border:1px solid #2a2a33;border-left:4px solid #444;border-radius:8px;padding:12px;cursor:pointer;font-size:.8rem;position:relative;text-align:left;color:#e0e0e0}
 .p.sel{border-color:#00ffcc;background:rgba(0,255,204,.05);border-left-color:#00ffcc}
 .p .n{margin-bottom:4px;line-height:1.25;word-break:break-word}
 .p .pr{color:#00ffcc;font-weight:bold;font-size:1.1em}
-.p .meta{color:#666;font-size:.62rem;margin-top:4px;display:block}
 .qty-badge{background:#00ffcc;color:#000;font-weight:bold;font-size:.7rem;padding:2px 6px;border-radius:4px;display:inline-block;margin-top:4px}
 .sum{background:linear-gradient(160deg,rgba(0,255,204,.05),rgba(255,0,85,.05));border:1px solid rgba(0,255,204,.2);border-radius:10px;padding:14px;font-size:.8rem;overflow-y:auto;max-height:100%}
 .sum h3{color:#fff;margin-bottom:8px;font-size:1rem;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:6px}
@@ -102,7 +106,6 @@ h2 .tg{display:block;font-size:.55rem;letter-spacing:2px;color:#8a8aa0;-webkit-t
 .cmd-card pre{color:#e0e0e0;font-size:.72rem;white-space:pre-wrap;word-break:break-all;font-family:var(--f);cursor:pointer;padding:4px;border-radius:4px}
 .cmd-card pre:hover{background:#0fc22}
 .cmd-card pre.copied{color:#0fc}
-.cnt-badge{display:inline-block;background:rgba(0,255,204,.12);color:#0fc;font-size:.65rem;padding:2px 8px;border-radius:999px;margin-left:6px;font-weight:normal}
 </style>
 </head>
 <body>
@@ -111,11 +114,13 @@ h2 .tg{display:block;font-size:.55rem;letter-spacing:2px;color:#8a8aa0;-webkit-t
 
 <div id="prank"><div id="p_head">HELLO RIZWAN</div><div id="p_log"></div><div id="p_cd"></div></div>
 
-<div id="splash">
+<!-- SPLASH — inline handlers work even if JS init fails -->
+<div id="splash" onclick="unlock(event)" onpointerdown="unlock(event)" ontouchstart="unlock(event)">
   <div class="splash-content">
     <div class="gyro"><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="gyro-core"></div></div>
     <h1 class="splash-title">drew.wtf</h1>
-    <div class="splash-prompt">[ TAP ANYWHERE | SCROLL UP | HIT SPACE TO ENTER ]</div>
+    <div class="splash-prompt">[ TAP · CLICK · PRESS SPACE ]</div>
+    <button type="button" class="splash-cta" onclick="unlock(event)" onpointerdown="unlock(event)">enter site</button>
   </div>
 </div>
 
@@ -161,8 +166,8 @@ h2 .tg{display:block;font-size:.55rem;letter-spacing:2px;color:#8a8aa0;-webkit-t
 <div id="mb" class="modal">
   <div class="mc">
     <button class="x" data-close="mb" type="button">&times;</button>
-    <h2>GRANDPA'S REBUILT PC BUILDER<span class="tg">select multiple ram, storage & fans freely · iXXX & Axxx editions</span></h2>
-    <p class="sub">Tap category tabs below. Prebuilt combos included. Multi-quantity on RAM / storage / fans.</p>
+    <h2>GRANDPA'S REBUILT PC BUILDER<span class="tg">20 prebuilts · 400+ parts · multi-select ram/ssd/hdd/fans</span></h2>
+    <p class="sub">Tap a prebuilt combo below, or build from scratch. iXXX & Axxx editions included.</p>
     <div class="prebuilt-grid" id="prebuiltContainer"></div>
     <div class="layout">
       <div class="left-pane">
@@ -208,13 +213,15 @@ function initAudio(){
     audioCtx = new AC();
     var bgm = $('bgm');
     if (bgm && !audioReady){
-      var src = audioCtx.createMediaElementSource(bgm);
-      analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 256;
-      src.connect(analyser);
-      analyser.connect(audioCtx.destination);
-      freqData = new Uint8Array(analyser.frequencyBinCount);
-      audioReady = true;
+      try {
+        var src = audioCtx.createMediaElementSource(bgm);
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 256;
+        src.connect(analyser);
+        analyser.connect(audioCtx.destination);
+        freqData = new Uint8Array(analyser.frequencyBinCount);
+        audioReady = true;
+      } catch(e){ analyser = null; audioReady = false; }
     }
   } catch(e){}
 }
@@ -244,25 +251,26 @@ function toggleMute(){
   if (btn){ btn.textContent = muted ? '♪ OFF' : '♪ ON'; btn.style.color = muted ? '#f05' : '#aaa'; }
 }
 
-/* ---------- SPLASH ---------- */
+/* ---------- SPLASH UNLOCK — bulletproof ---------- */
 var unlocked = false, animStarted = false;
 function unlock(e){
   if (unlocked) return;
-  if (e && e.cancelable) { try { e.preventDefault(); } catch(_){} }
   unlocked = true;
-  initAudio();
-  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+  if (e && e.cancelable && e.type === 'keydown'){ try { e.preventDefault(); } catch(_){} }
+  try { initAudio(); } catch(_){}
+  try { if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); } catch(_){}
   var bgm = $('bgm');
-  if (bgm){ bgm.volume = 0.5; var p = bgm.play(); if (p && p.catch) p.catch(function(){}); }
-  chime();
+  if (bgm){ bgm.volume = 0.5; try { var p = bgm.play(); if (p && p.catch) p.catch(function(){}); } catch(_){} }
+  try { chime(); } catch(_){}
   var sp = $('splash');
   if (sp){
     sp.style.opacity = '0';
     sp.style.pointerEvents = 'none';
-    setTimeout(function(){ sp.style.display = 'none'; }, 800);
+    setTimeout(function(){ if (sp && sp.parentNode) sp.style.display = 'none'; }, 800);
   }
-  if (!animStarted){ animStarted = true; requestAnimationFrame(animLoop); }
+  if (!animStarted){ animStarted = true; try { requestAnimationFrame(animLoop); } catch(_){} }
 }
+window.unlock = unlock;
 
 function pulse(el, col){
   if (!el) return;
@@ -271,7 +279,6 @@ function pulse(el, col){
   el.style.transform = 'scale(1.3)';
   setTimeout(function(){ el.style.color = orig; el.style.transform = 'scale(1)'; }, 120);
 }
-
 function om(id){ var m = $(id); if (m) m.classList.add('show'); }
 function cm(id){ var m = $(id); if (m) m.classList.remove('show'); }
 
@@ -280,10 +287,9 @@ var pranking = false;
 function startRizwan(){
   if (pranking) return;
   pranking = true;
-  var p = $('prank'), log = $('p_log'), cd = $('p_cd');
-  var bgm = $('bgm');
-  p.style.display = 'block';
-  log.innerHTML = ''; cd.innerHTML = ''; cd.style.fontSize = '12vh';
+  var p = $('prank'), log = $('p_log'), cd = $('p_cd'), bgm = $('bgm');
+  if (!p) return;
+  p.style.display = 'block'; log.innerHTML = ''; cd.innerHTML = ''; cd.style.fontSize = '12vh';
   if (bgm) bgm.pause();
   var steps = [
     { t:"INITIALIZING PROTOCOL...", d:1000 },
@@ -309,13 +315,11 @@ function startRizwan(){
         count--;
         if (count < 0){
           clearInterval(cdi);
-          cd.innerHTML = "LOL";
-          cd.style.fontSize = "20vh";
+          cd.innerHTML = "LOL"; cd.style.fontSize = "20vh";
           beep(150, 1, 'sawtooth', 0.4);
           setTimeout(function(){
-            p.style.display = 'none';
-            pranking = false;
-            if (!muted && bgm) bgm.play();
+            p.style.display = 'none'; pranking = false;
+            if (!muted && bgm) try { bgm.play(); } catch(_){}
           }, 2000);
         }
       }, 1000);
@@ -323,16 +327,18 @@ function startRizwan(){
   }
   nextStep();
 }
+window.startRizwan = startRizwan;
 
 /* ---------- OUIJA ---------- */
 function mkArch(id, str){
+  var el = $(id); if (!el) return;
   var html = '';
   for (var i = 0; i < str.length; i++){
     var deg = (i / (str.length - 1)) * 45 - 22.5;
     var y = Math.pow(deg, 2) * 0.03;
     html += '<div class="ouija-btn" data-oj="' + str[i] + '" style="transform:translateY(' + y + 'px) rotate(' + deg + 'deg)">' + str[i] + '</div>';
   }
-  $(id).innerHTML = html;
+  el.innerHTML = html;
 }
 var demon = false, demonCount = 0, ojStr = "";
 function oj(l){
@@ -341,24 +347,24 @@ function oj(l){
   if (l === 'GOODBYE'){
     ojStr = ""; demon = false;
     document.body.classList.remove('demonic');
-    $('main').classList.remove('shake');
+    var m = $('main'); if (m) m.classList.remove('shake');
     var bgm = $('bgm'); if (bgm) bgm.playbackRate = 1;
     chime();
-  } else if (l === 'YES' || l === 'NO'){
-    ojStr = l;
-  } else {
-    ojStr += l;
-  }
-  $('ouija_out').innerText = ojStr || '...';
+  } else if (l === 'YES' || l === 'NO'){ ojStr = l; }
+  else { ojStr += l; }
+  var o = $('ouija_out'); if (o) o.innerText = ojStr || '...';
 }
+window.oj = oj;
+window.toggleMute = toggleMute;
+window.om = om;
+window.cm = cm;
 
 /* =========================================================
    CATALOG — full Canada Computers parts dump
-   iCAN -> iXXX   ARMOURY -> Axxx
    ========================================================= */
 var RAW = {
 
-/* ---------- CPU ---------- */
+/* CPU */
 cpu: { multi:false, k:'name price', t:
 `AMD Ryzen 5 5500 6-Core AM4|124.99
 AMD Ryzen 5 5600X 6-Core AM4|439.00
@@ -368,6 +374,7 @@ AMD Ryzen 5 8400F 4nm AM5|199.99
 AMD Ryzen 5 9600X 6-Core AM5|279.98
 AMD Ryzen 7 5700X 8-Core AM4|289.99
 AMD Ryzen 7 5800XT 8-Core AM4|329.99
+AMD Ryzen 7 7700X 8-Core AM5|359.88
 AMD Ryzen 7 7800X3D 8-Core AM5|519.98
 AMD Ryzen 7 8700F 4nm AM5|369.88
 AMD Ryzen 7 9700X 8-Core AM5|449.99
@@ -396,12 +403,13 @@ Intel Core Ultra 7 265K LGA1851|479.99
 Intel Core Ultra 7 265KF LGA1851|419.99
 Intel Core Ultra 7 270K Plus LGA1851|459.99
 Intel Core Ultra 9 285K LGA1851|899.99
+Intel Xeon Silver 4514Y LGA4677|1165.39
 AMD Ryzen 7 5700X + Gigabyte B550M + 32GB DDR4 Bundle|699.97
 AMD R7 7800X3D + Gigabyte B650 EAGLE + T-Force 32GB Bundle|1099.97
 AMD R7 9800X3D + Gigabyte B850 AORUS ELITE + 32GB D5 Bundle|1497.98
 AMD Ryzen 9 9950X3D2 + ROG STRIX X870E-H + 64GB Bundle|2499.96`},
 
-/* ---------- MOTHERBOARD ---------- */
+/* MOTHERBOARD */
 mb: { multi:false, k:'name price', t:
 `ASUS Prime B550M-A WIFI II AM4|159.99
 MSI PRO B550M-VC WIFI AM4|139.99
@@ -444,9 +452,11 @@ ASUS PRIME Z890-P WIFI LGA1851|319.99
 MSI PRO Z890-S WIFI LGA1851|329.99
 Gigabyte Z890 AORUS ELITE WIFI7 LGA1851|399.99
 ASUS ROG STRIX Z890-A GAMING WIFI LGA1851|419.99
-ASUS ROG STRIX Z890-E GAMING WIFI LGA1851|729.99`},
+ASUS ROG STRIX Z890-E GAMING WIFI LGA1851|729.99
+ASUS PROART Z890-CREATOR WIFI LGA1851|669.99
+Supermicro MBD-X13SAE-O W680 LGA1700|680.09`},
 
-/* ---------- RAM ---------- */
+/* RAM */
 ram: { multi:true, k:'name price', t:
 `Kingston ValueRAM 8GB DDR4-3200 CL22|149.99
 Kingston ValueRAM 16GB DDR4-3200 CL22|389.99
@@ -474,6 +484,8 @@ G.SKILL Trident Z5 RGB 32GB (2x16) DDR5-6400 CL32|1089.99
 G.SKILL Trident Z5 Neo RGB 32GB (2x16) DDR5-6000 CL30|1089.99
 G.SKILL Flare X5 32GB (2x16) DDR5-6000 CL30|1069.99
 G.SKILL Ripjaws S5 32GB (2x16) DDR5-6000 CL30|729.99
+G.SKILL Trident Z5 RGB 32GB (2x16) DDR5-8000 CL38|1639.99
+G.SKILL Trident Z5 Royal 32GB (2x16) DDR5-7200 CL34|1659.99
 Corsair Vengeance RGB 64GB (2x32) DDR5-6000 CL30|1779.99
 Corsair Vengeance 96GB (2x48) DDR5-6000 CL36|1976.99
 Corsair Vengeance RGB 96GB (2x48) DDR5-6000 CL36|1992.99
@@ -492,7 +504,7 @@ KLEVV CRAS V RGB 64GB (2x32) DDR5-6000 CL30|1409.99
 KLEVV CRAS V RGB 128GB (2x64) DDR5-6000 CL32|2999.99
 KLEVV BOLT V 64GB (2x32) DDR5-6000 CL30|1399.99`},
 
-/* ---------- GPU ---------- */
+/* GPU */
 gpu: { multi:false, k:'name price', t:
 `Gigabyte GeForce GT 1030 Low Profile D4|159.99
 Gigabyte GeForce RTX 3050 WINDFORCE OC V2 6G|359.99
@@ -565,7 +577,7 @@ NVIDIA RTX PRO 6000 Blackwell 96GB|23999.99
 ASRock AMD Radeon AI PRO R9700 Creator|2899.99
 Intel Arc Pro B70 32GB GDDR6|2399.99`},
 
-/* ---------- PSU ---------- */
+/* PSU */
 psu: { multi:false, k:'name price w', t:
 `Thermaltake Smart White 500W|59.99|500
 AZZA PSAZ-550W ATX Bronze|54.99|550
@@ -627,7 +639,7 @@ be quiet! Dark Power Pro 13 1600W Titanium|679.99|1600
 Superflower 1700W Titanium|669.99|1700
 Corsair WS3000 ATX 3.1 Workstation|884.99|3000`},
 
-/* ---------- CASE ---------- */
+/* CASE */
 case: { multi:false, k:'name price', t:
 `DeepCool CC310 Black|29.99
 Gigabyte C102 Ice MicroATX|59.88
@@ -671,7 +683,6 @@ NZXT H9 Flow RGB+ All Black|349.99
 Corsair iCUE LINK 9000D RGB AIRFLOW Super-Tower|674.99
 Corsair iCUE 7000X RGB White|269.88
 HYTE Y70 Touch Infinite Snow White|519.99
-HYTE Y70 Touch Infinite Black|519.99
 be quiet! Dark Base Pro 901 Black|384.99
 SSUPD Xhuttle Black ATX|199.99
 Thermaltake The Tower 600 Snow|244.99
@@ -683,7 +694,7 @@ Axxx A08 Micro ATX Wood Black|54.88
 Axxx C708 Tempered Glass Mid-tower Black|84.99
 Axxx D60 Tempered Glass Mid-tower Black|108.88`},
 
-/* ---------- SSD ---------- */
+/* SSD */
 ssd: { multi:true, k:'name price', t:
 `Kingston A400 240GB SATA3|104.99
 Kingston A400 480GB SATA3|164.99
@@ -695,6 +706,7 @@ Lexar NS100 2TB SATA|399.99
 WD Blue SA510 500GB SATA III|279.99
 WD Blue SA510 1TB SATA III|319.99
 WD Blue SA510 2TB SATA III|429.99
+WD Blue SA510 4TB SATA III|749.99
 Samsung 870 EVO 500GB SATA III|409.99
 Samsung 870 EVO 1TB SATA III|554.99
 Samsung 870 EVO 2TB SATA III|944.99
@@ -739,10 +751,10 @@ Seagate FireCuda 530 1TB|129.99
 Seagate FireCuda 540 2TB Gen5|359.99
 Seagate FireCuda 530R 2TB|464.99`},
 
-/* ---------- HDD ---------- */
+/* HDD */
 hdd: { multi:true, k:'name price', t:
 `Seagate BarraCuda 2TB 3.5" 7200RPM|194.99
-Seagate BarraCuda 4TB 3.5"|224.99
+Seagate BarraCuda 4TB 3.5" SATA|224.99
 Seagate BarraCuda 8TB 3.5" SATA|344.99
 Seagate BarraCuda 20TB|859.99
 Seagate BarraCuda 24TB|1034.99
@@ -789,6 +801,7 @@ WD Red Pro 18TB NAS|1204.99
 WD Red Pro 20TB NAS|1544.99
 WD Red Pro 22TB NAS|1699.99
 WD Red Pro 24TB NAS|689.99
+WD Red Pro 26TB NAS|2009.99
 WD Purple 2TB Surveillance|239.99
 WD Purple 4TB Surveillance|299.99
 WD Purple 8TB Surveillance|549.99
@@ -822,10 +835,10 @@ Synology Plus 8TB NAS|629.99
 Synology Plus 12TB NAS|819.99
 Synology Plus 16TB NAS|999.99`},
 
-/* ---------- COOLER (AIO + Air) ---------- */
+/* COOLER */
 cooler: { multi:false, k:'name price', t:
 `DeepCool AK400 G2 Air Cooler|34.99
-DeepCool AK400 G2 WH Air Cooler White|34.99
+DeepCool AK400 G2 WH Air White|34.99
 DeepCool AK400 DIGITAL SE Air|39.99
 DeepCool AK400 DIGITAL WH Air White|39.88
 DeepCool AG400 G2 Air Cooler Black|19.99
@@ -844,7 +857,6 @@ DeepCool ASSASSIN 4S White|59.88
 Cooler Master Hyper 212 Black|49.99
 Cooler Master HYPER 212 Spectrum V3|34.99
 Cooler Master Hyper 212 Halo Black|54.99
-Cooler Master Hyper 212 Halo White|54.99
 be quiet! Dark Rock 5|94.99
 be quiet! Dark Rock Pro 5|129.99
 be quiet! Dark Rock Elite|154.99
@@ -855,13 +867,11 @@ be quiet! PURE ROCK PRO 3|64.99
 be quiet! PURE ROCK Slim 2|29.99
 Noctua NH-D15 chromax.black|119.99
 Noctua NH-U12A chromax.black|109.99
-Noctua NH-L9i-17xx low-profile|54.99
 Thermalright Peerless Assassin 120 SE|44.99
 Thermalright Phantom Spirit 120 SE|54.99
 Arctic Freezer 36 CO S1700 AM5|64.99
 Arctic Freezer 36 A-RGB Black|79.99
 TRYX TURRIS 620 Air Cooler Black|169.99
-TRYX TURRIS 620 Air Cooler White|169.99
 PCCOOLER CPS RZ620 Dual Tower|64.99
 PCCOOLER CPS RT620 Digital|59.99
 PCCOOLER CPS RT400 ARGB|24.99
@@ -898,16 +908,13 @@ Corsair iCUE LINK TITAN II 360 RX RGB Black|254.99
 Corsair H150i RGB ELITE 360mm White|224.88
 Corsair H100i RGB ELITE White|174.88
 Corsair H150 RGB 360mm|159.99
-Corsair iCUE H150i Elite Capellix|164.88
 NZXT Kraken 240 Elite RGB|359.99
 NZXT Kraken 360 Elite RGB|419.99
-NZXT Kraken 360 Elite RGB White|419.99
 NZXT Kraken Elite 360 Black|399.99
 NZXT Kraken Elite 240 Black|334.99
 NZXT Kraken Elite 240 White|364.99
 NZXT Kraken 240 RGB White|249.99
 NZXT Kraken 360 RGB White|304.99
-NZXT RL-KR360-B1 360mm|304.99
 MSI MAG Coreliquid E240 AIO|99.97
 MSI MAG Coreliquid E360 AIO|119.97
 MSI MAG Coreliquid E360 White|119.97
@@ -916,7 +923,6 @@ MSI MAG Coreliquid A15 360|119.99
 MSI MAG CORELIQUID I240 Black|179.99
 MSI MPG CORELIQUID P13 360 Black|284.99
 MSI MPG CORELIQUID P13 360 White|284.99
-MSI MEG Ai1300P 1300W Platinum|359.97
 Gigabyte AORUS WATERFORCE X II 360|189.88
 Gigabyte AORUS WATERFORCE X II 360 ICE|169.88
 Gigabyte AORUS WATERFORCE II 240|79.88
@@ -946,7 +952,7 @@ ASUS ROG RYUJIN III 360 ARGB EXTREME|499.99
 ASUS ROG Ryuo IV SLC 360 ARGB Black|489.99
 ASUS Prime LC 360 ARGB AIO|159.99
 ASUS Prime LC 360 ARGB White|169.99
-ASUS ProArt LC 360 360mm Liquid|329.99
+ASUS ProArt LC 360 Liquid|329.99
 Thermaltake TH240 V2 ARGB Sync|134.99
 Thermaltake TH360 V2 ARGB Sync|174.99
 Thermaltake TOUGHLIQUID Ultra 240|219.88
@@ -962,10 +968,9 @@ Fractal Design Lumen S36 v2 RGB|219.99
 Enermax AQUAFUSION 360mm|114.88
 Cougar AQUA ARGB 360|144.88
 Cougar AQUA 280 High Performance|99.88
-Bitfenix Cube 240 mm AIO|129.99
-Bitfenix Cube 360 mm AIO|129.99`},
+Bitfenix Cube 240 mm AIO|129.99`},
 
-/* ---------- CASE FAN ---------- */
+/* FANS */
 fan: { multi:true, k:'name price', t:
 `be quiet! Pure Wings 3 120mm Black|9.99
 be quiet! Pure Wings 3 140mm PWM|9.99
@@ -1102,7 +1107,6 @@ Cooler Master MasterFan SF120M ARGB|21.88
 Sudokoo MACH120 120mm Single Pack Black|39.99
 Sudokoo MACH120 120mm 3-Pack Black|99.99
 Sudokoo MACH140 140mm Single Pack Black|44.99
-Sudokoo MACH120 120mm Regular Case Fan 3-Pack Black|99.99
 Seasonic Magflow 120 ARGB Case Fan 3-Pack|66.88
 JONSBO ZB-120B 2400RPM ARGB PWM|12.99
 JONSBO ZA-120B PC Case Fan 700-2400RPM|14.99
@@ -1126,13 +1130,13 @@ iXXX Metal GPU Holder Black|9.99
 iXXX GPU Holder Silver|9.99`}
 };
 
-/* ---------- LABELS ---------- */
+/* LABELS */
 var LAB = {
   cpu:'CPU', mb:'Board', ram:'Memory', gpu:'GPU', psu:'Power',
   case:'Case', ssd:'SSD', hdd:'HDD', cooler:'Cooling', fan:'Fans'
 };
 
-/* ---------- PARSE ---------- */
+/* PARSE */
 var CAT = {}, _id = 0;
 for (var k in RAW){
   var r = RAW[k], ks = r.k.split(' ');
@@ -1145,26 +1149,28 @@ for (var k in RAW){
   });
 }
 
-/* ---------- PREBUILT COMBOS ---------- */
+/* =========================================================
+   PREBUILT COMBOS — 20 game & workload builds
+   ========================================================= */
 var PREBUILTS = [
   { name:'💰 Budget 1080p', picks: {
     cpu:'Ryzen 5 7600X', mb:'B650 EAGLE', ram:'TEAMGROUP T-FORCE VULCAN 32GB',
     gpu:'RTX 5050 8GB GDDR6', psu:'MSI MAG A750GL', cooler:'DeepCool AK400 G2 Air',
-    case:'DeepCool CG530 4F', ssd:'WD Black SN850X 1TB'
+    case:'DeepCool CG530 4F ATX', ssd:'WD Black SN850X 1TB'
   }},
   { name:'🎯 1440p Sweet Spot', picks: {
     cpu:'Ryzen 7 9800X3D', mb:'X870E-E GAMING WIFI', ram:'Corsair Vengeance RGB 32GB',
-    gpu:'RTX 5070 12GB GDDR7', psu:'RM850x', cooler:'Corsair NAUTILUS 360 RS ARGB Black',
+    gpu:'RTX 5070 12GB GDDR7', psu:'RM850x', cooler:'NAUTILUS 360 RS ARGB Black',
     case:'North XL Black', ssd:'WD Black SN850X 2TB'
   }},
   { name:'🚀 4K Enthusiast', picks: {
     cpu:'Ryzen 9 9950X3D', mb:'X870E-E GAMING WIFI', ram:'Corsair Vengeance 96GB',
     gpu:'RTX 5080 16GB OC SFF', psu:'Corsair HXi HX1500i', cooler:'iCUE LINK TITAN 360 RX LCD',
-    case:'ROG Hyperion GR701 White', ssd:'Samsung 990 Pro 4TB'
+    case:'ROG Hyperion GR701', ssd:'Samsung 990 Pro 4TB'
   }},
-  { name:'👑 Flagship', picks: {
+  { name:'👑 Flagship No-Compromise', picks: {
     cpu:'Ryzen 9 9950X3D2', mb:'MEG X870E GODLIKE', ram:'G.SKILL Trident Z5 Neo RGB 64GB',
-    gpu:'AORUS RTX 5090 INFINITY 32GB', psu:'MSI MEG Ai1600T PCIE5',
+    gpu:'AORUS RTX 5090 INFINITY', psu:'MSI MEG Ai1600T',
     cooler:'ROG RYUJIN III 360 ARGB EXTREME', case:'iCUE LINK 9000D RGB AIRFLOW',
     ssd:'Samsung 9100 PRO 4TB'
   }},
@@ -1181,18 +1187,18 @@ var PREBUILTS = [
   }},
   { name:'🔴 All-AMD Red Team', picks: {
     cpu:'Ryzen 7 9800X3D', mb:'X870E-E GAMING WIFI', ram:'G.SKILL Trident Z5 Neo RGB 32GB',
-    gpu:'SAPPHIRE PURE RX 9070 XT 16GB', psu:'Super Flower Leadex VII XP 1000W',
-    cooler:'Arctic Liquid Freezer III PRO 360', case:'Lian Li O11 Dynamic EVO XL Black',
+    gpu:'SAPPHIRE PURE AMD Radeon RX 9070 XT', psu:'Super Flower Leadex VII XP 1000W',
+    cooler:'Arctic Liquid Freezer III PRO 360 Black', case:'Lian Li O11 Dynamic EVO XL Black',
     ssd:'Samsung 990 Pro 2TB'
   }},
   { name:'💾 Storage Monster', picks: {
     cpu:'Ryzen 7 9800X3D', mb:'X870E-E GAMING WIFI', ram:'Corsair Vengeance 96GB',
-    gpu:'RTX 5070 12GB GDDR7', psu:'RM850x', cooler:'Corsair NAUTILUS 360 RS ARGB Black',
-    case:'Fractal Design North XL Black'
+    gpu:'RTX 5070 12GB GDDR7', psu:'RM850x', cooler:'NAUTILUS 360 RS ARGB Black',
+    case:'North XL Black'
   }, extras: [
     ['ssd','Samsung 990 Pro 4TB'],['ssd','BarraCuda 4TB'],['ssd','870 EVO 4TB'],
     ['hdd','WD Red Pro 18TB'],['hdd','IronWolf Pro 12TB']
-  }},
+  ]},
   { name:'🎬 Creator / Workstation', picks: {
     cpu:'Ryzen 9 9950X', mb:'ProArt X870E-CREATOR', ram:'Corsair Vengeance 96GB',
     gpu:'NVIDIA RTX 4000 Ada Professional', psu:'Corsair WS3000',
@@ -1200,12 +1206,64 @@ var PREBUILTS = [
   }},
   { name:'🎮 Esports / 240Hz', picks: {
     cpu:'Ryzen 7 7800X3D', mb:'B650 EAGLE', ram:'TEAMGROUP T-FORCE VULCAN 32GB',
-    gpu:'RTX 5070 GAMING OC 12G', psu:'MSI MAG A850GL',
-    cooler:'DeepCool AK400 G2 Air', case:'NZXT H5 Flow Compact', ssd:'Kingston NV3 1TB'
-  }}
+    gpu:'RTX 5070 GAMING OC 12G', psu:'MSI MAG A850GL', cooler:'DeepCool AK400 G2 Air',
+    case:'NZXT H5 Flow Compact', ssd:'Kingston NV3 1TB'
+  }},
+  { name:'🏎️ Forza Horizon / Racing', picks: {
+    cpu:'Ryzen 7 9800X3D', mb:'X870E-E GAMING WIFI', ram:'Corsair Vengeance RGB 32GB',
+    gpu:'RTX 5070 Ti GAMING OC 16G', psu:'RM850x', cooler:'NAUTILUS 360 RS ARGB Black',
+    case:'Lian Li O11 Dynamic EVO RGB', ssd:'WD Black SN850X 2TB'
+  }},
+  { name:'🎯 Escape from Tarkov', picks: {
+    cpu:'Ryzen 7 9800X3D', mb:'X870E-E GAMING WIFI', ram:'Corsair Vengeance 64GB',
+    gpu:'RTX 5070 Ti 16G VENTUS 3X OC', psu:'RM850x', cooler:'NAUTILUS 360 RS ARGB Black',
+    case:'North XL Black', ssd:'Samsung 990 Pro 2TB'
+  }},
+  { name:'🚗 GTA V / GTA VI Ready', picks: {
+    cpu:'Ryzen 7 9800X3D', mb:'X870E-E GAMING WIFI', ram:'Corsair Vengeance RGB 32GB',
+    gpu:'RTX 5080 16GB OC SFF', psu:'Corsair HXi HX1000i', cooler:'NAUTILUS 360 RS ARGB Black',
+    case:'North XL Black', ssd:'WD Black SN850X 4TB'
+  }},
+  { name:'⛏️ Minecraft RTX / Java', picks: {
+    cpu:'Ryzen 7 9800X3D', mb:'B650 EAGLE', ram:'G.SKILL Trident Z5 Neo RGB 32GB',
+    gpu:'RTX 5070 Ti GAMING OC 16G', psu:'RM850x', cooler:'DeepCool AK620',
+    case:'North XL Black', ssd:'WD Black SN850X 2TB'
+  }},
+  { name:'🎯 Fortnite Competitive', picks: {
+    cpu:'Ryzen 7 7800X3D', mb:'B650 EAGLE', ram:'TEAMGROUP T-FORCE VULCAN 32GB',
+    gpu:'RTX 5070 GAMING OC 12G', psu:'MSI MAG A850GL', cooler:'DeepCool AK620',
+    case:'NZXT H5 Flow Compact', ssd:'Kingston NV3 2TB'
+  }},
+  { name:'💥 Call of Duty Warzone', picks: {
+    cpu:'Ryzen 7 9800X3D', mb:'X870E-E GAMING WIFI', ram:'Corsair Vengeance RGB 32GB',
+    gpu:'RTX 5070 Ti 16G VENTUS 3X OC', psu:'RM850x', cooler:'NAUTILUS 360 RS ARGB Black',
+    case:'Lian Li O11 Dynamic EVO RGB', ssd:'WD Black SN850X 2TB'
+  }},
+  { name:'🏠 The Sims 4 / Life Sim', picks: {
+    cpu:'Ryzen 5 7600X', mb:'B650 EAGLE', ram:'TEAMGROUP T-FORCE VULCAN 32GB',
+    gpu:'RTX 5060 Ti 16GB OC', psu:'RM850x', cooler:'DeepCool AK400 G2 Air',
+    case:'Fractal Design Pop Air Black', ssd:'Kingston NV3 2TB'
+  }},
+  { name:'🎨 Adobe Suite (Premiere/AE)', picks: {
+    cpu:'Ryzen 9 9950X', mb:'X870E-E GAMING WIFI', ram:'Corsair Vengeance 96GB',
+    gpu:'RTX 5070 Ti GAMING OC 16G', psu:'Corsair HXi HX1000i',
+    cooler:'NAUTILUS 360 RS ARGB Black', case:'Fractal Design Define 7 Black',
+    ssd:'Samsung 990 Pro 4TB'
+  }, extras: [['hdd','BarraCuda 8TB']]},
+  { name:'🧊 3D Modeling / Blender', picks: {
+    cpu:'Ryzen 9 9950X', mb:'X870E-E GAMING WIFI', ram:'Corsair Vengeance 96GB',
+    gpu:'RTX 5080 16GB OC SFF', psu:'Corsair HXi HX1500i',
+    cooler:'Corsair iCUE LINK TITAN 360 RX LCD', case:'Fractal Design Define 7 Black',
+    ssd:'Samsung 990 Pro 2TB'
+  }, extras: [['hdd','WD Red Pro 18TB']]},
+  { name:'🎥 4K Video Editing', picks: {
+    cpu:'Ryzen 9 9950X3D', mb:'ProArt X870E-CREATOR', ram:'Corsair Vengeance 96GB',
+    gpu:'RTX 5080 16GB OC SFF', psu:'Corsair HXi HX1500i',
+    cooler:'ASUS ProArt LC 360', case:'Asus ProArt PA602', ssd:'Samsung 990 Pro 4TB'
+  }, extras: [['hdd','BarraCuda 8TB'],['ssd','Samsung 990 Pro 2TB']]}
 ];
 
-/* ---------- HELPERS ---------- */
+/* HELPERS */
 function usd(n){ return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 function findPart(cat, needle){
   var list = CAT[cat]; if (!list) return null;
@@ -1230,406 +1288,3 @@ function loadPrebuilt(pb){
       if (p.multi){
         S[pair[0]] = S[pair[0]] || [];
         var ex = null;
-        S[pair[0]].forEach(function(x){ if (x.id === p.id) ex = x; });
-        if (ex) ex.qty++;
-        else S[pair[0]].push(Object.assign({}, p, { qty: 1 }));
-      } else {
-        S[pair[0]] = p;
-      }
-    });
-  }
-  beep(1200, 0.08, 'triangle', 0.06);
-  draw();
-}
-
-/* ---------- BUILD STATE ---------- */
-var S = {};
-var tab = 'cpu';
-
-/* ---------- PC BUILDER ---------- */
-function draw(){
-  var tabsEl = $('tabs');
-  tabsEl.innerHTML = Object.keys(LAB).map(function(k){
-    var has = S[k] && (Array.isArray(S[k]) ? S[k].length > 0 : true);
-    return '<button type="button" class="tab ' + (k === tab ? 'on' : '') + ' ' + (has ? 'has' : '') + '" data-tab="' + k + '">' + LAB[k] + '</button>';
-  }).join('');
-
-  var q = ($('q').value || '').toLowerCase();
-  var so = $('so').value;
-  var L = CAT[tab].filter(function(p){ return !q || p.name.toLowerCase().indexOf(q) !== -1; });
-  L.sort(function(a, b){
-    if (so === 'a') return a.price - b.price;
-    if (so === 'd') return b.price - a.price;
-    return a.name.localeCompare(b.name);
-  });
-
-  var gw = $('grid_wrap');
-  gw.innerHTML = '<div class="grid" id="grid">' + L.map(function(p){
-    var isSel = false, count = 0;
-    if (CAT[tab].multi){
-      if (S[tab]){
-        S[tab].forEach(function(x){ if (x.id === p.id){ isSel = true; count = x.qty; } });
-      }
-    } else {
-      if (S[tab] && S[tab].id === p.id) isSel = true;
-    }
-    var badge = '';
-    if (isSel && CAT[tab].multi) badge = '<br><span class="qty-badge">×' + count + ' · tap +1</span>';
-    else if (isSel) badge = '<br><span class="qty-badge">Selected</span>';
-    return '<button type="button" class="p ' + (isSel ? 'sel' : '') + '" data-pick="' + p.id + '"><div class="n"><b>' + p.name + '</b></div><span class="pr">' + usd(p.price) + '</span>' + badge + '</button>';
-  }).join('') + '</div>';
-
-  summary();
-}
-
-function pick(i){
-  var catObj = CAT[tab];
-  var p = null;
-  for (var x = 0; x < catObj.length; x++){ if (catObj[x].id === i){ p = catObj[x]; break; } }
-  if (!p) return;
-  beep(1200, 0.05, 'square', 0.04);
-  if (p.multi){
-    S[tab] = S[tab] || [];
-    var ex = null;
-    S[tab].forEach(function(x){ if (x.id === p.id) ex = x; });
-    if (ex) ex.qty++;
-    else {
-      var cp = Object.assign({}, p); cp.qty = 1;
-      S[tab].push(cp);
-    }
-  } else {
-    if (S[tab] && S[tab].id === p.id) delete S[tab];
-    else S[tab] = p;
-  }
-  draw();
-}
-
-function summary(){
-  var tot = 0;
-  var html = '<h3>YOUR PC BUILD</h3>';
-  Object.keys(LAB).forEach(function(k){
-    var s = S[k];
-    if (!s || (Array.isArray(s) && s.length === 0)){
-      html += '<div class="sum-item"><div class="sum-row"><span class="sum-cat">' + LAB[k] + '</span><span class="sum-price">—</span></div></div>';
-    } else if (Array.isArray(s)){
-      var catTot = 0;
-      var names = s.map(function(item){ catTot += item.price * item.qty; tot += item.price * item.qty; return item.name + ' ×' + item.qty; }).join('<br>');
-      html += '<div class="sum-item"><div class="sum-row"><span class="sum-cat">' + LAB[k] + '</span><span class="sum-price">' + usd(catTot) + '</span></div><span class="sum-name">' + names + '</span></div>';
-    } else {
-      tot += s.price;
-      html += '<div class="sum-item"><div class="sum-row"><span class="sum-cat">' + LAB[k] + '</span><span class="sum-price">' + usd(s.price) + '</span></div><span class="sum-name">' + s.name + '</span></div>';
-    }
-  });
-  html += '<div class="tot">' + usd(tot) + '</div>';
-  html += '<button type="button" class="btn" id="clearBuild" style="background:#333;border-color:#555">Clear Build</button>';
-  $('sum').innerHTML = html;
-}
-
-/* ---------- WTF TOOLBOX ---------- */
-var CM = {
-  linux: [
-    ['CPU Temperatures & Fans','sensors'],
-    ['RAM Size, Speed & Slots','sudo lshw -C memory | grep -E "size|speed|description"'],
-    ['Complete Hardware Summary','sudo inxi -Fzxxx'],
-    ['GPU Info & Kernel Driver','lspci -nnk | grep -iA3 vga'],
-    ['Disk Space Usage','df -h'],
-    ['Live RAM Usage','free -h'],
-    ['Top 10 Processes by RAM','ps aux --sort=-%mem | head -n 11'],
-    ['Top 10 Processes by CPU','ps aux --sort=-%cpu | head -n 11'],
-    ['Block Devices (Disks/Partitions)','lsblk -o NAME,SIZE,TYPE,MOUNTPOINT,FSTYPE'],
-    ['CPU Model, Cores & Cache','lscpu'],
-    ['USB Devices','lsusb'],
-    ['PCI Devices','lspci'],
-    ['Kernel & OS Version','uname -a && cat /etc/os-release'],
-    ['Motherboard & BIOS Info','sudo dmidecode -t baseboard -t bios'],
-    ['Network Interfaces (short)','ip -br a'],
-    ['Uptime & Load Average','uptime -p && cat /proc/loadavg'],
-    ['SMART Disk Health (sda)','sudo smartctl -a /dev/sda'],
-    ['Live Sensor Watch','watch -n 1 sensors'],
-    ['Fan Speeds Only','sensors | grep -i fan'],
-    ['Disk I/O Stats','iostat -x 1 3'],
-    ['Listening Ports','sudo ss -tulpn'],
-    ['Who Is On This Box','w'],
-    ['GPU Utilization (nvidia)','nvidia-smi'],
-    ['All Sensors (JSON)','sensors -j'],
-    ['Memory Hardware Detail','sudo dmidecode -t memory'],
-    ['CPU Frequency Live','watch -n 1 "grep MHz /proc/cpuinfo"']
-  ],
-  powershell: [
-    ['CPU Temperature (WMI)','Get-CimInstance -Namespace root\\wmi -ClassName MSAcpi_ThermalZoneTemperature | Select CurrentTemperature'],
-    ['CPU Model, Cores, Speed','Get-CimInstance Win32_Processor | Select Name,NumberOfCores,MaxClockSpeed'],
-    ['RAM Size, Speed, Part #','Get-CimInstance Win32_PhysicalMemory | Select Manufacturer,Capacity,Speed,PartNumber'],
-    ['Full System Report','Get-ComputerInfo'],
-    ['GPU Model, VRAM, Driver','Get-CimInstance Win32_VideoController | Select Name,AdapterRAM,DriverVersion'],
-    ['Free Disk Space','Get-PSDrive -PSProvider FileSystem'],
-    ['Top 10 Processes by RAM','Get-Process | Sort-Object WorkingSet -Descending | Select-Object -First 10 Name,WorkingSet'],
-    ['Top 10 Processes by CPU','Get-Process | Sort-Object CPU -Descending | Select-Object -First 10 Name,CPU'],
-    ['Motherboard Info','Get-CimInstance Win32_BaseBoard | Select Manufacturer,Product,SerialNumber'],
-    ['BIOS Version & Date','Get-CimInstance Win32_BIOS | Select Manufacturer,SMBIOSBIOSVersion,ReleaseDate'],
-    ['USB Devices','Get-PnpDevice -Class USB | Select FriendlyName,Status'],
-    ['Network Adapters & Speed','Get-NetAdapter | Select Name,Status,LinkSpeed'],
-    ['System Uptime','(Get-Date) - (Get-CimInstance Win32_OperatingSystem).LastBootUpTime'],
-    ['Physical Disk Health','Get-PhysicalDisk | Select FriendlyName,MediaType,Size,HealthStatus'],
-    ['Startup Programs','Get-CimInstance Win32_StartupCommand | Select Name,Command,Location'],
-    ['Installed Windows Updates','Get-HotFix | Select HotFixID,InstalledOn'],
-    ['Battery (laptops)','Get-CimInstance Win32_Battery | Select EstimatedChargeRemaining,BatteryStatus'],
-    ['Full Spec Dump','systeminfo'],
-    ['DirectX Diagnostic Report','dxdiag /t $env:TEMP\\dxdiag.txt; Get-Content $env:TEMP\\dxdiag.txt'],
-    ['Windows Activation Status','Get-CimInstance SoftwareLicensingProduct -Filter "PartialProductKey IS NOT NULL" | Select Name,LicenseStatus'],
-    ['Installed Programs','Get-ItemProperty HKLM:\\Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\* | Select DisplayName,DisplayVersion'],
-    ['Windows Error Events (top 10)','Get-EventLog -LogName System -EntryType Error -Newest 10'],
-    ['GPU Utilization Live','while ($true) { nvidia-smi; Start-Sleep 2 }'],
-    ['WLAN Profiles','netsh wlan show profiles'],
-    ['Reset Network Stack','ipconfig /flushdns; netsh winsock reset; netsh int ip reset'],
-    ['List Services Running','Get-Service | Where-Object {$_.Status -eq "Running"}']
-  ]
-};
-
-function fshow(){ ftab('linux'); }
-
-function ftab(t){
-  $('ft').innerHTML = [['linux','🐧 Linux'],['powershell','🪟 PowerShell']].map(function(a){
-    return '<button type="button" class="tab ' + (a[0] === t ? 'on' : '') + '" data-ftab="' + a[0] + '">' + a[1] + '</button>';
-  }).join('');
-  $('fb').innerHTML = CM[t].map(function(c){
-    return '<div class="cmd-card"><div class="cmd-title">' + c[0] + '</div><pre data-copy="' + c[1].replace(/"/g, '&quot;') + '">' + c[1] + '</pre></div>';
-  }).join('');
-}
-
-/* ---------- BACKGROUND ---------- */
-var cv = $('bg'), cx = cv.getContext('2d');
-var mc2 = $('meter'), mx = mc2.getContext('2d');
-function rs(){
-  cv.width = window.innerWidth;
-  cv.height = window.innerHeight;
-  mc2.width = window.innerWidth;
-  mc2.height = 30;
-}
-window.addEventListener('resize', rs);
-rs();
-
-var rip = [];
-var stars = Array.from({ length: 250 }, function(){ return { x:(Math.random()-.5)*2, y:(Math.random()-.5)*2, z: Math.random() }; });
-var nodes_web = Array.from({ length: 70 }, function(){ return { x: Math.random(), y: Math.random(), vx: (Math.random()-.5)*.001, vy: (Math.random()-.5)*.001 }; });
-var vortex = Array.from({ length: 150 }, function(){ return { a: Math.random()*Math.PI*2, r: Math.random(), v: 0.01 + Math.random()*0.02 }; });
-var dr = [];
-
-function C(){ return demon ? '255,40,40' : '0,255,204'; }
-
-var MODES = [
-  function(W,H,t){ for(var i=0;i<6;i++){ cx.fillStyle = 'hsla(' + ((t*30 + i*60)%360) + ',100%,50%,0.12)'; cx.beginPath(); cx.arc(W/2, H/2, Math.max(W,H)*(1-((t*0.15 + i*0.15)%1)), 0, 7); cx.fill(); } },
-  function(W,H,t){ var bh = H/15; for(var i=0;i<15;i++){ cx.fillStyle = 'hsla(' + ((t*40 + i*24)%360) + ',90%,45%,0.3)'; cx.fillRect(Math.sin(t*2 + i)*80, i*bh, W, bh-2); } },
-  function(W,H){ nodes_web.forEach(function(n){ n.x = (n.x + n.vx + 1)%1; n.y = (n.y + n.vy + 1)%1; }); nodes_web.forEach(function(a, i){ cx.fillStyle = demon ? '#f33' : '#0fc'; cx.beginPath(); cx.arc(a.x*W, a.y*H, 2, 0, 7); cx.fill(); for(var j=i+1; j<nodes_web.length; j++){ var b = nodes_web[j], d = Math.hypot((a.x-b.x)*W, (a.y-b.y)*H); if (d < 140){ cx.strokeStyle = 'rgba(' + C() + ',' + ((1-d/140)*0.7) + ')'; cx.beginPath(); cx.moveTo(a.x*W, a.y*H); cx.lineTo(b.x*W, b.y*H); cx.stroke(); } } }); },
-  function(W,H,t){ var sp = 0.002 * (demon ? 2 : 1); stars.forEach(function(s){ s.z -= sp; if (s.z <= 0) s.z = 1; var k = 1/s.z, x = W/2 + s.x*W*.3*k, y = H/2 + s.y*H*.3*k; cx.fillStyle = 'rgba(150,220,255,' + (1-s.z) + ')'; cx.fillRect(x, y, (1-s.z)*3, (1-s.z)*3); }); },
-  function(W,H){ var n = Math.ceil(W/18); while (dr.length < n) dr.push(Math.random()*H/18); cx.font = '14px monospace'; cx.fillStyle = demon ? '#f33' : '#0fc'; dr.forEach(function(y, i){ cx.fillText(String.fromCharCode(12448 + (Math.random()*96|0)), i*18, y*18); dr[i] = (y*18 > H && Math.random() > 0.95) ? 0 : y + 1; }); },
-  function(W,H,t){ cx.lineWidth = 2; for(var i=1; i<=5; i++){ cx.strokeStyle = 'hsla(' + (150 + i*30) + ',100%,50%,0.3)'; var r = i*65 + Math.sin(t*3 + i)*30; cx.beginPath(); cx.arc(W/2, H/2, r, 0, 7); cx.stroke(); } },
-  function(W,H,t){ vortex.forEach(function(p){ p.a += p.v; p.r -= 0.003; if (p.r <= 0) p.r = 1; var rad = p.r*Math.max(W,H); cx.fillStyle = 'rgba(' + C() + ',' + (1-p.r) + ')'; cx.fillRect(W/2 + Math.cos(p.a + t)*rad, H/2 + Math.sin(p.a + t)*rad, 3, 3); }); },
-  function(W,H,t){ cx.lineWidth = 3; cx.beginPath(); for(var x=0; x<=W; x+=15){ var y = H/2 + Math.sin(x*0.01 + t*4)*90; cx.strokeStyle = 'hsla(' + ((t*80 + x*0.2)%360) + ',100%,60%,0.8)'; if (x === 0) cx.moveTo(x, y); else cx.lineTo(x, y); } cx.stroke(); },
-  function(W,H,t){ var s = 45; for(var x=0; x<W; x+=s){ for(var y=0; y<H; y+=s){ var w = Math.sin(x*0.01 + t*2) + Math.cos(y*0.01 + t*2); cx.fillStyle = 'hsla(' + ((t*40 + x)%360) + ',100%,50%,' + Math.max(0, w*0.25) + ')'; cx.fillRect(x+1, y+1, s-2, s-2); } } },
-  function(W,H,t){ for(var i=1; i<=8; i++){ cx.strokeStyle = 'hsla(' + (i*40 + t*50) + ',100%,50%,0.4)'; cx.beginPath(); var rx = W/4 + Math.sin(t + i)*100, ry = H/4 + Math.cos(t*1.2 + i)*100; cx.ellipse(W/2, H/2, rx*i*0.3, ry*i*0.3, t + i, 0, 7); cx.stroke(); } },
-  function(W,H,t){ cx.lineWidth = 1; for(var i=0; i<12; i++){ cx.strokeStyle = 'hsla(' + (i*30) + ',100%,60%,0.5)'; cx.beginPath(); cx.moveTo(W/2, H/2); cx.lineTo(W/2 + Math.cos(t + i*0.5)*W, H/2 + Math.sin(t*1.3 + i*0.5)*H); cx.stroke(); } },
-  function(W,H,t){ cx.lineWidth = 2; for(var i=0; i<16; i++){ var a = t + i*(Math.PI/8); cx.strokeStyle = 'hsla(' + (i*20) + ',100%,50%,0.4)'; cx.beginPath(); cx.moveTo(W/2, H/2); cx.lineTo(W/2 + Math.cos(a)*Math.max(W,H), H/2 + Math.sin(a)*Math.max(W,H)); cx.stroke(); } },
-  function(W,H,t){ for(var i=0; i<10; i++){ cx.fillStyle = 'hsla(' + (i*36 + t*20) + ',80%,50%,0.25)'; cx.beginPath(); cx.arc(W/2 + Math.sin(t + i)*200, H/2 + Math.cos(t*0.8 + i)*150, 40 + i*10, 0, 7); cx.fill(); } },
-  function(W,H,t){ cx.lineWidth = 4; for(var i=0; i<5; i++){ cx.strokeStyle = 'hsla(' + (t*60 + i*50) + ',100%,50%,0.5)'; cx.strokeRect(W/2 - (i*60 + Math.sin(t)*30), H/2 - (i*40 + Math.cos(t)*20), i*120, i*80); } },
-  function(W,H,t){ for(var x=0; x<W; x+=40){ for(var y=0; y<H; y+=40){ var r = Math.sin(x*0.02 + t)*Math.cos(y*0.02 + t)*20; cx.fillStyle = 'hsla(' + ((x + y + t*50)%360) + ',100%,50%,0.3)'; cx.fillRect(x, y, Math.abs(r) + 2, Math.abs(r) + 2); } } }
-];
-
-function chAnim(dir){
-  mode = (mode + dir + MODES.length) % MODES.length;
-  $('anim_lbl').innerText = 'VIBE ' + (mode + 1) + '/' + MODES.length;
-  cx.globalAlpha = 0.2; cx.fillStyle = '#000'; cx.fillRect(0, 0, cv.width, cv.height); cx.globalAlpha = 1;
-  beep(500 + mode*40, 0.05, 'triangle', 0.04);
-}
-
-function animLoop(){
-  var W = cv.width, H = cv.height, t = performance.now()/1000, N = 64, lv = [];
-  var bgm = $('bgm');
-  var idle = !bgm || bgm.paused || bgm.muted;
-  if (analyser && !idle){
-    analyser.getByteFrequencyData(freqData);
-    for(var i=0; i<N; i++) lv.push(freqData[i]/255);
-    bass = (freqData[1] + freqData[2] + freqData[3] + freqData[4])/1020;
-  } else {
-    var b = idle ? 0 : Math.pow(Math.max(0, Math.sin(t*Math.PI*2*1.9)), 6);
-    bass = bass*0.8 + b*0.2;
-    for(var i=0; i<N; i++) lv.push(idle ? 0 : (0.25 + 0.5*Math.abs(Math.sin(t*3 + i*0.5)))*(0.4 + bass));
-  }
-  var wg = document.querySelector('.wg');
-  if (wg) wg.style.setProperty('--beat', bass.toFixed(3));
-
-  cx.fillStyle = demon ? 'rgba(10,0,0,0.3)' : 'rgba(5,5,8,0.3)';
-  cx.fillRect(0, 0, W, H);
-  MODES[mode](W, H, t);
-
-  rip = rip.filter(function(r){ r.r += 8; return r.r < 300; });
-  rip.forEach(function(r){ cx.strokeStyle = 'rgba(' + C() + ',' + (1 - r.r/300) + ')'; cx.lineWidth = 2; cx.beginPath(); cx.arc(r.x, r.y, r.r, 0, 7); cx.stroke(); });
-
-  var mw = mc2.width, mh = 30;
-  mx.clearRect(0, 0, mw, mh);
-  mx.strokeStyle = demon ? '#f00' : '#0fc';
-  mx.lineWidth = 2;
-  mx.beginPath();
-  for(var i=0; i<N; i++){
-    var x = i/(N-1)*mw;
-    var y = mh/2 - (i%2 ? 1 : -1)*lv[i]*mh*0.45;
-    if (i) mx.lineTo(x, y); else mx.moveTo(x, y);
-  }
-  mx.stroke();
-
-  requestAnimationFrame(animLoop);
-}
-
-/* ---------- EVENT WIRING ---------- */
-(function(){
-  var sp = $('splash');
-  if (sp){
-    sp.addEventListener('pointerdown', unlock, { passive: false });
-    sp.addEventListener('click', unlock);
-    sp.addEventListener('touchstart', unlock, { passive: true });
-  }
-  window.addEventListener('keydown', function(e){
-    if (e.code === 'Space' || e.code === 'Enter' || e.key === ' '){ unlock(e); }
-  });
-  window.addEventListener('wheel', function(e){ if (e.deltaY < 0) unlock(e); }, { passive: true });
-
-  window.addEventListener('pointermove', function(e){
-    var sc = $('spirit-cursor');
-    if (sc){ sc.style.left = e.clientX + 'px'; sc.style.top = e.clientY + 'px'; }
-  });
-
-  $('mute_btn').addEventListener('click', toggleMute);
-  $('anim_lbl').addEventListener('click', function(e){ e.stopPropagation(); chAnim(1); });
-  $('btm_ctrl').addEventListener('click', function(e){ if (e.target === this) chAnim(1); });
-
-  var clk_dew = 0, clk_r = 0, clk_wtf = 0;
-  function checkDew(e){
-    e.stopPropagation(); pulse(e.currentTarget, '#ff0055'); chime();
-    clk_dew++;
-    if (clk_dew >= 10){ clk_dew = 0; om('mb'); draw(); }
-  }
-  ['n_d','n_e','n_w'].forEach(function(id){ $(id).addEventListener('click', checkDew); });
-
-  $('n_wtf').addEventListener('click', function(e){
-    e.stopPropagation(); pulse(e.currentTarget, '#ffaa00'); chime();
-    clk_wtf++;
-    if (clk_wtf >= 10){ clk_wtf = 0; om('mf'); fshow(); }
-  });
-  $('n_r').addEventListener('click', function(e){
-    e.stopPropagation(); pulse(e.currentTarget, '#f00'); chime();
-    clk_r++;
-    if (clk_r >= 6){ clk_r = 0; startRizwan(); }
-  });
-  $('n_dot').addEventListener('click', function(e){
-    e.stopPropagation(); pulse(e.currentTarget, '');
-    var bgm = $('bgm');
-    if (demon){
-      demon = false; demonCount = 0;
-      document.body.classList.remove('demonic');
-      $('main').classList.remove('shake');
-      if (bgm) bgm.playbackRate = 1;
-      chime();
-      $('ouija_out').innerText = '...';
-      return;
-    }
-    demonCount++;
-    beep(110 + demonCount*45, 0.12, 'sawtooth', 0.07);
-    if (demonCount >= 6){
-      demonCount = 0; demon = true; sting();
-      document.body.classList.add('demonic');
-      $('main').classList.add('shake');
-      if (bgm) bgm.playbackRate = 0.7;
-    }
-  });
-
-  mkArch('o_arch1', 'ABCDEFGHIJKLM');
-  mkArch('o_arch2', 'NOPQRSTUVWXYZ');
-  document.querySelectorAll('[data-oj]').forEach(function(el){
-    el.addEventListener('click', function(e){ e.stopPropagation(); oj(el.getAttribute('data-oj')); });
-  });
-
-  document.querySelectorAll('[data-close]').forEach(function(el){
-    el.addEventListener('click', function(){ cm(el.getAttribute('data-close')); });
-  });
-  document.querySelectorAll('.modal').forEach(function(m){
-    m.addEventListener('click', function(e){ if (e.target === m) m.classList.remove('show'); });
-  });
-  window.addEventListener('keydown', function(e){
-    if (e.key === 'Escape'){
-      document.querySelectorAll('.modal.show').forEach(function(m){ m.classList.remove('show'); });
-    }
-  });
-
-  window.addEventListener('pointerdown', function(e){
-    if (!unlocked) return;
-    if (e.target.closest('button') || e.target.closest('.modal') || e.target.closest('.node') || e.target.closest('#splash') || e.target.closest('#btm_ctrl') || e.target.closest('.ouija-btn')) return;
-    rip.push({ x: e.clientX, y: e.clientY, r: 0 });
-    chAnim(1);
-  });
-
-  $('tabs').addEventListener('click', function(e){
-    var t = e.target.closest('.tab'); if (!t) return;
-    tab = t.getAttribute('data-tab');
-    draw();
-  });
-  $('grid_wrap').addEventListener('click', function(e){
-    var p = e.target.closest('.p'); if (!p) return;
-    pick(p.getAttribute('data-pick'));
-  });
-  $('sum').addEventListener('click', function(e){
-    if (e.target && e.target.id === 'clearBuild'){
-      Object.keys(S).forEach(function(kk){ delete S[kk]; });
-      draw();
-    }
-  });
-  $('q').addEventListener('input', draw);
-  $('so').addEventListener('change', draw);
-
-  $('prebuiltContainer').innerHTML = PREBUILTS.map(function(pb){
-    return '<button type="button" class="prebuilt-btn" data-prebuilt="' + pb.name + '">' + pb.name + '</button>';
-  }).join('');
-  $('prebuiltContainer').addEventListener('click', function(e){
-    var b = e.target.closest('.prebuilt-btn'); if (!b) return;
-    var name = b.getAttribute('data-prebuilt');
-    var pb = null;
-    PREBUILTS.forEach(function(x){ if (x.name === name) pb = x; });
-    if (pb) loadPrebuilt(pb);
-  });
-
-  $('ft').addEventListener('click', function(e){
-    var t = e.target.closest('.tab'); if (!t) return;
-    ftab(t.getAttribute('data-ftab'));
-  });
-  $('fb').addEventListener('click', function(e){
-    var pre = e.target.closest('pre'); if (!pre) return;
-    var txt = pre.getAttribute('data-copy') || pre.textContent;
-    try {
-      navigator.clipboard.writeText(txt).then(function(){
-        pre.classList.add('copied');
-        var old = pre.textContent;
-        pre.textContent = '✓ COPIED';
-        beep(1400, 0.1, 'triangle', 0.05);
-        setTimeout(function(){ pre.textContent = old; pre.classList.remove('copied'); }, 900);
-      }).catch(function(){});
-    } catch(_) {}
-  });
-
-  draw();
-  requestAnimationFrame(animLoop);
-})();
-
-window.unlock = unlock;
-window.toggleMute = toggleMute;
-window.om = om;
-window.cm = cm;
-window.oj = oj;
-window.draw = draw;
-window.pick = pick;
-window.loadPrebuilt = loadPrebuilt;
-window.fshow = fshow;
-window.ftab = ftab;
-window.chAnim = chAnim;
-window.startRizwan = startRizwan;
-window.pulse = pulse;
-</script>
-</body>
-</html>
