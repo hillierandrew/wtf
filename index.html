@@ -192,7 +192,7 @@ rip=rip.filter(r=>(r.r+=6)<300);rip.forEach(r=>{cx.strokeStyle=`rgba(${C()},${1-
 const mw=mc2.width,mh=64;mx.clearRect(0,0,mw,mh);mx.strokeStyle=demon?'#f00':'#0fc';mx.lineWidth=2;mx.shadowBlur=10;mx.shadowColor=mx.strokeStyle;mx.beginPath();
 for(let i=0;i<N;i++){const x=i/(N-1)*mw,y=mh/2-(i%2?1:-1)*lv[i]*mh*.45;i?mx.lineTo(x,y):mx.moveTo(x,y)}mx.stroke();requestAnimationFrame(anim)}
 
-/* ===== CATALOG (in-stock subset of Canada Computers pages; flags x=sold out, p=pickup only, u=used) ===== */
+/* ===== CATALOG ===== */
 const RAW={
 cpu:{k:'name price f sock w igpu',t:`AMD Ryzen 7 9800X3D 8-Core|619.99||AM5|120|0
 AMD Ryzen 7 9850X3D 8-Core|679.98||AM5|120|0
@@ -383,7 +383,7 @@ Synology Plus 12TB|819.99|
 Seagate SkyHawk AI 8TB|459.99|
 Toshiba N300 14TB NAS|729.99|p
 WD Purple Pro 18TB|1204.99|`},
-cooler:{k:'name price f rad',t:`CORSAIR NAUTILUS 360 RS ARGB AIO|184.99||360
+cpucooler:{k:'name price f rad',t:`CORSAIR NAUTILUS 360 RS ARGB AIO|184.99||360
 Arctic Liquid Freezer III PRO 360 AIO|189.99||360
 Arctic Liquid Freezer III PRO 420 AIO|209.99||420
 DeepCool MYSTIQUE 240 LCD AIO|199.99||240
@@ -394,7 +394,6 @@ be quiet! Dark Rock 5 Air Cooler|109.99|p|0
 DeepCool AK400 G2 Air Cooler|34.99||0
 DeepCool ASSASSIN IV WH Air Cooler|79.88|p|0
 Cooler Master HYPER 212 Spectrum V3|34.99|p|0
-iCAN 4-Heatpipe CPU Cooler (Open Box)|16.99|pu|0
 CORSAIR NAUTILUS 240 RS ARGB AIO|114.99|p|240
 CORSAIR iCUE LINK TITAN 360 RX RGB AIO|189.99|p|360
 CORSAIR iCUE LINK TITAN II 360 RX RGB AIO|254.99||360
@@ -412,6 +411,347 @@ be quiet! Dark Rock Pro 5 Air Cooler|134.99|p|0
 be quiet! PURE ROCK 3 Air Cooler|59.99||0
 Arctic Freezer 36 A-RGB Air Cooler|79.99||0
 Cooler Master Hyper 212 Black|49.99||0`},
+casefan:{k:'name price f',t:`LIAN LI UF-SLIN120-3B 120mm Case Fan Black|124.99|x
+LIAN LI UF-SLIN120-3W 120mm Case Fan White|124.99|x
+LIAN LI UF-SLIN120-1B 120mm Case Fan Black|39.99|
+LIAN LI UF-SLIN120-1W 120mm Case Fan White|39.99|
+LIAN LI SL140 Reverse Blade 140mm Case Fan Black|39.99|x
+LIAN LI UF-SLIN140-1B 140mm Case Fan Black|39.99|
+LIAN LI UF-SLIN140-1W 140mm Case Fan White|39.99|
+LIAN LI UNI FAN SL WIRELESS RGB LCD White 3x12cm Fan Pack with Controller|194.99|
+LIAN LI Fan 12TLLCD1W3B FDB fan Black|209.99|
+LIAN LI Fan 12RTLLCD1W1B FDB fan Black|64.99|x
+LIAN LI UNI FAN SL Wireless LCD 120 Reverse Blade White|59.99|x
+LIAN LI Fan 12TLLCD1W3W FDB fan White|209.99|
+LIAN LI UNI FAN SL WIRELESS RGB LCD Black single pack without controller|59.99|x
+LIAN LI Fan 12RTL1W1W FDB fan White|44.99|x
+LIAN LI UNI FAN SL 120 Wireless RGB 120mm White|39.99|
+LIAN LI Fan 12TL1W1W FDB fan White|44.99|x
+LIAN LI UNI FAN SL WIRELESS RGB LCD Reverse Black single pack without controller|59.99|x
+LIAN LI Fan 12TL1W1B FDB fan Black|44.99|x
+LIAN LI Side ARGB Kit (3-pack) for Uni Fan P28 / GA II Trinity Black|9.88|
+LIAN LI Side ARGB Kit (3-pack) White|9.88|
+LIAN LI UNI FAN SL WIRELESS LCD RGB Black 3x12cm with Controller|194.99|x
+LIAN LI UNI FAN SL 120 Wireless RGB Reverse Blade White|39.99|x
+LIAN LI UNI FAN SL 120 Wireless RGB Reverse Blade Black|39.99|x
+LIAN LI Fan 12RTLLCD1W3W FDB fan White|209.99|x
+LIAN LI Uni Fan SL-INF 120 Reverse Blade 120mm Black|39.99|x
+LIAN LI SL120 Reverse Blade 120mm White|39.99|x
+be quiet! Pure Wings 3 120mm Case Fan Black|9.99|x
+be quiet! BL098 120mm Case Fan Black|34.99|x
+be quiet! BL099 140mm Case Fan Black|34.99|x
+be quiet! BL093 120mm Case Fan Black|24.99|
+be quiet! BL094 120mm Case Fan Black|24.99|x
+be quiet! PURE WINGS 3 140mm PWM Case Fan|9.99|x
+be quiet! BL097 140mm Case Fan Black|24.99|x
+be quiet! Light Wings LX 120mm PWM High-speed ARGB Black 3-pack|49.99|
+be quiet! ARGB Light Wings 140mm PWM Triple Pack|114.99|
+be quiet! ARGB Light Wings 120mm PWM Triple Pack|64.99|
+be quiet! Light Wings LX 120mm PWM ARGB White 3-pack|49.99|
+be quiet! Light Wings LX 120mm PWM ARGB Black 3-pack|44.99|
+be quiet! Light Wings LX 120mm PWM Reverse White|14.99|
+be quiet! Light Wings LX 120mm PWM High-speed ARGB White 3-pack|49.99|
+be quiet! Light Wings LX 120mm PWM Reverse Black|24.99|x
+be quiet! ARGB Light Wings 140mm PWM high-speed Triple Pack|114.99|
+be quiet! Light Wings LX 140mm PWM High-speed ARGB Black 3-pack|49.99|
+be quiet! Light Wings LX 140mm PWM ARGB Black|19.99|
+be quiet! Light Wings LX 140mm PWM ARGB White 3-pack|49.99|
+be quiet! Pure Wings 140mm Case Fan|9.99|x
+be quiet! ARGB Light Wings 140mm PWM|24.99|
+be quiet! Light Wings LX 140mm PWM ARGB Black 3-pack|49.99|
+be quiet! ARGB Light Wings 120mm PWM|19.99|
+be quiet! Silent Wings Pro 4 140mm PWM White|34.99|
+be quiet! Silent Wings Pro 4 120mm PWM White|24.99|
+be quiet! SHADOW WINGS 2 120mm PWM BL085|9.99|x
+be quiet! Light Wings 140mm PWM Reverse Black|29.99|
+be quiet! SHADOW WINGS 2 140mm PWM BL087|19.99|x
+be quiet! ARGB Light Wings 120mm PWM-high-speed|19.99|
+be quiet! Silent Wings 4 120mm PWM White|24.99|
+be quiet! Silent Wings 4 140mm PWM high-speed White|24.99|x
+be quiet! Light Wings LX 140mm PWM High-speed ARGB White 3-pack|79.99|
+be quiet! Light Wings 140mm PWM Reverse White|39.99|
+be quiet! ARGB Light Wings 140mm PWM high-speed|24.99|
+be quiet! LIGHT WINGS 120mm White PWM high-speed Triple-Pack|69.99|
+be quiet! Shadow Wings 2 PWM White 140 mm|9.99|x
+be quiet! ARGB Light Wings 120mm PWM high-speed Triple Pack|69.99|
+be quiet! LIGHT WINGS 120mm White PWM Triple-Pack|79.99|x
+be quiet! Pure Wings 3 Reverse Triple Pack 120mm White|64.99|
+be quiet! Pure Wings 3 Reverse Triple Pack 120mm Black|64.99|
+be quiet! Pure Wings 3 PWM 120mm 3-Pack Black|64.99|
+be quiet! Pure Wings 3 PWM high-speed BL140|64.99|
+be quiet! Pure Wings 3 PWM 140mm 3-Pack Black|69.99|
+be quiet! PURE WINGS PWM High-Speed 140mm 3-Pack Black|69.99|
+be quiet! PURE WINGS 3 120mm Case Fan|9.99|x
+be quiet! PURE WINGS 3 140mm PWM high-speed|9.99|x
+be quiet! PURE WINGS 3 120mm PWM White|9.99|x
+be quiet! PURE WINGS 3 120mm PWM high-speed White|14.99|x
+be quiet! PURE WINGS 2 PWM 92mm|12.99|x
+be quiet! PURE WINGS 3 140mm PWM White|9.99|x
+be quiet! PURE WINGS 3 140mm PWM high-speed White|14.99|x
+be quiet! SILENT WINGS 4 140mm|34.99|x
+be quiet! Silent Wings 4 140mm PWM White|44.99|x
+be quiet! Silent Wings 4 120mm PWM high-speed White|44.99|x
+be quiet! BL081 Pure Wings 2 120mm PWM High Speed|14.99|x
+be quiet! LIGHT WINGS 140mm White PWM high-speed Triple-Pack|84.99|x
+be quiet! LIGHT WINGS 140mm White PWM Triple-Pack|89.99|x
+be quiet! PURE WINGS 2 140mm|14.99|x
+CORSAIR RS120 120mm Case Fan Black|54.99|x
+CORSAIR 120mm Case Fan White|49.99|
+CORSAIR RS120 ARGB 120mm Case Fan Black|16.99|x
+CORSAIR RS120 120mm Case Fan Black|19.99|x
+CORSAIR RS120-R ARGB 120mm Fan Triple Pack BLK|74.99|x
+CORSAIR RS120 ARGB 120mm Case Fan White|16.99|
+CORSAIR LX-R RGB Series iCUE LINK LX120-R RGB 120mm Triple Fan Kit|179.99|x
+CORSAIR RS120 Case Fan White|54.99|x
+CORSAIR RX Series iCUE LINK RX120 RGB 120mm Triple Pack|139.99|x
+CORSAIR LX-R RGB Series iCUE LINK LX120-R RGB White Triple Fan Kit|179.99|x
+CORSAIR RS140 ARGB 140mm PWM Fan Black|34.99|x
+CORSAIR iCUE LINK LX120 RGB 120mm PWM Fan Expansion Black|54.99|
+CORSAIR RX Series iCUE LINK RX120 RGB 120mm Single Pack|49.99|
+CORSAIR iCUE LINK LX120-R RGB 120mm PWM Reverse Fan Expansion|54.99|
+CORSAIR iCUE LINK LX120 RGB 120mm PWM Fan Expansion White|54.99|
+CORSAIR RS140 ARGB 140mm PWM Fans Dual Pack Black|39.99|x
+CORSAIR RX Series iCUE LINK RX120 RGB 120mm White Single Pack|49.99|
+CORSAIR iCUE LINK LX140 RGB 140mm PWM Fan Expansion Black|59.99|
+CORSAIR RX Series iCUE LINK RX120 120mm Single Pack|39.99|x
+CORSAIR iCUE LINK LX140 RGB 140mm PWM Fan Expansion White|59.99|x
+CORSAIR RS140 ARGB 140mm PWM Fans Dual Pack White|59.99|x
+CORSAIR RS140 140mm PWM Fan White|24.99|
+CORSAIR RX Series iCUE LINK RX140 RGB 140mm Single Pack|39.99|
+CORSAIR iCUE LINK LX140 RGB 140mm PWM Fans Starter Kit White|149.99|
+CORSAIR RX Series iCUE LINK RX140 140mm Single Pack|49.99|x
+CORSAIR RX Series iCUE LINK RX140 RGB 140mm Dual Pack|89.99|
+CORSAIR RX Series iCUE LINK RX140 140mm Dual Pack|114.99|x
+CORSAIR iCUE LINK LX140 RGB 140mm PWM Fans Starter Kit Black|149.99|
+CORSAIR SLIM Series CO-9050144-WW Case Fan Black|24.88|x
+CORSAIR iCUE LINK RX120 MAX RGB 120mm PWM Fan Expansion|64.99|x
+CORSAIR RS140 ARGB 140mm PWM Fan White|34.99|x
+CORSAIR RX Series iCUE LINK RX120 120mm Triple Pack|119.99|x
+CORSAIR iCUE LINK LX120 RGB 120mm PWM Fans Starter Kit White|129.99|
+CORSAIR LX120-R RGB Case Fan White|54.99|
+CORSAIR QX RGB Series iCUE LINK QX120 RGB 120mm Magnetic Dome Single Pack|69.99|x
+CORSAIR SP120 RGB ELITE Performance Triple Fan Kit|69.88|x
+CORSAIR RS140 140mm PWM Fans Dual Pack Black|49.99|x
+CORSAIR RS140 140mm PWM Fans Dual Pack White|49.99|x
+CORSAIR QX QX140 Case Fan White|54.88|x
+CORSAIR CO-9050157-WW Case Fan White|29.88|x
+CORSAIR AR120 RGB 120mm ARGB-compatible Single Pack White|17.88|
+CORSAIR iCUE SP140 RGB ELITE Performance 140mm PWM Single Fan|19.88|x
+CORSAIR QX QX140 Case Fan White|134.88|x
+CORSAIR CO-9050160-WW Case Fan White|41.88|x
+CORSAIR Air Series AF120 LED Red Quiet Edition 120 mm Twin Pack|29.99|x
+CORSAIR RS360 II ARGB Unibody 120mm Regular 3-Pack Black|74.99|
+CORSAIR RS360 II ARGB Unibody 120mm Regular 3-Pack White|74.99|
+CORSAIR iCUE LINK LX120 RGB 120mm PWM Fans Starter Kit Black|129.99|x
+CORSAIR RS140 140mm Case Fan Black|24.99|x
+CORSAIR AF ELITE AF120 ELITE Single Pack|9.88|x
+CORSAIR AF ELITE AF140 ELITE WHITE Single Pack|12.88|x
+CORSAIR CO-9050156-WW Case Fan Black|41.88|x
+CORSAIR QX QX120 Case Fan Black|149.99|x
+CORSAIR QX QX140 Case Fan Black|134.88|x
+CORSAIR RX140 II RGB 140mm Single Pack White|54.99|x
+CORSAIR RX140 II RGB 140mm Single Pack Black|54.99|x
+CORSAIR RX360 II Unified RGB 360mm Expansion 3-Pack White|99.90|x
+CORSAIR RX360 II Unified RGB 360mm Expansion 3-Pack Black|99.99|x
+CORSAIR RS360 II Unibody 120mm Regular 3-Pack Black|54.99|x
+CORSAIR RS140 II 140mm Single Pack Black|24.99|x
+CORSAIR RS120 II 120mm Regular Single Pack Black|19.99|x
+CORSAIR RS140 II ARGB 140mm Single Pack White|24.99|x
+CORSAIR RS140 II ARGB 140mm Single Pack Black|24.99|x
+CORSAIR RS120 II ARGB 120mm Single Pack White|24.99|x
+DeepCool FK120 High Performance Cooling Fan 4-Pin PWM Fluid Dynamic|29.88|
+DeepCool FC120-3 IN 1 Performance RGB PWM Triple Pack|29.88|
+DeepCool FL12 3IN1 120mm High-Performance ARGB Gen 2 Black PWM|79.99|x
+DeepCool FL12 WH 3IN1 120mm High-Performance ARGB Gen 2 White|79.99|x
+DeepCool FL12 WH Case Fan White|17.99|
+DeepCool FL12 120mm High-Performance ARGB Gen 2 Black PWM|17.99|x
+DeepCool FL12R WH 3IN1 120mm High-Performance ARGB Gen 2 White|84.99|x
+DeepCool FT12 120mm FDB Fan 3-Phase 10-pole 12-slot Motor PWM|25.99|x
+DeepCool FL12R WH 120mm High-Performance ARGB Gen 2 White Reverse|34.99|x
+DeepCool FT9 SLIM 92mm Slim FDB Case Fan 15mm frame PWM|19.88|x
+DeepCool FC120 WHITE-3 IN 1 Performance RGB PWM Triple Pack|29.88|
+DeepCool FC120 Performance RGB PWM Single Pack|9.88|x
+DeepCool FL12R 120mm High-Performance ARGB Gen 2 Black Reverse|34.99|x
+DeepCool FT12 WH 120mm FDB Fan|25.99|x
+DeepCool FT14 WH 140mm FDB Fan|31.99|x
+DeepCool FT14 140mm FDB Fan|31.99|x
+DeepCool RF120B High Brightness Case Fan Blue LED|7.99|x
+DeepCool RF 120 3 in 1 Series 120mm RGB LED|24.88|x
+DeepCool MF120 GT A-RGB PWM Fan 3-Pack|39.88|x
+DeepCool FD12 V2 3IN1 120mm 3-Pack Black|26.99|
+DeepCool FD12 V2 120mm Single Pack Black|9.99|
+DeepCool FD12 ARGB V2 120mm Single Pack Black|12.99|x
+ARCTIC COOLING ACFAN00254A 120mm Case Fan White|8.88|
+ARCTIC COOLING P14 MAX 140mm PWM Fan White 1 Piece|18.99|x
+ARCTIC COOLING P8 P8 PWM PST Case Fan Black|14.99|x
+ARCTIC COOLING P12 PWM PST A-RGB 0dB Black 120mm|59.99|x
+ARCTIC COOLING P14 PWM PST 140mm with Cable Splitter White|19.99|x
+ARCTIC COOLING ACFAN00231A 120mm Case Fan Black|24.99|
+ARCTIC COOLING P14 ACFAN00138A 140mm Case Fan Black|17.70|x
+ARCTIC COOLING P14 Pro PST 140mm Single Pack Black|21.99|x
+ARCTIC COOLING P12 Pro PST 120mm Single Pack White|17.99|
+ARCTIC COOLING P12 Pro PST 120mm Single Pack Black|16.99|x
+ARCTIC COOLING P14 PWM PST 140mm with Cable Splitter|5.88|x
+ARCTIC COOLING P12 120mm Case Fan Black|15.70|x
+ARCTIC COOLING P MAX 120mm Case Fan White|14.99|x
+ARCTIC COOLING ACFAN00120A 120mm Case Fan Black|14.99|x
+ARCTIC COOLING P12 PWM PST White|14.99|x
+ARCTIC COOLING P12 MAX 120mm PWM 5 Pieces|59.99|x
+ARCTIC COOLING P12 PWM PST A-RGB 0dB White|59.99|x
+ARCTIC COOLING P12 PRO PWM PST CO 120mm Black|21.99|x
+ARCTIC COOLING P12 Pro PST 120mm 5-Pack Black|59.99|x
+ARCTIC COOLING P14 MAX 140mm PWM 5 Pieces|64.99|x
+Block III ARGB PWM Fan Daisy Chained PWM|11.99|x
+Block III ARGB PWM Fan|11.99|
+12012 Thin Fan Maglev White|9.99|
+12012 Thin Fan Maglev Black|9.99|
+Block Vanguard Reverse Maglev White|9.99|
+Block Vanguard Reverse Maglev Black|9.99|
+Block Vanguard Regular Maglev White|9.99|
+Block Vanguard Regular Maglev Black|9.99|
+Block Guardian ARGB Fan White|11.99|
+Block Guardian ARGB Fan Silent Black|11.99|
+Block V Wire-free Splicing Fan ARGB PWM Daisy Chained|11.88|x
+Block III ARGB Fan White|4.88|x
+Block V Wire-free Splicing Fan ARGB White|11.88|x
+Block V Wire-free Splicing Fan ARGB|8.88|x
+DarkFlash INF34R A-RGB Cooling Fan Reverse Airflow 1 Pack Black|12.99|
+DarkFlash INF34 A-RGB Cooling Fan 1 Pack Black|12.99|x
+DarkFlash INF34R A-RGB Reverse 1 Pack White|12.99|
+DarkFlash Gauss G24 ARGB Fan 3 Pack Black|58.88|x
+DarkFlash Gauss G24 ARGB Fan 3 Pack White|58.88|x
+DarkFlash 120x120x25mm Regular Case Fan White|12.99|
+DarkFlash DM8R LINE Reverse Blade A-RGB 1 Pack White|9.99|
+DarkFlash DM8R LINE Reverse Blade A-RGB 1 Pack Black|9.99|
+DarkFlash DM8 LINE A-RGB 1 Pack White|9.99|x
+DarkFlash DM8 LINE A-RGB 1 Pack Black|9.99|x
+DarkFlash DM20R LINE Reverse Blade Black|9.99|x
+DarkFlash DM20R LINE Reverse Blade White|9.99|
+DarkFlash DM20 LINE Regular Blade Black|9.99|
+DarkFlash DM20 LINE Regular Blade White|9.99|x
+Montech AX 120 PWM Case Fan Black|8.88|x
+Montech RX 120 PWM Case Fan White|9.88|
+Montech AX 140 PWM Case Fan White|15.88|x
+Montech AX 140 PWM Case Fan Black|14.88|
+Montech RX 140 PWM Case Fan Black|14.88|x
+Montech RX 120 PWM Case Fan Black|8.88|x
+Montech AX 120 PWM Case Fan White|9.88|x
+Montech RX 140 PWM Case Fan White|15.88|
+NZXT F240 RGB Core|39.99|x
+NZXT F140P 140MM|24.99|
+NZXT F140 RGB 140mm RGB Fans Twin Black + RGB Lighting Controller|89.99|x
+NZXT F120 RGB DUO Case Fan Triple Pack White|129.99|x
+NZXT F140 RGB Core Case Fan Black|29.99|x
+NZXT F120Q 120MM|19.99|x
+NZXT F140 RGB DUO Twin Pack Black|99.99|x
+NZXT F140Q 140MM|24.99|x
+NZXT F140 RGB Core White|29.99|x
+NZXT F120 RGB DUO White|11.88|x
+THERMALTAKE CT120 ARGB Sync PC Cooling Fan 2 Pack|54.99|x
+THERMALTAKE CT120 ARGB Sync 2 Pack White|54.99|
+THERMALTAKE Pure Duo 14 ARGB Sync Radiator Fan White 2 pack|24.88|x
+THERMALTAKE SWAFAN EX12 ARGB PC Cooling Fan|41.88|x
+THERMALTAKE SWAFAN EX12 ARGB White|41.88|x
+THERMALTAKE Pure Duo 12 ARGB Sync Radiator Fan White 2 pack|21.88|x
+THERMALTAKE Pure Duo 14 ARGB Sync Black 2 pack|24.88|x
+THERMALTAKE SWAFAN EX14 ARGB White|46.88|x
+FRACTAL DESIGN Dynamic X2 GP Cooling Fan Black|19.99|x
+FRACTAL DESIGN Dynamic X2 GP 140 mm Cooling Fan White|24.99|x
+FRACTAL DESIGN Momentum 12 RGB PWM Black 120 mm ARGB LED FDB 3-pack|109.99|
+FRACTAL DESIGN Momentum 12 RGB PWM White 120 mm ARGB LED FDB|44.99|
+FRACTAL DESIGN Momentum 12 RGB PWM Black 120 mm ARGB LED FDB|44.99|x
+FRACTAL DESIGN Momentum 12 PWM White 120 mm FDB|29.99|
+FRACTAL DESIGN Momentum 12 PWM Black 120 mm FDB|29.99|x
+FRACTAL DESIGN Venturi HP-12 120mm|29.99|x
+FRACTAL DESIGN Prisma AL-12 PWM 120mm ARGB LED|44.99|x
+FRACTAL DESIGN Aspect 14 PWM Black 140 mm 500-1700 RPM|24.99|x
+FRACTAL DESIGN Venturi HP-14 140mm|34.99|x
+FRACTAL DESIGN Venturi HF-12 120mm|29.99|x
+FRACTAL DESIGN Venturi HP-14 140MM PWM|34.99|x
+FRACTAL DESIGN Venturi HF-14 140mm|29.99|x
+FRACTAL DESIGN Aspect 12 Black 120 mm 1200 RPM|19.99|x
+FRACTAL DESIGN Prisma AL-12 120mm 3-Pack|89.99|x
+FRACTAL DESIGN Silent Series LL 140mm|19.99|x
+FRACTAL DESIGN Prisma SL-14 140mm Blue LED|24.99|x
+FRACTAL DESIGN Prisma SL-12 120mm Green LED|19.99|x
+FRACTAL DESIGN Prisma AL-14 140mm A-RGB LED 3-Pack|99.99|x
+FRACTAL DESIGN Prisma SL-14 140mm Green LED|24.99|x
+FRACTAL DESIGN Prisma AL-12 PWM 3-Pack|99.99|x
+FRACTAL DESIGN Silent Series LL 120mm|14.99|x
+FRACTAL DESIGN Dynamic X2 GP-14 140mm|24.99|x
+FRACTAL DESIGN Dynamic X2 GP 120 mm White|19.99|x
+FRACTAL DESIGN Prisma AL-12 ARGB PWM White 120 mm|44.99|x
+PCCOOLER CPS FG120 ARGB FAN 800-1800 RPM 120 mm|7.99|x
+PCCOOLER CPS FG120R ARGB FAN Reverse Airflow 800-1800 RPM 120 mm WH|7.99|
+PCCOOLER CPS FG120R ARGB FAN Reverse 800-1800 RPM 120 mm|7.99|
+PCCOOLER CPS F5R120 FAN Fluid Dynamics Bearing 500-2200 RPM 120 mm|14.99|x
+PCCOOLER CPS F7X120 ARGB FAN Wireless Dual Ball Bearing|79.99|x
+PCCOOLER CPS F7 X120BR ARGB WH|34.99|x
+PCCOOLER CPS F7 X120BR ARGB|34.99|x
+PCCOOLER CPS F7 X120B ARGB WH|34.99|x
+PCCOOLER CPS F7 X120B ARGB BK|34.99|x
+ASUS Prime MR120 ARGB 120mm Reverse Case Fan 3-Pack White|54.99|
+ASUS ROG Eurux GR120 ARGB 120mm Single Pack Black|69.99|
+ASUS ROG Eurux GR120 ARGB 120mm Reverse Single Pack Black|69.99|x
+ASUS ROG Eurux GR120 ARGB 120mm Reverse 3-Pack Black|199.99|x
+ASUS Prime MR120 120mm Reverse Case Fan 3-Pack Black|54.99|
+ASUS PRIME MR120 FAN ARGB REVERSE WHITE 120mm Single|18.88|x
+ASUS PRIME MR120 FAN ARGB WHITE 120mm Single|18.88|
+ASUS PRIME MR120 FAN ARGB BLACK 120mm|18.99|
+ASUS Prime MR120 ARGB Fan Triple Pack White|54.99|
+ASUS Prime MR120 ARGB Fan Triple Pack Black|54.99|x
+ASUS TUF GAMING TF120 ARGB White 3IN1 120mm 3-Pack|89.99|
+ASUS ROG Eurux GR120 ARGB 3-Pack Black|199.99|x
+HYTE FA12 120mm Regular Case Fan MATCHA MILK|69.99|x
+HYTE FA12 120mm Regular Case Fan TARO MILK|69.99|x
+HYTE FA12 Fans (4-Pack) 120mm STRAWBERRY MILK|69.99|x
+HYTE FA12 120mm Case Fan 4-Pack White|54.99|
+HYTE FA12 120mm Case Fan 4-Pack Black|54.99|
+HYTE FA12 120mm Case Fan 4-Pack Orange|69.99|
+HAVN H18 180mm Case Fan 2-Pack Black|69.99|x
+HAVN H18 180mm Case Fan Single Pack Black|41.99|x
+HAVN H14 140mm Case Fan 3-Pack Black|69.99|x
+HAVN H14 140mm Case Fan Single Pack Black|30.99|
+HAVN H12 120mm Case Fan 3-Pack Black|59.99|
+HAVN H12 120mm Case Fan 3-Pack White|59.99|x
+HAVN H14 140mm Case Fan 3-Pack White|69.99|x
+HAVN H14 140mm Case Fan Single Pack White|30.99|
+HAVN H12 120mm Case Fan Single Pack Black|29.99|
+HAVN H12 120mm Case Fan Single Pack White|29.99|
+Sudokoo MACH120 120mm Regular Case Fan 3-Pack Black|99.99|
+Sudokoo MACH120 120mm Regular Case Fan Single Pack Black|39.99|
+Sudokoo MACH140 140mm Regular Case Fan Single Pack Black|44.99|
+JONSBO ZB-360B PC Case Fan All-IN-One|39.99|
+JONSBO ZB-120B PC Case Fan 2400RPM 3Pin ARGB 4Pin PWM|12.99|x
+JONSBO ZA-360BR (Reversed) PC Case Fan|44.99|x
+JONSBO ZA-360B PC Case Fan|44.99|
+JONSBO ZA-120B PC Case Fan|14.99|
+MSI MPG EZ120 ARGB WHITE-1W Magnetic Connector Block 1 Pack white|34.97|x
+MSI MPG EZ120 ARGB-3B Magnetic Connector Block 3 Pack black|119.99|x
+MSI MPG EZ120 120mm Case Fan White|119.99|x
+MSI MPG EZ120 ARGB-1B Magnetic Connector Block 1 Pack black|34.97|x
+MSI MPG EZ120R ARGB 3-B|119.99|x
+MSI MPG EZ120R ARGB WHITE-3W|119.99|x
+Seasonic Magflow 120 ARGB Case Fan 3-Pack|66.88|x
+Seasonic Magflow 120 ARGB 1-Pack|22.88|
+Bykski 9 Blade High Volume 120mm PWM Fan 3000 RPM / 101.65 CFM|16.99|x
+Cooler Master Masterfan MF120 Prismatic|49.99|x
+Cooler Master MasterFan SF120M ARGB|21.88|x
+COOLER MASTER MFX-B8NN-25NPK-R1 Case Fan black|16.99|
+COOLER MASTER MasterFan A120 120mm Silver Single Pack|69.99|x
+COOLER MASTER MasterFan M120 ARGB 120mm Black Single Pack|59.90|x
+Silverstone Shark Force 120 ARGB SST-SF120B-ARGB|14.88|x
+Silverstone Fan FHS 80X High performance 80mmx38mm PWM|28.46|x
+StarTech 60x10mm Replacement Ball Bearing FAN6X1TX3|9.99|
+Supermicro 92x92x38mm Hot-Swappable FAN-0114L4 5000 RPM|39.99|x
+Cougar Vortex RGB FCB 120 Cooling Fan|8.88|x
+InWin Crown Addressable RGB Twin Fan Kit 120 mm|24.88|x
+Super Flower Megacool Case Fan Single Pack|39.99|x
+GIGABYTE AORUS EZ CHAIN FAN 120 (3-Pack)|89.99|x
+GIGABYTE AORUS EZ CHAIN FAN 120 ICE (3-Pack)|89.99|x
+GIGABYTE AORUS EZ CHAIN FAN 120 ICE|34.99|x
+GIGABYTE AORUS EZ CHAIN FAN 120|34.99|x
+Kopplen KF12 ARGB 120MM LED Silent Case Fan Black|3.88|x`},
 psu:{k:'name price f w sfx',t:`Coolmax I-400 400W ATX|31.99|x|400|0
 THERMALTAKE Smart White 500W|59.99||500|0
 AZZA PSAZ-550W ATX|54.99|p|550|0
@@ -493,7 +833,7 @@ DarkFlash DRX70 Mesh (ATX)|99.99||3|360|0
 SilverStone SUGO 16 (Mini-ITX)|119.99|p|1|240|1
 JONSBO D32 PRO (Micro-ATX)|89.99||2|240|0`}
 };
-const LAB={cpu:'CPU',mb:'Motherboard',ram:'RAM',gpu:'GPU',psu:'PSU',cooler:'Cooler',case:'Case',ssd:'SSD',hdd:'HDD'};
+const LAB={cpu:'CPU',mb:'Motherboard',ram:'RAM',gpu:'GPU',psu:'PSU',cpucooler:'CPU Cooling',casefan:'Case Fans',case:'Case',ssd:'SSD',hdd:'HDD'};
 const FN={1:'Mini-ITX',2:'mATX',3:'ATX',4:'E-ATX'};
 const CAT={};let id=0;
 for(const k in RAW){const r=RAW[k],ks=r.k.split(' ');CAT[k]=r.t.split('\n').map(l=>{const v=l.split('|'),o={id:k+(id++),cat:k};ks.forEach((q,i)=>{o[q]=v[i]===undefined?'':v[i]});
@@ -501,17 +841,17 @@ o.price=+o.price;o.f=o.f||'';o.sold=o.f.includes('x');o.used=o.f.includes('u');o
 ['w','rec','ddr','form','board','rad','igpu','sfx','sfxo'].forEach(q=>{if(o[q]!==undefined&&o[q]!=='')o[q]=+o[q]});return o})}
 if(window.PARTS)for(const k in PARTS)CAT[k]=PARTS[k].map(o=>{o=Object.assign({},o,{id:k+(id++),cat:k});o.price=+o.price;o.f=o.f||'';o.sold=o.f.includes('x');o.used=o.f.includes('u');o.pick=o.f.includes('p');o.inf=o.f.includes('i');return o});
 CAT.cpu.forEach(p=>{if(p.sock==='AM5'&&!/\dF\b/.test(p.name))p.igpu=1});
-const clean=s=>s.replace(/\(?open box\)?/ig,m=>m.startsWith('(')?'(Used)':'Used').replace(/ican/ig,'XXXX').replace(/armoury/ig,'XXXXXXX');
+const clean=s=>s.replace(/\(?open box\)?/ig,m=>m.startsWith('(')?'(Used)':'Used').replace(/armoury/ig,'XXXXXXX');
 /* ===== COMPATIBILITY ===== */
 const S={};let tab='cpu';
 function pair(a,b){ // returns reason if incompatible
 const [x,y]=a.cat<b.cat?[a,b]:[b,a];const t=x.cat+'-'+y.cat;
-const M={cpu:a.cat==='cpu'?a:b,mb:a.cat==='mb'?a:b,ram:a.cat==='ram'?a:b,psu:a.cat==='psu'?a:b,gpu:a.cat==='gpu'?a:b,case:a.cat==='case'?a:b,cooler:a.cat==='cooler'?a:b};
+const M={cpu:a.cat==='cpu'?a:b,mb:a.cat==='mb'?a:b,ram:a.cat==='ram'?a:b,psu:a.cat==='psu'?a:b,gpu:a.cat==='gpu'?a:b,case:a.cat==='case'?a:b,cpucooler:a.cat==='cpucooler'?a:b};
 const k=[a.cat,b.cat].sort().join('-');
 if(k==='cpu-mb'&&M.cpu.sock!==M.mb.sock)return M.cpu.sock+' CPU needs a '+M.cpu.sock+' board (this is '+M.mb.sock+')';
 if(k==='mb-ram'&&M.ram.ddr!==M.mb.ddr)return 'Board uses DDR'+M.mb.ddr+', RAM is DDR'+M.ram.ddr;
 if(k==='case-mb'&&M.mb.form>M.case.board)return FN[M.mb.form]+' board does not fit a '+FN[M.case.board]+'-max case';
-if(k==='case-cooler'&&M.cooler.rad>M.case.rad)return M.cooler.rad+'mm radiator exceeds case limit ('+M.case.rad+'mm)';
+if(k==='case-cpucooler'&&M.cpucooler.rad&&M.cpucooler.rad>M.case.rad)return M.cpucooler.rad+'mm radiator exceeds case limit ('+M.case.rad+'mm)';
 if(k==='case-psu'&&M.case.sfxo&&!M.psu.sfx)return 'Case only takes SFX power supplies';
 if(k==='gpu-psu'&&M.psu.w<M.gpu.rec)return 'Needs '+M.gpu.rec+'W+ PSU (this is '+M.psu.w+'W)';
 return null}
@@ -535,8 +875,7 @@ const it=Object.values(S),tot=it.reduce((a,b)=>a+b.price,0),need=(S.cpu?S.cpu.w:
 const pct=psu?Math.min(100,need/psu*100):0,W=[];
 if(S.psu&&need>psu)W.push('⚠️ Estimated draw exceeds PSU rating');else if(S.psu&&need>psu*.8)W.push('🟡 Tight PSU headroom (<20%)');
 if(S.cpu&&!S.cpu.igpu&&!S.gpu)W.push('⚠️ This CPU has no integrated graphics: add a GPU');
-if(S.cpu&&S.cpu.sock==='LGA1700'&&S.mb&&S.mb.ddr===4&&S.ram&&0)W.push('');
-if(S.gpu&&S.gpu.rec>=750&&S.psu&&S.psu.w<1000)W.push('ℹ️ High-end GPU: check for 12V-2x6 cable');
+if(S.gpu&&S.gpu.rec>=750&&S.psu&&S.psu.w<1000)W.push('ℹ️️ High-end GPU: check for 12V-2x6 cable');
 $('sum').innerHTML=`<h3>SYSTEM TOTAL</h3>${Object.keys(LAB).map(k=>`<div class="r"><span>${LAB[k]}</span><span>${S[k]?usd(S[k].price):'-'}</span></div>`).join('')}
 <div class="tot">${usd(tot)}</div><div class="r"><span>Est. draw (CPU+GPU+100W)</span><span>${need}W</span></div>
 <div class="bar"><i style="width:${pct}%;background:${pct>100?'#f05':pct>80?'#fa0':'#0fc'}"></i></div>
@@ -571,7 +910,7 @@ ps:[
 ["Repair system files (admin)","sfc /scannow"],["Repair Windows image (admin)","DISM /Online /Cleanup-Image /RestoreHealth"],["Top 10 CPU hogs","Get-Process | Sort CPU -Descending | Select -First 10 Name,CPU,WS"],
 ["Network config","Get-NetIPConfiguration"],["Flush DNS","ipconfig /flushdns"],["Check activation status","slmgr /xpr"],["Restore point before changes (admin)","Checkpoint-Computer -Description 'before-build' -RestorePointType MODIFY_SETTINGS"],
 ["Power / battery report (admin)","powercfg /energy"]]};
-const SW='<ul><li><b>Office:</b> <a href="https://www.libreoffice.org" target="_blank">LibreOffice</a></li><li><b>3D / video:</b> <a href="https://www.blender.org" target="_blank">Blender</a>, <a href="https://kdenlive.org" target="_blank">Kdenlive</a>, <a href="https://obsproject.com" target="_blank">OBS Studio</a></li><li><b>Images:</b> <a href="https://www.gimp.org" target="_blank">GIMP</a>, <a href="https://krita.org" target="_blank">Krita</a>, <a href="https://inkscape.org" target="_blank">Inkscape</a></li><li><b>Media:</b> <a href="https://www.videolan.org" target="_blank">VLC</a>, <a href="https://jellyfin.org" target="_blank">In.org</a></li><li><b>Linux:</b> <a href="https://cachyos.org" target="_blank">CachyOS</a>, <a href="https://linuxmint.com" target="_blank">Linux Mint</a>, <a href="https://fedoraproject.org" target="_blank">Fedora</a></li><li><b>Self-hosting:</b> <a href="https://immich.app" target="_blank">Immich</a>, <a href="https://nextcloud.com" target="_blank">Nextcloud</a>, <a href="https://www.home-assistant.io" target="_blank">Home Assistant</a></li><li><b>PC testing:</b> <a href="https://www.memtest.org" target="_blank">MemTest86</a>, <a href="https://www.hwinfo.com" target="_blank">HWiNFO</a>, <a href="https://crystalmark.info" target="_blank">CrystalDiskInfo</a></li></ul>';
+const SW='<ul><li><b>Office:</b> <a href="https://www.libreoffice.org" target="_blank">LibreOffice</a></li><li><b>3D / video:</b> <a href="https://www.blender.org" target="_blank">Blender</a>, <a href="https://kdenlive.org" target="_blank">Kdenlive</a>, <a href="https://obsproject.com" target="_blank">OBS Studio</a></li><li><b>Images:</b> <a href="https://www.gimp.org" target="_blank">GIMP</a>, <a href="https://krita.org" target="_blank">Krita</a>, <a href="https://inkscape.org" target="_blank">Inkscape</a></li><li><b>Media:</b> <a href="https://www.videolan.org" target="_blank">VLC</a>, <a href="https://jellyfin.org" target="_blank">Jellyfin</a></li><li><b>Linux:</b> <a href="https://cachyos.org" target="_blank">CachyOS</a>, <a href="https://linuxmint.com" target="_blank">Linux Mint</a>, <a href="https://fedoraproject.org" target="_blank">Fedora</a></li><li><b>Self-hosting:</b> <a href="https://immich.app" target="_blank">Immich</a>, <a href="https://nextcloud.com" target="_blank">Nextcloud</a>, <a href="https://www.home-assistant.io" target="_blank">Home Assistant</a></li><li><b>PC testing:</b> <a href="https://www.memtest.org" target="_blank">MemTest86</a>, <a href="https://www.hwinfo.com" target="_blank">HWiNFO</a>, <a href="https://crystalmark.info" target="_blank">CrystalDiskInfo</a></li></ul>';
 function fshow(){ftab(tabF)}
 function ftab(t){tabF=t;tick();$('ft').innerHTML=[['lx','Konsole / Linux'],['ps','PowerShell / Windows'],['sw','Free software']].map(a=>`<button class="tab ${a[0]===t?'on':''}" onclick="ftab('${a[0]}')">${a[1]}</button>`).join('');
 if(t==='sw'){$('fb').innerHTML=SW;return}$('fb').innerHTML=`<div class="padbox"><b>${t==='lx'?'Your Konsole commands':'Your PowerShell commands'}</b><textarea id="pad" rows="4" spellcheck="false" autocapitalize="off" autocorrect="off" placeholder="Type or paste commands here...">${esc(ld('pad_'+t))}</textarea><button class="btn" onclick="cpy($('pad').value,this)">Copy</button><button class="btn" onclick="sv('${t}');cpy('',null)">Save</button><button class="btn" onclick="$('pad').value='';sv('${t}')">Clear</button></div>`+CM[t].map((c,i)=>`<div class="cmd"><div class="ct">${esc(c[0])}</div><pre>${esc(c[1])}</pre><button class="btn" onclick="cpy(CM['${t}'][${i}][1],this)">Copy</button></div>`).join('')}
