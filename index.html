@@ -1,328 +1,179 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>drew.wtf</title>
-  <style>
-    :root{--bg:#050508;--fg:#e0e0e0;--a1:#ff0055;--a2:#00ffcc;--a3:#ffaa00;--f:'Courier New',Courier,monospace}
-    body.demonic{--bg:#0a0000;--fg:#ff3333;--a1:#aa0000;--a2:#ff0000;--a3:#ff0000}
-    *{margin:0;padding:0;box-sizing:border-box}
-    html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--fg);font-family:var(--f);transition:background 1s,color 1s}
-    .ns{user-select:none;-webkit-user-select:none}
-    #bg{position:absolute;inset:0;width:100%;height:100%;z-index:1}
-    #splash{position:fixed;inset:0;background:radial-gradient(circle,#111118,#000);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity .6s,transform .6s}
-    .card{text-align:center;padding:40px;border:1px solid #fff2;border-radius:10px;background:#0008;animation:br 4s infinite ease-in-out;backdrop-filter:blur(5px)}
-    @keyframes br{0%,100%{transform:scale(1);box-shadow:0 0 30px #00ffcc22}50%{transform:scale(1.02);box-shadow:0 0 50px #ff005533}}
-    .card h1{font-size:3rem;letter-spacing:5px;margin-bottom:20px;color:#fff;text-shadow:0 0 10px rgba(0,255,204,0.5)}
-    .card p{color:#888;letter-spacing:2px;animation:bl 1.5s infinite}
-    @keyframes bl{0%,100%{opacity:.3}50%{opacity:1}}
-    #main{position:relative;z-index:10;width:100%;height:100%;display:flex;align-items:center;justify-content:center}
-    .wg{font-size:6rem;font-weight:bold;display:flex;gap:5px}
-    @media(min-width:768px){.wg{font-size:10rem}}
-    .node{cursor:pointer;display:inline-block;transition:transform .1s,color .2s,text-shadow .2s}
-    #nd:hover{color:var(--a1);text-shadow:0 0 20px var(--a1)}
-    #nt{color:var(--a2)}#nt:hover{text-shadow:0 0 20px var(--a2)}
-    #nw:hover{color:var(--a3);text-shadow:0 0 20px var(--a3)}
-    @keyframes shake{0%{transform:translate(0);}20%{transform:translate(-4px,4px) skewX(2deg);}40%{transform:translate(4px,-4px) skewY(-2deg);}60%{transform:translate(-4px,-4px) skewX(-2deg);filter:hue-rotate(45deg);}80%{transform:translate(4px,4px) skewY(2deg);}100%{transform:translate(0);}}
-    .shake{animation:shake .15s infinite}
-    #controls{position:fixed;right:14px;bottom:14px;z-index:10000;display:flex;gap:8px}
-    .ctrl-btn{background:#000a;color:#fff;border:1px solid #555;border-radius:6px;padding:8px 12px;font-family:var(--f);cursor:pointer}
-    .modal{position:fixed;inset:0;background:#000e;backdrop-filter:blur(10px);z-index:1000;display:none;align-items:center;justify-content:center}
-    .modal.show{display:flex}
-    .mc{background:#0d0d12;border:1px solid #333;border-radius:8px;width:96%;max-width:1200px;max-height:92vh;padding:24px;overflow-y:auto;position:relative;color:#e0e0e0}
-    .x{position:absolute;top:10px;right:16px;background:none;border:0;color:#888;font-size:2rem;cursor:pointer}.x:hover{color:#fff}
-    h2{color:#ff0055;margin-bottom:4px}.sub{color:#888;font-size:.85rem;margin-bottom:14px}
-    .layout{display:grid;grid-template-columns:1fr 300px;gap:16px}
-    @media(max-width:850px){.layout{grid-template-columns:1fr}}
-    .tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
-    .tab{background:#15151a;border:1px solid #333;color:#aaa;padding:6px 10px;border-radius:4px;cursor:pointer;font-family:var(--f);font-size:.8rem}
-    .tab.on{border-color:#00ffcc;color:#00ffcc}.tab.has::after{content:" ✓";color:#00ffcc}
-    .tools{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
-    .tools input,.tools select{background:#000;color:#fff;border:1px solid #333;border-radius:4px;padding:8px;font-family:var(--f);flex:1;min-width:120px}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
-    .p{background:#15151a;border:1px solid #2a2a33;border-left:4px solid #444;border-radius:6px;padding:10px;cursor:pointer;font-size:.82rem;position:relative}
-    .p:hover{border-left-color:#00ffcc}.p.sel{border-color:#00ffcc;background:#00ffcc12}
-    .p.dis{opacity:.4;filter:grayscale(1);cursor:not-allowed}.p.dis:hover{border-left-color:#444}
-    .p .n{margin-bottom:6px;line-height:1.3;word-break:break-word}.p .pr{color:#00ffcc;font-weight:bold}
-    .b{display:inline-block;font-size:.7rem;padding:1px 6px;border-radius:3px;margin-left:4px;background:#333;color:#ddd}
-    .b.u{background:#ffaa0033;color:#ffaa00}.b.s{background:#ff005533;color:#ff5588}
-    .em{position:absolute;top:8px;right:8px}
-    .why{color:#ff7799;font-size:.72rem;margin-top:5px}
-    .sum{background:#00ffcc0a;border:1px solid #00ffcc;border-radius:6px;padding:14px;font-size:.82rem;align-self:start;position:sticky;top:0}
-    .sum h3{color:#fff;margin-bottom:8px}.sum div.r{display:flex;justify-content:space-between;gap:8px;margin:3px 0;color:#aaa}
-    .tot{font-size:1.8rem;color:#00ffcc;font-weight:bold;margin:8px 0}
-    .bar{height:8px;background:#222;border-radius:4px;overflow:hidden;margin:6px 0}.bar i{display:block;height:100%;background:#00ffcc}
-    .btn{background:#222;color:#fff;border:1px solid #555;padding:8px 12px;border-radius:4px;cursor:pointer;font-family:var(--f);margin:8px 6px 0 0}.btn:hover{background:#444}
-    .warn{color:#ffaa00;font-size:.75rem;margin-top:4px}
-    .fo a{color:#55aaff}.fo li{background:#111;padding:10px;margin:8px 0;list-style:none;border-left:3px solid #ffaa00}
-    #wave{position:fixed;bottom:0;left:0;width:100%;height:4px;background:#00ffcc22;z-index:999;display:flex}
-    #wave i{height:100%;background:var(--a2);width:0;transition:width 0.05s}
-  </style>
-</head>
-<body>
-  <!-- Audio Context & Music Setup -->
-  <audio id="bgm" src="dream.mp3" loop preload="auto"></audio>
-  <div id="wave"><i id="wbar"></i></div>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<title>drew.wtf</title>
+<style>
+:root{--bg:#050508;--fg:#e0e0e0;--a1:#ff0055;--a2:#00ffcc;--a3:#ffaa00;--f:'Courier New',Courier,monospace}
+body.demonic{--bg:#0a0000;--fg:#ff3333;--a1:#aa0000;--a2:#ff0000;--a3:#ff0000}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--fg);font-family:var(--f);transition:background 1s,color 1s}
+.ns{user-select:none;-webkit-user-select:none}
+#bg{position:absolute;inset:0;width:100%;height:100%;z-index:1}
+#splash{position:fixed;inset:0;background:radial-gradient(circle,#111118,#000);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity .6s,transform .6s}
+.card{text-align:center;padding:40px;border:1px solid #fff2;border-radius:10px;background:#0008;animation:br 4s infinite ease-in-out}
+@keyframes br{0%,100%{transform:scale(1);box-shadow:0 0 30px #00ffcc22}50%{transform:scale(1.02);box-shadow:0 0 50px #ff005533}}
+.card h1{font-size:3rem;letter-spacing:5px;margin-bottom:20px;color:#fff}
+.card p{color:#888;letter-spacing:2px;animation:bl 1.5s infinite}
+@keyframes bl{0%,100%{opacity:.3}50%{opacity:1}}
+#main{position:relative;z-index:10;width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+.wg{font-size:6rem;font-weight:bold;display:flex;gap:5px}
+@media(min-width:768px){.wg{font-size:10rem}}
+.node{cursor:pointer;display:inline-block;transition:transform .1s,color .2s,text-shadow .2s}
+#nd:hover{color:var(--a1);text-shadow:0 0 20px var(--a1)}
+#nt{color:var(--a2)}#nt:hover{text-shadow:0 0 20px var(--a2)}
+#nw:hover{color:var(--a3);text-shadow:0 0 20px var(--a3)}
+@keyframes shake{0%{transform:translate(0)}20%{transform:translate(-4px,4px) skewX(2deg)}40%{transform:translate(4px,-4px) skewY(-2deg)}60%{transform:translate(-4px,-4px) skewX(-2deg);filter:hue-rotate(45deg)}80%{transform:translate(4px,4px) skewY(2deg)}100%{transform:translate(0)}}
+.shake{animation:shake .15s infinite}
+#mute{position:fixed;right:14px;bottom:14px;z-index:10000;background:#000a;color:#fff;border:1px solid #555;border-radius:6px;padding:8px 12px;font-family:var(--f);cursor:pointer}
+.modal{position:fixed;inset:0;background:#000e;backdrop-filter:blur(10px);z-index:1000;display:none;align-items:center;justify-content:center}
+.modal.show{display:flex}
+.mc{background:#0d0d12;border:1px solid #333;border-radius:8px;width:96%;max-width:1200px;max-height:92vh;padding:24px;overflow-y:auto;position:relative;color:#e0e0e0}
+.x{position:absolute;top:10px;right:16px;background:none;border:0;color:#888;font-size:2rem;cursor:pointer}.x:hover{color:#fff}
+h2{color:#ff0055;margin-bottom:4px}.sub{color:#888;font-size:.85rem;margin-bottom:14px}
+.layout{display:grid;grid-template-columns:1fr 300px;gap:16px}
+@media(max-width:850px){.layout{grid-template-columns:1fr}}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.tab{background:#15151a;border:1px solid #333;color:#aaa;padding:6px 10px;border-radius:4px;cursor:pointer;font-family:var(--f);font-size:.8rem}
+.tab.on{border-color:#00ffcc;color:#00ffcc}.tab.has::after{content:" ✓";color:#00ffcc}
+.tools{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.tools input,.tools select{background:#000;color:#fff;border:1px solid #333;border-radius:4px;padding:8px;font-family:var(--f);flex:1;min-width:120px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.p{background:#15151a;border:1px solid #2a2a33;border-left:4px solid #444;border-radius:6px;padding:10px;cursor:pointer;font-size:.82rem;position:relative}
+.p:hover{border-left-color:#00ffcc}.p.sel{border-color:#00ffcc;background:#00ffcc12}
+.p.dis{opacity:.4;filter:grayscale(1);cursor:not-allowed}.p.dis:hover{border-left-color:#444}
+.p .n{margin-bottom:6px;line-height:1.3;word-break:break-word}.p .pr{color:#00ffcc;font-weight:bold}
+.b{display:inline-block;font-size:.7rem;padding:1px 6px;border-radius:3px;margin-left:4px;background:#333;color:#ddd}
+.b.u{background:#ffaa0033;color:#ffaa00}.b.s{background:#ff005533;color:#ff5588}
+.em{position:absolute;top:8px;right:8px}
+.why{color:#ff7799;font-size:.72rem;margin-top:5px}
+.sum{background:#00ffcc0a;border:1px solid #00ffcc;border-radius:6px;padding:14px;font-size:.82rem;align-self:start;position:sticky;top:0}
+.sum h3{color:#fff;margin-bottom:8px}.sum div.r{display:flex;justify-content:space-between;gap:8px;margin:3px 0;color:#aaa}
+.tot{font-size:1.8rem;color:#00ffcc;font-weight:bold;margin:8px 0}
+.bar{height:8px;background:#222;border-radius:4px;overflow:hidden;margin:6px 0}.bar i{display:block;height:100%;background:#00ffcc}
+.btn{background:#222;color:#fff;border:1px solid #555;padding:8px 12px;border-radius:4px;cursor:pointer;font-family:var(--f);margin:8px 6px 0 0}.btn:hover{background:#444}
+.warn{color:#ffaa00;font-size:.75rem;margin-top:4px}
+.fo a{color:#55aaff}.fo li{background:#111;padding:10px;margin:8px 0;list-style:none;border-left:3px solid #ffaa00}
 
-  <div id="splash" class="ns">
-    <div class="card">
-      <h1>drew.wtf</h1>
-      <p>[ PRESS SPACE, CLICK, OR SCROLL TO ENTER ]</p>
-    </div>
-  </div>
+html,body{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.node,.tab,.p,.btn,#mute{touch-action:manipulation;cursor:pointer}
+.mc{max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px);-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
+.modal{overflow:hidden;touch-action:pan-y}
+#splash::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,#0000 0 2px,#00ffcc08 2px 4px);pointer-events:none}
+#splash::after{content:"";position:absolute;left:-50%;right:-50%;bottom:0;height:45%;background:linear-gradient(#ff005544 1px,transparent 1px) 0 0/60px 60px,linear-gradient(90deg,#ff005544 1px,transparent 1px) 0 0/60px 60px;transform:perspective(300px) rotateX(60deg);transform-origin:bottom;animation:grid 2s linear infinite;-webkit-mask-image:linear-gradient(transparent,#000);mask-image:linear-gradient(transparent,#000);pointer-events:none}
+@keyframes grid{to{background-position:0 60px,0 0}}
+.card{position:relative;z-index:2}
+.card h1{text-shadow:0 0 10px #0fc,0 0 30px #0fc,0 0 60px #f05;animation:fl 3s infinite}
+@keyframes fl{0%,91%,100%{opacity:1}93%{opacity:.35}95%{opacity:1}97%{opacity:.6}}
+.card p{text-shadow:2px 0 #f05,-2px 0 #0fc}
+.wg{--beat:0;transform:scale(calc(1 + var(--beat)*.07));text-shadow:0 0 calc(10px + var(--beat)*40px) var(--a2)}
+#meter{position:fixed;left:0;right:0;bottom:0;width:100%;height:64px;z-index:5;pointer-events:none}
+.p.na:not(.dis){background:#2a2410;border-left-color:#ffcc00;border-color:#ffcc0055}
+.p.na:not(.dis) .n{color:#ffe27a}
+.b.y{background:#ffcc00;color:#000;font-weight:bold}
+.b.i{background:#2255aa44;color:#8cf}
+.br,.md{text-decoration:underline}.br{font-weight:bold}
+.tools label{color:#aaa;font-size:.8rem;display:flex;align-items:center;gap:6px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}.wg{transform:none}}
 
-  <div id="controls" class="ns">
-    <button id="mute" class="ctrl-btn" aria-label="Toggle audio">♪ on</button>
-  </div>
+body{position:fixed;top:0;left:0;right:0;bottom:0}
+#main{pointer-events:none}.node{pointer-events:auto}
+.wg{font-size:clamp(2.6rem,15vw,10rem)}
+#nt{filter:drop-shadow(0 0 12px #ff7a00);animation:pg 2.4s infinite ease-in-out}
+@keyframes pg{0%,100%{filter:drop-shadow(0 0 8px #ff7a00)}50%{filter:drop-shadow(0 0 24px #ffb000)}}
+#bg{touch-action:manipulation}
+.hint{position:fixed;bottom:74px;left:0;right:0;text-align:center;color:#ffffff66;font-size:.72rem;letter-spacing:3px;z-index:6;pointer-events:none;text-transform:uppercase}
+.modal{-webkit-backdrop-filter:blur(14px);background:#000d}
+.mc{background:linear-gradient(160deg,#10101c,#08080f);border:1px solid #ffffff14;box-shadow:0 30px 100px #000,0 0 0 1px #00ffcc22,0 0 80px #ff005512}
+h2{background:linear-gradient(90deg,#ff0055,#ff9a00,#00ffcc);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:1.6rem;letter-spacing:2px}
+h2 .tg{display:block;font-size:.7rem;letter-spacing:3px;color:#8a8aa0;-webkit-text-fill-color:#8a8aa0;margin-top:2px;text-transform:uppercase}
+.tab{border-radius:999px;padding:8px 14px}
+.p{border-radius:10px;background:linear-gradient(160deg,#171724,#101018);transition:transform .15s,box-shadow .15s}
+.p:hover{transform:translateY(-2px);box-shadow:0 8px 24px #0008,0 0 0 1px #00ffcc55}
+.sum{border-radius:12px;background:linear-gradient(160deg,#00ffcc10,#ff005510);-webkit-backdrop-filter:blur(8px)}
+.cmd{background:#0b0b13;border:1px solid #262633;border-radius:8px;padding:10px;margin:10px 0}
+.cmd .ct{color:#00ffcc;font-size:.8rem;margin-bottom:6px}
+.cmd pre{background:#000;color:#9dffb0;padding:10px;border-radius:6px;overflow-x:auto;white-space:pre-wrap;word-break:break-all;font-size:.82rem;user-select:text;-webkit-user-select:text}
+.padbox{background:#12121c;border:1px solid #ff005544;border-radius:8px;padding:10px;margin-bottom:10px}
+.padbox textarea{width:100%;background:#000;color:#fff;border:1px solid #333;border-radius:6px;padding:8px;font-family:var(--f);margin:8px 0;font-size:16px}
+.fo ul{list-style:none}
+</style></head><body>
+<audio id="bgm" src="dream.mp3" loop preload="auto"></audio>
+<div id="splash" class="ns"><div class="card"><h1>drew.wtf</h1><p>[ PRESS SPACE, CLICK, OR SCROLL TO ENTER ]</p></div></div>
+<button id="mute" class="ns" aria-label="Toggle music">♪ on</button>
+<canvas id="bg"></canvas>
+<canvas id="meter"></canvas>
+<div id="main" class="ns"><div class="wg"><div id="nd" class="node">drew</div><div id="nt" class="node">🎃</div><div id="nw" class="node">wtf</div></div></div>
 
-  <canvas id="bg"></canvas>
+<div class="hint ns">tap the background to change the vibe</div>
+<div id="mb" class="modal"><div class="mc"><button class="x" onclick="cm('mb')">&times;</button>
+<h2>PC BUILDER<span class="tg">smart compatibility &middot; live pricing &middot; CAD</span></h2>
+<p class="sub">Pick any part first. Everything else updates: 🟢 compatible, ❌ greyed out with the reason. Prices CAD.</p>
+<div class="layout"><div><div class="tabs" id="tabs"></div>
+<div class="tools"><input id="q" placeholder="Search..." oninput="draw()"><select id="so" onchange="draw()"><option value="n">Sort: name</option><option value="a">Price low-high</option><option value="d">Price high-low</option></select><select id="cond" onchange="draw()"><option value="">New + used</option><option value="new">New only</option><option value="used">Used only</option></select><label><input type="checkbox" id="hu" onchange="draw()">Hide unavailable</label></div>
+<div class="grid" id="grid"></div></div>
+<div class="sum" id="sum"></div></div></div></div>
 
-  <div id="main" class="ns">
-    <div class="wg">
-      <div id="nd" class="node">drew</div>
-      <div id="nt" class="node">.</div>
-      <div id="nw" class="node">wtf</div>
-    </div>
-  </div>
+<div id="mf" class="modal"><div class="mc fo"><button class="x" onclick="cm('mf')">&times;</button>
+<h2>WTF TOOLBOX<span class="tg">copy-paste commands &middot; scratchpads &middot; free software</span></h2>
+<div class="tabs" id="ft"></div><div id="fb"></div></div></div>
 
-  <!-- Hardware Configurator Modal -->
-  <div id="mb" class="modal">
-    <div class="mc">
-      <button class="x" onclick="cm('mb')">&times;</button>
-      <h2>// SMART HARDWARE CONFIGURATOR</h2>
-      <p class="sub">Full compatibility engine active. Select any component to filter matching hardware options live.</p>
-      <div class="layout">
-        <div>
-          <div class="tabs" id="tabs"></div>
-          <div class="tools">
-            <input id="q" placeholder="Search parts..." oninput="draw()">
-            <select id="so" onchange="draw()">
-              <option value="n">Sort: Name</option>
-              <option value="a">Price: Low to High</option>
-              <option value="d">Price: High to Low</option>
-            </select>
-            <select id="cond" onchange="draw()">
-              <option value="">All Conditions</option>
-              <option value="new">New Only</option>
-              <option value="used">Used Only</option>
-            </select>
-            <label style="display:flex;align-items:center;gap:6px;font-size:0.8rem;cursor:pointer;">
-              <input type="checkbox" id="hideSold" onchange="draw()"> Hide Disallowed/Sold Out
-            </label>
-          </div>
-          <div class="grid" id="grid"></div>
-        </div>
-        <div class="sum" id="sum"></div>
-      </div>
-    </div>
-  </div>
+<script>onerror=function(m,u,l){var d=document.createElement('div');d.style.cssText='position:fixed;top:0;left:0;right:0;background:#a00;color:#fff;font:11px monospace;padding:4px;z-index:99999';d.textContent='JS error: '+m+' (line '+l+')';if(document.body)document.body.appendChild(d)}</script>
+<script src="parts.js"></script>
+<script>
+/* ===== AUDIO ===== */
+const bgm=document.getElementById('bgm'),mute=document.getElementById('mute');
+let fell=false;
+bgm.addEventListener('error',()=>{if(!fell){fell=true;bgm.crossOrigin="anonymous";bgm.src='https://raw.githubusercontent.com/hillierandrew/wtf/main/dream.mp3';bgm.load();if(open1)bgm.play().catch(()=>{})}});
+let AC,muted=false,LIM=300,an,fd;
+function beep(f,d=.08,t='square',v=.05){if(muted)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();const o=AC.createOscillator(),g=AC.createGain();o.type=t;o.frequency.value=f;g.gain.setValueAtTime(v,AC.currentTime);g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d)}catch(e){}}
+const chime=()=>[660,880,1320].forEach((f,i)=>setTimeout(()=>beep(f,.15,'triangle'),i*90)),sting=()=>{beep(55,.6,'sawtooth',.12);beep(58,.6,'square',.08)},buzz=()=>beep(90,.12,'sawtooth',.06),tick=()=>beep(900,.03,'square',.03);
+function setupAn(){if(!/^https?:/.test(location.protocol)||fell)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const sr=AC.createMediaElementSource(bgm);an=AC.createAnalyser();an.fftSize=256;sr.connect(an);an.connect(AC.destination);fd=new Uint8Array(an.frequencyBinCount)}catch(e){an=null}}
+mute.onclick=e=>{e.stopPropagation();muted=!muted;bgm.muted=muted;mute.textContent=muted?'♪ off':'♪ on'};
+/* ===== ENTRY ===== */
+let open1=false;const sp=document.getElementById('splash');
+function unlock(e){if(open1)return;if(e.type==='keydown'&&e.code!=='Space'&&e.code!=='Enter')return;
+open1=true;bgm.volume=.5;bgm.play().catch(()=>{});chime();setupAn();sp.style.opacity=0;sp.style.transform='scale(1.5)';sp.style.pointerEvents='none';setTimeout(()=>sp.remove(),650);
+['click','keydown','wheel','touchend','pointerup'].forEach(t=>removeEventListener(t,unlock));anim()}
+['click','keydown','wheel','touchend','pointerup'].forEach(t=>addEventListener(t,unlock));addEventListener('pointerup',()=>{if(open1&&bgm.paused&&!muted)bgm.play().catch(()=>{})});
+/* ===== EASTER EGGS ===== */
+let demon=false;const c={d:0,t:0,w:0};
+function pulse(el,col){el.style.color=col;el.style.transform='scale(1.2)';setTimeout(()=>{el.style.color='';el.style.transform=''},150)}
+const nd=document.getElementById('nd'),nt=document.getElementById('nt'),nw=document.getElementById('nw');
+nd.onclick=e=>{e.stopPropagation();pulse(nd,'#ff0055');c.d++;beep(300+c.d*70);if(c.d>=10){c.d=0;chime();om('mb');draw()}};
+nt.onclick=e=>{e.stopPropagation();pulse(nt,'');if(demon){demon=false;c.t=0;document.body.classList.remove('demonic');document.getElementById('main').classList.remove('shake');nw.textContent='wtf';bgm.playbackRate=1;chime();return}
+c.t++;beep(110+c.t*45,.12,'sawtooth',.07);if(c.t>=6){c.t=0;demon=true;sting();document.body.classList.add('demonic');document.getElementById('main').classList.add('shake');nw.textContent='666';bgm.playbackRate=.7}};
+nw.onclick=e=>{e.stopPropagation();pulse(nw,demon?'#f00':'#ffaa00');c.w++;beep(400+c.w*60);if(c.w>=10){c.w=0;chime();om('mf');fshow()}};
+function om(id){document.getElementById(id).classList.add('show')}
+function cm(id){document.getElementById(id).classList.remove('show')}
+const cv=document.getElementById('bg'),cx=cv.getContext('2d'),mc2=document.getElementById('meter'),mx=mc2.getContext('2d'),wg=document.querySelector('.wg');
+function rs(){cv.width=innerWidth;cv.height=innerHeight;mc2.width=innerWidth;mc2.height=64}addEventListener('resize',rs);rs();
+const RM=matchMedia('(prefers-reduced-motion:reduce)').matches;let bass=0,ms={x:0,y:0},rip=[];
+const stars=Array.from({length:RM?60:260},()=>({x:(Math.random()-.5)*2,y:(Math.random()-.5)*2,z:Math.random(),t:Math.random()*6}));
+addEventListener('pointermove',e=>{ms.x=e.clientX/innerWidth-.5;ms.y=e.clientY/innerHeight-.5});
+addEventListener('pointerdown',e=>{if(open1)rip.push({x:e.clientX,y:e.clientY,r:0})});
+let mode=0;const C=()=>demon?'255,40,40':'0,255,204',dr=[],nodes=Array.from({length:70},()=>({x:Math.random(),y:Math.random(),vx:(Math.random()-.5)*.0006,vy:(Math.random()-.5)*.0006})),EM=['🎃','🦇','👻','🕸','🕯'],fl=Array.from({length:34},()=>({x:Math.random(),y:Math.random(),s:14+Math.random()*26,e:EM[Math.random()*5|0],p:Math.random()*6}));
+const MODES=[
+(W,H,t)=>{stars.forEach(s=>{s.z-=.0008*(1+bass*3)*(demon?3:1);if(s.z<=0){s.z=1;s.x=(Math.random()-.5)*2;s.y=(Math.random()-.5)*2}
+const k=1/s.z,x=W/2+s.x*W*.25*k-ms.x*60*(1-s.z),y=H/2+s.y*H*.25*k-ms.y*60*(1-s.z),a=Math.min(1,(1-s.z)*1.4)*(.6+.4*Math.sin(t*3+s.t)),j=demon?Math.random()*2:0;
+cx.fillStyle=demon?`rgba(255,${60+Math.random()*40|0},60,${a})`:`rgba(200,230,255,${a})`;cx.beginPath();cx.arc(x+j,y+j,(1-s.z)*2.2+.3,0,7);cx.fill()})},
+(W,H)=>{const n=Math.ceil(W/16);while(dr.length<n)dr.push(Math.random()*H/16);cx.font='15px monospace';cx.fillStyle=demon?'#ff3030':'#00ffcc';dr.forEach((y,i)=>{cx.fillText(String.fromCharCode(12448+Math.random()*96|0),i*16,y*16);dr[i]=y*16>H&&Math.random()>.975?0:y+1+bass*2})},
+(W,H)=>{nodes.forEach(n=>{n.x=(n.x+n.vx*(1+bass*8)+1)%1;n.y=(n.y+n.vy*(1+bass*8)+1)%1});cx.lineWidth=1;nodes.forEach((a,i)=>{cx.fillStyle=demon?'#f33':'#ff0055';cx.beginPath();cx.arc(a.x*W,a.y*H,2+bass*3,0,7);cx.fill();for(let j=i+1;j<nodes.length;j++){const b=nodes[j],d=Math.hypot((a.x-b.x)*W,(a.y-b.y)*H);if(d<130){cx.strokeStyle=`rgba(${C()},${(1-d/130)*.6})`;cx.beginPath();cx.moveTo(a.x*W,a.y*H);cx.lineTo(b.x*W,b.y*H);cx.stroke()}}})},
+(W,H,t)=>{cx.lineWidth=36;for(let k=0;k<4;k++){cx.strokeStyle=`hsla(${demon?k*12:150+k*55},100%,60%,.16)`;cx.beginPath();for(let x=0;x<=W;x+=10){const y=H*.45+k*34+Math.sin(x*.004+t*(.4+k*.15)+k)*H*(.1+bass*.12);x?cx.lineTo(x,y):cx.moveTo(x,y)}cx.stroke()}},
+(W,H,t)=>{fl.forEach(o=>{o.y-=.0007+bass*.003;if(o.y<-.1){o.y=1.1;o.x=Math.random()}cx.globalAlpha=.75;cx.font=o.s+'px serif';cx.fillText(o.e,o.x*W+Math.sin(t+o.p)*30,o.y*H)});cx.globalAlpha=1;cx.fillStyle='rgba(255,122,0,.8)';for(let i=0;i<40;i++)cx.fillRect((i*97+t*30*(1+i%3))%W,H-((i*53+t*60)%H),2,2)}
+];
+cv.addEventListener('pointerdown',e=>{if(!open1)return;mode=(mode+1)%MODES.length;cx.globalAlpha=.18;cx.fillStyle='#fff';cx.fillRect(0,0,cv.width,cv.height);cx.globalAlpha=1;beep(480+mode*110,.07,'triangle',.05)});
+function anim(){const W=cv.width,H=cv.height,t=performance.now()/1000,N=64,lv=[],idle=bgm.paused||bgm.muted;
+if(an&&!idle){an.getByteFrequencyData(fd);for(let i=0;i<N;i++)lv.push(fd[i]/255);bass=(fd[1]+fd[2]+fd[3]+fd[4])/1020}
+else{const b=idle?0:Math.pow(Math.max(0,Math.sin(t*Math.PI*2*1.9)),6);bass=bass*.8+b*.2;for(let i=0;i<N;i++)lv.push(idle?0:(.25+.5*Math.abs(Math.sin(t*3+i*.5)))*(.4+bass))}
+wg.style.setProperty('--beat',bass.toFixed(3));
+cx.fillStyle=demon?'rgba(10,0,0,.3)':'rgba(5,5,8,.3)';cx.fillRect(0,0,W,H);
+MODES[mode](W,H,t);
+rip=rip.filter(r=>(r.r+=6)<300);rip.forEach(r=>{cx.strokeStyle=`rgba(${C()},${1-r.r/300})`;cx.beginPath();cx.arc(r.x,r.y,r.r,0,7);cx.stroke()});
+const mw=mc2.width,mh=64;mx.clearRect(0,0,mw,mh);mx.strokeStyle=demon?'#f00':'#0fc';mx.lineWidth=2;mx.shadowBlur=10;mx.shadowColor=mx.strokeStyle;mx.beginPath();
+for(let i=0;i<N;i++){const x=i/(N-1)*mw,y=mh/2-(i%2?1:-1)*lv[i]*mh*.45;i?mx.lineTo(x,y):mx.moveTo(x,y)}mx.stroke();requestAnimationFrame(anim)}
 
-  <!-- Open-Source Hub Modal -->
-  <div id="mf" class="modal">
-    <div class="mc fo">
-      <button class="x" onclick="cm('mf')">&times;</button>
-      <h2>// FREE &amp; OPEN-SOURCE HUB</h2>
-      <p class="sub">Legit tools, utilities, and operating systems.</p>
-      <ul>
-        <li><b>Office:</b> <a href="https://www.libreoffice.org" target="_blank">LibreOffice</a></li>
-        <li><b>3D / Video:</b> <a href="https://www.blender.org" target="_blank">Blender</a>, <a href="https://kdenlive.org" target="_blank">Kdenlive</a>, <a href="https://obsproject.com" target="_blank">OBS Studio</a></li>
-        <li><b>Images:</b> <a href="https://www.gimp.org" target="_blank">GIMP</a>, <a href="https://krita.org" target="_blank">Krita</a>, <a href="https://inkscape.org" target="_blank">Inkscape</a></li>
-        <li><b>Media:</b> <a href="https://www.videolan.org" target="_blank">VLC</a>, <a href="https://jellyfin.org" target="_blank">Jellyfin</a></li>
-        <li><b>Linux:</b> <a href="https://linuxmint.com" target="_blank">Linux Mint</a>, <a href="https://fedoraproject.org" target="_blank">Fedora</a>, <a href="https://ubuntu.com" target="_blank">Ubuntu</a></li>
-        <li><b>Self-hosting:</b> <a href="https://immich.app" target="_blank">Immich</a>, <a href="https://nextcloud.com" target="_blank">Nextcloud</a>, <a href="https://www.home-assistant.io" target="_blank">Home Assistant</a></li>
-        <li><b>Music:</b> <a href="https://www.audacityteam.org" target="_blank">Audacity</a>, <a href="https://www.musescore.org" target="_blank">MuseScore</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <script>
-    /* ===== AUDIO & SYNTH BEEPS ENGINE ===== */
-    const bgm = document.getElementById('bgm'), mute = document.getElementById('mute');
-    let audioCtx = null, analyser = null, dataArray = null;
-    let fell = false;
-
-    bgm.addEventListener('error', () => {
-      if (!fell) {
-        fell = true;
-        bgm.src = 'https://raw.githubusercontent.com/hillierandrew/wtf/main/dream.mp3';
-        bgm.load();
-        if (open1) bgm.play().catch(() => {});
-      }
-    });
-
-    function initAudioContext() {
-      if (!audioCtx) {
-        const AC = window.AudioContext || window.webkitAudioContext;
-        audioCtx = new AC();
-        analyser = audioCtx.createAnalyser();
-        const source = audioCtx.createMediaElementSource(bgm);
-        source.connect(analyser);
-        analyser.connect(audioCtx.destination);
-        analyser.fftSize = 64;
-        dataArray = new Uint8Array(analyser.frequencyBinCount);
-      }
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-    }
-
-    function playBeep(freq, duration, type='sine', vol=0.05) {
-      if (!audioCtx) return;
-      try {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + duration);
-      } catch(e) {}
-    }
-
-    mute.onclick = (e) => {
-      e.stopPropagation();
-      bgm.muted = !bgm.muted;
-      mute.textContent = bgm.muted ? '♪ off' : '♪ on';
-      playBeep(400, 0.1);
-    };
-
-    /* ===== ENTRY & UNLOCK ===== */
-    let open1 = false;
-    const sp = document.getElementById('splash');
-
-    function unlock(e) {
-      if (open1) return;
-      if (e.type === 'keydown' && e.code !== 'Space' && e.code !== 'Enter') return;
-      open1 = true;
-      initAudioContext();
-      bgm.volume = .5;
-      bgm.play().catch(() => {});
-      sp.style.opacity = 0;
-      sp.style.transform = 'scale(1.5)';
-      setTimeout(() => sp.style.display = 'none', 600);
-      ['click', 'keydown', 'wheel', 'touchstart'].forEach(t => removeEventListener(t, unlock));
-      anim();
-    }
-    ['click', 'keydown', 'wheel', 'touchstart'].forEach(t => addEventListener(t, unlock));
-
-    /* ===== EASTER EGG NODES ===== */
-    let demon = false;
-    const c = { d: 0, t: 0, w: 0 };
-    function pulse(el, col) {
-      el.style.color = col;
-      el.style.transform = 'scale(1.2)';
-      setTimeout(() => { el.style.color = ''; el.style.transform = ''; }, 150);
-    }
-
-    const nd = document.getElementById('nd'), nt = document.getElementById('nt'), nw = document.getElementById('nw');
-
-    nd.onclick = (e) => {
-      e.stopPropagation();
-      c.d++;
-      playBeep(300 + (c.d * 50), 0.1, 'triangle', 0.1);
-      pulse(nd, '#ff0055');
-      if (c.d >= 10) {
-        c.d = 0;
-        playBeep(880, 0.3, 'sine', 0.15);
-        om('mb');
-        draw();
-      }
-    };
-
-    nt.onclick = (e) => {
-      e.stopPropagation();
-      c.t++;
-      playBeep(200 + (c.t * 80), 0.1, 'sine', 0.1);
-      pulse(nt, '#00ffcc');
-      if (c.t >= 6 && !demon) {
-        demon = true;
-        document.body.classList.add('demonic');
-        document.getElementById('main').classList.add('shake');
-        nw.textContent = '666';
-        bgm.playbackRate = .7;
-        playBeep(80, 0.8, 'sawtooth', 0.2);
-      }
-    };
-
-    nw.onclick = (e) => {
-      e.stopPropagation();
-      c.w++;
-      playBeep(400 + (c.w * 40), 0.1, 'sawtooth', 0.1);
-      pulse(nw, demon ? '#f00' : '#ffaa00');
-      if (c.w >= 10) {
-        c.w = 0;
-        playBeep(600, 0.3, 'sine', 0.15);
-        om('mf');
-      }
-    };
-
-    function om(id) { document.getElementById(id).classList.add('show'); playBeep(550, 0.1); }
-    function cm(id) { document.getElementById(id).classList.remove('show'); playBeep(350, 0.1); }
-
-    /* ===== STARFIELD / RIPPLE CANVAS ===== */
-    const cv = document.getElementById('bg'), cx = cv.getContext('2d');
-    function rs() { cv.width = innerWidth; cv.height = innerHeight; }
-    addEventListener('resize', rs); rs();
-
-    let mouse = { x: cv.width/2, y: cv.height/2 };
-    addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
-
-    const ps = Array.from({ length: 120 }, () => ({
-      x: Math.random() * cv.width,
-      y: Math.random() * cv.height,
-      z: Math.random() * cv.width,
-      s: Math.random() * 2
-    }));
-
-    const ripples = [];
-    addEventListener('click', e => {
-      if (open1) ripples.push({ x: e.clientX, y: e.clientY, r: 0, alpha: 1 });
-    });
-
-    function anim() {
-      cx.fillStyle = demon ? 'rgba(10,0,0,.25)' : 'rgba(5,5,8,.25)';
-      cx.fillRect(0, 0, cv.width, cv.height);
-
-      // Starfield movement toward mouse drift
-      cx.fillStyle = demon ? '#ff3333' : '#ccc';
-      ps.forEach(p => {
-        let dx = (mouse.x - cv.width/2) * 0.0002;
-        let dy = (mouse.y - cv.height/2) * 0.0002;
-        p.x += dx * p.z; p.y += dy * p.z;
-        if(p.x < 0) p.x = cv.width; if(p.x > cv.width) p.x = 0;
-        if(p.y < 0) p.y = cv.height; if(p.y > cv.height) p.y = 0;
-
-        cx.beginPath();
-        cx.arc(p.x, p.y, p.s, 0, 7);
-        cx.fill();
-      });
-
-      // Ripple effects
-      ripples.forEach((rp, idx) => {
-        rp.r += 4; rp.alpha -= 0.02;
-        cx.strokeStyle = demon ? `rgba(255,0,0,${rp.alpha})` : `rgba(0,255,204,${rp.alpha})`;
-        cx.lineWidth = 1.5;
-        cx.beginPath(); cx.arc(rp.x, rp.y, rp.r, 0, Math.PI*2); cx.stroke();
-        if(rp.alpha <= 0) ripples.splice(idx, 1);
-      });
-
-      // Real-time audio waveform / heartbeat bar
-      if (analyser && !bgm.paused) {
-        analyser.getByteFrequencyData(dataArray);
-        let avg = dataArray.reduce((a,b)=>a+b, 0) / dataArray.length;
-        document.getElementById('wbar').style.width = (avg * 2.5) + '%';
-      }
-
-      requestAnimationFrame(anim);
-    }
-
-    /* ===== COMPREHENSIVE HARDWARE DATASET ===== */
-    const RAW = {
-      cpu: {
-        k: 'name price f sock w igpu',
-        t: `AMD Ryzen 7 9800X3D 8-Core|619.99||AM5|120|0
+/* ===== CATALOG (in-stock subset of Canada Computers pages; flags x=sold out, p=pickup only, u=used) ===== */
+const RAW={
+cpu:{k:'name price f sock w igpu',t:`AMD Ryzen 7 9800X3D 8-Core|619.99||AM5|120|0
 AMD Ryzen 7 9850X3D 8-Core|679.98||AM5|120|0
 AMD Ryzen 7 7800X3D 8-Core|519.98||AM5|120|0
 AMD Ryzen 9 9950X3D 16-Core|929.98||AM5|170|0
@@ -343,11 +194,28 @@ Intel Core i7-14700K 20-Core|539.99||LGA1700|253|1
 Intel Core i5-14600KF 14-Core|329.99||LGA1700|181|0
 Intel Core i5-14600K 14-Core|349.99|p|LGA1700|181|1
 Intel Core i5-14400 10-Core|259.00||LGA1700|148|1
-Intel Core i3-14100 4-Core|189.99||LGA1700|110|1`
-      },
-      mb: {
-        k: 'name price f sock ddr form',
-        t: `GIGABYTE B650 EAGLE AX ATX|249.99||AM5|5|3
+Intel Core i3-14100 4-Core|189.99||LGA1700|110|1
+AMD Ryzen 9 9950X 16-Core|729.99|p|AM5|170|1
+AMD Ryzen 7 9700X 8-Core|449.99|p|AM5|65|1
+AMD Ryzen 9 9900X3D 12-Core|799.99||AM5|120|1
+AMD Ryzen 9 9950X3D2 Dual Edition 16-Core|1099.99||AM5|200|1
+AMD Ryzen 9 7950X3D 16-Core|799.88|p|AM5|120|1
+AMD Ryzen 5 7600X 6-Core|209.88|p|AM5|105|1
+AMD Ryzen 7 7700X 8-Core|359.88|x|AM5|105|1
+AMD Ryzen 7 8700F 8-Core|369.88||AM5|65|0
+AMD Ryzen 9 5900XT 16-Core|419.99||AM4|105|0
+AMD Ryzen 7 5800XT 8-Core|329.99|p|AM4|105|0
+AMD Ryzen 5 4500 6-Core|179.88|p|AM4|65|0
+Intel Core Ultra 7 265KF 20-Core|419.99||LGA1851|250|0
+Intel Core Ultra 5 245KF 14-Core|269.99|p|LGA1851|159|0
+Intel Core Ultra 7 270K Plus 24-Core|459.99||LGA1851|250|1
+Intel Core Ultra 5 250K Plus 18-Core|319.99||LGA1851|159|1
+Intel Core i9-14900KF 24-Core|619.00||LGA1700|253|0
+Intel Core i7-14700KF 20-Core|509.99||LGA1700|253|0
+Intel Core i7-14700 20-Core|499.99||LGA1700|219|1
+Intel Core i5-13400 10-Core|229.00|x|LGA1700|148|1
+Intel Core i7-12700K 12-Core|379.00|x|LGA1700|190|1`},
+mb:{k:'name price f sock ddr form',t:`GIGABYTE B650 EAGLE AX ATX|249.99||AM5|5|3
 GIGABYTE B650M GAMING PLUS WIFI mATX|179.99|p|AM5|5|2
 ASUS TUF GAMING X870-PLUS WIFI ATX|349.99||AM5|5|3
 GIGABYTE B850 AORUS ELITE WIFI7 ATX|339.99||AM5|5|3
@@ -364,11 +232,30 @@ ASUS ROG STRIX B860-I GAMING WIFI Mini-ITX|309.99||LGA1851|5|1
 MSI PRO B760M-P DDR4 mATX|139.99||LGA1700|4|2
 GIGABYTE B760M GAMING PLUS WIFI DDR4 mATX|169.99||LGA1700|4|2
 ASUS Z790 GAMING WIFI7 DDR5 ATX|269.99||LGA1700|5|3
-ASUS TUF Gaming Z790-Plus WiFi DDR5 ATX|369.99|p|LGA1700|5|3`
-      },
-      ram: {
-        k: 'name price f ddr',
-        t: `G.SKILL Ripjaws V 32GB (2x16GB) DDR4 3200|379.99||4
+ASUS TUF Gaming Z790-Plus WiFi DDR5 ATX|369.99|p|LGA1700|5|3
+GIGABYTE X870 AORUS ELITE WIFI7 ATX|409.99|p|AM5|5|3
+ASUS ROG STRIX B650-A GAMING WIFI ATX|309.99||AM5|5|3
+MSI MAG X870E TOMAHAWK WIFI ATX|349.99|p|AM5|5|3
+MSI PRO B850M-A WIFI mATX|239.99||AM5|5|2
+GIGABYTE B850M AORUS ELITE WIFI6E mATX|289.99|p|AM5|5|2
+ASUS TUF GAMING B850-PLUS WIFI ATX|329.99||AM5|5|3
+GIGABYTE B850 EAGLE WIFI6E ATX|259.99||AM5|5|3
+ASUS ProArt X870E-CREATOR WIFI ATX|729.99||AM5|5|3
+ASUS ROG CROSSHAIR X870E HERO ATX|799.88|p|AM5|5|3
+MSI MEG X870E GODLIKE E-ATX|1429.99|x|AM5|5|4
+MSI PRO B840M-B mATX|179.99||AM5|5|2
+GIGABYTE B550 EAGLE WIFI6 ATX|179.99||AM4|4|3
+GIGABYTE B550M DS3H AC R2 mATX|169.99||AM4|4|2
+MSI MAG B550 TOMAHAWK MAX WIFI ATX|224.99|p|AM4|4|3
+ASUS ROG STRIX B550-F GAMING WIFI II ATX|249.99||AM4|4|3
+ASUS PRIME B550M-K WIFI mATX|129.99||AM4|4|2
+MSI MAG Z890 TOMAHAWK WIFI II ATX|319.99|p|LGA1851|5|3
+ASUS TUF GAMING Z890-PLUS WIFI ATX|369.99|p|LGA1851|5|3
+ASUS ROG STRIX Z890-E GAMING WIFI ATX|729.99||LGA1851|5|3
+MSI PRO B860M-A WIFI mATX|254.99|p|LGA1851|5|2
+MSI B760 GAMING PLUS WIFI DDR5 ATX|194.99|p|LGA1700|5|3
+ASUS TUF GAMING B760-PLUS WIFI DDR5 ATX|279.99|p|LGA1700|5|3`},
+ram:{k:'name price f ddr',t:`G.SKILL Ripjaws V 32GB (2x16GB) DDR4 3200|379.99||4
 CORSAIR VENGEANCE LPX 32GB (2x16GB) DDR4 3200|435.99||4
 Kingston FURY Beast 16GB (2x8GB) DDR4 3200|259.99|p|4
 CORSAIR VENGEANCE RGB 32GB (2x16GB) DDR5 6000 CL36|799.99||5
@@ -377,11 +264,25 @@ TEAMGROUP T-FORCE VULCAN 32GB (2x16GB) DDR5 6000|759.99||5
 G.SKILL Ripjaws S5 32GB (2x16GB) DDR5 6000|729.99||5
 KLEVV BOLT V 32GB (2x16GB) DDR5 6000|719.99||5
 CORSAIR VENGEANCE RGB 64GB (2x32GB) DDR5 6000|1779.99||5
-G.SKILL Trident Z5 Neo RGB 64GB (2x32GB) DDR5 6000|2129.99||5`
-      },
-      gpu: {
-        k: 'name price f rec w tag',
-        t: `GIGABYTE AORUS GeForce RTX 5090 INFINITY 32GB|8499.00|x|1000|575|
+G.SKILL Trident Z5 Neo RGB 64GB (2x32GB) DDR5 6000|2129.99||5
+CORSAIR VENGEANCE 32GB (2x16GB) DDR5 6000 CL36|783.99||5
+CORSAIR VENGEANCE RGB 32GB (2x16GB) DDR5 6000 CL30|886.99||5
+CORSAIR DOMINATOR TITANIUM RGB 64GB (2x32GB) DDR5 6000|1857.99||5
+CORSAIR VENGEANCE 96GB (2x48GB) DDR5 6000 CL36|1976.99||5
+Kingston FURY Beast 64GB (2x32GB) DDR5 6000|1889.99||5
+Kingston FURY Renegade RGB 32GB (2x16GB) DDR5 6400 CL32|979.99||5
+G.SKILL Trident Z5 Royal Neo RGB 32GB (2x16GB) DDR5 6000 CL28|1654.99||5
+G.SKILL Flare X5 32GB (2x16GB) DDR5 6000 CL30|1069.99||5
+TEAMGROUP T-FORCE DELTA RGB 32GB (2x16GB) DDR5 6000|768.99||5
+Lexar THOR OC 32GB (2x16GB) DDR5 6000|569.99|x|5
+KLEVV CRAS V RGB 64GB (2x32GB) DDR5 6000|1409.99||5
+Kingston FURY Beast 16GB (2x8GB) DDR5 5600|444.99||5
+G.SKILL Trident Z RGB 32GB (2x16GB) DDR4 3600|404.99||4
+CORSAIR VENGEANCE RGB PRO 32GB (2x16GB) DDR4 3200|454.99||4
+TEAMGROUP T-FORCE VULCAN Z 16GB (2x8GB) DDR4 3200|179.99||4
+KLEVV BOLT X 32GB (2x16GB) DDR4 3200|359.99||4
+Kingston FURY Beast 32GB (2x16GB) DDR4 3200|379.99||4`},
+gpu:{k:'name price f rec w tag',t:`GIGABYTE AORUS GeForce RTX 5090 INFINITY 32GB|8499.00|x|1000|575|
 ASUS PRIME GeForce RTX 5080 16GB GDDR7|2229.99||850|360|
 MSI GeForce RTX 5070 Ti 16G SHADOW 3X OC|1689.99||750|300|
 GIGABYTE GeForce RTX 5070 GAMING OC 12G|1299.00||650|250|
@@ -393,11 +294,32 @@ GIGABYTE Radeon RX 9070 XT GAMING OC|1049.00||750|304|
 XFX Swift AMD Radeon RX 9070 GRE 12GB|1049.00||700|220|
 SAPPHIRE PULSE AMD Radeon RX 9060 XT 16GB|849.99||600|180|
 ASUS TURBO Radeon AI PRO R9700|2839.99||750|300|Workstation
-GIGABYTE GeForce GT 1030 Low Profile|159.99|p|300|30|`
-      },
-      ssd: {
-        k: 'name price f',
-        t: `WD Black SN850X 1TB PCIe Gen4 NVMe M.2|329.99|
+GIGABYTE GeForce GT 1030 Low Profile|159.99|p|300|30|
+ASUS TUF Gaming GeForce RTX 5080 16GB|2649.99||850|360|
+MSI GeForce RTX 5080 16G VENTUS 3X OC|2399.99||850|360|
+ZOTAC GAMING GeForce RTX 5080 SOLID CORE OC|2299.99||850|360|
+GIGABYTE GeForce RTX 5080 GAMING OC|2589.00||850|360|
+ASUS ROG Astral GeForce RTX 5080 OC Quad-Fan|2919.99||850|360|
+ASUS Prime GeForce RTX 5070 Ti 16GB OC|1849.99||750|300|
+GIGABYTE GeForce RTX 5070 Ti GAMING OC 16G|1799.00||750|300|
+ASUS Prime GeForce RTX 5070 OC 12GB|1299.99||650|250|
+ASUS TUF Gaming GeForce RTX 5070 12GB OC|1349.99|p|650|250|
+ZOTAC GAMING GeForce RTX 5060 Ti 16GB Twin Edge OC|1179.99||600|180|
+ASUS Prime GeForce RTX 5060 Ti 8GB|779.99||600|180|
+ASUS PRIME GeForce RTX 5060 8GB|739.99||550|145|
+ZOTAC GeForce RTX 5060 AMP Core|659.99||550|145|
+ASUS Prime GeForce RTX 5050 8GB OC|619.99||550|130|
+ASUS Dual GeForce RTX 3050 6GB OC|419.99||450|70|
+ZOTAC GeForce RTX 3060 Twin Edge OC 12G|689.99|x|550|170|
+ASUS Prime Radeon RX 9070 XT OC Edition|1539.99||750|304|
+SAPPHIRE NITRO+ AMD Radeon RX 9070 XT 16GB|1499.00||750|304|
+XFX Swift AMD Radeon RX 9070 XT Triple Fan|1399.00||750|304|
+ASUS Prime Radeon RX 9070 OC Edition|1449.99||650|220|
+XFX SWIFT AMD Radeon RX 9060 XT OC 16GB|899.99||600|160|
+GIGABYTE Radeon RX 7600 GAMING OC 8GB|579.99||550|165|
+PowerColor Red Devil AMD Radeon RX 9070 XT 16GB|1189.99|x|750|304|
+INTEL ARC PRO B70 32GB|2399.99||750|230|Workstation`},
+ssd:{k:'name price f',t:`WD Black SN850X 1TB PCIe Gen4 NVMe M.2|329.99|
 WD Black SN850X 2TB PCIe Gen4 NVMe M.2|559.99|
 WD Black SN850X 2TB PCIe Gen4 NVMe M.2 (Open Box)|503.99|pu
 Samsung 990 Pro 2TB M.2 NVMe PCIe 4.0|649.99|
@@ -405,11 +327,22 @@ Samsung 990 Pro 4TB M.2 NVMe PCIe 4.0|1499.99|p
 Samsung 9100 PRO 1TB M.2 NVMe PCIe Gen5|464.99|
 Kingston NV3 1TB NVMe PCIe 4x4|229.99|
 Lexar NM790 2TB M.2|429.99|
-Kingston A400 480GB SATA3 2.5"|164.99|`
-      },
-      hdd: {
-        k: 'name price f',
-        t: `Seagate BarraCuda 8TB 3.5" SATA|344.99|
+Kingston A400 480GB SATA3 2.5"|164.99|
+WD Black SN8100 2TB PCIe Gen5 NVMe|579.99|
+WD Black SN8100 4TB PCIe Gen5 NVMe|1099.99|
+Samsung 9100 PRO 2TB M.2 NVMe PCIe Gen5|924.99|p
+Samsung 990 EVO Plus 2TB M.2 NVMe|789.99|
+Samsung 990 EVO Plus 1TB M.2 NVMe|299.99|p
+WD Black SN7100 2TB PCIe Gen4|529.99|
+WD Blue SN5100 2TB NVMe|409.99|
+Lexar NM990 2TB M.2 PCIe Gen5|769.99|
+Lexar NM790 1TB M.2|259.99|
+Lexar NQ780 2TB M.2 PCIe Gen4|399.99|
+Kingston NV3 2TB NVMe PCIe 4x4|429.99|
+ADATA LEGEND 860 1TB PCIe Gen4|239.99|
+Samsung 870 EVO 1TB SATA III|554.99|
+WD Blue SA510 1TB SATA III|319.99|p`},
+hdd:{k:'name price f',t:`Seagate BarraCuda 8TB 3.5" SATA|344.99|
 Seagate BarraCuda 24TB Internal|1034.99|
 Seagate BarraCuda 4TB Internal|224.99|p
 Seagate BarraCuda 8TB 3.5" SATA (Open Box)|310.49|pu
@@ -417,11 +350,19 @@ Seagate IronWolf 4TB NAS|264.99|
 WD Red Plus 8TB NAS|529.99|
 WD Blue 4TB|259.98|
 Toshiba N300 Pro 8TB NAS|529.99|
-WD Red Pro 16TB|1089.99|`
-      },
-      cooler: {
-        k: 'name price f rad',
-        t: `CORSAIR NAUTILUS 360 RS ARGB AIO|184.99||360
+WD Red Pro 16TB|1089.99|
+Seagate IronWolf Pro 20TB|994.99|
+WD Red Pro 18TB|1204.99|
+WD Red Plus 12TB|759.99|
+WD Black 8TB|584.99|
+WD Black 10TB|719.99|p
+WD Blue 8TB|499.99|
+WD Blue 10TB Desktop|619.99|
+Synology Plus 12TB|819.99|
+Seagate SkyHawk AI 8TB|459.99|
+Toshiba N300 14TB NAS|729.99|p
+WD Purple Pro 18TB|1204.99|`},
+cooler:{k:'name price f rad',t:`CORSAIR NAUTILUS 360 RS ARGB AIO|184.99||360
 Arctic Liquid Freezer III PRO 360 AIO|189.99||360
 Arctic Liquid Freezer III PRO 420 AIO|209.99||420
 DeepCool MYSTIQUE 240 LCD AIO|199.99||240
@@ -432,11 +373,25 @@ be quiet! Dark Rock 5 Air Cooler|109.99|p|0
 DeepCool AK400 G2 Air Cooler|34.99||0
 DeepCool ASSASSIN IV WH Air Cooler|79.88|p|0
 Cooler Master HYPER 212 Spectrum V3|34.99|p|0
-XXXX 4-Heatpipe CPU Cooler (Open Box)|16.99|pu|0`
-      },
-      psu: {
-        k: 'name price f w sfx',
-        t: `Coolmax I-400 400W ATX|31.99|x|400|0
+iCAN 4-Heatpipe CPU Cooler (Open Box)|16.99|pu|0
+CORSAIR NAUTILUS 240 RS ARGB AIO|114.99|p|240
+CORSAIR iCUE LINK TITAN 360 RX RGB AIO|189.99|p|360
+CORSAIR iCUE LINK TITAN II 360 RX RGB AIO|254.99||360
+NZXT Kraken Elite 360 RGB AIO|399.99|p|360
+MSI MAG CORELIQUID I360 AIO|224.99|p|360
+LIAN LI Galahad II Trinity 360 AIO|199.99||360
+DeepCool LM360 360mm AIO|129.99||360
+DeepCool LE360 V2 360mm AIO|89.99||360
+Thermaltake TH360 V2 ARGB AIO|174.99|p|360
+be quiet! LIGHT LOOP 360mm AIO|219.99||360
+Montech HyperFlow ARGB 360 AIO|149.99||360
+DeepCool AK620 G2 Air Cooler|74.99||0
+DeepCool AG400 G2 ARGB Air Cooler|23.99||0
+be quiet! Dark Rock Pro 5 Air Cooler|134.99|p|0
+be quiet! PURE ROCK 3 Air Cooler|59.99||0
+Arctic Freezer 36 A-RGB Air Cooler|79.99||0
+Cooler Master Hyper 212 Black|49.99||0`},
+psu:{k:'name price f w sfx',t:`Coolmax I-400 400W ATX|31.99|x|400|0
 THERMALTAKE Smart White 500W|59.99||500|0
 AZZA PSAZ-550W ATX|54.99|p|550|0
 MSI MAG A650BN 650W Bronze|99.99|p|650|0
@@ -450,11 +405,31 @@ CORSAIR RM1000x 1000W Gold|264.99||1000|0
 MSI MPG A1000GS 1000W Gold|289.99||1000|0
 Super Flower Leadex VII XP 1200W Platinum|204.99|p|1200|0
 ASUS ROG STRIX 1200W Platinum|339.99|p|1200|0
-CORSAIR HX1500i 1500W Platinum|489.99||1500|0`
-      },
-      case: {
-        k: 'name price f board rad sfxo',
-        t: `CORSAIR FRAME 4000D RS ARGB (ATX)|124.99||3|360|0
+CORSAIR HX1500i 1500W Platinum|489.99||1500|0
+CORSAIR RM850e 850W Gold|184.99|p|850|0
+CORSAIR RM1000e 1000W Gold|239.99|p|1000|0
+CORSAIR RM750x 750W Gold|164.99||750|0
+SUPERFLOWER 850W Gold|164.99|p|850|0
+SUPERFLOWER 1000W Gold|199.99|p|1000|0
+GIGABYTE GP-UD850GM 850W Gold|169.99||850|0
+GIGABYTE GP-UD750GM 750W Gold|139.99|p|750|0
+FSP Hydro G Pro 850W|199.99||850|0
+FSP VITA 1000W Gold|199.99||1000|0
+DeepCool PQ850G 850W Gold|129.99||850|0
+DeepCool PQ1000G 1000W Gold|169.99||1000|0
+DeepCool PQ1200G 1200W Gold|179.99||1200|0
+be quiet! PURE POWER 13 M 1000W Gold|239.99||1000|0
+be quiet! PURE POWER 13 M 750W Gold|169.99||750|0
+MSI MAG A1250GL 1250W Gold|219.99|p|1250|0
+MSI MPG A850GS 850W Gold|159.97|p|850|0
+ASUS TUF Gaming 850W Gold|199.99||850|0
+ASUS ROG-STRIX 1000W Platinum|279.99||1000|0
+CORSAIR SF1000 1000W Platinum SFX|334.99|p|1000|1
+CORSAIR SF750 Platinum SFX|254.99|p|750|1
+ASUS ROG Loki 850W Platinum SFX-L|299.99|p|850|1
+MSI MPG Ai1300TS 1300W Titanium|599.99|p|1300|0
+MSI MEG Ai1600T 1600W Titanium|799.99|p|1600|0`},
+case:{k:'name price f board rad sfxo',t:`CORSAIR FRAME 4000D RS ARGB (ATX)|124.99||3|360|0
 CORSAIR 3500X Tempered Glass (ATX)|129.99||3|360|0
 FRACTAL DESIGN Pop Air (ATX)|95.99||3|360|0
 HYTE Y70 (ATX)|304.99||3|360|0
@@ -468,134 +443,116 @@ DeepCool CH260 (Micro-ATX)|104.99||2|240|0
 ASUS Prime AP201 (Micro-ATX)|109.99|p|2|240|0
 THERMALTAKE S100 TG (Micro-ATX)|74.99|p|2|240|0
 DeepCool CH170 DIGITAL (Mini-ITX)|129.99|p|1|240|1
-FRACTAL DESIGN Terra (Mini-ITX)|279.99|p|1|240|1`
-      }
-    };
+FRACTAL DESIGN Terra (Mini-ITX)|279.99|p|1|240|1
+CORSAIR FRAME 4000D RS (ATX)|104.99|p|3|360|0
+CORSAIR AIR 5400 RS-R ARGB (ATX)|309.99||3|420|0
+CORSAIR iCUE LINK 3500X RGB (ATX)|209.99||3|360|0
+FRACTAL DESIGN North (ATX)|167.99||3|360|0
+FRACTAL DESIGN North XL (ATX)|215.99||3|420|0
+FRACTAL DESIGN Meshify 3 (ATX)|159.99||3|360|0
+FRACTAL DESIGN Define 7 (ATX)|209.99||3|420|0
+FRACTAL DESIGN Pop 2 Air (ATX)|139.99||3|360|0
+FRACTAL DESIGN Node 304 (Mini-ITX)|149.99||1|120|0
+FRACTAL DESIGN Pop Mini Air (Micro-ATX)|111.99||2|280|0
+DeepCool CH360 Digital (Micro-ATX)|134.99|p|2|280|0
+DeepCool CG530 4F (ATX)|79.99||3|360|0
+DeepCool CH780 (ATX)|199.99|p|3|420|0
+NZXT H5 Flow RGB (ATX)|139.99|p|3|360|0
+NZXT H9 Flow RGB+ (ATX)|349.99|p|3|420|0
+NZXT H3 Flow (Micro-ATX)|84.99|p|2|240|0
+HYTE X50 (ATX)|119.99||3|360|0
+LIAN LI LANCOOL 207 (ATX)|124.99|p|3|360|0
+LIAN LI A3-mATX (Micro-ATX)|99.99|p|2|240|0
+MSI MAG FORGE 321R AIRFLOW (ATX)|119.99||3|360|0
+ASUS TUF Gaming GT502 Horizon (ATX)|239.99||3|420|0
+be quiet! Pure Base 500DX (ATX)|139.99|p|3|360|0
+be quiet! Dark Base 701 (ATX)|314.99|p|3|420|0
+THERMALTAKE View 380 TG ARGB (ATX)|139.99||3|360|0
+DarkFlash DRX70 Mesh (ATX)|99.99||3|360|0
+SilverStone SUGO 16 (Mini-ITX)|119.99|p|1|240|1
+JONSBO D32 PRO (Micro-ATX)|89.99||2|240|0`}
+};
+const LAB={cpu:'CPU',mb:'Motherboard',ram:'RAM',gpu:'GPU',psu:'PSU',cooler:'Cooler',case:'Case',ssd:'SSD',hdd:'HDD'};
+const FN={1:'Mini-ITX',2:'mATX',3:'ATX',4:'E-ATX'};
+const CAT={};let id=0;
+for(const k in RAW){const r=RAW[k],ks=r.k.split(' ');CAT[k]=r.t.split('\n').map(l=>{const v=l.split('|'),o={id:k+(id++),cat:k};ks.forEach((q,i)=>{o[q]=v[i]===undefined?'':v[i]});
+o.price=+o.price;o.f=o.f||'';o.sold=o.f.includes('x');o.used=o.f.includes('u');o.pick=o.f.includes('p');
+['w','rec','ddr','form','board','rad','igpu','sfx','sfxo'].forEach(q=>{if(o[q]!==undefined&&o[q]!=='')o[q]=+o[q]});return o})}
+if(window.PARTS)for(const k in PARTS)CAT[k]=PARTS[k].map(o=>{o=Object.assign({},o,{id:k+(id++),cat:k});o.price=+o.price;o.f=o.f||'';o.sold=o.f.includes('x');o.used=o.f.includes('u');o.pick=o.f.includes('p');o.inf=o.f.includes('i');return o});
+CAT.cpu.forEach(p=>{if(p.sock==='AM5'&&!/\dF\b/.test(p.name))p.igpu=1});
+const clean=s=>s.replace(/\(?open box\)?/ig,m=>m.startsWith('(')?'(Used)':'Used').replace(/ican/ig,'XXXX').replace(/armoury/ig,'XXXXXXX');
+/* ===== COMPATIBILITY ===== */
+const S={};let tab='cpu';
+function pair(a,b){ // returns reason if incompatible
+const [x,y]=a.cat<b.cat?[a,b]:[b,a];const t=x.cat+'-'+y.cat;
+const M={cpu:a.cat==='cpu'?a:b,mb:a.cat==='mb'?a:b,ram:a.cat==='ram'?a:b,psu:a.cat==='psu'?a:b,gpu:a.cat==='gpu'?a:b,case:a.cat==='case'?a:b,cooler:a.cat==='cooler'?a:b};
+const k=[a.cat,b.cat].sort().join('-');
+if(k==='cpu-mb'&&M.cpu.sock!==M.mb.sock)return M.cpu.sock+' CPU needs a '+M.cpu.sock+' board (this is '+M.mb.sock+')';
+if(k==='mb-ram'&&M.ram.ddr!==M.mb.ddr)return 'Board uses DDR'+M.mb.ddr+', RAM is DDR'+M.ram.ddr;
+if(k==='case-mb'&&M.mb.form>M.case.board)return FN[M.mb.form]+' board does not fit a '+FN[M.case.board]+'-max case';
+if(k==='case-cooler'&&M.cooler.rad>M.case.rad)return M.cooler.rad+'mm radiator exceeds case limit ('+M.case.rad+'mm)';
+if(k==='case-psu'&&M.case.sfxo&&!M.psu.sfx)return 'Case only takes SFX power supplies';
+if(k==='gpu-psu'&&M.psu.w<M.gpu.rec)return 'Needs '+M.gpu.rec+'W+ PSU (this is '+M.psu.w+'W)';
+return null}
+function why(p){const r=[];for(const c in S){if(c===p.cat)continue;const m=pair(p,S[c]);if(m)r.push(m)}return r}
+/* ===== BUILDER UI ===== */
+const $=i=>document.getElementById(i),usd=n=>'$'+n.toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
+function draw(){
+$('tabs').innerHTML=Object.keys(LAB).map(k=>`<button class="tab ${k===tab?'on':''} ${S[k]?'has':''}" onclick="tab='${k}';LIM=300;tick();draw()">${LAB[k]}</button>`).join('');
+const q=$('q').value.toLowerCase(),so=$('so').value,cd=$('cond').value,others=Object.keys(S).filter(k=>k!==tab).length;
+let L=CAT[tab].filter(p=>(!q||clean(p.name).toLowerCase().includes(q))&&(cd===''||(cd==='used')===p.used)&&(!$('hu').checked||!p.sold));
+L.sort((a,b)=>so==='a'?a.price-b.price:so==='d'?b.price-a.price:a.name.localeCompare(b.name));
+$('grid').innerHTML=L.slice(0,LIM).map(p=>{const w=why(p),bad=w.length>0,sel=S[tab]&&S[tab].id===p.id,em=bad?'❌':(others?'🟢':'');
+return `<div class="p ${sel?'sel':''} ${bad&&!sel?'dis':''} ${p.sold?'na':''}" ${bad&&!sel?'onclick="buzz()"':`onclick="pick('${p.id}')"`} title="${w.join('; ')}">
+<span class="em">${em}</span><div class="n">${fmt(p.name)}</div><span class="pr">${usd(p.price)}</span>
+${p.used?'<span class="b u">Used</span>':''}${p.sold?'<span class="b y">Unavailable</span>':p.pick?'<span class="b">Store exclusive</span>':''}${p.tag?`<span class="b">${p.tag}</span>`:''}${p.inf?'<span class="b i">inferred</span>':''}
+${bad?`<div class="why">${w[0]}</div>`:''}</div>`}).join('')+(L.length>LIM?`<button class="btn" onclick="LIM+=300;draw()">Show more (${L.length-LIM})</button>`:'')||'<p class="sub">No matches.</p>';
+summary()}
+function pick(i){const p=CAT[tab].find(x=>x.id===i);beep(1200,.05,'square',.04);if(S[tab]&&S[tab].id===i)delete S[tab];else{S[tab]=p;for(const c in S)if(c!==tab&&pair(p,S[c]))delete S[c]}draw()}
+function summary(){
+const it=Object.values(S),tot=it.reduce((a,b)=>a+b.price,0),need=(S.cpu?S.cpu.w:0)+(S.gpu?S.gpu.w:0)+100,psu=S.psu?S.psu.w:0;
+const pct=psu?Math.min(100,need/psu*100):0,W=[];
+if(S.psu&&need>psu)W.push('⚠️ Estimated draw exceeds PSU rating');else if(S.psu&&need>psu*.8)W.push('🟡 Tight PSU headroom (<20%)');
+if(S.cpu&&!S.cpu.igpu&&!S.gpu)W.push('⚠️ This CPU has no integrated graphics: add a GPU');
+if(S.cpu&&S.cpu.sock==='LGA1700'&&S.mb&&S.mb.ddr===4&&S.ram&&0)W.push('');
+if(S.gpu&&S.gpu.rec>=750&&S.psu&&S.psu.w<1000)W.push('ℹ️ High-end GPU: check for 12V-2x6 cable');
+$('sum').innerHTML=`<h3>SYSTEM TOTAL</h3>${Object.keys(LAB).map(k=>`<div class="r"><span>${LAB[k]}</span><span>${S[k]?usd(S[k].price):'-'}</span></div>`).join('')}
+<div class="tot">${usd(tot)}</div><div class="r"><span>Est. draw (CPU+GPU+100W)</span><span>${need}W</span></div>
+<div class="bar"><i style="width:${pct}%;background:${pct>100?'#f05':pct>80?'#fa0':'#0fc'}"></i></div>
+<div class="r"><span>PSU</span><span>${psu?psu+'W':'-'}</span></div>${W.filter(Boolean).map(w=>`<div class="warn">${w}</div>`).join('')}
+<button class="btn" onclick="cp()">Copy build</button><button class="btn" onclick="for(const k in S)delete S[k];tick();draw()">Reset</button><button class="btn" onclick="dl()">Download .txt</button>
+<div class="warn">Power figures are estimates.</div>`}
+function cp(){cpy(bt(),document.querySelector('.sum .btn'))}
 
-    const LAB = { cpu: 'CPU', mb: 'Motherboard', ram: 'RAM', gpu: 'GPU', psu: 'PSU', cooler: 'Cooler', case: 'Case', ssd: 'SSD', hdd: 'HDD' };
-    const FN = { 1: 'Mini-ITX', 2: 'mATX', 3: 'ATX', 4: 'E-ATX' };
-    const CAT = {}; let id = 0;
+const BR='ASUS|GIGABYTE|AORUS|MSI|CORSAIR|AMD|Intel|Kingston|KLEVV|G\.SKILL|TEAMGROUP|Team Group|Samsung|Western Digital|WD|Seagate|Toshiba|Lexar|Crucial|SAPPHIRE|XFX|ZOTAC|PowerColor|PNY|NVIDIA|ASRock|be quiet!|DeepCool|Cooler Master|NZXT|LIAN LI|Lian-Li|FRACTAL DESIGN|Fractal Design|Arctic|THERMALTAKE|Super Flower|SUPERFLOWER|FSP|Seasonic|HYTE|Phanteks|SilverStone|AZZA|DarkFlash|JONSBO|PCCOOLER|Montech|Synology|ADATA|XPG|Antec|InWin|Acer|EKWB|Bykski|HAVN|Sudokoo|TRYX|Enermax|COUGAR|BitFenix|Gigabyte|Thermal Grizzly|Silverstone|Aegis|LaCie';
+const BRX=new RegExp('^('+BR+')(?![A-Za-z])','i'),esc=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function fmt(n){n=clean(n);const m=n.match(BRX);if(!m)return esc(n);const b=m[1],T=n.slice(b.length).trim().split(/\s+/);let k=T.slice(0,4).findIndex(w=>/\d/.test(w));if(k<0)k=Math.min(2,T.length)-1;if(k<0)return '<b class="br">'+esc(b)+'</b>';
+return '<b class="br">'+esc(b)+'</b> <span class="md">'+esc(T.slice(0,k+1).join(' '))+'</span> '+esc(T.slice(k+1).join(' '))}
+function bt(){return Object.keys(LAB).filter(k=>S[k]).map(k=>LAB[k]+': '+clean(S[k].name)+' - '+usd(S[k].price)).join('\n')+'\nTotal: '+usd(Object.values(S).reduce((a,b)=>a+b.price,0))}
+function dl(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([bt()],{type:'text/plain'}));a.download='drew-wtf-build.txt';a.click()}
 
-    for (const k in RAW) {
-      const r = RAW[k], ks = r.k.split(' ');
-      CAT[k] = r.t.split('\n').map(l => {
-        const v = l.split('|'), o = { id: k + (id++), cat: k };
-        ks.forEach((q, i) => { o[q] = v[i] === undefined ? '' : v[i]; });
-        o.price = +o.price; o.f = o.f || ''; o.sold = o.f.includes('x'); o.used = o.f.includes('u'); o.pick = o.f.includes('p');
-        ['w', 'rec', 'ddr', 'form', 'board', 'rad', 'igpu', 'sfx', 'sfxo'].forEach(q => {
-          if (o[q] !== undefined && o[q] !== '') o[q] = +o[q];
-        });
-        return o;
-      });
-    }
-
-    // Name formatting & cleaning rules (iCAN->XXXX, ARMOURY->XXXXXXX, Open Box->Used)
-    const clean = s => s.replace(/\(?open box\)?/ig, m => m.startsWith('(') ? '(Used)' : 'Used')
-                         .replace(/ican/ig, 'XXXX').replace(/armoury/ig, 'XXXXXXX');
-
-    /* ===== ADVANCED DUAL-WAY COMPATIBILITY MATRIX ===== */
-    const S = {}; let tab = 'cpu';
-
-    function pair(a, b) {
-      const [x, y] = a.cat < b.cat ? [a, b] : [b, a];
-      const k = [a.cat, b.cat].sort().join('-');
-      const M = { cpu: a.cat==='cpu'?a:b, mb: a.cat==='mb'?a:b, ram: a.cat==='ram'?a:b, psu: a.cat==='psu'?a:b, gpu: a.cat==='gpu'?a:b, case: a.cat==='case'?a:b, cooler: a.cat==='cooler'?a:b };
-
-      if (k === 'cpu-mb' && M.cpu.sock !== M.mb.sock) return M.cpu.sock + ' CPU requires matching board socket (is ' + M.mb.sock + ')';
-      if (k === 'mb-ram' && M.ram.ddr !== M.mb.ddr) return 'Board uses DDR' + M.mb.ddr + ', RAM is DDR' + M.ram.ddr;
-      if (k === 'case-mb' && M.mb.form > M.case.board) return FN[M.mb.form] + ' board exceeds case limit (' + FN[M.case.board] + ')';
-      if (k === 'case-cooler' && M.cooler.rad > M.case.rad) return M.cooler.rad + 'mm radiator exceeds case limit (' + M.case.rad + 'mm)';
-      if (k === 'case-psu' && M.case.sfxo && !M.psu.sfx) return 'Case requires an SFX power supply';
-      if (k === 'gpu-psu' && M.psu.w < M.gpu.rec) return 'Requires ' + M.gpu.rec + 'W+ PSU (is ' + M.psu.w + 'W)';
-      return null;
-    }
-
-    function why(p) {
-      const r = [];
-      for (const c in S) {
-        if (c === p.cat) continue;
-        const m = pair(p, S[c]);
-        if (m) r.push(m);
-      }
-      return r;
-    }
-
-    /* ===== BUILDER INTERFACE RENDERING ===== */
-    const $= i => document.getElementById(i), usd = n => '$' + n.toLocaleString('en-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-    function draw() {
-      $('tabs').innerHTML = Object.keys(LAB).map(k => `<button class="tab ${k === tab ? 'on' : ''} ${S[k] ? 'has' : ''}" onclick="tab='${k}';playBeep(300,0.05);draw()">${LAB[k]}</button>`).join('');
-      
-      const q = $('q').value.toLowerCase(), so =$('so').value, cd = $('cond').value, hideS =$('hideSold').checked, others = Object.keys(S).filter(k => k !== tab).length;
-      
-      let L = CAT[tab].filter(p => (!q || clean(p.name).toLowerCase().includes(q)) && (cd === '' || (cd === 'used') === p.used));
-      L.sort((a, b) => so === 'a' ? a.price - b.price : so === 'd' ? b.price - a.price : a.name.localeCompare(b.name));
-
-      $('grid').innerHTML = L.map(p => {
-        const w = why(p), bad = w.length > 0, dis = p.sold || bad, sel = S[tab] && S[tab].id === p.id;
-        if (hideS && (p.sold || bad)) return '';
-        const em = bad ? '❌' : (others ? '🟢' : '');
-
-        return `<div class="p ${sel ? 'sel' : ''} ${dis && !sel ? 'dis' : ''}" ${dis && !sel ? `onclick="playBeep(120,0.1,'sawtooth')"` : `onclick="playBeep(450,0.05);pick('${p.id}')"`} title="${w.join('; ')}">
-          <span class="em">${em}</span>
-          <div class="n">${clean(p.name)}</div>
-          <span class="pr">${usd(p.price)}</span>
-          ${p.used ? '<span class="b u">Used</span>' : ''}
-          ${p.sold ? '<span class="b s">Disallowed / Sold Out</span>' : p.pick ? '<span class="b">Store Exclusive</span>' : ''}
-          ${bad ? `<div class="why">${w[0]}</div>` : ''}
-        </div>`;
-      }).join('') || '<p class="sub">No components found matching filters.</p>';
-      
-      summary();
-    }
-
-    function pick(i) {
-      const p = CAT[tab].find(x => x.id === i);
-      if (S[tab] && S[tab].id === i) delete S[tab];
-      else S[tab] = p;
-
-      // Clean dangling incompatible selections automatically
-      for (const c in S) {
-        if (c !== tab && pair(S[tab] || S[c], S[c]) && S[tab] && pair(S[tab], S[c])) delete S[c];
-      }
-      draw();
-    }
-
-    function summary() {
-      const it = Object.values(S), tot = it.reduce((a, b) => a + b.price, 0);
-      const need = (S.cpu ? S.cpu.w : 0) + (S.gpu ? S.gpu.w : 0) + 100, psu = S.psu ? S.psu.w : 0;
-      const pct = psu ? Math.min(100, need / psu * 100) : 0, W = [];
-
-      if (S.psu && need > psu) W.push('⚠️ Estimated power draw exceeds PSU limit');
-      else if (S.psu && need > psu * .8) W.push('🟡 Tight power headroom (<20%)');
-      if (S.cpu && !S.cpu.igpu && !S.gpu) W.push('⚠️ CPU lacks integrated graphics: dedicated GPU needed');
-      if (S.gpu && S.gpu.rec >= 750 && S.psu && S.psu.w < 1000) W.push('ℹ️ High-draw GPU: verify 12V-2x6 cable readiness');
-
-      $('sum').innerHTML = `<h3>SYSTEM TOTAL</h3>` +
-        Object.keys(LAB).map(k => `<div class="r"><span>${LAB[k]}</span><span>${S[k] ? usd(S[k].price) : '-'}</span></div>`).join('') +
-        `<div class="tot">${usd(tot)}</div>` +
-        `<div class="r"><span>Est. Power Draw (CPU+GPU+100W)</span><span>${need}W</span></div>` +
-        `<div class="bar"><i style="width:${pct}%;background:${pct > 100 ? '#f05' : pct > 80 ? '#fa0' : '#0fc'}"></i></div>` +
-        `<div class="r"><span>Selected PSU</span><span>${psu ? psu + 'W' : '-'}</span></div>` +
-        W.map(w => `<div class="warn">${w}</div>`).join('') +
-        `<button class="btn" onclick="playBeep(500,0.1);cp()">Copy build list</button>` +
-        `<button class="btn" onclick="playBeep(500,0.1);dlTxt()">Download .txt</button>` +
-        `<button class="btn" onclick="playBeep(200,0.1);for(const k in S)delete S[k];draw()">Reset</button>` +
-        `<div class="warn" style="margin-top:10px;">Power configurations &amp; specs are estimated profiles.</div>`;
-    }
-
-    function cp() {
-      const t = Object.keys(LAB).filter(k => S[k]).map(k => LAB[k] + ': ' + clean(S[k].name) + ' - ' + usd(S[k].price)).join('\n') + '\nTotal: ' + usd(Object.values(S).reduce((a, b) => a + b.price, 0));
-      navigator.clipboard.writeText(t).then(() => alert('Build list copied to clipboard.'));
-    }
-
-    function dlTxt() {
-      const t = Object.keys(LAB).filter(k => S[k]).map(k => LAB[k] + ': ' + clean(S[k].name) + ' - ' + usd(S[k].price)).join('\n') + '\nTotal: ' + usd(Object.values(S).reduce((a, b) => a + b.price, 0));
-      const blob = new Blob([t], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url; a.download = 'drew.wtf-build.txt'; a.click();
-      URL.revokeObjectURL(url);
-    }
-  </script>
-</body>
-</html>
+function cpy(t,b){const ok=()=>{if(b){const o=b.dataset.o||b.textContent;b.dataset.o=o;b.textContent='Copied ✓';setTimeout(()=>b.textContent=o,1300)}beep(1100,.05,'triangle',.04)};
+const fb=()=>{const a=document.createElement('textarea');a.value=t;a.setAttribute('readonly','');a.style.cssText='position:fixed;top:0;left:0;opacity:0;font-size:16px';document.body.appendChild(a);a.focus();a.select();a.setSelectionRange(0,99999);try{document.execCommand('copy')}catch(e){}a.remove();ok()};
+if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(t).then(ok,fb);else fb()}
+const ld=k=>{try{return localStorage.getItem(k)||''}catch(e){return ''}},sv=t=>{try{localStorage.setItem('pad_'+t,$('pad').value)}catch(e){}};
+let tabF='lx';
+const CM={lx:[
+["Update everything (CachyOS)","sudo pacman -Syu"],["Update with AUR helper","paru -Syu"],["System summary","fastfetch"],["CPU info","lscpu"],
+["GPU info","lspci -k | grep -EA3 'VGA|3D'"],["RAM sticks (speed, size, part no.)","sudo dmidecode -t memory | grep -E 'Size|Speed|Type:|Part'"],
+["Disks and mounts","lsblk -o NAME,SIZE,TYPE,MODEL,MOUNTPOINT"],["NVMe health","sudo smartctl -a /dev/nvme0"],["Temperatures","sensors"],["NVIDIA stats","nvidia-smi"],
+["Disk space","df -h"],["Biggest folders in home","du -h --max-depth=1 ~ | sort -hr | head"],["Errors from this boot","journalctl -p 3 -xb"],["Open ports","ss -tulpn"],["Network addresses","ip -br a"],
+["CPU stress test (60s)","stress-ng --cpu 0 --timeout 60s"],["Write ISO to USB (CHECK /dev/sdX FIRST - erases the drive)","sudo dd if=cachyos.iso of=/dev/sdX bs=4M status=progress oflag=sync"],
+["Serve this site locally","python -m http.server 8000"],["Build the full parts catalog","python build_parts.py ."]],
+ps:[
+["Update all apps","winget upgrade --all"],["List installed apps","winget list"],["System summary","Get-ComputerInfo | Select CsName,OsName,OsVersion,CsProcessors,CsTotalPhysicalMemory"],
+["CPU","Get-CimInstance Win32_Processor | Select Name,NumberOfCores,NumberOfLogicalProcessors"],["GPU","Get-CimInstance Win32_VideoController | Select Name,DriverVersion,AdapterRAM"],
+["RAM sticks","Get-CimInstance Win32_PhysicalMemory | Select Manufacturer,PartNumber,Speed,Capacity"],["Disks and health","Get-PhysicalDisk | Select FriendlyName,MediaType,Size,HealthStatus"],["Free space","Get-Volume"],
+["Repair system files (admin)","sfc /scannow"],["Repair Windows image (admin)","DISM /Online /Cleanup-Image /RestoreHealth"],["Top 10 CPU hogs","Get-Process | Sort CPU -Descending | Select -First 10 Name,CPU,WS"],
+["Network config","Get-NetIPConfiguration"],["Flush DNS","ipconfig /flushdns"],["Check activation status","slmgr /xpr"],["Restore point before changes (admin)","Checkpoint-Computer -Description 'before-build' -RestorePointType MODIFY_SETTINGS"],
+["Power / battery report (admin)","powercfg /energy"]]};
+const SW='<ul><li><b>Office:</b> <a href="https://www.libreoffice.org" target="_blank">LibreOffice</a></li><li><b>3D / video:</b> <a href="https://www.blender.org" target="_blank">Blender</a>, <a href="https://kdenlive.org" target="_blank">Kdenlive</a>, <a href="https://obsproject.com" target="_blank">OBS Studio</a></li><li><b>Images:</b> <a href="https://www.gimp.org" target="_blank">GIMP</a>, <a href="https://krita.org" target="_blank">Krita</a>, <a href="https://inkscape.org" target="_blank">Inkscape</a></li><li><b>Media:</b> <a href="https://www.videolan.org" target="_blank">VLC</a>, <a href="https://jellyfin.org" target="_blank">Jellyfin</a></li><li><b>Linux:</b> <a href="https://cachyos.org" target="_blank">CachyOS</a>, <a href="https://linuxmint.com" target="_blank">Linux Mint</a>, <a href="https://fedoraproject.org" target="_blank">Fedora</a></li><li><b>Self-hosting:</b> <a href="https://immich.app" target="_blank">Immich</a>, <a href="https://nextcloud.com" target="_blank">Nextcloud</a>, <a href="https://www.home-assistant.io" target="_blank">Home Assistant</a></li><li><b>PC testing:</b> <a href="https://www.memtest.org" target="_blank">MemTest86</a>, <a href="https://www.hwinfo.com" target="_blank">HWiNFO</a>, <a href="https://crystalmark.info" target="_blank">CrystalDiskInfo</a></li></ul>';
+function fshow(){ftab(tabF)}
+function ftab(t){tabF=t;tick();$('ft').innerHTML=[['lx','Konsole / Linux'],['ps','PowerShell / Windows'],['sw','Free software']].map(a=>`<button class="tab ${a[0]===t?'on':''}" onclick="ftab('${a[0]}')">${a[1]}</button>`).join('');
+if(t==='sw'){$('fb').innerHTML=SW;return}
+$('fb').innerHTML=`<div class="padbox"><b>${t==='lx'?'Your Konsole commands':'Your PowerShell commands'}</b><textarea id="pad" rows="4" spellcheck="false" autocapitalize="off" autocorrect="off" placeholder="Type or paste commands here...">${esc(ld('pad_'+t))}</textarea><button class="btn" onclick="cpy($('pad').value,this)">Copy</button><button class="btn" onclick="sv('${t}');cpy('',null)">Save</button><button class="btn" onclick="$('pad').value='';sv('${t}')">Clear</button></div>`+CM[t].map((c,i)=>`<div class="cmd"><div class="ct">${esc(c[0])}</div><pre>${esc(c[1])}</pre><button class="btn" onclick="cpy(CM['${t}'][${i}][1],this)">Copy</button></div>`).join('')}
+</script></body></html>
