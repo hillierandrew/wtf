@@ -97,6 +97,15 @@ h2 .tg{display:block;font-size:.7rem;letter-spacing:3px;color:#8a8aa0;-webkit-te
 .fo ul{list-style:none}
 #uwu{position:fixed;left:0;top:0;z-index:10;cursor:pointer;touch-action:manipulation;white-space:nowrap;padding:8px 16px;line-height:1;color:#ff4fd8;--a2:#ff4fd8}
 #uwut{display:inline-block;font-size:clamp(3.4rem,22vw,10rem);font-weight:bold;letter-spacing:.04em}
+.fields{background:linear-gradient(160deg,#ff005514,#00ffcc0d);border:1px solid #ffffff1a;border-radius:12px;padding:12px;margin-bottom:14px}
+.fh{color:#8a8aa0;font-size:.7rem;letter-spacing:3px;margin-bottom:8px}
+.fchips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:#14141e;border:1px solid #2c2c3a;color:#ccc;border-radius:999px;padding:8px 12px;font-family:var(--f);font-size:.78rem;cursor:pointer;touch-action:manipulation}
+.chip span{margin-right:6px}.chip.on{border-color:#ff9a00;color:#fff;background:#ff9a0022;box-shadow:0 0 14px #ff9a0044}
+.finfo{margin:10px 0;color:#ddd;font-size:.82rem;line-height:1.5}.finfo span{color:#00ffcc}
+.fact{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.fact select{background:#000;color:#fff;border:1px solid #333;border-radius:6px;padding:9px;font-family:var(--f)}
+.fact label{color:#aaa;font-size:.8rem;display:flex;gap:6px;align-items:center}.btn.go{background:linear-gradient(90deg,#ff0055,#ff9a00);border:0;margin:0;font-weight:bold}
+.fnote{color:#ffaa00;font-size:.78rem;margin-top:8px}.b.g{background:#00ffcc22;color:#00ffcc}.b.w{background:#ff9a0022;color:#ff9a00}
 </style></head><body>
 <audio id="bgm" src="dream.mp3" loop preload="auto"></audio>
 <button id="mute" class="ns" aria-label="Toggle music">♪ on</button>
@@ -106,8 +115,10 @@ h2 .tg{display:block;font-size:.7rem;letter-spacing:3px;color:#8a8aa0;-webkit-te
 
 <div class="hint ns">tap the background &middot; click UWU x10</div>
 <div id="mb" class="modal"><div class="mc"><button class="x" onclick="cm('mb')">&times;</button>
-<h2>PC BUILDER<span class="tg">smart compatibility &middot; live pricing &middot; CAD</span></h2>
-<p class="sub">Pick any part first. Everything else updates: 🟢 compatible, ❌ greyed out with the reason. Prices CAD.</p>
+<h2>INDUSTRY BUILDER<span class="tg">pick your field &middot; auto-spec &middot; live compatibility &middot; CAD</span></h2>
+<p class="sub">Choose your industry, hit Auto-build, then swap any part. 🟢 compatible, ❌ greyed out with the reason. Prices CAD.</p>
+<div class="fields"><div class="fh">BUILD FOR</div><div class="fchips" id="fchips"></div><div class="finfo" id="finfo"></div>
+<div class="fact"><select id="tier"><option value="0">Value</option><option value=".45">Balanced</option><option value=".9">Performance</option></select><button class="btn go" onclick="autobuild()">⚡ Auto-build for this field</button><label><input type="checkbox" id="ff" onchange="draw()">Only parts that fit</label></div><div class="fnote" id="fnote"></div></div>
 <div class="layout"><div><div class="tabs" id="tabs"></div>
 <div class="tools"><input id="q" placeholder="Search..." oninput="draw()"><select id="so" onchange="draw()"><option value="n">Sort: name</option><option value="a">Price low-high</option><option value="d">Price high-low</option></select><select id="cond" onchange="draw()"><option value="">New + used</option><option value="new">New only</option><option value="used">Used only</option></select><label><input type="checkbox" id="hu" onchange="draw()">Hide unavailable</label></div>
 <div class="grid" id="grid"></div></div>
@@ -499,15 +510,15 @@ return null}
 function why(p){const r=[];for(const c in S){if(c===p.cat)continue;const m=pair(p,S[c]);if(m)r.push(m)}return r}
 /* ===== BUILDER UI ===== */
 const $=i=>document.getElementById(i),usd=n=>'$'+n.toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
-function draw(){
+function draw(){fieldsUI();
 $('tabs').innerHTML=Object.keys(LAB).map(k=>`<button class="tab ${k===tab?'on':''} ${S[k]?'has':''}" onclick="tab='${k}';LIM=300;tick();draw()">${LAB[k]}</button>`).join('');
 const q=$('q').value.toLowerCase(),so=$('so').value,cd=$('cond').value,others=Object.keys(S).filter(k=>k!==tab).length;
-let L=CAT[tab].filter(p=>(!q||clean(p.name).toLowerCase().includes(q))&&(cd===''||(cd==='used')===p.used)&&(!$('hu').checked||!p.sold));
+let L=CAT[tab].filter(p=>(!q||clean(p.name).toLowerCase().includes(q))&&(cd===''||(cd==='used')===p.used)&&(!$('hu').checked||!p.sold)&&(!$('ff').checked||fok(p)));
 L.sort((a,b)=>so==='a'?a.price-b.price:so==='d'?b.price-a.price:a.name.localeCompare(b.name));
 $('grid').innerHTML=L.slice(0,LIM).map(p=>{const w=why(p),bad=w.length>0,sel=S[tab]&&S[tab].id===p.id,em=bad?'❌':(others?'🟢':'');
 return `<div class="p ${sel?'sel':''} ${bad&&!sel?'dis':''} ${p.sold?'na':''}" ${bad&&!sel?'onclick="buzz()"':`onclick="pick('${p.id}')"`} title="${w.join('; ')}">
 <span class="em">${em}</span><div class="n">${fmt(p.name)}</div><span class="pr">${usd(p.price)}</span>
-${p.used?'<span class="b u">Used</span>':''}${p.sold?'<span class="b y">Unavailable</span>':p.pick?'<span class="b">Store exclusive</span>':''}${p.tag?`<span class="b">${p.tag}</span>`:''}${p.inf?'<span class="b i">inferred</span>':''}
+${p.used?'<span class="b u">Used</span>':''}${p.sold?'<span class="b y">Unavailable</span>':p.pick?'<span class="b">Store exclusive</span>':''}${p.tag?`<span class="b">${p.tag}</span>`:''}${p.inf?'<span class="b i">inferred</span>':''}${fb(p)}
 ${bad?`<div class="why">${w[0]}</div>`:''}</div>`}).join('')+(L.length>LIM?`<button class="btn" onclick="LIM+=300;draw()">Show more (${L.length-LIM})</button>`:'')||'<p class="sub">No matches.</p>';
 summary()}
 function pick(i){const p=CAT[tab].find(x=>x.id===i);beep(1200,.05,'square',.04);if(S[tab]&&S[tab].id===i)delete S[tab];else{S[tab]=p;for(const c in S)if(c!==tab&&pair(p,S[c]))delete S[c]}draw()}
@@ -518,7 +529,7 @@ if(S.psu&&need>psu)W.push('⚠️ Estimated draw exceeds PSU rating');else if(S.
 if(S.cpu&&!S.cpu.igpu&&!S.gpu)W.push('⚠️ This CPU has no integrated graphics: add a GPU');
 if(S.cpu&&S.cpu.sock==='LGA1700'&&S.mb&&S.mb.ddr===4&&S.ram&&0)W.push('');
 if(S.gpu&&S.gpu.rec>=750&&S.psu&&S.psu.w<1000)W.push('ℹ️ High-end GPU: check for 12V-2x6 cable');
-$('sum').innerHTML=`<h3>SYSTEM TOTAL</h3>${Object.keys(LAB).map(k=>`<div class="r"><span>${LAB[k]}</span><span>${S[k]?usd(S[k].price):'-'}</span></div>`).join('')}
+$('sum').innerHTML=`<h3>SYSTEM TOTAL</h3>${cur?`<div class="warn" style="color:#00ffcc">${FD[cur].i} ${FD[cur].n}</div>`:''}${Object.keys(LAB).map(k=>`<div class="r"><span>${LAB[k]}</span><span>${S[k]?usd(S[k].price):'-'}</span></div>`).join('')}
 <div class="tot">${usd(tot)}</div><div class="r"><span>Est. draw (CPU+GPU+100W)</span><span>${need}W</span></div>
 <div class="bar"><i style="width:${pct}%;background:${pct>100?'#f05':pct>80?'#fa0':'#0fc'}"></i></div>
 <div class="r"><span>PSU</span><span>${psu?psu+'W':'-'}</span></div>${W.filter(Boolean).map(w=>`<div class="warn">${w}</div>`).join('')}
@@ -530,7 +541,7 @@ const BR='ASUS|GIGABYTE|AORUS|MSI|CORSAIR|AMD|Intel|Kingston|KLEVV|G\.SKILL|TEAM
 const BRX=new RegExp('^('+BR+')(?![A-Za-z])','i'),esc=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 function fmt(n){n=clean(n);const m=n.match(BRX);if(!m)return esc(n);const b=m[1],T=n.slice(b.length).trim().split(/\s+/);let k=T.slice(0,4).findIndex(w=>/\d/.test(w));if(k<0)k=Math.min(2,T.length)-1;if(k<0)return '<b class="br">'+esc(b)+'</b>';
 return '<b class="br">'+esc(b)+'</b> <span class="md">'+esc(T.slice(0,k+1).join(' '))+'</span> '+esc(T.slice(k+1).join(' '))}
-function bt(){return Object.keys(LAB).filter(k=>S[k]).map(k=>LAB[k]+': '+clean(S[k].name)+' - '+usd(S[k].price)).join('\n')+'\nTotal: '+usd(Object.values(S).reduce((a,b)=>a+b.price,0))}
+function bt(){return (cur?'Built for: '+FD[cur].n+'\n':'')+Object.keys(LAB).filter(k=>S[k]).map(k=>LAB[k]+': '+clean(S[k].name)+' - '+usd(S[k].price)).join('\n')+'\nTotal: '+usd(Object.values(S).reduce((a,b)=>a+b.price,0))}
 function dl(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([bt()],{type:'text/plain'}));a.download='drew-wtf-build.txt';a.click()}
 
 function cpy(t,b){const ok=()=>{if(b){const o=b.dataset.o||b.textContent;b.dataset.o=o;b.textContent='Copied ✓';setTimeout(()=>b.textContent=o,1300)}beep(1100,.05,'triangle',.04)};
@@ -557,5 +568,42 @@ function fshow(){ftab(tabF)}
 function ftab(t){tabF=t;tick();$('ft').innerHTML=[['lx','Konsole / Linux'],['ps','PowerShell / Windows'],['sw','Free software']].map(a=>`<button class="tab ${a[0]===t?'on':''}" onclick="ftab('${a[0]}')">${a[1]}</button>`).join('');
 if(t==='sw'){$('fb').innerHTML=SW;return}
 $('fb').innerHTML=`<div class="padbox"><b>${t==='lx'?'Your Konsole commands':'Your PowerShell commands'}</b><textarea id="pad" rows="4" spellcheck="false" autocapitalize="off" autocorrect="off" placeholder="Type or paste commands here...">${esc(ld('pad_'+t))}</textarea><button class="btn" onclick="cpy($('pad').value,this)">Copy</button><button class="btn" onclick="sv('${t}');cpy('',null)">Save</button><button class="btn" onclick="$('pad').value='';sv('${t}')">Clear</button></div>`+CM[t].map((c,i)=>`<div class="cmd"><div class="ct">${esc(c[0])}</div><pre>${esc(c[1])}</pre><button class="btn" onclick="cpy(CM['${t}'][${i}][1],this)">Copy</button></div>`).join('')}
+
+/* ===== INDUSTRY / FIELD PRESETS ===== */
+const FDL=[
+{id:'ai',i:'🧠',n:'AI & Machine Learning',d:'Training and inference. VRAM and RAM decide what models you can run.',cpu:{cores:12},ram:{gb:64},gpu:{vram:16},ssd:{gb:2000},hdd:{gb:8000},psu:{w:1000}},
+{id:'vid',i:'🎬',n:'Video & Film Production',d:'Editing, color grading and exports. Cores, fast storage and RAM keep timelines smooth.',cpu:{cores:12},ram:{gb:64},gpu:{vram:12},ssd:{gb:2000},hdd:{gb:8000},psu:{w:850}},
+{id:'cgi',i:'🧊',n:'3D, VFX & Animation',d:'Rendering and simulation. A big GPU and lots of memory.',cpu:{cores:12},ram:{gb:64},gpu:{vram:16},ssd:{gb:2000},psu:{w:1000}},
+{id:'cad',i:'📐',n:'Engineering & CAD',d:'Modeling and simulation. Strong per-core speed, solid GPU, stable platform.',cpu:{cores:8},ram:{gb:32},gpu:{vram:8},ssd:{gb:1000},psu:{w:750}},
+{id:'arc',i:'🏛️',n:'Architecture & Design',d:'BIM, rendering and Adobe suite. Balanced CPU and a GPU with headroom.',cpu:{cores:8},ram:{gb:32},gpu:{vram:12},ssd:{gb:1000},psu:{w:750}},
+{id:'dev',i:'💻',n:'Software Development',d:'Compiling, containers and VMs. Many cores and plenty of RAM; built-in graphics are enough.',cpu:{cores:12,igpu:true},ram:{gb:64},ssd:{gb:2000},psu:{w:650}},
+{id:'data',i:'📊',n:'Data Science & Analytics',d:'Big datasets in memory plus GPU acceleration for modeling.',cpu:{cores:16},ram:{gb:64},gpu:{vram:12},ssd:{gb:2000},hdd:{gb:8000},psu:{w:850}},
+{id:'sci',i:'🔬',n:'Science & Medical Imaging',d:'Simulation, CUDA/GPU compute and imaging pipelines.',cpu:{cores:16},ram:{gb:64},gpu:{vram:16},ssd:{gb:2000},hdd:{gb:8000},psu:{w:1000}},
+{id:'fin',i:'📈',n:'Finance & Trading',d:'Many monitors, fast and reliable. A modest GPU drives the screens.',cpu:{cores:8},ram:{gb:32},gpu:{vram:8},ssd:{gb:1000},psu:{w:650}},
+{id:'aud',i:'🎧',n:'Audio & Music Production',d:'Quiet and low-latency. Fast cores and RAM; built-in graphics are fine.',cpu:{cores:8,igpu:true},ram:{gb:32},ssd:{gb:1000},psu:{w:650}},
+{id:'biz',i:'🏢',n:'Office & Business',d:'Reliable everyday machine. Built-in graphics, sensible RAM and a fast SSD.',cpu:{cores:6,igpu:true},ram:{gb:16},ssd:{gb:500},psu:{w:500}},
+{id:'srv',i:'🗄️',n:'Home Server & NAS',d:'Always-on storage, backups and media. Low power CPU with built-in graphics, lots of HDD.',cpu:{cores:6,igpu:true},ram:{gb:32},ssd:{gb:500},hdd:{gb:8000},psu:{w:500}}];
+const FD={};FDL.forEach(f=>FD[f.id]=f);let cur=null;
+const gb=n=>{const m=n.match(/(\d+(?:\.\d+)?)\s?(TB|GB)\b/i);return m?(+m[1])*(m[2].toUpperCase()==='TB'?1000:1):0};
+const VT=[['5090',32],['5080',16],['5070 Ti',16],['5070',12],['5060 Ti',16],['5060',8],['5050',8],['3060',12],['3050',6],['9070 XT',16],['9070 GRE',12],['9070',16],['9060 XT',16],['7600',8],['1030',2],['730',2],['R9700',32],['B70',32]];
+function vramOf(p){const m=p.name.match(/\b(\d{1,2})\s?G(?:B)?\b/);if(m)return+m[1];for(const[k,v]of VT)if(p.name.includes(k))return v;return 0}
+function fit(f,p){const r=f[p.cat];if(!r)return null;
+if(p.cat==='cpu'){const m=p.name.match(/(\d+)-Core/);if(!m)return null;return{ok:+m[1]>=r.cores&&(!r.igpu||!!p.igpu)}}
+if(p.cat==='ram')return{ok:gb(p.name)>=r.gb};if(p.cat==='gpu')return{ok:vramOf(p)>=r.vram};
+if(p.cat==='ssd'||p.cat==='hdd')return{ok:gb(p.name)>=r.gb};if(p.cat==='psu')return{ok:p.w>=r.w};return null}
+const fok=p=>{if(!cur)return true;const x=fit(FD[cur],p);return !x||x.ok},fb=p=>{const x=cur&&fit(FD[cur],p);return x?(x.ok?'<span class="b g">✓ fits</span>':'<span class="b w">below spec</span>'):''};
+function reqText(f){return[`CPU ${f.cpu.cores}+ cores${f.cpu.igpu?' with built-in graphics':''}`,`RAM ${f.ram.gb}GB+`,f.gpu?`GPU ${f.gpu.vram}GB+ VRAM`:'no dedicated GPU needed',`SSD ${f.ssd.gb/1000}TB+`,f.hdd?`HDD ${f.hdd.gb/1000}TB+`:''].filter(Boolean).join(' · ')}
+function fieldsUI(){$('fchips').innerHTML=FDL.map(f=>`<button class="chip ${f.id===cur?'on':''}" onclick="setF('${f.id}')"><span>${f.i}</span>${f.n}</button>`).join('');
+const f=FD[cur];$('finfo').innerHTML=f?`<b>${f.i} ${f.n}</b> &mdash; ${f.d}<br><span>${reqText(f)}</span>`:'Pick your industry or field for tuned recommendations and a one-click starter build.'}
+function setF(id){cur=cur===id?null:id;$('fnote').textContent='';tick();draw()}
+function autobuild(){const f=FD[cur];if(!f){$('fnote').textContent='Pick a field first.';buzz();return}
+const q=+$('tier').value,skip=[];for(const k in S)delete S[k];
+for(const c of['cpu','mb','ram','gpu','psu','case','cooler','ssd','hdd']){if(c==='gpu'&&!f.gpu)continue;if(c==='hdd'&&!f.hdd)continue;
+let L=CAT[c].filter(p=>!p.sold&&!p.used&&!why(p).length&&fok(p));
+if(c==='psu'){const need=((S.cpu&&S.cpu.w)||0)+((S.gpu&&S.gpu.w)||0)+100;L=L.filter(p=>p.w>=need*1.3)}
+if(c==='cooler'&&S.cpu&&S.cpu.w>=150){const L2=L.filter(p=>p.rad>=240);if(L2.length)L=L2}
+if(!L.length){skip.push(LAB[c]);continue}
+L.sort((a,b)=>a.price-b.price);S[c]=L[Math.min(L.length-1,Math.floor(q*(L.length-1)))]}
+$('fnote').textContent=skip.length?'Built what was in stock. No match found for: '+skip.join(', ')+'.':'Done. Every part is compatible. Swap anything you like.';chime();draw()}
 anim();bounce();
 </script></body></html>
