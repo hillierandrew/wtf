@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<title>UWU</title>
+<title>DREW.WTF</title>
 <style>
 :root{--bg:#050508;--fg:#e0e0e0;--a1:#ff0055;--a2:#00ffcc;--a3:#ffaa00;--f:'Courier New',Courier,monospace}
 body.demonic{--bg:#0a0000;--fg:#ff3333;--a1:#aa0000;--a2:#ff0000;--a3:#ff0000}
@@ -106,6 +106,22 @@ h2 .tg{display:block;font-size:.7rem;letter-spacing:3px;color:#8a8aa0;-webkit-te
 .fact{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.fact select{background:#000;color:#fff;border:1px solid #333;border-radius:6px;padding:9px;font-family:var(--f)}
 .fact label{color:#aaa;font-size:.8rem;display:flex;gap:6px;align-items:center}.btn.go{background:linear-gradient(90deg,#ff0055,#ff9a00);border:0;margin:0;font-weight:bold}
 .fnote{color:#ffaa00;font-size:.78rem;margin-top:8px}.b.g{background:#00ffcc22;color:#00ffcc}.b.w{background:#ff9a0022;color:#ff9a00}
+
+/* --- mobile-first navigation, gate, and guided setup --- */
+:focus-visible{outline:3px solid #00ffcc;outline-offset:3px}
+#site-actions{position:fixed;left:14px;bottom:14px;z-index:20;display:flex;gap:8px;flex-wrap:wrap;max-width:calc(100vw - 104px)}
+.action{min-height:46px;background:#10101ad9;color:#fff;border:1px solid #ffffff35;border-radius:999px;padding:11px 15px;font:700 .86rem var(--f);letter-spacing:.03em;cursor:pointer;box-shadow:0 8px 30px #0008;touch-action:manipulation}
+.action:hover{border-color:#00ffcc;color:#00ffcc}.action.primary{background:linear-gradient(90deg,#ff0055,#ff8a00);border:0}
+.gate-card,.quiz-card{max-width:590px;text-align:left}.gate-card h2,.quiz-card h2{font-size:clamp(1.45rem,6vw,2.1rem)}
+.gate-intro{line-height:1.55;color:#c6c6d2;margin:10px 0 18px}.gate-form{display:grid;gap:12px}.gate-form label{color:#c8c8d4;font-size:.9rem}.gate-form input{width:100%;min-height:52px;margin-top:7px;padding:12px 14px;background:#050509;color:#fff;border:1px solid #5b5b70;border-radius:8px;font:1.1rem var(--f)}
+.gate-form button,.wide-btn{min-height:48px;font-size:.96rem;margin:0}.gate-message{min-height:1.4em;color:#ffaa00;font-size:.86rem}.gate-message.error{color:#ff7799}
+.choice-label{color:#bcbccc;font-size:.84rem;letter-spacing:.08em;margin:16px 0 8px}.choice-row{display:flex;flex-wrap:wrap;gap:8px}.qchoice{min-height:45px;padding:9px 12px;border:1px solid #424254;background:#15151f;color:#e9e9f0;border-radius:9px;font:inherit;cursor:pointer;touch-action:manipulation}.qchoice.on{border-color:#00ffcc;background:#00ffcc1c;color:#fff;box-shadow:0 0 0 1px #00ffcc55}.quiz-result{margin-top:16px;padding:13px;border-left:3px solid #00ffcc;background:#00ffcc0d;line-height:1.55;color:#dedee8}.quiz-result:empty{display:none}
+.prebuilt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:14px}.prebuilt{padding:15px;background:linear-gradient(150deg,#171725,#11111a);border:1px solid #353548;border-radius:12px}.prebuilt h3{font-size:1rem;color:#fff;margin-bottom:6px}.prebuilt p{font-size:.84rem;line-height:1.45;color:#b8b8c5;min-height:3.7em}.prebuilt .price{color:#00ffcc;font-weight:bold;margin:10px 0 0}
+#gotcha{position:fixed;inset:0;z-index:10050;display:none;overflow:hidden;align-items:center;justify-content:center;background:radial-gradient(circle at center,#39104b,#08000d 65%);text-align:center}.gotcha-card{position:relative;z-index:2;max-width:520px;padding:30px 22px;background:#14091ce8;border:2px solid #ff72d5;border-radius:20px;box-shadow:0 0 70px #ff00bb77}.gotcha-card h2{font-size:clamp(2.2rem,13vw,5rem);color:#fff;-webkit-text-fill-color:#fff;text-shadow:0 0 25px #ff4fd8}.gotcha-card p{margin:10px 0 18px;color:#ffd6ef}.kitten{position:absolute;top:-12vh;z-index:1;animation:kittenfall var(--fall,4s) linear forwards;font-size:clamp(1.4rem,5vw,2.8rem);pointer-events:none}@keyframes kittenfall{to{transform:translate3d(var(--drift,0),120vh,0) rotate(540deg);opacity:.85}}
+@media(max-width:700px){
+  #mute{min-height:46px;right:12px;bottom:12px;font-size:.9rem}.hint{bottom:70px;font-size:.62rem;letter-spacing:1.8px;padding:0 10px}.mc{width:100%;max-height:100dvh;min-height:100dvh;border-radius:0;padding:66px 16px 28px}.x{top:14px;right:16px;min-width:44px;min-height:44px;line-height:1}.layout{gap:14px}.tabs{gap:8px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;scrollbar-width:thin}.tab{white-space:nowrap;min-height:44px;padding:10px 14px;font-size:.88rem}.tools{display:grid;grid-template-columns:1fr 1fr;gap:9px}.tools input{grid-column:1/-1;min-height:48px;font-size:16px}.tools select{min-height:46px;min-width:0;font-size:16px}.tools label{grid-column:1/-1;min-height:42px;font-size:.9rem}.grid{grid-template-columns:1fr;gap:11px}.p{min-height:100px;padding:14px;font-size:.94rem}.p .n{padding-right:25px}.sum{position:static;order:-1;padding:16px;font-size:.9rem}.sum .btn{min-height:44px;font-size:.84rem}.fields{padding:14px}.chip{min-height:43px;font-size:.84rem;padding:9px 12px}.fact select,.fact .btn{min-height:46px;font-size:.9rem}.fact{display:grid;grid-template-columns:1fr}.fact .btn{width:100%}.prebuilt-grid{grid-template-columns:1fr}.action{font-size:.78rem;padding:10px 12px}.gate-card,.quiz-card{padding-top:72px}
+}
+@media(min-width:701px){.mc{padding:28px}.tools input{min-height:42px}.p{min-height:90px}.gate-card,.quiz-card{padding:32px}.layout{grid-template-columns:minmax(0,1fr) 315px}}
 </style></head><body>
 <audio id="bgm" src="dream.mp3" loop preload="auto"></audio>
 <button id="mute" class="ns" aria-label="Toggle music">♪ on</button>
@@ -113,10 +129,12 @@ h2 .tg{display:block;font-size:.7rem;letter-spacing:3px;color:#8a8aa0;-webkit-te
 <canvas id="meter"></canvas>
 <div id="uwu" class="ns"><span class="wg" id="uwut">UWU</span></div>
 
-<div class="hint ns">tap the background &middot; click UWU x10</div>
+<div class="hint ns">tap the background &middot; click UWU x10 to enter</div>
+<div id="site-actions" class="ns"><button class="action primary" type="button" onclick="requestBuilder()">PC builder</button><button class="action" type="button" onclick="om('mf');fshow()">WTF toolbox</button></div>
 <div id="mb" class="modal"><div class="mc"><button class="x" onclick="cm('mb')">&times;</button>
 <h2>INDUSTRY BUILDER<span class="tg">pick your field &middot; auto-spec &middot; live compatibility &middot; CAD</span></h2>
-<p class="sub">Choose your industry, hit Auto-build, then swap any part. 🟢 compatible, ❌ greyed out with the reason. Prices CAD.</p>
+<p class="sub">Choose a field, start with a prebuilt or use the questionnaire. Then swap any part. 🟢 compatible, ❌ greyed out with the reason. Prices are CAD estimates; confirm live price and availability before buying.</p>
+<div class="tools"><button class="btn go" type="button" onclick="om('mq');renderQuiz()">✦ Find my PC</button><button class="btn" type="button" onclick="showPrebuilts()">▣ Ready-to-go builds</button></div>
 <div class="fields"><div class="fh">BUILD FOR</div><div class="fchips" id="fchips"></div><div class="finfo" id="finfo"></div>
 <div class="fact"><select id="tier"><option value="0">Value</option><option value=".45">Balanced</option><option value=".9">Performance</option></select><button class="btn go" onclick="autobuild()">⚡ Auto-build for this field</button><label><input type="checkbox" id="ff" onchange="draw()">Only parts that fit</label></div><div class="fnote" id="fnote"></div></div>
 <div class="layout"><div><div class="tabs" id="tabs"></div>
@@ -127,6 +145,20 @@ h2 .tg{display:block;font-size:.7rem;letter-spacing:3px;color:#8a8aa0;-webkit-te
 <div id="mf" class="modal"><div class="mc fo"><button class="x" onclick="cm('mf')">&times;</button>
 <h2>WTF TOOLBOX<span class="tg">copy-paste commands &middot; scratchpads &middot; free software</span></h2>
 <div class="tabs" id="ft"></div><div id="fb"></div></div></div>
+
+<div id="mg" class="modal" role="dialog" aria-modal="true" aria-labelledby="gateTitle"><div class="mc gate-card"><button class="x" type="button" onclick="cm('mg')" aria-label="Close password gate">&times;</button>
+<h2 id="gateTitle">PC BUILDER ACCESS<span class="tg">one small checkpoint before the parts</span></h2><p class="gate-intro">Enter the builder password to continue. This gate appears after using UWU or the builder button.</p>
+<form class="gate-form" onsubmit="return submitGate(event)"><label for="gatePassword">Password<input id="gatePassword" type="password" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="gateMessage"></label><button class="btn go wide-btn" type="submit">Enter PC Builder</button><p id="gateMessage" class="gate-message" aria-live="polite"></p></form></div></div>
+
+<div id="mq" class="modal" role="dialog" aria-modal="true" aria-labelledby="quizTitle"><div class="mc quiz-card"><button class="x" type="button" onclick="cm('mq')" aria-label="Close questionnaire">&times;</button>
+<h2 id="quizTitle">PC MATCHMAKER<span class="tg">answer two quick questions</span></h2><p class="sub">This suggests a compatible starting configuration you can adjust afterward.</p>
+<p class="choice-label">WHAT WILL YOU USE IT FOR MOST?</p><div id="qUses" class="choice-row"></div>
+<p class="choice-label">HOW MUCH PERFORMANCE HEADROOM DO YOU WANT?</p><div id="qTiers" class="choice-row"></div><div id="qResult" class="quiz-result" aria-live="polite"></div></div></div>
+
+<div id="mpb" class="modal" role="dialog" aria-modal="true" aria-labelledby="prebuiltTitle"><div class="mc"><button class="x" type="button" onclick="cm('mpb')" aria-label="Close ready-to-go builds">&times;</button>
+<h2 id="prebuiltTitle">READY-TO-GO BUILDS<span class="tg">complete starting points from the current catalog</span></h2><p class="sub">Each build can be loaded into the builder, checked for compatibility, and customized. Prices are estimates.</p><div id="prebuiltGrid" class="prebuilt-grid"></div></div></div>
+
+<div id="gotcha" role="dialog" aria-modal="true" aria-hidden="true"><div class="gotcha-card"><h2>GOTCHA!</h2><p>Six UWU taps summoned the kitten swarm.</p><button class="action primary" type="button" onclick="dismissGotcha()">I accept the kittens</button></div></div>
 
 <script>onerror=function(m,u,l){var d=document.createElement('div');d.style.cssText='position:fixed;top:0;left:0;right:0;background:#a00;color:#fff;font:11px monospace;padding:4px;z-index:99999';d.textContent='JS error: '+m+' (line '+l+')';if(document.body)document.body.appendChild(d)}</script>
 <script src="parts.js"></script>
@@ -150,7 +182,12 @@ open1=true;bgm.volume=.5;bgm.play().catch(()=>{});chime();setupAn();
 let demon=false;const c={d:0,t:0,w:0};
 function pulse(el,col){el.style.color=col;el.style.transform='scale(1.2)';setTimeout(()=>{el.style.color='';el.style.transform=''},150)}
 const uwu=document.getElementById('uwu'),uwut=document.getElementById('uwut');let ux=40,uy=80,vx=2,vy=1.6,hue=300;
-uwu.addEventListener('click',e=>{e.stopPropagation();c.d++;beep(300+c.d*70);uwut.style.filter='brightness(2.2)';setTimeout(()=>uwut.style.filter='',120);if(c.d>=10){c.d=0;chime();om('mb');draw()}});
+const GATE_PASSWORD='P123';
+function requestBuilder(){const msg=$('gateMessage'),input=$('gatePassword');msg.textContent='';msg.classList.remove('error');input.value='';om('mg');setTimeout(()=>input.focus(),80)}
+function submitGate(e){e.preventDefault();const input=$('gatePassword'),msg=$('gateMessage');if(input.value===GATE_PASSWORD){input.value='';msg.textContent='';cm('mg');om('mb');chime();draw();return false}msg.textContent='That password does not match. Try again.';msg.classList.add('error');input.select();buzz();return false}
+function showGotcha(){const g=$('gotcha');g.style.display='flex';g.setAttribute('aria-hidden','false');g.querySelectorAll('.kitten').forEach(k=>k.remove());const count=matchMedia('(prefers-reduced-motion:reduce)').matches?12:42;for(let i=0;i<count;i++){const k=document.createElement('span');k.className='kitten';k.textContent='🐱';k.style.left=(Math.random()*98)+'%';k.style.setProperty('--fall',(2.7+Math.random()*2.5)+'s');k.style.setProperty('--drift',((Math.random()-.5)*35)+'vw');k.style.animationDelay=(Math.random()*.65)+'s';g.appendChild(k)}sting()}
+function dismissGotcha(){const g=$('gotcha');g.style.display='none';g.setAttribute('aria-hidden','true');g.querySelectorAll('.kitten').forEach(k=>k.remove());chime()}
+uwu.addEventListener('click',e=>{e.stopPropagation();c.d++;beep(300+c.d*70);uwut.style.filter='brightness(2.2)';setTimeout(()=>uwut.style.filter='',120);if(c.d===6)showGotcha();if(c.d>=10){c.d=0;requestBuilder()}});
 function bounce(){const W=innerWidth,H=innerHeight-70,w=uwu.offsetWidth,h=uwu.offsetHeight,k=1+bass*1.5;ux+=vx*k;uy+=vy*k;let hit=0;
 if(ux<=0){ux=0;vx=Math.abs(vx);hit=1}if(ux+w>=W){ux=Math.max(0,W-w);vx=-Math.abs(vx);hit=1}if(uy<=0){uy=0;vy=Math.abs(vy);hit=1}if(uy+h>=H){uy=Math.max(0,H-h);vy=-Math.abs(vy);hit=1}
 if(hit){hue=(hue+57)%360;const col='hsl('+hue+',100%,65%)';uwu.style.color=col;uwu.style.setProperty('--a2',col);beep(700+hue,.03,'square',.02)}
@@ -483,9 +520,62 @@ be quiet! Dark Base 701 (ATX)|314.99|p|3|420|0
 THERMALTAKE View 380 TG ARGB (ATX)|139.99||3|360|0
 DarkFlash DRX70 Mesh (ATX)|99.99||3|360|0
 SilverStone SUGO 16 (Mini-ITX)|119.99|p|1|240|1
-JONSBO D32 PRO (Micro-ATX)|89.99||2|240|0`}
+JONSBO D32 PRO (Micro-ATX)|89.99||2|240|0`},
+monitor:{k:'name price f size hz tag',t:`AOC Q27G3XMN 27in QHD Mini-LED 180Hz|379.99||27|180|Gaming
+Dell P2723D 27in QHD IPS|329.99||27|60|Work
+Dell UltraSharp U2723QE 27in 4K IPS USB-C|749.99||27|60|Creator
+ASUS ProArt PA279CRV 27in 4K IPS|599.99||27|60|Creator
+LG UltraGear 27GS95QE 27in OLED QHD 240Hz|899.99||27|240|Gaming
+Samsung Odyssey G70D 32in 4K 144Hz|799.99||32|144|Gaming
+BenQ PD2705U 27in 4K Designer Monitor|649.99||27|60|Creator
+LG 34WN80C-B 34in Ultrawide QHD USB-C|649.99||34|60|Work
+ASUS ROG Strix XG27ACS 27in QHD 180Hz|399.99||27|180|Gaming
+ViewSonic VA2432-H 24in IPS 100Hz|159.99||24|100|School`},
+keyboard:{k:'name price f tag',t:`Keychron K2 V2 Wireless Mechanical Keyboard|119.99||Work
+Keychron V3 QMK Custom Mechanical Keyboard|109.99||Gaming
+Keychron Q6 Max Full-size Wireless Keyboard|279.99||Developer
+Logitech MX Keys S Wireless Keyboard|149.99||Work
+Logitech G Pro X TKL Lightspeed Keyboard|269.99||Gaming
+Corsair K70 RGB PRO Mechanical Keyboard|189.99||Gaming
+Microsoft Ergonomic Keyboard|79.99||Office
+Royal Kludge RK84 Wireless Keyboard|89.99|p|Value`},
+mouse:{k:'name price f tag',t:`Logitech MX Master 3S Wireless Mouse|139.99||Work
+Logitech G Pro X Superlight 2 Mouse|199.99||Gaming
+Razer DeathAdder V3 Wired Mouse|99.99||Gaming
+Razer Basilisk V3 Pro Mouse|189.99||Gaming
+Logitech M720 Triathlon Mouse|69.99||Office
+3Dconnexion CadMouse Pro Wireless|179.99||CAD
+SteelSeries Rival 5 Wired Mouse|79.99||Gaming`},
+headset:{k:'name price f tag',t:`HyperX Cloud III Wireless Headset|179.99||Gaming
+SteelSeries Arctis Nova 7 Wireless Headset|239.99||Gaming
+Logitech Zone Vibe 100 Wireless Headset|129.99||Work
+Audio-Technica ATH-M50x Headphones|219.99||Audio
+Razer BlackShark V2 X Headset|79.99||Value
+Sony WH-CH720N Wireless Headphones|179.99||Work`},
+fan:{k:'name price f size tag',t:`ARCTIC P12 PWM PST 120mm Fan 5-Pack|49.99||120|Airflow
+Noctua NF-A12x25 PWM 120mm Fan|44.99||120|Quiet
+Corsair RS120 ARGB 120mm Fan 3-Pack|74.99||120|RGB
+be quiet! Silent Wings 4 140mm Fan|39.99||140|Quiet
+Lian Li UNI FAN SL-INF 120 Triple Pack|119.99||120|RGB
+DeepCool FK120 120mm Fan 3-Pack|39.99||120|Value`},
+net:{k:'name price f tag',t:`TP-Link Archer TXE75E Wi-Fi 6E PCIe Adapter|69.99||Wi-Fi
+TP-Link Archer TX55E Wi-Fi 6 PCIe Adapter|49.99||Wi-Fi
+Intel X550-T2 Dual-Port 10GbE Adapter|299.99||10GbE
+ASUS XG-C100C 10GbE PCIe Adapter|139.99||10GbE
+TP-Link UE306 USB 3.0 Gigabit Ethernet Adapter|24.99||Ethernet
+ASUS PCE-AXE59BT Wi-Fi 6E PCIe Adapter|89.99||Wi-Fi`},
+capture:{k:'name price f tag',t:`Elgato 4K60 Pro MK.2 Capture Card|329.99||Streaming
+Elgato HD60 X External Capture Card|239.99||Streaming
+AVerMedia Live Gamer 4K 2.1 Capture Card|399.99||Streaming
+Elgato Cam Link 4K USB Capture|159.99||Camera
+AVerMedia Live Gamer Mini Capture Card|119.99||Value`},
+os:{k:'name price f tag',t:`Windows 11 Home USB|169.99||Home
+Windows 11 Pro USB|249.99||Pro
+Ubuntu Linux LTS Download|0.00||Free
+Fedora Workstation Download|0.00||Free
+Linux Mint Cinnamon Download|0.00||Free`}
 };
-const LAB={cpu:'CPU',mb:'Motherboard',ram:'RAM',gpu:'GPU',psu:'PSU',cooler:'Cooler',case:'Case',ssd:'SSD',hdd:'HDD'};
+const LAB={cpu:'CPU',mb:'Motherboard',ram:'RAM',gpu:'GPU',psu:'PSU',cooler:'Cooler',case:'Case',ssd:'SSD',hdd:'HDD',monitor:'Monitor',keyboard:'Keyboard',mouse:'Mouse',headset:'Headset',fan:'Case fans',net:'Networking',capture:'Capture',os:'Operating system'};
 const FN={1:'Mini-ITX',2:'mATX',3:'ATX',4:'E-ATX'};
 const CAT={};let id=0;
 for(const k in RAW){const r=RAW[k],ks=r.k.split(' ');CAT[k]=r.t.split('\n').map(l=>{const v=l.split('|'),o={id:k+(id++),cat:k};ks.forEach((q,i)=>{o[q]=v[i]===undefined?'':v[i]});
@@ -571,12 +661,16 @@ $('fb').innerHTML=`<div class="padbox"><b>${t==='lx'?'Your Konsole commands':'Yo
 
 /* ===== INDUSTRY / FIELD PRESETS ===== */
 const FDL=[
+{id:'school',i:'🎓',n:'School & Study',d:'Research, writing, video calls and everyday projects. Quiet, dependable and easy to upgrade.',cpu:{cores:6,igpu:true},ram:{gb:16},ssd:{gb:500},psu:{w:500}},
+{id:'game',i:'🎮',n:'Gaming & Streaming',d:'High refresh gaming, Discord and streaming. Prioritizes a fast CPU, GPU and responsive storage.',cpu:{cores:8},ram:{gb:32},gpu:{vram:12},ssd:{gb:1000},psu:{w:750}},
 {id:'ai',i:'🧠',n:'AI & Machine Learning',d:'Training and inference. VRAM and RAM decide what models you can run.',cpu:{cores:12},ram:{gb:64},gpu:{vram:16},ssd:{gb:2000},hdd:{gb:8000},psu:{w:1000}},
 {id:'vid',i:'🎬',n:'Video & Film Production',d:'Editing, color grading and exports. Cores, fast storage and RAM keep timelines smooth.',cpu:{cores:12},ram:{gb:64},gpu:{vram:12},ssd:{gb:2000},hdd:{gb:8000},psu:{w:850}},
 {id:'cgi',i:'🧊',n:'3D, VFX & Animation',d:'Rendering and simulation. A big GPU and lots of memory.',cpu:{cores:12},ram:{gb:64},gpu:{vram:16},ssd:{gb:2000},psu:{w:1000}},
 {id:'cad',i:'📐',n:'Engineering & CAD',d:'Modeling and simulation. Strong per-core speed, solid GPU, stable platform.',cpu:{cores:8},ram:{gb:32},gpu:{vram:8},ssd:{gb:1000},psu:{w:750}},
 {id:'arc',i:'🏛️',n:'Architecture & Design',d:'BIM, rendering and Adobe suite. Balanced CPU and a GPU with headroom.',cpu:{cores:8},ram:{gb:32},gpu:{vram:12},ssd:{gb:1000},psu:{w:750}},
 {id:'dev',i:'💻',n:'Software Development',d:'Compiling, containers and VMs. Many cores and plenty of RAM; built-in graphics are enough.',cpu:{cores:12,igpu:true},ram:{gb:64},ssd:{gb:2000},psu:{w:650}},
+{id:'cyber',i:'🔐',n:'Cybersecurity & Virtual Labs',d:'Virtual machines, labs and several operating systems. Memory and CPU threads matter most.',cpu:{cores:12,igpu:true},ram:{gb:64},ssd:{gb:2000},psu:{w:650}},
+{id:'photo',i:'📷',n:'Photography & Design',d:'RAW edits, layout and color work. Fast storage, ample memory and a color-capable display.',cpu:{cores:8},ram:{gb:32},gpu:{vram:8},ssd:{gb:2000},psu:{w:650}},
 {id:'data',i:'📊',n:'Data Science & Analytics',d:'Big datasets in memory plus GPU acceleration for modeling.',cpu:{cores:16},ram:{gb:64},gpu:{vram:12},ssd:{gb:2000},hdd:{gb:8000},psu:{w:850}},
 {id:'sci',i:'🔬',n:'Science & Medical Imaging',d:'Simulation, CUDA/GPU compute and imaging pipelines.',cpu:{cores:16},ram:{gb:64},gpu:{vram:16},ssd:{gb:2000},hdd:{gb:8000},psu:{w:1000}},
 {id:'fin',i:'📈',n:'Finance & Trading',d:'Many monitors, fast and reliable. A modest GPU drives the screens.',cpu:{cores:8},ram:{gb:32},gpu:{vram:8},ssd:{gb:1000},psu:{w:650}},
@@ -605,5 +699,34 @@ if(c==='cooler'&&S.cpu&&S.cpu.w>=150){const L2=L.filter(p=>p.rad>=240);if(L2.len
 if(!L.length){skip.push(LAB[c]);continue}
 L.sort((a,b)=>a.price-b.price);S[c]=L[Math.min(L.length-1,Math.floor(q*(L.length-1)))]}
 $('fnote').textContent=skip.length?'Built what was in stock. No match found for: '+skip.join(', ')+'.':'Done. Every part is compatible. Swap anything you like.';chime();draw()}
+
+/* ===== QUESTIONNAIRE + READY-TO-GO BUILDS ===== */
+const QUIZ_USES=[
+ ['school','🎓 School & study'],['biz','🏢 Work & office'],['game','🎮 Gaming & streaming'],['fin','📈 Finance & trading'],
+ ['dev','💻 Development'],['vid','🎬 Creative & video'],['ai','🧠 AI & data'],['cyber','🔐 Virtual labs'],['srv','🗄️ Home server']
+];
+const QUIZ_TIERS=[['0','Value'],['.45','Balanced'],['.9','Performance']];
+let quizUse='school',quizTier='.45';
+function renderQuiz(){
+ $('qUses').innerHTML=QUIZ_USES.map(([id,label])=>`<button class="qchoice ${quizUse===id?'on':''}" type="button" aria-pressed="${quizUse===id}" onclick="quizUse='${id}';renderQuiz()">${label}</button>`).join('');
+ $('qTiers').innerHTML=QUIZ_TIERS.map(([id,label])=>`<button class="qchoice ${quizTier===id?'on':''}" type="button" aria-pressed="${quizTier===id}" onclick="quizTier='${id}';renderQuiz()">${label}</button>`).join('');
+ const f=FD[quizUse];$('qResult').innerHTML=`<b>${f.i} ${f.n}</b><br>${f.d}<br><span>${reqText(f)}</span><br><button class="btn go wide-btn" type="button" onclick="applyQuiz()">Build this recommendation</button>`;
+}
+function applyQuiz(){cur=quizUse;$('tier').value=quizTier;cm('mq');autobuild();$('fnote').textContent='Questionnaire recommendation loaded. Every selected core part is compatible; personalize anything below.'}
+const PREBUILTS=[
+ {id:'study',icon:'🎓',name:'Study Sprint',field:'school',tier:'0',desc:'A focused everyday desktop for assignments, calls and research.',parts:{cpu:'AMD Ryzen 5 9600X',mb:'GIGABYTE B650M GAMING PLUS',ram:'Kingston FURY Beast 32GB (2x16GB) DDR5',psu:'MSI MAG A650BN',cooler:'DeepCool AK400 G2',case:'DeepCool CH260',ssd:'Kingston NV3 1TB',monitor:'ViewSonic VA2432',keyboard:'Keychron K2',mouse:'Logitech M720',os:'Windows 11 Home'}},
+ {id:'game',icon:'🎮',name:'QHD Game Night',field:'game',tier:'.45',desc:'A smooth 1440p gaming and streaming baseline with a high-refresh display.',parts:{cpu:'AMD Ryzen 7 7800X3D',mb:'GIGABYTE B650 EAGLE',ram:'Kingston FURY Beast 32GB (2x16GB) DDR5',gpu:'GIGABYTE GeForce RTX 5070 GAMING',psu:'MSI MAG A750GL',cooler:'Arctic Liquid Freezer III PRO 360',case:'CORSAIR 3500X',ssd:'WD Black SN850X 2TB',monitor:'AOC Q27G3XMN',keyboard:'Keychron V3',mouse:'Logitech G Pro X Superlight 2',headset:'HyperX Cloud III',fan:'ARCTIC P12 PWM',os:'Windows 11 Home'}},
+ {id:'dev',icon:'💻',name:'Container Forge',field:'dev',tier:'.45',desc:'A developer workstation for compiles, containers, local services and virtual machines.',parts:{cpu:'AMD Ryzen 9 9900X',mb:'GIGABYTE B850 EAGLE',ram:'Kingston FURY Beast 64GB (2x32GB) DDR5',psu:'MSI MAG A650BN',cooler:'DeepCool AK620 G2',case:'FRACTAL DESIGN North',ssd:'Samsung 990 Pro 2TB',monitor:'Dell UltraSharp U2723QE',keyboard:'Keychron Q6 Max',mouse:'Logitech MX Master 3S',os:'Ubuntu Linux'}},
+ {id:'finance',icon:'📈',name:'Market Desk',field:'fin',tier:'.45',desc:'A reliable multi-screen base for spreadsheets, analysis, calls and trading tools.',parts:{cpu:'AMD Ryzen 7 9700X',mb:'MSI MAG B850 TOMAHAWK',ram:'Kingston FURY Beast 32GB (2x16GB) DDR5',gpu:'GIGABYTE GeForce RTX 5060 EAGLE',psu:'CORSAIR RM750e',cooler:'DeepCool AK400 G2',case:'FRACTAL DESIGN Pop Air',ssd:'WD Black SN850X 1TB',monitor:'Dell P2723D',keyboard:'Logitech MX Keys S',mouse:'Logitech MX Master 3S',os:'Windows 11 Pro'}},
+ {id:'creator',icon:'🎬',name:'Creator Canvas',field:'vid',tier:'.9',desc:'For editing, rendering, 3D work and large media libraries.',parts:{cpu:'AMD Ryzen 9 9950X',mb:'ASUS ProArt X870E-CREATOR',ram:'Kingston FURY Beast 64GB (2x32GB) DDR5',gpu:'SAPPHIRE PULSE AMD Radeon RX 9060 XT 16GB',psu:'CORSAIR RM1000x',cooler:'Arctic Liquid Freezer III PRO 360',case:'FRACTAL DESIGN North XL',ssd:'WD Black SN850X 2TB',hdd:'Seagate IronWolf Pro 20TB',monitor:'ASUS ProArt PA279CRV',keyboard:'Keychron Q6 Max',mouse:'3Dconnexion CadMouse',capture:'Elgato 4K60 Pro',os:'Windows 11 Pro'}},
+ {id:'ai',icon:'🧠',name:'Local AI Lab',field:'ai',tier:'.9',desc:'Big-memory, high-VRAM workstation for local inference, compute and data workloads.',parts:{cpu:'AMD Ryzen 9 9950X3D',mb:'ASUS ProArt X870E-CREATOR',ram:'CORSAIR VENGEANCE 96GB',gpu:'ASUS TURBO Radeon AI PRO R9700',psu:'CORSAIR RM1000x',cooler:'Arctic Liquid Freezer III PRO 420',case:'FRACTAL DESIGN North XL',ssd:'WD Black SN8100 4TB',hdd:'Seagate IronWolf Pro 20TB',monitor:'Dell UltraSharp U2723QE',keyboard:'Keychron Q6 Max',mouse:'Logitech MX Master 3S',os:'Ubuntu Linux'}},
+ {id:'server',icon:'🗄️',name:'Home Vault',field:'srv',tier:'0',desc:'A compact, efficient starter for backups, media and self-hosted services.',parts:{cpu:'AMD Ryzen 5 9600X',mb:'GIGABYTE B650M GAMING PLUS',ram:'Kingston FURY Beast 32GB (2x16GB) DDR5',psu:'THERMALTAKE Smart White 500W',cooler:'DeepCool AK400 G2',case:'DeepCool CH260',ssd:'Kingston NV3 1TB',hdd:'Seagate BarraCuda 8TB',net:'ASUS XG-C100C',os:'Ubuntu Linux'}}
+];
+function prebuiltParts(b){return Object.entries(b.parts).map(([cat,needle])=>CAT[cat]&&CAT[cat].find(p=>!p.sold&&clean(p.name).toLowerCase().includes(needle.toLowerCase()))).filter(Boolean)}
+function prebuiltPrice(b){return prebuiltParts(b).reduce((total,p)=>total+p.price,0)}
+function showPrebuilts(){
+ $('prebuiltGrid').innerHTML=PREBUILTS.map(b=>`<article class="prebuilt"><h3>${b.icon} ${b.name}</h3><p>${b.desc}</p><div class="price">From ${usd(prebuiltPrice(b))}</div><button class="btn" type="button" onclick="loadPrebuilt('${b.id}')">Load & customize</button></article>`).join('');om('mpb');
+}
+function loadPrebuilt(id){const b=PREBUILTS.find(x=>x.id===id),missing=[];for(const k in S)delete S[k];for(const [cat,needle] of Object.entries(b.parts)){const p=CAT[cat]&&CAT[cat].find(x=>!x.sold&&clean(x.name).toLowerCase().includes(needle.toLowerCase()));if(p)S[cat]=p;else missing.push(LAB[cat])}cur=b.field;$('tier').value=b.tier;tab='cpu';cm('mpb');draw();$('fnote').textContent=missing.length?'Loaded '+b.name+'. Not found in this catalog: '+missing.join(', ')+'.':'Loaded '+b.name+'. Review it, then customize any part.';chime()}
 anim();bounce();
 </script></body></html>
