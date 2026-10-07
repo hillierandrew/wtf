@@ -1,144 +1,608 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>No internet</title><style>:root{--bg:#0f1117;--bg-card:#171a23;--bg-cart:#12141b;--fg:#e8ebf2;--fg-muted:#8b93a7;--a1:#ff5a47;--a2:#ff9d2e;--border:rgba(255,157,46,.28);--f:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
-body.light-mode{--bg:#f4f5f8;--bg-card:#fff;--bg-cart:#eef0f5;--fg:#1c2030;--fg-muted:#5d667c;--a1:#d92600;--a2:#d9690a;--border:rgba(217,105,10,.35)}
-body.chr{--bg:#f7f7f7;--bg-card:#fff;--bg-cart:#f1f3f4;--fg:#202124;--fg-muted:#5f6368;--a1:#d93025;--a2:#1a73e8;--border:#dadce0}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#0b0f19">
+<title>Pro PC Builder</title>
+<style>
+:root{
+  --bg:#0b0f19;--bg-card:#131b2e;--bg-cart:#0d1322;--bg-input:#0f1626;
+  --fg:#f1f5f9;--fg-muted:#94a3b8;
+  --a1:#ef4444;--a2:#3b82f6;--a2-2:#1d4ed8;
+  --accent-glow:rgba(59,130,246,.25);
+  --border:rgba(148,163,184,.15);
+  --ok:#22c55e;--warn:#f59e0b;
+  --font-size-base:15px;
+  --f:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --r:14px;--r-sm:10px;
+}
+html{font-size:var(--font-size-base)}
+body.light-mode{
+  --bg:#f1f5f9;--bg-card:#ffffff;--bg-cart:#f8fafc;--bg-input:#ffffff;
+  --fg:#0f172a;--fg-muted:#64748b;
+  --a1:#dc2626;--a2:#2563eb;--a2-2:#1e40af;
+  --accent-glow:rgba(37,99,235,.15);
+  --border:rgba(15,23,42,.12);
+}
+body.chr{
+  --bg:#fdfdfd;--bg-card:#ffffff;--bg-cart:#f1f3f4;--bg-input:#ffffff;
+  --fg:#202124;--fg-muted:#5f6368;
+  --a1:#d93025;--a2:#1a73e8;--a2-2:#1557b0;
+  --border:#dadce0;
+  --accent-glow:rgba(26,115,232,.15);
+}
+body.neon{
+  --bg:#05060a;--bg-card:#0a0e1a;--bg-cart:#070912;--bg-input:#080b14;
+  --fg:#e6f7ff;--fg-muted:#7dd3fc;
+  --a1:#ff2d95;--a2:#00e5ff;--a2-2:#00b8d4;
+  --accent-glow:rgba(0,229,255,.35);
+  --border:rgba(0,229,255,.2);
+}
+body.mobile-touch{--font-size-base:16px}
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--fg);font-family:var(--f)}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--fg);font-family:var(--f);transition:background .3s,color .3s}
 .ns{user-select:none;-webkit-user-select:none}
-.btn-primary{background:var(--a2);color:#fff;border:0;padding:13px;border-radius:10px;font-weight:800;cursor:pointer;width:100%;font:inherit}
-::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:5px}
-#dino{position:fixed;inset:0;z-index:1;background:#f7f7f7;color:#5f6368;font:15px/1.6 'Segoe UI',Roboto,Helvetica,Arial,sans-serif;overflow:auto}
-#dino .w{max-width:600px;margin:0 auto;padding:0 20px}
-#dino canvas{display:block;width:100%;max-width:600px;height:150px;margin:7vh auto 0}
-#dino h1{font-weight:400;font-size:1.6rem;color:#4a4a4a;margin:36px 0 14px}#dino p{margin:0 0 12px}#dino ul{margin:0 0 14px 22px}#dino small{color:#80868b}
-#pw{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center}#pw.show{display:flex}
-#pw div{background:#fff;padding:22px;border-radius:8px;width:300px;box-shadow:0 8px 30px rgba(0,0,0,.3);font:14px 'Segoe UI',sans-serif;color:#202124}
-#pw input{width:100%;padding:9px;margin:10px 0;border:1px solid #dadce0;border-radius:4px;font:inherit}#pw .btn-primary{background:#1a73e8;padding:9px;border-radius:4px}
-.sug{display:flex;gap:8px;align-items:center;padding:10px 18px;border-bottom:1px solid var(--border);flex-wrap:wrap;flex:none;color:var(--fg-muted);font-weight:700}
-.sug input,.sug select{background:var(--bg);color:var(--fg);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font:inherit}.sug input{width:92px}
-.qs{display:inline-flex;align-items:center;gap:8px;font-weight:800}.qs button{width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--fg);cursor:pointer;font-weight:900}
-.cp{background:rgba(255,80,60,.1);border:1px solid rgba(255,80,60,.35);border-radius:10px;padding:10px 14px;font-size:.82rem;font-weight:700;line-height:1.6}.cp b{display:block}.cp.ok{background:rgba(46,204,113,.12);border-color:rgba(46,204,113,.4);color:#1fa85a}
-.chrh{display:none;padding:14px 22px 10px;border-bottom:1px solid #535353;flex:none}body.chr .chrh{display:block}.chrh h1{font-weight:400;font-size:1.5rem;color:#4a4a4a}
-body.chr .pc,body.chr .sl,body.chr .kp div,body.chr .cp{border-radius:4px;box-shadow:none}body.chr .bh{background:#f7f7f7;border:0}body.chr .brand{font-weight:400;color:#5f6368}
+button{font:inherit;cursor:pointer;color:inherit}
+input,select{font:inherit;color:inherit}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:5px;border:2px solid transparent;background-clip:content-box}
+::-webkit-scrollbar-thumb:hover{background:var(--fg-muted);background-clip:content-box}
+*{scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+
+.btn-primary{background:linear-gradient(135deg,var(--a2),var(--a2-2));color:#fff;border:0;padding:13px 20px;border-radius:12px;font-weight:700;cursor:pointer;width:100%;font:inherit;box-shadow:0 4px 14px var(--accent-glow);transition:transform .1s,opacity .2s,box-shadow .2s;min-height:48px}
+.btn-primary:hover{opacity:.95;box-shadow:0 6px 20px var(--accent-glow)}
+.btn-primary:active{transform:scale(.98)}
+.btn-ghost{background:var(--bg-input);color:var(--fg);border:1px solid var(--border);border-radius:12px;padding:11px 18px;font-weight:700;cursor:pointer;font:inherit;transition:all .2s;min-height:44px}
+.btn-ghost:hover{background:var(--bg-card);border-color:var(--a2)}
+
+/* DINO SPLASH */
+#dino{position:fixed;inset:0;z-index:1;background:#f7f7f7;color:#5f6368;font:15px/1.6 'Segoe UI',Roboto,sans-serif;overflow:auto;display:flex;align-items:center;justify-content:center;transition:opacity .5s}
+#dino.gone{opacity:0;pointer-events:none}
+#dino .w{max-width:600px;margin:0 auto;padding:20px;text-align:center}
+#dino canvas{display:block;width:100%;max-width:600px;height:150px;margin:0 auto 20px;cursor:pointer;touch-action:manipulation}
+#dino h1{font-weight:400;font-size:1.8rem;color:#202124;margin:20px 0 10px}
+#dino p{margin:0 0 10px;color:#5f6368}
+#dino small{color:#80868b;font-family:monospace}
+#dino .counter{margin-top:12px;font-size:.8rem;color:#a4a4a4;font-weight:600;letter-spacing:.1em}
+#dino .counter b{color:#202124}
+
+/* UI switcher / bottom-left pill */
+#uiPill{position:fixed;left:14px;bottom:14px;z-index:99998;display:flex;gap:6px;align-items:center;background:rgba(0,0,0,.35);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.15);border-radius:999px;padding:6px 6px 6px 10px;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+#uiPill button{width:40px;height:40px;border-radius:50%;border:0;background:transparent;color:#fff;font-size:1.15rem;display:flex;align-items:center;justify-content:center;transition:all .2s}
+#uiPill button:hover{background:rgba(255,255,255,.15)}
+#uiPill button.active{background:#fff;color:#000}
+#uiPill .label{color:#fff;font-size:.7rem;font-weight:800;letter-spacing:.05em;padding-right:6px;text-transform:uppercase}
+#uiPill.sunglasses button{background:rgba(0,0,0,.4);color:#fff;font-size:1.3rem}
+#uiPill.sunglasses button.active{background:#ffb400;color:#000}
+
+/* Music control */
+#musicCtl{position:fixed;right:14px;bottom:14px;z-index:99998;display:flex;gap:6px;align-items:center;background:rgba(0,0,0,.4);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.15);border-radius:999px;padding:6px 10px 6px 6px;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+#musicCtl button{width:40px;height:40px;border-radius:50%;border:0;background:transparent;color:#fff;font-size:1.15rem;display:flex;align-items:center;justify-content:center;transition:all .2s}
+#musicCtl button:hover{background:rgba(255,255,255,.15)}
+#musicCtl input[type=range]{width:80px;accent-color:#00e5ff}
+@media(max-width:600px){#musicCtl input[type=range]{width:60px}}
+
+/* Password Modal */
+#pw{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px}
+#pw.show{display:flex}
+#pw .box{background:var(--bg-card);padding:32px 28px;border-radius:20px;width:100%;max-width:420px;box-shadow:0 24px 60px rgba(0,0,0,.5);border:1px solid var(--border);color:var(--fg)}
+#pw h3{margin-bottom:10px;font-size:1.3rem;font-weight:800}
+#pw p.hint{font-size:.85rem;color:var(--fg-muted);margin-bottom:16px;line-height:1.5}
+#pw input{width:100%;padding:14px 16px;margin:8px 0 18px;background:var(--bg-input);border:1px solid var(--border);color:var(--fg);border-radius:12px;font:inherit;outline:none;font-size:1.05rem;letter-spacing:.05em;min-height:52px}
+#pw input:focus{border-color:var(--a2);box-shadow:0 0 0 3px var(--accent-glow)}
+#pw .close{position:absolute;top:16px;right:16px;width:40px;height:40px;border-radius:50%;border:0;background:var(--bg-input);color:var(--fg-muted);font-size:1.4rem;display:flex;align-items:center;justify-content:center}
+
+/* BUILDER APP */
 #builder-app{position:fixed;inset:0;z-index:100;display:none;flex-direction:column;background:var(--bg)}
 #builder-app.show{display:flex}
-.bh{display:flex;align-items:center;gap:16px;padding:12px 22px;background:var(--bg-card);border-bottom:1px solid var(--border)}
-.brand{font-weight:900;font-size:1.2rem;color:var(--a2);white-space:nowrap;line-height:1.1}.brand small{display:block;font-size:.62rem;color:var(--fg-muted);letter-spacing:2px}
-.bh input{flex:1;max-width:560px;margin:0 auto;min-width:0;background:var(--bg);border:1px solid var(--border);color:var(--fg);padding:10px 18px;border-radius:24px;outline:0;font:inherit}.bh input:focus{border-color:var(--a2)}
-.bb{background:var(--bg);color:var(--fg);border:1px solid var(--border);border-radius:20px;padding:8px 16px;font-weight:700;cursor:pointer}
-.bm{display:grid;grid-template-columns:190px 1fr 410px;flex:1;min-height:0}
-.rail{background:var(--bg-card);border-right:1px solid var(--border);overflow:auto;padding:10px}
-.ri{display:flex;gap:10px;align-items:center;padding:11px 12px;border-radius:10px;cursor:pointer;color:var(--fg-muted);font-weight:700}.ri:hover{background:var(--bg)}.ri.on{background:var(--bg);color:var(--a2);box-shadow:inset 3px 0 var(--a2)}.ri i{margin-left:auto;color:#2ecc71;font-style:normal}
-.mid{display:flex;flex-direction:column;min-height:0}
-.tags{display:flex;gap:6px;overflow-x:auto;padding:12px 18px;border-bottom:1px solid var(--border);flex:none}
-.tg{white-space:nowrap;border:1px solid var(--border);background:var(--bg-card);color:var(--fg-muted);border-radius:16px;padding:5px 12px;font-size:.8rem;font-weight:700;cursor:pointer}.tg.on{background:var(--a2);color:#000;border-color:var(--a2)}
-.grid{flex:1;overflow:auto;padding:18px;display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));align-content:start}
-.gh{grid-column:1/-1;margin:8px 0 0;color:var(--fg-muted)}
-.pc{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px;cursor:pointer}.pc:hover{border-color:var(--a2)}.pc.sel{border:2px solid var(--a2);background:var(--bg)}
-.pn{font-weight:800;line-height:1.3}.ps{color:var(--fg-muted);font-size:.82rem}
-.pt{display:flex;gap:5px;flex-wrap:wrap}.pt span{font-size:.7rem;padding:3px 8px;border-radius:5px;background:var(--bg);border:1px solid var(--border);color:var(--fg-muted);font-weight:700}
-.pf{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:6px;color:var(--fg-muted);font-weight:800}.pf b{font-size:1.3rem;color:var(--a2)}
-.pr{color:#e0442f;font-size:.8rem;font-weight:700}
-.bp{background:var(--bg-cart);border-left:1px solid var(--border);overflow:auto;padding:18px;display:flex;flex-direction:column;gap:12px}
-.tot{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.tot b{font-size:1.7rem;color:var(--a2)}.tot h2{font-size:1.2rem}
-.st{padding:6px 12px;border-radius:8px;font-weight:800;font-size:.8rem}.st.ok{background:rgba(46,204,113,.15);color:#1fa85a}.st.no{background:rgba(255,80,60,.15);color:#e0442f}
-.sl{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px}.sl.e{border-style:dashed;color:var(--fg-muted);cursor:pointer}
-.sl small{display:block;font-size:.68rem;color:var(--fg-muted);font-weight:800}.sl div{flex:1;font-size:.86rem;font-weight:700;line-height:1.25}.sl button{background:0;border:0;color:var(--a1);cursor:pointer;font-weight:900}
-.kp{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.kp div{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:8px;text-align:center;font-size:.68rem;color:var(--fg-muted);font-weight:700}.kp b{display:block;font-size:1rem;color:var(--fg)}
-.bar{display:flex;align-items:center;gap:8px;font-size:.78rem;font-weight:800}.bar span{width:64px}.bar i{flex:1;height:8px;background:var(--bg-card);border-radius:4px;overflow:hidden}.bar u{display:block;height:100%;background:var(--a2)}
-@media(max-width:1050px){.bm{grid-template-columns:1fr;grid-template-rows:auto 1fr 44vh}.rail{display:flex;overflow-x:auto;border:0;border-bottom:1px solid var(--border)}.ri{white-space:nowrap}.bp{border:0;border-top:1px solid var(--border)}}
-#erp{position:fixed;inset:0;z-index:200;display:none;flex-direction:column;background:#fff;font:12px Tahoma,Arial,sans-serif;color:#222}#erp.show{display:flex}
-.eh{display:flex;align-items:center;gap:10px;padding:5px 12px;min-height:50px;background:linear-gradient(#6d9fc9,#2e5f8f);color:#fff;border-bottom:1px solid #1d4468}
-.elogo{font:italic bold 19px Georgia,serif;text-shadow:1px 1px 2px #0006;white-space:nowrap}.elogo small{display:block;font:italic 9px Arial}
-.ealert{flex:1;text-align:center;color:#ff3b2f;font:italic bold 16px Arial;text-shadow:0 1px 1px #0008}
-.eh select,.ebtn{font:11px Tahoma,Arial;border:1px solid #8a9aa9;background:linear-gradient(#fff,#dde3e9);padding:3px 8px;color:#222;cursor:pointer}.eh .ebtn{background:linear-gradient(#5aa0d8,#2a73b5);color:#fff;border-color:#1d4f80}
-.etabs{display:flex;gap:2px;padding:4px 6px 0;background:linear-gradient(#f3f5f7,#d4dbe2);border-bottom:1px solid #8fa0b0;overflow-x:auto}
-.etab{white-space:nowrap;padding:4px 12px;border:1px solid #9aa9b8;border-bottom:0;border-radius:4px 4px 0 0;background:linear-gradient(#f8f9fa,#e1e6eb);cursor:pointer}.etab.on{background:#fff;font-weight:bold;position:relative;top:1px}
+.bh{display:flex;align-items:center;gap:14px;padding:12px 18px;background:var(--bg-card);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.brand{font-weight:900;font-size:1.15rem;color:var(--a2);white-space:nowrap;line-height:1.1;letter-spacing:.5px}
+.brand small{display:block;font-size:.6rem;color:var(--fg-muted);letter-spacing:2px;font-weight:600}
+.bh .search{flex:1;min-width:180px;max-width:600px;background:var(--bg-input);border:1px solid var(--border);color:var(--fg);padding:11px 18px;border-radius:26px;outline:0;font:inherit;transition:all .2s;min-height:44px}
+.bh .search:focus{border-color:var(--a2);box-shadow:0 0 0 3px var(--accent-glow)}
+.bh .right{display:flex;gap:8px;align-items:center;margin-left:auto}
+.icon-btn{width:44px;height:44px;border-radius:50%;background:var(--bg-input);border:1px solid var(--border);color:var(--fg);font-size:1.15rem;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.icon-btn:hover{background:var(--bg-card);border-color:var(--a2);color:var(--a2)}
+.font-slider-wrap{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--fg-muted);font-weight:600;padding:0 8px}
+.font-slider-wrap input{width:80px;accent-color:var(--a2)}
+
+.bm{display:grid;grid-template-columns:220px 1fr 440px;flex:1;min-height:0}
+@media(max-width:1200px){.bm{grid-template-columns:180px 1fr 380px}}
+@media(max-width:1000px){.bm{grid-template-columns:1fr;grid-template-rows:auto 1fr auto}}
+
+.rail{background:var(--bg-card);border-right:1px solid var(--border);overflow-y:auto;padding:10px}
+@media(max-width:1000px){.rail{display:flex;overflow-x:auto;overflow-y:hidden;border:0;border-bottom:1px solid var(--border);padding:8px;gap:6px;flex-wrap:nowrap}}
+.ri{display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:12px;cursor:pointer;color:var(--fg-muted);font-weight:700;transition:all .15s;margin-bottom:4px;font-size:.92rem;min-height:52px;white-space:nowrap}
+@media(max-width:1000px){.ri{margin-bottom:0;flex:0 0 auto}}
+.ri:hover{background:var(--bg-input);color:var(--fg)}
+.ri.on{background:linear-gradient(135deg,var(--a2),var(--a2-2));color:#fff;box-shadow:0 4px 14px var(--accent-glow)}
+.ri i{margin-left:auto;background:rgba(255,255,255,.25);padding:2px 9px;border-radius:20px;font-size:.72rem;font-style:normal;font-weight:800}
+.ri .emoji{font-size:1.15rem;line-height:1}
+
+.mid{display:flex;flex-direction:column;min-height:0;min-width:0}
+.sub-tools{display:flex;gap:8px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--bg-card);flex-wrap:wrap;font-weight:700;color:var(--fg-muted);font-size:.85rem}
+.sub-tools label{display:flex;align-items:center;gap:6px}
+.sub-tools input,.sub-tools select{background:var(--bg-input);color:var(--fg);border:1px solid var(--border);border-radius:10px;padding:9px 12px;font:inherit;min-height:40px}
+.sub-tools input[type=number]{width:110px}
+
+.tags{display:flex;gap:6px;overflow-x:auto;padding:10px 16px;border-bottom:1px solid var(--border);flex:none;background:var(--bg)}
+.tg{white-space:nowrap;border:1px solid var(--border);background:var(--bg-card);color:var(--fg-muted);border-radius:999px;padding:8px 14px;font-size:.8rem;font-weight:700;cursor:pointer;transition:all .15s;min-height:38px;display:flex;align-items:center}
+.tg:hover{color:var(--fg);border-color:var(--a2)}
+.tg.on{background:linear-gradient(135deg,var(--a2),var(--a2-2));color:#fff;border-color:transparent;box-shadow:0 2px 10px var(--accent-glow)}
+
+.grid{flex:1;overflow-y:auto;padding:16px;display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));align-content:start}
+@media(max-width:600px){.grid{grid-template-columns:1fr;padding:12px;gap:12px}}
+.gh{grid-column:1/-1;margin:8px 0 0;color:var(--fg-muted);font-size:1.05rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+
+.pc{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px;cursor:pointer;transition:all .18s;position:relative;color:inherit}
+.pc:hover{border-color:var(--a2);transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,0,0,.15)}
+.pc.sel{border:2px solid var(--a2);background:linear-gradient(160deg,var(--bg-card),var(--bg-input));box-shadow:0 0 0 3px var(--accent-glow)}
+.pc.dis{opacity:.55}
+.pc .pn{font-weight:800;line-height:1.35;font-size:1rem;color:var(--fg)}
+.pc .ps{color:var(--fg-muted);font-size:.82rem;line-height:1.5}
+.pc .pt{display:flex;gap:5px;flex-wrap:wrap}
+.pc .pt span{font-size:.7rem;padding:3px 8px;border-radius:6px;background:var(--bg-input);border:1px solid var(--border);color:var(--fg-muted);font-weight:700;white-space:nowrap}
+.pc .pf{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:8px;color:var(--fg-muted);font-weight:800;gap:8px}
+.pc .pf b{font-size:1.35rem;color:var(--a2);letter-spacing:-.02em}
+.pc .pr{color:var(--a1);font-size:.78rem;font-weight:700;background:rgba(239,68,68,.1);padding:7px 10px;border-radius:8px;line-height:1.4}
+
+.qtyc{display:inline-flex;align-items:center;gap:0;background:var(--bg-input);border:1px solid var(--border);border-radius:999px;padding:3px;font-weight:900}
+.qtyc button{width:32px;height:32px;border-radius:50%;background:transparent;border:0;color:var(--fg);font-size:1.15rem;font-weight:900;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.qtyc button:hover{background:var(--a2);color:#fff}
+.qtyc span{min-width:28px;text-align:center;font-weight:900}
+
+.bp{background:var(--bg-cart);border-left:1px solid var(--border);overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+@media(max-width:1000px){.bp{border:0;border-top:1px solid var(--border);max-height:44vh}}
+.tot{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.tot b{font-size:1.6rem;color:var(--a2);letter-spacing:-.02em}
+.tot h2{font-size:1.15rem;font-weight:800}
+.st{padding:6px 12px;border-radius:8px;font-weight:800;font-size:.78rem}
+.cp{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:12px;padding:12px 14px;font-size:.85rem;font-weight:600;line-height:1.55;color:var(--a1)}
+.cp.ok{background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.25);color:var(--ok)}
+.cp b{display:block;margin-bottom:4px;font-weight:800}
+.sl{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;transition:border-color .15s}
+.sl:hover{border-color:var(--a2)}
+.sl.e{border-style:dashed;color:var(--fg-muted);cursor:pointer;background:transparent}
+.sl.e:hover{background:var(--bg-card);color:var(--fg)}
+.sl small{display:block;font-size:.68rem;color:var(--fg-muted);font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.sl .body{flex:1;font-size:.88rem;font-weight:700;line-height:1.35;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.sl .emoji{font-size:1.3rem;flex-shrink:0}
+.sl .rm{background:transparent;border:0;color:var(--a1);font-weight:900;padding:6px;border-radius:8px;font-size:1.1rem}
+.sl .rm:hover{background:rgba(239,68,68,.12)}
+
+.kp{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.kp div{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center;font-size:.68rem;color:var(--fg-muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.kp b{display:block;font-size:1rem;color:var(--fg);margin-top:3px;text-transform:none;letter-spacing:0;font-weight:800}
+
+.bar{display:flex;align-items:center;gap:10px;font-size:.8rem;font-weight:800}
+.bar span.lbl{width:80px;color:var(--fg-muted)}
+.bar i{flex:1;height:10px;background:var(--bg-card);border-radius:5px;overflow:hidden;border:1px solid var(--border)}
+.bar u{display:block;height:100%;background:linear-gradient(90deg,var(--a2),#60a5fa);border-radius:5px;transition:width .4s}
+.bar .val{width:36px;text-align:right;color:var(--fg)}
+
+/* ERP Stealth */
+#erp{position:fixed;inset:0;z-index:200;display:none;flex-direction:column;background:#fff;font:12px Tahoma,Arial,sans-serif;color:#222}
+#erp.show{display:flex}
+body.dark-erp #erp{background:#1a1d24;color:#e0e0e0}
+body.dark-erp .emain{background:#1a1d24}
+body.dark-erp .egrid{border-color:#3a3f4a}
+body.dark-erp .emain th{background:linear-gradient(#2a2f38,#232830);border-color:#3a3f4a;color:#e0e0e0}
+body.dark-erp .emain td{border-color:#2a2f38;color:#e0e0e0}
+body.dark-erp .emain tr:hover td{background:#252a33}
+body.dark-erp .emain tr.sel td{background:#1d7fc6;color:#fff}
+body.dark-erp .emain td.n{background:#232830;color:#888}
+body.dark-erp .eord{border-color:#3a3f4a}
+body.dark-erp .esum{background:#232830;border-color:#3a3f4a}
+body.dark-erp .ebtn{background:linear-gradient(#5aa0d8,#2a73b5);color:#fff}
+body.dark-erp .elogo{color:#7dd3fc}
+body.dark-erp .ett{color:#7dd3fc}
+.eh{display:flex;align-items:center;gap:10px;padding:6px 14px;min-height:52px;background:linear-gradient(#6d9fc9,#2e5f8f);color:#fff;border-bottom:1px solid #1d4468;flex-wrap:wrap}
+body.dark-erp .eh{background:linear-gradient(#1e3a52,#0d1f2d)}
+.elogo{font:italic bold 18px Georgia,serif;text-shadow:1px 1px 2px #0006;white-space:nowrap}
+.elogo small{display:block;font:italic 9px Arial}
+.ealert{flex:1;text-align:center;color:#ff3b2f;font:italic bold 15px Arial;text-shadow:0 1px 1px #0008;min-width:100px}
+.eh select,.ebtn{font:11px Tahoma,Arial;border:1px solid #8a9aa9;background:linear-gradient(#fff,#dde3e9);padding:5px 10px;color:#222;cursor:pointer;border-radius:4px;min-height:32px}
+.eh .ebtn{background:linear-gradient(#5aa0d8,#2a73b5);color:#fff;border-color:#1d4f80}
+body.dark-erp .eh select,body.dark-erp .eh .ebtn{border-color:#3a5a7a}
+.etabs{display:flex;gap:2px;padding:5px 8px 0;background:linear-gradient(#f3f5f7,#d4dbe2);border-bottom:1px solid #8fa0b0;overflow-x:auto}
+body.dark-erp .etabs{background:linear-gradient(#2a2f38,#1f242c);border-color:#3a3f4a}
+.etab{white-space:nowrap;padding:5px 14px;border:1px solid #9aa9b8;border-bottom:0;border-radius:5px 5px 0 0;background:linear-gradient(#f8f9fa,#e1e6eb);cursor:pointer;font-size:11px}
+body.dark-erp .etab{background:linear-gradient(#2f3540,#262b33);border-color:#3a3f4a;color:#e0e0e0}
+.etab.on{background:#fff;font-weight:bold;position:relative;top:1px}
+body.dark-erp .etab.on{background:#1a1d24;color:#fff}
 .ebody{display:flex;flex:1;min-height:0}
-.esb{width:172px;flex:none;overflow:auto;background:linear-gradient(#4b84b6,#2b5a86);color:#fff}.esb input{width:calc(100% - 12px);margin:6px;padding:3px;border:1px solid #1d4468;font:11px Tahoma}
-.esi{display:flex;align-items:center;gap:7px;padding:8px 9px;border-bottom:1px solid #2b5a86;border-top:1px solid #6b9bc6;cursor:pointer}.esi:hover{background:#6aa1d1}.esi.on{background:linear-gradient(#f7c948,#e0a20e);color:#222;font-weight:bold}
-.dot{width:11px;height:11px;border-radius:50%;border:1px solid #fff8;flex:none}
-.emain{flex:1;min-width:0;display:flex;flex-direction:column;padding:4px 8px}
-.ett{font-weight:bold;color:#333;padding:4px 0}
-.etool{display:flex;gap:8px;align-items:center;padding:3px 0 6px}.etool input{width:260px;max-width:40%;padding:3px;border:1px solid #9aa;font:11px Tahoma}
-.egrid{flex:1;overflow:auto;border:1px solid #b5bec8;min-height:80px}
-.emain table{width:100%;border-collapse:collapse}
-.emain th{position:sticky;top:0;background:linear-gradient(#fff,#dde2e8);border:1px solid #c3cad2;padding:5px 7px;font-weight:normal;color:#444;text-align:left;white-space:nowrap}
-.emain td{border:1px solid #dfe3e7;padding:4px 7px;height:26px}.emain tr:hover td{background:#eaf3fb}.emain tr.sel td{background:#1d7fc6;color:#fff}
-.emain td.n{background:#eef0f2;color:#666;width:26px;text-align:center}
-.r{text-align:right!important}.err{color:#c00}.sel .err{color:#ffb4a8}.lk{color:#06c;text-decoration:underline;cursor:pointer;text-align:center}
-.epg{display:flex;gap:10px;align-items:center;padding:4px 2px;border-top:1px solid #ccc;color:#555}
-.eord{max-height:36%;overflow:auto;border-top:2px solid #6f8ca6;margin-top:4px}
-.esum{padding:6px;background:#f2f4f6;border:1px solid #c5ccd3;line-height:1.7}
-@media(max-width:800px){.esb,.ealert{display:none}}
-</style></head><body><div id="dino" class="ns"><div class="w"><canvas id="dc" width="600" height="150"></canvas>
-<h1>Unable to connect to the Internet</h1><p>This webpage can't be displayed because your computer isn't connected to the Internet.</p><p>Try:</p><ul><li>Checking the network cables, modem and router</li><li>Reconnecting to Wi-Fi</li></ul><small>ERR_INTERNET_DISCONNECTED</small></div></div>
-<div id="pw"><div><b>Enter password</b><input id="pi" type="password" autocomplete="off"><button class="btn-primary" onclick="tryPw()">Continue</button></div></div>
+.esb{width:180px;flex:none;overflow-y:auto;background:linear-gradient(#4b84b6,#2b5a86);color:#fff}
+body.dark-erp .esb{background:linear-gradient(#1e3a52,#0d1f2d)}
+.esb input{width:calc(100% - 12px);margin:6px;padding:5px;border:1px solid #1d4468;font:11px Tahoma;background:rgba(255,255,255,.9)}
+.esi{display:flex;align-items:center;gap:8px;padding:9px 10px;border-bottom:1px solid rgba(0,0,0,.15);border-top:1px solid rgba(255,255,255,.1);cursor:pointer;font-size:11px;transition:background .12s}
+.esi:hover{background:rgba(255,255,255,.1)}
+.esi.on{background:linear-gradient(#f7c948,#e0a20e);color:#222;font-weight:bold}
+.dot{width:11px;height:11px;border-radius:50%;border:1px solid rgba(255,255,255,.5);flex:none}
+.emain{flex:1;min-width:0;display:flex;flex-direction:column;padding:6px 10px;background:#fff}
+body.dark-erp .emain{background:#1a1d24}
+.ett{font-weight:bold;color:#333;padding:5px 0;font-size:11px}
+body.dark-erp .ett{color:#7dd3fc}
+.etool{display:flex;gap:8px;align-items:center;padding:4px 0 8px;flex-wrap:wrap}
+.etool input{width:240px;max-width:100%;padding:5px;border:1px solid #9aa;font:11px Tahoma;min-height:32px;border-radius:4px}
+body.dark-erp .etool input{background:#232830;color:#fff;border-color:#3a3f4a}
+.etool select{min-height:32px;border-radius:4px}
+.egrid{flex:1;overflow:auto;border:1px solid #b5bec8;min-height:100px;background:#fff}
+body.dark-erp .egrid{background:#1a1d24}
+.emain table{width:100%;border-collapse:collapse;font-size:11px}
+.emain th{position:sticky;top:0;background:linear-gradient(#fff,#dde2e8);border:1px solid #c3cad2;padding:6px 8px;font-weight:600;color:#444;text-align:left;white-space:nowrap;z-index:1}
+.emain td{border:1px solid #dfe3e7;padding:6px 8px;height:28px;vertical-align:middle}
+.emain tr{cursor:pointer}
+.emain tr.sel td{background:#1d7fc6;color:#fff}
+.emain td.n{background:#eef0f2;color:#666;width:32px;text-align:center;font-weight:600}
+.r{text-align:right!important}
+.err{color:#c00}
+.sel .err{color:#ffb4a8}
+.lk{color:#06c;text-decoration:underline;cursor:pointer;text-align:center;font-weight:700}
+.sel .lk{color:#fff}
+.epg{display:flex;gap:10px;align-items:center;padding:6px 2px;border-top:1px solid #ccc;color:#555;font-size:11px}
+body.dark-erp .epg{color:#aaa;border-color:#3a3f4a}
+.eord{max-height:40%;overflow:auto;border-top:2px solid #6f8ca6;margin-top:6px}
+.esum{padding:8px;background:#f2f4f6;border:1px solid #c5ccd3;line-height:1.7;font-size:11px}
+@media(max-width:800px){.esb,.ealert{display:none}.eh{gap:6px;padding:6px}.elogo{font-size:14px}}
+
+/* Neon overrides */
+body.neon .pc:hover{border-color:var(--a2);box-shadow:0 0 20px rgba(0,229,255,.3)}
+body.neon .pc.sel{box-shadow:0 0 20px rgba(0,229,255,.4),inset 0 0 30px rgba(0,229,255,.05)}
+body.neon .ri.on{box-shadow:0 0 20px rgba(0,229,255,.5)}
+body.neon .btn-primary{box-shadow:0 0 24px rgba(0,229,255,.35)}
+
+/* Toast */
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(20,20,30,.95);color:#fff;padding:13px 22px;border-radius:12px;z-index:99999;font:700 14px var(--f);box-shadow:0 10px 30px rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.15);display:none;max-width:calc(100vw - 40px);text-align:center}
+</style>
+</head>
+<body>
+
+<audio id="bgm" loop preload="auto" src="dream.mp3"></audio>
+
+<!-- Music control (bottom-right) -->
+<div id="musicCtl" class="ns">
+  <button id="muteBtn" title="Mute">🔊</button>
+  <input type="range" id="volSlider" min="0" max="100" value="50" title="Volume">
+</div>
+
+<!-- UI switcher (bottom-left) -->
+<div id="uiPill" class="ns">
+  <span class="label" id="uiLabel">UI</span>
+  <button data-ui="1" title="Password1 — Pro Builder">🕶️</button>
+  <button data-ui="2" title="Password2 — ERP">🥽</button>
+  <button data-ui="3" title="Password3 — Clean">👓</button>
+  <button data-ui="4" title="Password4 — Mobile">🧢</button>
+  <button data-ui="5" title="Password5 — Neon">🕶️</button>
+</div>
+
+<!-- Offline Dino Splash -->
+<div id="dino" class="ns">
+  <div class="w">
+    <canvas id="dc" width="600" height="150"></canvas>
+    <h1>No internet connection</h1>
+    <p>Press the dinosaur <b>20 times</b> to open the authentication dialog.</p>
+    <small>ERR_INTERNET_DISCONNECTED</small>
+    <div class="counter"><b id="tapCount">0</b> / 20 taps</div>
+  </div>
+</div>
+
+<!-- Password Modal -->
+<div id="pw" class="ns">
+  <div class="box" style="position:relative">
+    <button class="close" onclick="closePw()">✕</button>
+    <h3>System Authentication</h3>
+    <p class="hint">Enter one of: <b>Password1</b>, <b>Password2</b>, <b>Password3</b>, <b>Password4</b>, <b>Password5</b></p>
+    <input id="pi" type="password" autocomplete="off" placeholder="Enter password...">
+    <button class="btn-primary" onclick="tryPw()">Authenticate</button>
+  </div>
+</div>
+
+<!-- ===== BUILDER APP ===== -->
 <div id="builder-app">
- <header class="bh"><div class="brand">BAKWAS BUILDER<small>PC CONFIGURATOR</small></div><input id="q" placeholder="Search parts, specs or tags (DDR5, SFF, iGPU, 16GB VRAM...)" oninput="draw()"><button class="bb" onclick="document.body.classList.toggle('light-mode')">Theme</button></header>
- <div class="chrh"><h1>Unable to connect to the Internet</h1></div><div class="bm"><nav class="rail" id="rail"></nav><main class="mid"><div class="sug">Budget $<input id="bud" type="number" value="1500"><select id="uc"><option value="">All use cases</option><option value="g">Gaming</option><option value="v">Video editing</option><option value="c">AutoCAD / workstation</option><option value="a">DJ / audio</option><option value="i">AI</option><option value="o">Office</option></select><button class="bb" onclick="suggest($('bud').value,$('uc').value)">Suggest a build</button></div><div class="tags" id="tags"></div><div class="grid" id="grid"></div></main><aside class="bp" id="bp"></aside></div>
+  <header class="bh">
+    <div class="brand">PRO BUILDER<small>SYSTEM CONFIGURATOR</small></div>
+    <input class="search" id="q" placeholder="Search parts, specs or tags (DDR5, SFF, iGPU, 16GB VRAM...)" oninput="draw()">
+    <div class="right">
+      <button class="icon-btn" id="themeBtn" onclick="cycleTheme()" title="Theme">🌙</button>
+      <button class="icon-btn" id="layoutBtn" onclick="cycleLayout()" title="Layout">📱</button>
+      <div class="font-slider-wrap">
+        <span>Aa</span>
+        <input type="range" id="fontSlider" min="12" max="20" value="15" oninput="changeFontSize(this.value)">
+      </div>
+    </div>
+  </header>
+  <div class="bm">
+    <nav class="rail" id="rail"></nav>
+    <main class="mid">
+      <div class="sub-tools">
+        Budget $<input id="bud" type="number" value="1500">
+        <select id="uc">
+          <option value="">All use cases</option>
+          <option value="g">Gaming</option>
+          <option value="v">Video editing</option>
+          <option value="c">AutoCAD / workstation</option>
+          <option value="a">DJ / audio</option>
+          <option value="i">AI</option>
+          <option value="o">Office</option>
+        </select>
+        <button class="btn-ghost" onclick="suggest($('bud').value,$('uc').value)">Suggest build</button>
+      </div>
+      <div class="tags" id="tags"></div>
+      <div class="grid" id="grid"></div>
+    </main>
+    <aside class="bp" id="bp"></aside>
+  </div>
 </div>
+
+<!-- ===== ERP MODE ===== -->
 <div id="erp" class="ns">
- <div class="eh"><div class="elogo">Enterprise ERP<small>Enterprise Resource Planning System</small></div><div class="ealert" id="ealert"></div><select><option>PC Build Desk</option></select><span>Location:</span><select><option>112 Mississauga</option></select><button class="ebtn">Message Center</button></div>
- <div class="etabs"><div class="etab">Home</div><div class="etab">Store Dashboard</div><div class="etab">Sales Order &#10006;</div><div class="etab on">SONL04011460 &#10006;</div><div class="etab">Message Center</div></div>
- <div class="ebody"><div class="esb" id="esb"></div><div class="emain"><div class="ett" id="ett"></div>
-  <div class="etool"><button class="ebtn">&#128269; Search</button><input id="eq" placeholder="Description, spec or tag" oninput="edraw()"><select id="ecs" onchange="eg(this.value)"></select><input id="ebud" type="number" value="1500" style="width:80px"><button class="ebtn" onclick="suggest($('ebud').value,'')">Suggest build</button></div>
-  <div class="egrid"><table id="et"></table></div>
-  <div class="epg"><span>100 &#9662;</span><span>|&#9664; &#9664; Page 1 of 1 &#9654; &#9654;|</span><span>&#8635;</span><span id="ecnt" style="margin-left:auto"></span></div>
-  <div class="eord" id="eord"></div></div></div>
+  <div class="eh">
+    <div class="elogo">Enterprise ERP<small>Enterprise Resource Planning System</small></div>
+    <div class="ealert" id="ealert"></div>
+    <select><option>PC Build Desk</option></select>
+    <span>Location:</span>
+    <select><option>112 Mississauga</option></select>
+    <button class="ebtn" onclick="cycleTheme()">Theme</button>
+  </div>
+  <div class="etabs">
+    <div class="etab">Home</div>
+    <div class="etab">Store Dashboard</div>
+    <div class="etab">Sales Order</div>
+    <div class="etab on">SONL04011460</div>
+    <div class="etab">Message Center</div>
+  </div>
+  <div class="ebody">
+    <div class="esb" id="esb"></div>
+    <div class="emain">
+      <div class="ett" id="ett"></div>
+      <div class="etool">
+        <button class="ebtn">🔍 Search</button>
+        <input id="eq" placeholder="Description, spec or tag" oninput="edraw()">
+        <select id="ecs" onchange="eg(this.value)"></select>
+        <input id="ebud" type="number" value="1500" style="width:90px">
+        <button class="ebtn" onclick="suggest($('ebud').value,'')">Suggest build</button>
+      </div>
+      <div class="egrid"><table id="et"></table></div>
+      <div class="epg">
+        <span>100 ▾</span>
+        <span>|◀ ◀ Page 1 of 1 ▶ ▶|</span>
+        <span>↻</span>
+        <span id="ecnt" style="margin-left:auto"></span>
+      </div>
+      <div class="eord" id="eord"></div>
+    </div>
+  </div>
 </div>
-<script>/* ===== CATALOG (prices are CAD estimates: edit the rows below) ===== */
+
+<script>
+/* ============================================================
+   MUSIC PLAYER — plays reliably, with volume + mute
+   ============================================================ */
+const bgm=document.getElementById('bgm'),muteBtn=document.getElementById('muteBtn'),volSlider=document.getElementById('volSlider');
+let musicStarted=false;
+const MUSIC_SOURCES=[
+  'dream.mp3',
+  'https://raw.githubusercontent.com/hillierandrew/wtf/main/dream.mp3',
+  'https://raw.githubusercontent.com/hillierandrew/wtf/main/dreams.mp3'
+];
+let musicSourceIdx=0;
+bgm.addEventListener('error',()=>{
+  musicSourceIdx++;
+  if(musicSourceIdx<MUSIC_SOURCES.length){
+    bgm.src=MUSIC_SOURCES[musicSourceIdx];
+    bgm.load();
+    if(musicStarted)bgm.play().catch(()=>{});
+  }
+});
+function startMusic(){
+  if(musicStarted)return;
+  musicStarted=true;
+  bgm.volume=(+volSlider.value)/100;
+  bgm.play().catch(()=>{/* will retry on next user gesture */});
+}
+// Retry playback on any user gesture
+function gesturePlay(){
+  if(musicStarted&&bgm.paused){bgm.volume=(+volSlider.value)/100;bgm.play().catch(()=>{})}
+  else if(!musicStarted){startMusic()}
+}
+['click','touchstart','keydown'].forEach(t=>document.addEventListener(t,gesturePlay,{passive:true}));
+
+muteBtn.addEventListener('click',()=>{
+  bgm.muted=!bgm.muted;
+  muteBtn.textContent=bgm.muted?'🔇':'🔊';
+});
+volSlider.addEventListener('input',()=>{
+  bgm.volume=(+volSlider.value)/100;
+  if(bgm.volume>0)bgm.muted=false;
+  muteBtn.textContent=bgm.muted?'🔇':(bgm.volume===0?'🔇':'🔊');
+});
+
+/* ============================================================
+   UI SWITCHER (bottom-left pill)
+   ============================================================ */
+const UI_STYLES={
+  1:{cls:'',          title:'Pro Builder', theme:'dark'},
+  2:{cls:'',          title:'ERP',          theme:'dark-erp', erp:true},
+  3:{cls:'chr',       title:'Clean',        theme:'light'},
+  4:{cls:'mobile-touch',title:'Mobile',     theme:'dark'},
+  5:{cls:'neon',      title:'Neon',         theme:'dark'}
+};
+let currentUI=1, currentTheme='dark';
+function applyUI(n){
+  currentUI=+n;
+  const s=UI_STYLES[currentUI];
+  document.body.className=s.cls;
+  // apply theme
+  document.body.classList.remove('light-mode','dark-erp','neon');
+  if(s.theme==='light')document.body.classList.add('light-mode');
+  if(s.theme==='dark-erp')document.body.classList.add('dark-erp');
+  if(s.theme==='neon')document.body.classList.add('neon');
+  // Toggle between builder and ERP
+  if(s.erp){
+    if(!document.getElementById('erp').classList.contains('show')){
+      if(document.getElementById('builder-app').classList.contains('show'))return;
+      openStealthBuilder();
+    }
+  }else{
+    if(document.getElementById('erp').classList.contains('show')){
+      document.getElementById('erp').classList.remove('show');
+      document.getElementById('builder-app').classList.add('show');
+      draw();
+    }
+  }
+  // Update pill active state
+  document.querySelectorAll('#uiPill button').forEach(b=>{
+    b.classList.toggle('active',+b.dataset.ui===currentUI);
+  });
+  document.getElementById('uiLabel').textContent=s.title;
+}
+document.querySelectorAll('#uiPill button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    if(currentUI===+b.dataset.ui)return;
+    // for UI 2 (ERP), open ERP; for others, open builder
+    applyUI(b.dataset.ui);
+    // If switching between builder and ERP and nothing was open, open it
+    const ui=UI_STYLES[+b.dataset.ui];
+    if(ui.erp){
+      // open ERP
+      document.getElementById('builder-app').classList.remove('show');
+      openStealthBuilder();
+    }else{
+      document.getElementById('erp').classList.remove('show');
+      document.getElementById('builder-app').classList.add('show');
+      draw();
+    }
+  });
+});
+
+/* Cycle theme button (cycles: dark → light → neon → dark-erp) */
+const THEMES=['dark','light','neon','dark-erp'];
+function cycleTheme(){
+  const idx=THEMES.indexOf(currentTheme);
+  currentTheme=THEMES[(idx+1)%THEMES.length];
+  document.body.classList.remove('light-mode','dark-erp','neon');
+  if(currentTheme==='light')document.body.classList.add('light-mode');
+  if(currentTheme==='neon')document.body.classList.add('neon');
+  if(currentTheme==='dark-erp')document.body.classList.add('dark-erp');
+  document.getElementById('themeBtn').textContent=
+    currentTheme==='light'?'☀️':currentTheme==='neon'?'⚡':currentTheme==='dark-erp'?'🏢':'🌙';
+  toast('Theme: '+currentTheme.toUpperCase());
+}
+
+/* Cycle layout (mobile / desktop visual) */
+let currentLayout='wide';
+function cycleLayout(){
+  currentLayout=currentLayout==='wide'?'compact':'wide';
+  if(currentLayout==='compact'){
+    document.body.classList.add('mobile-touch');
+    document.getElementById('layoutBtn').textContent='📱';
+    toast('Compact layout');
+  }else{
+    document.body.classList.remove('mobile-touch');
+    document.getElementById('layoutBtn').textContent='🖥️';
+    toast('Wide layout');
+  }
+}
+
+/* Font size */
+function changeFontSize(val){
+  document.documentElement.style.setProperty('--font-size-base',val+'px');
+}
+
+/* Toast */
+function toast(t){
+  let e=document.getElementById('toast');
+  if(!e){e=document.createElement('div');e.id='toast';document.body.appendChild(e)}
+  e.textContent=t;e.style.display='block';
+  clearTimeout(e._t);
+  e._t=setTimeout(()=>e.style.display='none',2400);
+}
+
+/* ============================================================
+   CATALOG
+   ============================================================ */
 const CATS=[['pb','Ready-made builds','🚀'],['cpu','Processor','🧠'],['mb','Motherboard','🕹️'],['ram','Memory','📼'],['gpu','Graphics card','🎮'],['ssd','Storage','💾'],['cooler','CPU cooler','❄️'],['psu','Power supply','⚡'],['case','Case','📦'],['fan','Case fans','🌀']],SLOTS=CATS.slice(1),RK={ITX:1,mATX:2,ATX:3};
 const $=i=>document.getElementById(i),M=n=>'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}),fs=g=>g>=1000?g/1000+'TB':g+'GB';
 const FLD={cpu:'k n p sock d c t w ig oc f',mb:'k n p sock d form wifi oc',ram:'k n p d gb mhz lp',gpu:'k n p v b rec len tdp f',ssd:'k n p gb t',cooler:'k n p t size tdp s',psu:'k n p w form',case:'k n p form rad cl gl psu',fan:'k n p sz pk rgb'};
+
 const ROWS={
 cpu:[['r5600','AMD Ryzen 5 5600',159,'AM4','4',6,12,65,0,1,4],['r5600g','AMD Ryzen 5 5600G',189,'AM4','4',6,12,65,1,1,3],['r5700x3d','AMD Ryzen 7 5700X3D',329,'AM4','4',8,16,105,0,0,6],['r7600','AMD Ryzen 5 7600',269,'AM5','5',6,12,88,1,1,6],['r9600x','AMD Ryzen 5 9600X',329,'AM5','5',6,12,88,1,1,7],['r7700','AMD Ryzen 7 7700',389,'AM5','5',8,16,88,1,1,7],['r9700x','AMD Ryzen 7 9700X',469,'AM5','5',8,16,88,1,1,8],['r9800x3d','AMD Ryzen 7 9800X3D',689,'AM5','5',8,16,120,1,1,10],['r9900x','AMD Ryzen 9 9900X',569,'AM5','5',12,24,162,1,1,8],['r9950x3d','AMD Ryzen 9 9950X3D',969,'AM5','5',16,32,200,1,1,10],['i3-12100','Intel Core i3-12100',169,'LGA1700','45',4,8,89,1,0,3],['i5-12400','Intel Core i5-12400',229,'LGA1700','45',6,12,117,1,0,5],['i5-14400f','Intel Core i5-14400F',249,'LGA1700','45',10,16,148,0,0,6],['i5-14600k','Intel Core i5-14600K',399,'LGA1700','45',14,20,181,1,1,8],['i7-14700k','Intel Core i7-14700K',549,'LGA1700','45',20,28,253,1,1,9],['i9-14900k','Intel Core i9-14900K',699,'LGA1700','45',24,32,253,1,1,9],['u5-245k','Intel Core Ultra 5 245K',399,'LGA1851','5',14,14,159,1,1,8],['u7-265k','Intel Core Ultra 7 265K',549,'LGA1851','5',20,20,250,1,1,9],['u9-285k','Intel Core Ultra 9 285K',799,'LGA1851','5',24,24,250,1,1,10]],
 mb:[['b550m','MSI B550M PRO-VDH WiFi',149,'AM4','4','mATX',1,1],['a620m','GIGABYTE A620M S2H',119,'AM5','5','mATX',0,0],['b650','GIGABYTE B650 EAGLE AX',229,'AM5','5','ATX',1,1],['b650m','MSI MAG B650M Mortar WiFi',249,'AM5','5','mATX',1,1],['b650i','ASUS ROG STRIX B650E-I GAMING WIFI',429,'AM5','5','ITX',1,1],['x870','MSI MAG X870 Tomahawk WiFi',389,'AM5','5','ATX',1,1],['x870e','ASUS ROG STRIX X870E-E GAMING WIFI',699,'AM5','5','ATX',1,1],['b760m4','GIGABYTE B760M DS3H DDR4',139,'LGA1700','4','mATX',0,0],['b760m5','GIGABYTE B760M AORUS ELITE AX',259,'LGA1700','5','mATX',1,0],['z790d4','ASUS PRIME Z790-P WIFI D4',289,'LGA1700','4','ATX',1,1],['z790','MSI PRO Z790-A WiFi',339,'LGA1700','5','ATX',1,1],['z790i','ASUS ROG STRIX Z790-I GAMING WIFI',569,'LGA1700','5','ITX',1,1],['b860m','ASUS PRIME B860M-A WiFi',239,'LGA1851','5','mATX',1,0],['z890','MSI MAG Z890 TOMAHAWK WiFi',419,'LGA1851','5','ATX',1,1]],
 ram:[['d4-16','TEAMGROUP T-Force Vulcan 16GB (2x8) DDR4-3200',55,'4',16,3200,0],['d4-32','Corsair Vengeance LPX 32GB (2x16) DDR4-3600',99,'4',32,3600,1],['d4-64','G.SKILL Ripjaws V 64GB (2x32) DDR4-3600',199,'4',64,3600,0],['d5-16','Kingston FURY Beast 16GB (2x8) DDR5-5600',89,'5',16,5600,0],['d5-32lp','Crucial Pro 32GB (2x16) DDR5-5600 Low Profile',129,'5',32,5600,1],['d5-32','Corsair Vengeance 32GB (2x16) DDR5-6000 CL30',179,'5',32,6000,0],['d5-64','G.SKILL Trident Z5 RGB 64GB (2x32) DDR5-6400',329,'5',64,6400,0],['d5-96','Corsair Dominator Titanium 96GB (2x48) DDR5-6600',599,'5',96,6600,0],['d5-128','Crucial Pro 128GB (2x64) DDR5-5600',649,'5',128,5600,1]],
-gpu:[['b580','Intel Arc B580 12GB',349,12,'I',550,272,190,5],['4060','NVIDIA GeForce RTX 4060 8GB',389,8,'N',550,200,115,5],['4060ti','NVIDIA GeForce RTX 4060 Ti 16GB',629,16,'N',550,250,165,6],['4070s','NVIDIA GeForce RTX 4070 SUPER 12GB',859,12,'N',650,242,220,7],['4070tis','NVIDIA GeForce RTX 4070 Ti SUPER 16GB',1149,16,'N',750,305,285,8],['4080s','NVIDIA GeForce RTX 4080 SUPER 16GB',1499,16,'N',750,310,320,9],['4090','NVIDIA GeForce RTX 4090 24GB',2999,24,'N',850,336,450,10],['5060','NVIDIA GeForce RTX 5060 8GB',429,8,'N',550,240,145,5],['5060ti','NVIDIA GeForce RTX 5060 Ti 16GB',599,16,'N',600,244,180,6],['5070','NVIDIA GeForce RTX 5070 12GB',779,12,'N',650,242,250,7],['5070ti','NVIDIA GeForce RTX 5070 Ti 16GB',1149,16,'N',750,300,300,8],['5080','NVIDIA GeForce RTX 5080 16GB',1599,16,'N',850,304,360,9],['5090','NVIDIA GeForce RTX 5090 32GB',3299,32,'N',1000,336,575,10],['7600','AMD Radeon RX 7600 8GB',329,8,'A',550,204,165,4],['7800xt','AMD Radeon RX 7800 XT 16GB',679,16,'A',700,267,263,7],['7900xtx','AMD Radeon RX 7900 XTX 24GB',1349,24,'A',800,287,355,9],['9060xt','AMD Radeon RX 9060 XT 16GB',459,16,'A',550,240,160,6],['9070','AMD Radeon RX 9070 16GB',849,16,'A',650,260,220,8],['9070xt','AMD Radeon RX 9070 XT 16GB',949,16,'A',750,330,304,8],['rtx2000','NVIDIA RTX 2000 Ada 16GB Low Profile (workstation)',949,16,'N',300,167,70,5],['rtx4000','NVIDIA RTX 4000 SFF Ada 20GB Low Profile (workstation)',1999,20,'N',300,168,70,6]],
+gpu:[['b580','Intel Arc B580 12GB',349,12,'I',550,272,190,5],['4060','NVIDIA GeForce RTX 4060 8GB',389,8,'N',550,200,115,5],['4060ti','NVIDIA GeForce RTX 4060 Ti 16GB',629,16,'N',550,250,165,6],['4070s','NVIDIA GeForce RTX 4070 SUPER 12GB',859,12,'N',650,242,220,7],['4070tis','NVIDIA GeForce RTX 4070 Ti SUPER 16GB',1149,16,'N',750,305,285,8],['4080s','NVIDIA GeForce RTX 4080 SUPER 16GB',1499,16,'N',750,310,320,9],['4090','NVIDIA GeForce RTX 4090 24GB',2999,24,'N',850,336,450,10],['5060','NVIDIA GeForce RTX 5060 8GB',429,8,'N',550,240,145,5],['5060ti','NVIDIA GeForce RTX 5060 Ti 16GB',599,16,'N',600,244,180,6],['5070','NVIDIA GeForce RTX 5070 12GB',779,12,'N',650,242,250,7],['5070ti','NVIDIA GeForce RTX 5070 Ti 16GB',1149,16,'N',750,300,300,8],['5080','NVIDIA GeForce RTX 5080 16GB',1599,16,'N',850,304,360,9],['5090','NVIDIA GeForce RTX 5090 32GB',3299,32,'N',1000,336,575,10],['7600','AMD Radeon RX 7600 8GB',329,8,'A',550,204,165,4],['7800xt','AMD Radeon RX 7800 XT 16GB',679,16,'A',700,267,263,7],['7900xtx','AMD Radeon RX 7900 XTX 24GB',1349,24,'A',800,287,355,9],['9060xt','AMD Radeon RX 9060 XT 16GB',459,16,'A',550,240,160,6],['9070','AMD Radeon RX 9070 16GB',849,16,'A',650,260,220,8],['9070xt','AMD Radeon RX 9070 XT 16GB',949,16,'A',750,330,304,8],['rtx2000','NVIDIA RTX 2000 Ada 16GB Low Profile',949,16,'N',300,167,70,5],['rtx4000','NVIDIA RTX 4000 SFF Ada 20GB Low Profile',1999,20,'N',300,168,70,6]],
 ssd:[['p3-1','Crucial P3 Plus 1TB NVMe',99,1000,'NVMe Gen4'],['sn770-1','WD Black SN770 1TB NVMe',119,1000,'NVMe Gen4'],['990evo-1','Samsung 990 EVO Plus 1TB NVMe',129,1000,'NVMe Gen4'],['990evo-2','Samsung 990 EVO Plus 2TB NVMe',219,2000,'NVMe Gen4'],['sn850x-2','WD Black SN850X 2TB NVMe',239,2000,'NVMe Gen4'],['990pro-2','Samsung 990 Pro 2TB NVMe',279,2000,'NVMe Gen4'],['990pro-4','Samsung 990 Pro 4TB NVMe',579,4000,'NVMe Gen4'],['t705-2','Crucial T705 2TB NVMe',459,2000,'NVMe Gen5'],['870-1','Samsung 870 EVO 1TB 2.5" SSD',139,1000,'SATA SSD'],['bc-4t','Seagate BarraCuda 4TB HDD',119,4000,'HDD'],['ih-8t','Seagate IronWolf 8TB NAS HDD',239,8000,'HDD'],['sn580-2','WD Blue SN5000 2TB NVMe',179,2000,'NVMe Gen4']],
 cooler:[['ax120','Thermalright Assassin X 120 SE',29,'Air',148,180,''],['pa120','Thermalright Peerless Assassin 120 SE',49,'Air',155,250,''],['dh15','Noctua NH-D15 G2',169,'Air',168,300,''],['l9i','Noctua NH-L9i-17xx Low Profile',69,'Air',37,65,'I'],['l9a','Noctua NH-L9a-AM5 Low Profile',69,'Air',37,65,'A'],['lf240','Arctic Liquid Freezer III 240 AIO',119,'AIO',240,300,''],['lf360','Arctic Liquid Freezer III 360 AIO',159,'AIO',360,400,''],['h100i','Corsair iCUE H100i Elite 240 AIO',189,'AIO',240,300,''],['kraken','NZXT Kraken Elite 360 LCD AIO',399,'AIO',360,400,'']],
 psu:[['smart500','Thermaltake Smart 500W 80+',49,500,'ATX'],['bq550','be quiet! Pure Power 12 M 550W Gold',99,550,'ATX'],['cx650','Corsair CX650 650W Bronze',99,650,'ATX'],['rm750e','Corsair RM750e 750W Gold',149,750,'ATX'],['mag850','MSI MAG A850GL PCIE5 850W Gold',169,850,'ATX'],['rm850e','Corsair RM850e 850W Gold',179,850,'ATX'],['rm1000x','Corsair RM1000x 1000W Gold',269,1000,'ATX'],['rm1200','Corsair RM1200x SHIFT 1200W Gold',339,1200,'ATX'],['sf750','Corsair SF750 750W Platinum SFX',229,750,'SFX'],['sf1000','Corsair SF1000 1000W Platinum SFX',339,1000,'SFX']],
 fan:[['p12','Arctic P12 PWM PST 120mm',13,120,1,0],['p14','Arctic P14 PWM PST 140mm',14,140,1,0],['nfa12','Noctua NF-A12x25 PWM 120mm',38,120,1,0],['nfa14','Noctua NF-A14 PWM 140mm',34,140,1,0],['nfa9','Noctua NF-A9 PWM 92mm (SFF)',26,92,1,0],['sw4','be quiet! Silent Wings 4 140mm PWM',34,140,1,0],['sp120','Corsair iCUE SP120 RGB ELITE 120mm 3-pack',49,120,3,1],['tl12','Thermalright TL-C12C X3 120mm 3-pack',39,120,3,0],['sl120','Lian Li UNI FAN SL120 V2 120mm 3-pack',89,120,3,1],['sl140','Lian Li UNI FAN SL140 V2 140mm 3-pack',99,140,3,1]],
-case:[['air100','Montech AIR 100 ARGB Micro-ATX',79,'mATX',240,160,330,'ATX'],['h5','NZXT H5 Flow ATX',119,'ATX',280,165,365,'ATX'],['4000d','Corsair 4000D Airflow ATX',129,'ATX',360,170,360,'ATX'],['popsil','Fractal Design Pop Silent ATX (sound-dampened)',129,'ATX',280,170,405,'ATX'],['h6','NZXT H6 Flow RGB ATX',169,'ATX',360,163,365,'ATX'],['north','Fractal Design North ATX',199,'ATX',360,170,355,'ATX'],['o11','Lian Li O11 Dynamic EVO ATX',229,'ATX',360,167,426,'ATX'],['nr200','Cooler Master NR200P Mini-ITX (SFF)',139,'ITX',280,155,330,'SFX'],['terra','Fractal Design Terra Mini-ITX (SFF)',239,'ITX',0,77,322,'SFX']]};
+case:[['air100','Montech AIR 100 ARGB Micro-ATX',79,'mATX',240,160,330,'ATX'],['h5','NZXT H5 Flow ATX',119,'ATX',280,165,365,'ATX'],['4000d','Corsair 4000D Airflow ATX',129,'ATX',360,170,360,'ATX'],['popsil','Fractal Design Pop Silent ATX',129,'ATX',280,170,405,'ATX'],['h6','NZXT H6 Flow RGB ATX',169,'ATX',360,163,365,'ATX'],['north','Fractal Design North ATX',199,'ATX',360,170,355,'ATX'],['o11','Lian Li O11 Dynamic EVO ATX',229,'ATX',360,167,426,'ATX'],['nr200','Cooler Master NR200P Mini-ITX',139,'ITX',280,155,330,'SFX'],['terra','Fractal Design Terra Mini-ITX',239,'ITX',0,77,322,'SFX']]
+};
+
 const PRE=[
 ['g1','Gaming','Esports 1080p (Fortnite, Valorant, CS2)','Gaming,240 FPS,Value','High frame rates in competitive games.','r7600,b650m,d5-16,9060xt,p3-1,pa120,rm750e,air100'],
 ['g2','Gaming','1440p High Refresh','Gaming,1440p,NVIDIA','Smooth 1440p at high settings.','r9600x,b650,d5-32,5070,990evo-1,pa120,rm750e,h5'],
 ['g3','Gaming','4K Ultra / Max Settings','Gaming,4K,Enthusiast','Top-end gaming with ray tracing.','r9800x3d,x870,d5-32,5080,990pro-2,lf360,rm1000x,north'],
 ['g4','Gaming','Budget Gaming (DDR4)','Gaming,DDR4,Budget','Lowest price that still plays 1080p well.','r5600,b550m,d4-16,7600,p3-1,ax120,cx650,air100'],
 ['g5','Gaming','Small Form Factor Gaming','Gaming,SFF,Mini-ITX','Compact case, full-size performance.','r9700x,b650i,d5-32lp,5070,990evo-1,pa120,sf750,nr200'],
-['p1','Professional','AutoCAD / Revit / SolidWorks','CAD,Workstation,Single-thread','Fast cores, 64GB RAM and a workstation GPU.','i7-14700k,z790,d5-64,rtx2000,990pro-2,lf360,rm750e,4000d'],
-['p2','Professional','Video Editing (Premiere, DaVinci)','Video,Creator,Quick Sync','Many cores, 64GB RAM and a strong GPU for exports.','u7-265k,z890,d5-64,5070ti,990pro-2,lf360,rm850e,h6'],
-['p3','Professional','DJ / Music Production / Audio','Audio,Quiet,No GPU needed','Quiet air cooling and a sound-dampened case. Uses integrated graphics.','r7700,b650m,d5-32lp,,990evo-2,dh15,bq550,popsil'],
+['p1','Professional','AutoCAD / Revit / SolidWorks','CAD,Workstation,Single-thread','Fast cores, 64GB RAM and workstation GPU.','i7-14700k,z790,d5-64,rtx2000,990pro-2,lf360,rm750e,4000d'],
+['p2','Professional','Video Editing (Premiere, DaVinci)','Video,Creator,Quick Sync','Many cores, 64GB RAM and strong GPU.','u7-265k,z890,d5-64,5070ti,990pro-2,lf360,rm850e,h6'],
+['p3','Professional','DJ / Music Production / Audio','Audio,Quiet,No GPU needed','Quiet air cooling and sound-dampened case.','r7700,b650m,d5-32lp,,990evo-2,dh15,bq550,popsil'],
 ['p4','Professional','AI / Local LLM Workstation','AI,CUDA,128GB RAM','32GB VRAM and 128GB RAM for local models.','r9950x3d,x870e,d5-128,5090,990pro-4,lf360,rm1200,o11'],
-['e1','Everyday','Office / School (no GPU needed)','Office,Budget,DDR4,Integrated graphics','Documents, browsing and video calls.','i5-12400,b760m4,d4-16,,p3-1,ax120,smart500,air100']];
-function tg(o){const t=[],D=x=>[...x].map(d=>'DDR'+d);switch(o.cat){
-case'cpu':t.push(o.sock,...D(o.d),o.ig?'Integrated graphics':'No iGPU',o.oc?'Overclockable':'Locked');if(o.f>=8)t.push('Gaming');if(o.t>=20)t.push('Creator / Pro');if(o.p<260)t.push('Budget');break;
-case'mb':t.push(o.sock,...D(o.d),o.form,o.wifi?'WiFi':'No WiFi');if(o.oc)t.push('Overclockable');if(o.form=='ITX')t.push('SFF');break;
-case'ram':t.push('DDR'+o.d,o.gb+'GB',o.mhz+'MHz');if(o.lp)t.push('Low profile');if(o.gb>=64)t.push('Creator / AI');break;
-case'gpu':t.push({N:'NVIDIA',A:'AMD',I:'Intel'}[o.b],o.v+'GB VRAM');if(o.f>=7)t.push('Gaming');if(o.v>=16)t.push('AI / LLM');if(o.len<=250)t.push('SFF GPU');if(o.len<=170)t.push('Low profile');if(/Ada/.test(o.n))t.push('Workstation / CAD');break;
-case'ssd':t.push(o.t,fs(o.gb),/NVMe/.test(o.t)?'NVMe':'SATA');break;case'fan':t.push(o.sz+'mm',o.pk>1?o.pk+'-pack':'Single');if(o.rgb)t.push('ARGB');break;
-case'cooler':t.push(o.t=='AIO'?'Liquid':'Air');if(o.t=='Air'&&o.size<=70)t.push('Low profile','SFF');break;
-case'psu':t.push(o.w+'W',o.form);if(o.form=='SFX')t.push('SFF PSU');break;
-case'case':t.push(o.form);if(o.form=='ITX')t.push('SFF');break}return t}
-const sp=o=>({cpu:()=>`${o.c} cores / ${o.t} threads · up to ${o.w}W`,mb:()=>`${o.sock} · DDR${o.d} · ${o.form}${o.wifi?' · WiFi':''} · ${o.m2} M.2 · ${o.sata} SATA · ${o.dimm} RAM slots`,ram:()=>`${o.gb}GB · DDR${o.d}-${o.mhz}`,gpu:()=>`${o.v}GB VRAM · ${o.tdp}W · ${o.len}mm · PSU ${o.rec}W+`,ssd:()=>`${fs(o.gb)} · ${o.t}`,cooler:()=>`${o.t=='AIO'?o.size+'mm radiator':o.size+'mm tall'} · rated ${o.tdp}W`,psu:()=>`${o.w}W · ${o.form}`,case:()=>`${o.form} · GPU up to ${o.gl}mm · cooler up to ${o.cl}mm · radiator ${o.rad||'none'} · ${o.fx} fan mounts (${o.fz}mm), ${o.fi} included`,fan:()=>`${o.sz}mm · ${o.pk>1?o.pk+'-pack':'single'}${o.rgb?' · ARGB':''}`}[o.cat]());
-const DB={};for(const c in ROWS){const f=FLD[c].split(' ');DB[c]=ROWS[c].map(r=>{const o={cat:c,id:c+'-'+r[0]};f.forEach((x,i)=>o[x]=r[i]);o.tags=tg(o);return o}).sort((a,b)=>a.p-b.p)}
-DB.pb=PRE.map(r=>{const o={cat:'pb',id:'pb-'+r[0],g:r[1],n:r[2],tags:r[3].split(','),desc:r[4]};o.parts=r[5].split(',').map((k,i)=>k&&DB[SLOTS[i][0]].find(p=>p.k==k)).filter(Boolean);o.p=o.parts.reduce((a,p)=>a+p.p,0);return o});
-const XB={b550m:[2,4,4],a620m:[1,4,2],b650:[3,4,4],b650m:[2,4,4],b650i:[2,2,2],x870:[3,4,4],x870e:[4,4,4],b760m4:[2,4,4],b760m5:[2,4,4],z790d4:[3,4,4],z790:[4,6,4],z790i:[2,2,2],b860m:[2,4,4],z890:[4,4,4]},XC={air100:[6,'120',3],h5:[5,'120,140',2],'4000d':[6,'120,140',2],popsil:[6,'120,140',2],h6:[8,'120,140',3],north:[7,'120,140',2],o11:[9,'120,140',0],nr200:[4,'92,120',2],terra:[3,'120,140',0]};
-for(const k in XB)Object.assign(DB.mb.find(p=>p.k==k),{m2:XB[k][0],sata:XB[k][1],dimm:XB[k][2]});for(const k in XC)Object.assign(DB.case.find(p=>p.k==k),{fx:XC[k][0],fz:XC[k][1],fi:XC[k][2]});
-DB.mb.forEach(p=>p.tags.push(p.m2+' M.2',p.sata+' SATA ports'));DB.case.forEach(p=>p.tags.push(p.fx+' fan mounts','Fans '+p.fz+'mm'));
+['e1','Everyday','Office / School (no GPU needed)','Office,Budget,DDR4,Integrated graphics','Documents, browsing and video calls.','i5-12400,b760m4,d4-16,,p3-1,ax120,smart500,air100']
+];
+
+function tg(o){
+  const t=[],D=x=>[...x].map(d=>'DDR'+d);
+  switch(o.cat){
+    case'cpu':t.push(o.sock,...D(o.d),o.ig?'Integrated graphics':'No iGPU',o.oc?'Overclockable':'Locked');if(o.f>=8)t.push('Gaming');if(o.t>=20)t.push('Creator / Pro');if(o.p<260)t.push('Budget');break;
+    case'mb':t.push(o.sock,...D(o.d),o.form,o.wifi?'WiFi':'No WiFi');if(o.oc)t.push('Overclockable');if(o.form=='ITX')t.push('SFF');break;
+    case'ram':t.push('DDR'+o.d,o.gb+'GB',o.mhz+'MHz');if(o.lp)t.push('Low profile');if(o.gb>=64)t.push('Creator / AI');break;
+    case'gpu':t.push({N:'NVIDIA',A:'AMD',I:'Intel'}[o.b],o.v+'GB VRAM');if(o.f>=7)t.push('Gaming');if(o.v>=16)t.push('AI / LLM');if(o.len<=250)t.push('SFF GPU');if(o.len<=170)t.push('Low profile');break;
+    case'ssd':t.push(o.t,fs(o.gb),/NVMe/.test(o.t)?'NVMe':'SATA');break;
+    case'fan':t.push(o.sz+'mm',o.pk>1?o.pk+'-pack':'Single');if(o.rgb)t.push('ARGB');break;
+    case'cooler':t.push(o.t=='AIO'?'Liquid':'Air');if(o.t=='Air'&&o.size<=70)t.push('Low profile','SFF');break;
+    case'psu':t.push(o.w+'W',o.form);if(o.form=='SFX')t.push('SFF PSU');break;
+    case'case':t.push(o.form);if(o.form=='ITX')t.push('SFF');break
+  }
+  return t;
+}
+
+const sp=o=>({cpu:()=>`${o.c} cores / ${o.t} threads · up to ${o.w}W`,mb:()=>`${o.sock} · DDR${o.d} · ${o.form}${o.wifi?' · WiFi':''} · ${o.m2} M.2`,ram:()=>`${o.gb}GB · DDR${o.d}-${o.mhz}`,gpu:()=>`${o.v}GB VRAM · ${o.tdp}W · ${o.len}mm · PSU ${o.rec}W+`,ssd:()=>`${fs(o.gb)} · ${o.t}`,cooler:()=>`${o.t=='AIO'?o.size+'mm radiator':o.size+'mm tall'} · rated ${o.tdp}W`,psu:()=>`${o.w}W · ${o.form}`,case:()=>`${o.form} · GPU up to ${o.gl}mm · cooler up to ${o.cl}mm`,fan:()=>`${o.sz}mm · ${o.pk>1?o.pk+'-pack':'single'}`}[o.cat]());
+
+const DB={};
+for(const c in ROWS){
+  const f=FLD[c].split(' ');
+  DB[c]=ROWS[c].map(r=>{const o={cat:c,id:c+'-'+r[0]};f.forEach((x,i)=>o[x]=r[i]);o.tags=tg(o);return o}).sort((a,b)=>a.p-b.p);
+}
+DB.pb=PRE.map(r=>{
+  const o={cat:'pb',id:'pb-'+r[0],g:r[1],n:r[2],tags:r[3].split(','),desc:r[4]};
+  o.parts=r[5].split(',').map((k,i)=>k&&DB[SLOTS[i][0]].find(p=>p.k==k)).filter(Boolean);
+  o.p=o.parts.reduce((a,p)=>a+p.p,0);
+  return o;
+});
+
+const XB={b550m:[2,4,4],a620m:[1,4,2],b650:[3,4,4],b650m:[2,4,4],b650i:[2,2,2],x870:[3,4,4],x870e:[4,4,4],b760m4:[2,4,4],b760m5:[2,4,4],z790d4:[3,4,4],z790:[4,6,4],z790i:[2,2,2],b860m:[2,4,4],z890:[4,4,4]};
+const XC={air100:[6,'120',3],h5:[5,'120,140',2],'4000d':[6,'120,140',2],popsil:[6,'120,140',2],h6:[8,'120,140',3],north:[7,'120,140',2],o11:[9,'120,140',0],nr200:[4,'92,120',2],terra:[3,'120,140',0]};
+for(const k in XB)Object.assign(DB.mb.find(p=>p.k==k),{m2:XB[k][0],sata:XB[k][1],dimm:XB[k][2]});
+for(const k in XC)Object.assign(DB.case.find(p=>p.k==k),{fx:XC[k][0],fz:XC[k][1],fi:XC[k][2]});
+
 let C={},S={},N={},tab='pb',tag='',ec='cpu';
-function chk(a,b){const m={[a.cat]:a,[b.cat]:b},{cpu,mb,ram,gpu,cooler:k,psu,case:c}=m;
-if(cpu&&mb&&cpu.sock!=mb.sock)return`Needs a ${cpu.sock} motherboard`;
-if(mb&&ram&&mb.d!=ram.d)return`Motherboard uses DDR${mb.d}`;
-if(cpu&&ram&&!cpu.d.includes(ram.d))return`CPU supports DDR${[...cpu.d].join('/')}`;
-if(mb&&c&&RK[mb.form]>RK[c.form])return`${mb.form} board won't fit this case`;
-if(k&&c&&(k.t=='AIO'?k.size>c.rad:k.size>c.cl))return k.t=='AIO'?`Case fits ${c.rad||'no'}mm radiators`:`Case fits coolers up to ${c.cl}mm`;
-if(gpu&&c&&gpu.len>c.gl)return`GPU is ${gpu.len}mm, case fits ${c.gl}mm`;
-if(psu&&c&&c.psu=='SFX'&&psu.form!='SFX')return'Case needs an SFX power supply';
-if(gpu&&psu&&psu.w<gpu.rec)return`GPU needs a ${gpu.rec}W+ power supply`;
-if(cpu&&k){if(k.s&&k.s!=(cpu.sock[0]=='A'?'A':'I'))return`Cooler is ${k.s=='A'?'AMD':'Intel'} only`;if(k.tdp<cpu.w)return`Cooler rated ${k.tdp}W, CPU can draw ${cpu.w}W`}if(m.fan&&c&&!c.fz.split(',').includes(''+m.fan.sz))return`Case doesn't take ${m.fan.sz}mm fans`;return''}
+function chk(a,b){
+  const m={[a.cat]:a,[b.cat]:b},{cpu,mb,ram,gpu,cooler:k,psu,case:c}=m;
+  if(cpu&&mb&&cpu.sock!=mb.sock)return`Needs a ${cpu.sock} motherboard`;
+  if(mb&&ram&&mb.d!=ram.d)return`Motherboard uses DDR${mb.d}`;
+  if(cpu&&ram&&!cpu.d.includes(ram.d))return`CPU supports DDR${[...cpu.d].join('/')}`;
+  if(mb&&c&&RK[mb.form]>RK[c.form])return`${mb.form} board won't fit this case`;
+  if(k&&c&&(k.t=='AIO'?k.size>c.rad:k.size>c.cl))return k.t=='AIO'?`Case fits ${c.rad||'no'}mm radiators`:`Case fits coolers up to ${c.cl}mm`;
+  if(gpu&&c&&gpu.len>c.gl)return`GPU is ${gpu.len}mm, case fits ${c.gl}mm`;
+  if(psu&&c&&c.psu=='SFX'&&psu.form!='SFX')return'Case needs an SFX power supply';
+  if(gpu&&psu&&psu.w<gpu.rec)return`GPU needs a ${gpu.rec}W+ power supply`;
+  return '';
+}
+
 const PM={};Object.values(DB).forEach(a=>a.forEach(p=>PM[p.id]=p));
-const MULTI={ram:1,ssd:1,fan:1},ids=()=>Object.keys(C),LN=()=>ids().map(i=>PM[i]),tick=()=>{},chime=tick,buzz=tick;
+const MULTI={ram:1,ssd:1,fan:1},ids=()=>Object.keys(C),LN=()=>ids().map(i=>PM[i]);
 function sync(){S={};N={};ids().forEach(i=>{const p=PM[i];N[p.cat]=(N[p.cat]||0)+C[i];S[p.cat]=S[p.cat]||p})}
 const R=()=>{sync();$('erp').classList.contains('show')?edraw():draw()};
 function add(id){const p=PM[id];if(!MULTI[p.cat])ids().forEach(i=>PM[i].cat==p.cat&&delete C[i]);C[id]=(C[id]||0)+1;R()}
@@ -147,59 +611,174 @@ function del(id){delete C[id];R()}
 function pick(id){!MULTI[PM[id].cat]&&C[id]?del(id):add(id)}
 function load(id){C={};DB.pb.find(o=>o.id==id).parts.forEach(p=>C[p.id]=1);R()}
 function clr(){C={};R()}
+
 const UCR={g:/Gaming/,v:/Video|Creator/,c:/CAD|Workstation/,a:/Audio/,i:/AI/,o:/Office/};
-function suggest(b,u){b=+b||0;const a=DB.pb.filter(x=>!u||UCR[u].test(x.n+x.tags)),pl=a.length?a:DB.pb,ok=pl.filter(x=>x.p<=b).sort((x,y)=>y.p-x.p)[0]||[...pl].sort((x,y)=>x.p-y.p)[0];load(ok.id);toast(ok.p<=b?`Loaded: ${ok.n}`:`Nothing fits ${M(b)}. Cheapest match loaded: ${ok.n}`)}
+function suggest(b,u){
+  b=+b||0;
+  const a=DB.pb.filter(x=>!u||UCR[u].test(x.n+x.tags)),pl=a.length?a:DB.pb;
+  const ok=pl.filter(x=>x.p<=b).sort((x,y)=>y.p-x.p)[0]||[...pl].sort((x,y)=>x.p-y.p)[0];
+  load(ok.id);
+}
 function list(c,q,t){q=(q||'').toLowerCase();return DB[c].filter(p=>(!q||(p.n+' '+p.tags.join(' ')).toLowerCase().includes(q))&&(!t||p.tags.includes(t)))}
 function iss(p){for(const l of LN()){if(l.cat!=p.cat){const m=chk(p,l);if(m)return m}}return''}
-function sum(){const L=LN(),is=new Set(),rq=[],cp=S.cpu,gp=S.gpu,mb=S.mb,cs=S.case,ps=S.psu;
-for(let i=0;i<L.length;i++)for(let j=i+1;j<L.length;j++)if(L[i].cat!=L[j].cat){const m=chk(L[i],L[j]);m&&is.add(m)}
-[['cpu','A CPU'],['mb','A motherboard'],['ram','At least one RAM module'],['ssd','At least one storage drive'],['cooler','A CPU cooler'],['case','A case'],['psu','A power supply']].forEach(([c,t])=>N[c]||rq.push(t+' is required'));
-const q2=(c,f)=>L.filter(p=>p.cat==c).reduce((a,p)=>a+f(p)*C[p.id],0),nv=q2('ssd',p=>/NVMe/.test(p.t)?1:0),sa=q2('ssd',p=>/NVMe/.test(p.t)?0:1),fn=q2('fan',p=>p.pk),ds=q2('ram',p=>+(p.n.match(/\((\d)x/)||[0,1])[1]),rg=q2('ram',p=>p.gb);
-if(mb){nv>mb.m2&&is.add(`Board has ${mb.m2} M.2 slots, build uses ${nv}`);sa>mb.sata&&is.add(`Board has ${mb.sata} SATA ports, build uses ${sa}`);ds>mb.dimm&&is.add(`Board has ${mb.dimm} RAM slots, build uses ${ds}`)}
-if(cs&&fn>cs.fx-cs.fi)is.add(`Case has room for ${cs.fx-cs.fi} more fans, build adds ${fn}`);
-if(cp&&!cp.ig&&!gp)is.add('No video output: this CPU has no integrated graphics, add a graphics card');
-const w=(cp?cp.w:0)+(gp?gp.tdp:0)+(cp||gp?90+fn*5:0);ps&&w&&ps.w<w+100&&is.add(`PSU is tight for a ~${w}W load`);
-const cf=cp?cp.f:0;
-return{c:cp?cp.c:0,t:cp?cp.t:0,v:gp?gp.v:0,r:rg,st:q2('ssd',p=>p.gb),nv,sa,fn,w,is:[...is],rq,tot:L.reduce((a,p)=>a+p.p*C[p.id],0),sc:[gp?gp.f*.7+(cp?cf*.3:1.5):cf*.3,gp?Math.min(10,gp.v/3)*(gp.b=='N'?1:.75):0,Math.min(5,cp?cp.t/6:0)+Math.min(3,rg/32)+(gp?gp.f/5:0)]}}
-function toast(t){let e=$('toast');if(!e){e=document.createElement('div');e.id='toast';e.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 20px;border-radius:20px;z-index:99999;font:600 13px sans-serif';document.body.appendChild(e)}e.textContent=t;e.style.display='block';clearTimeout(e.t);e.t=setTimeout(()=>e.style.display='none',2600)}
-function copyQ(){const s=sum();let t='PC BUILD QUOTE\n\n';SLOTS.forEach(c=>LN().filter(p=>p.cat==c[0]).forEach(p=>t+=`${c[1]}: ${p.n} x${C[p.id]} - ${M(p.p*C[p.id])}\n`));t+=`\nCores/threads: ${s.c}/${s.t} | VRAM: ${s.v}GB | RAM: ${s.r}GB | Storage: ${fs(s.st)} (${s.nv} NVMe, ${s.sa} SATA) | Case fans: ${s.fn}\nSubtotal ${M(s.tot)}\nHST 13% ${M(s.tot*.13)}\nTOTAL ${M(s.tot*1.13)}\n`;const b=s.rq.concat(s.is);if(b.length)t+='\nISSUES:\n- '+b.join('\n- ');navigator.clipboard?navigator.clipboard.writeText(t).then(()=>toast('Quote copied'),()=>toast('Copy blocked by the browser')):toast('Copy not supported here')}
-function openBuilder(sk){document.body.className=sk;document.title=sk?'No internet':'PC Builder';$('builder-app').classList.add('show');R()}
+
+function sum(){
+  const L=LN(),is=new Set(),rq=[];
+  for(let i=0;i<L.length;i++)for(let j=i+1;j<L.length;j++)if(L[i].cat!=L[j].cat){const m=chk(L[i],L[j]);m&&is.add(m)}
+  [['cpu','A CPU'],['mb','A motherboard'],['ram','At least one RAM module'],['ssd','At least one storage drive'],['cooler','A CPU cooler'],['case','A case'],['psu','A power supply']].forEach(([c,t])=>N[c]||rq.push(t+' is required'));
+  const q2=(c,f)=>L.filter(p=>p.cat==c).reduce((a,p)=>a+f(p)*C[p.id],0),nv=q2('ssd',p=>/NVMe/.test(p.t)?1:0),sa=q2('ssd',p=>/NVMe/.test(p.t)?0:1),fn=q2('fan',p=>p.pk),ds=q2('ram',p=>+(p.n.match(/\((\d)x/)||[0,1])[1]),rg=q2('ram',p=>p.gb);
+  const cp=S.cpu,gp=S.gpu;
+  const w=(cp?cp.w:0)+(gp?gp.tdp:0)+(cp||gp?90+fn*5:0);
+  const cf=cp?cp.f:0;
+  return{c:cp?cp.c:0,t:cp?cp.t:0,v:gp?gp.v:0,r:rg,st:q2('ssd',p=>p.gb),nv,sa,fn,w,is:[...is],rq,tot:L.reduce((a,p)=>a+p.p*C[p.id],0),sc:[gp?gp.f*.7+(cp?cf*.3:1.5):cf*.3,gp?Math.min(10,gp.v/3):0,Math.min(5,cp?cp.t/6:0)]}
+}
+
+function copyQ(){
+  const s=sum();let t='PC BUILD QUOTE\n\n';
+  SLOTS.forEach(c=>LN().filter(p=>p.cat==c[0]).forEach(p=>t+=`${c[1]}: ${p.n} x${C[p.id]} - ${M(p.p*C[p.id])}\n`));
+  t+=`\nSubtotal ${M(s.tot)}\nHST 13% ${M(s.tot*.13)}\nTOTAL ${M(s.tot*1.13)}\n`;
+  navigator.clipboard?navigator.clipboard.writeText(t).then(()=>toast('Quote copied to clipboard!')):toast('Copy failed');
+}
+
+function openBuilder(sk){
+  document.body.className=sk||'';
+  document.title='Pro PC Builder';
+  $('builder-app').classList.add('show');
+  R();
+}
+
+function openStealthBuilder(){
+  document.body.className='';
+  document.title='Sales Order - ERP';
+  $('ecs').innerHTML=CATS.map(c=>`<option value="${c[0]}">${c[1]}</option>`).join('');
+  $('erp').classList.add('show');
+  R();
+}
+
 function go(c){tab=c;tag='';$('q').value='';draw()}
-function draw(){const gs=$('grid').scrollTop,s=sum(),n=ids().length,bad=s.is.length+s.rq.length;
-$('rail').innerHTML=CATS.map(c=>`<div class="ri ${c[0]==tab?'on':''}" onclick="go('${c[0]}')"><span>${c[2]}</span>${c[1]}${N[c[0]]?`<i>${N[c[0]]}</i>`:''}</div>`).join('');
-const ts=new Set();DB[tab].forEach(p=>p.tags.forEach(t=>ts.add(t)));
-$('tags').innerHTML=[''].concat([...ts]).map(t=>`<button class="tg ${t==tag?'on':''}" onclick="tag='${t}';draw()">${t||'All'}</button>`).join('');
-const L=list(tab,$('q').value,tag),T=p=>p.tags.map(t=>`<span>${t}</span>`).join(''),qs=p=>`<span class="qs" onclick="event.stopPropagation()"><button onclick="dec('${p.id}')">−</button>${C[p.id]}<button onclick="add('${p.id}')">+</button></span>`;
-$('grid').innerHTML=!L.length?'<p class="ps">No parts match. Clear the search or pick another tag.</p>':tab=='pb'?['Gaming','Professional','Everyday'].map(g=>{const a=L.filter(x=>x.g==g);return a.length?`<h3 class="gh">${g}</h3>`+a.map(x=>`<div class="pc" onclick="load('${x.id}')"><div class="pn">${x.n}</div><div class="ps">${x.desc}</div><div class="pt">${T(x)}</div><div class="pf"><b>${M(x.p)}</b><span>Load this build</span></div></div>`).join(''):''}).join(''):L.map(p=>{const q=C[p.id]||0,b=q?'':iss(p);return`<div class="pc ${q?'sel':''}" onclick="pick('${p.id}')"><div class="pn">${p.n}</div><div class="ps">${sp(p)}</div><div class="pt">${T(p)}</div><div class="pf"><b>${M(p.p)}</b>${q&&MULTI[p.cat]?qs(p):q?'<span>✓ In build</span>':'<span>+ Add</span>'}</div>${b?`<div class="pr">⚠ ${b}</div>`:''}</div>`}).join('');
-$('grid').scrollTop=gs;
-$('bp').innerHTML=`<div class="tot"><h2>Your build</h2><span class="ps">${n} item${n==1?'':'s'}</span></div><div class="cp ${bad?'':'ok'}">${bad?'<b>Compatibility issues:</b>'+s.rq.concat(s.is).map(m=>'• '+m).join('<br>'):'✓ All components are compatible'}</div>`
-+SLOTS.map(c=>{const a=LN().filter(p=>p.cat==c[0]);return a.length?a.map(p=>`<div class="sl"><span>${c[2]}</span><div><small>${c[1]}</small>${p.n}</div>${MULTI[p.cat]?qs(p):''}<b>${M(p.p*C[p.id])}</b><button onclick="del('${p.id}')">✕</button></div>`).join(''):`<div class="sl e" onclick="go('${c[0]}')"><span>${c[2]}</span><div><small>${c[1]}</small>+ Add ${c[1].toLowerCase()}</div></div>`}).join('')
-+`<div class="kp"><div><b>${s.c}C / ${s.t}T</b>Cores / threads</div><div><b>${s.v}GB</b>Graphics memory</div><div><b>${s.r}GB</b>Memory</div><div><b>${fs(s.st)}</b>Storage</div><div><b>${s.nv} / ${s.sa}</b>NVMe / SATA</div><div><b>${s.fn}</b>Added fans</div><div><b>~${s.w}W</b>Est. load</div><div><b>${S.psu?S.psu.w+'W':'-'}</b>PSU</div><div><b>${S.mb?S.mb.m2+' / '+S.mb.sata:'-'}</b>Board M.2 / SATA</div></div>`
-+[['Gaming',s.sc[0]],['AI / LLM',s.sc[1]],['Creator',s.sc[2]]].map(([l,v])=>`<div class="bar"><span>${l}</span><i><u style="width:${v*10}%"></u></i>${v.toFixed(1)}</div>`).join('')
-+`<div><div class="tot"><span>Subtotal</span><span>${M(s.tot)}</span></div><div class="tot"><span>HST 13%</span><span>${M(s.tot*.13)}</span></div><div class="tot"><span>Total</span><b>${M(s.tot*1.13)}</b></div></div><button class="btn-primary" onclick="copyQ()">Copy quote</button><button class="bb" onclick="clr()">Clear build</button>`}
-/* ===== PASSWORD1: ERP ===== */
-function openStealthBuilder(){document.body.className='';document.title='Sales Order';$('ecs').innerHTML=CATS.map(c=>`<option value="${c[0]}">${c[1]}</option>`).join('');$('erp').classList.add('show');R()}
+
+function draw(){
+  const gs=$('grid').scrollTop,s=sum(),n=ids().length,bad=s.is.length+s.rq.length;
+  $('rail').innerHTML=CATS.map(c=>`<div class="ri ${c[0]==tab?'on':''}" onclick="go('${c[0]}')"><span class="emoji">${c[2]}</span>${c[1]}${N[c[0]]?`<i>${N[c[0]]}</i>`:''}</div>`).join('');
+  const ts=new Set();DB[tab].forEach(p=>p.tags.forEach(t=>ts.add(t)));
+  $('tags').innerHTML=[''].concat([...ts]).map(t=>`<button class="tg ${t==tag?'on':''}" onclick="tag='${t}';draw()">${t||'All'}</button>`).join('');
+  const L=list(tab,$('q').value,tag),T=p=>p.tags.map(t=>`<span>${t}</span>`).join(''),qs=p=>`<span class="qtyc" onclick="event.stopPropagation()"><button onclick="dec('${p.id}')">−</button><span>${C[p.id]}</span><button onclick="add('${p.id}')">+</button></span>`;
+  
+  $('grid').innerHTML=!L.length?'<p class="ps" style="color:var(--fg-muted);padding:24px">No matching parts found.</p>':tab=='pb'?['Gaming','Professional','Everyday'].map(g=>{
+    const a=L.filter(x=>x.g==g);
+    return a.length?`<h3 class="gh">${g}</h3>`+a.map(x=>`<div class="pc" onclick="load('${x.id}')"><div class="pn">${x.n}</div><div class="ps">${x.desc}</div><div class="pt">${T(x)}</div><div class="pf"><b>${M(x.p)}</b><span>Load configuration →</span></div></div>`).join(''):''
+  }).join(''):L.map(p=>{
+    const q=C[p.id]||0,b=q?'':iss(p);
+    return`<div class="pc ${q?'sel':''} ${b&&!q?'dis':''}" onclick="pick('${p.id}')"><div class="pn">${p.n}</div><div class="ps">${sp(p)}</div><div class="pt">${T(p)}</div><div class="pf"><b>${M(p.p)}</b>${q&&MULTI[p.cat]?qs(p):q?'<span style="color:var(--ok);font-weight:800">✓ In build</span>':'<span>+ Add</span>'}</div>${b&&!q?`<div class="pr">⚠ ${b}</div>`:''}</div>`
+  }).join('');
+  
+  $('grid').scrollTop=gs;
+  $('bp').innerHTML=`<div class="tot"><h2>Your Build</h2><span class="st" style="background:var(--bg-input);color:var(--fg-muted)">${n} item${n==1?'':'s'}</span></div>
+  <div class="cp ${bad?'':'ok'}">${bad?'<b>Compatibility notice:</b>'+s.rq.concat(s.is).map(m=>'• '+m).join('<br>'):'✓ All components fully compatible'}</div>`
+  +SLOTS.map(c=>{
+    const a=LN().filter(p=>p.cat==c[0]);
+    return a.length?a.map(p=>`<div class="sl"><span class="emoji">${c[2]}</span><div class="body"><small>${c[1]}</small>${p.n}</div>${MULTI[p.cat]?qs(p):''}<b>${M(p.p*C[p.id])}</b><button class="rm" onclick="del('${p.id}')">✕</button></div>`).join(''):`<div class="sl e" onclick="go('${c[0]}')"><span class="emoji">${c[2]}</span><div class="body"><small>${c[1]}</small>+ Select ${c[1].toLowerCase()}</div></div>`
+  }).join('')
+  +`<div class="kp"><div><b>${s.c}C / ${s.t}T</b>Cores</div><div><b>${s.v}GB</b>VRAM</div><div><b>${s.r}GB</b>Memory</div><div><b>${fs(s.st)}</b>Storage</div><div><b>~${s.w}W</b>Est. Load</div><div><b>${S.psu?S.psu.w+'W':'-'}</b>PSU</div></div>`
+  +[['Gaming',s.sc[0]],['AI / LLM',s.sc[1]],['Creator',s.sc[2]]].map(([l,v])=>`<div class="bar"><span class="lbl">${l}</span><i><u style="width:${Math.min(100,v*10)}%"></u></i><span class="val">${v.toFixed(1)}</span></div>`).join('')
+  +`<div><div class="tot"><span style="color:var(--fg-muted)">Subtotal</span><span>${M(s.tot)}</span></div><div class="tot"><span style="color:var(--fg-muted)">HST 13%</span><span>${M(s.tot*.13)}</span></div><div class="tot"><span style="font-weight:800">Total</span><b>${M(s.tot*1.13)}</b></div></div>
+  <button class="btn-primary" onclick="copyQ()">Copy Quote</button><button class="btn-ghost" style="width:100%;margin-top:8px" onclick="clr()">Clear Build</button>`;
+}
+
+/* ERP MODE */
 function eg(c){ec=c;$('eq').value='';edraw()}
-function edraw(){const s=sum(),n=ids().length,L=list(ec,$('eq').value),eg_=document.querySelector('.egrid'),gs=eg_.scrollTop,bad=s.rq.concat(s.is),lk=(f,id,t)=>`<span class="lk" onclick="${f}('${id}')">${t}</span>`;
-$('ealert').textContent=n?`${n} line${n>1?'s':''} on this order${s.is.length?' - '+s.is.length+' compatibility issue'+(s.is.length>1?'s':''):''}`:'0 items on this order';
-$('ecs').value=ec;$('ett').textContent='Component Picking Report - '+CATS.find(c=>c[0]==ec)[1];
-$('esb').innerHTML='<input value="SONL04011460" readonly>'+['Employee','Product Manage','Sales Promotion','Purchase','Account','Customer Manage','Sales','Inventory','Service','System Setting','Production'].map(x=>`<div class="esi"><span class="dot" style="background:#8fc1ea"></span>${x}</div>`).join('')+CATS.map(c=>`<div class="esi ${c[0]==ec?'on':''}" onclick="eg('${c[0]}')"><span class="dot" style="background:${N[c[0]]?'#4c4':'#fc3'}"></span>${c[1]}</div>`).join('');
-$('et').innerHTML=!L.length?'<tr><td style="padding:16px;text-align:center">0 records returned.</td></tr>':ec=='pb'?'<tr><th></th><th>Template</th><th>Group</th><th>Main components</th><th class="r">Est. price</th></tr>'+L.map((x,i)=>`<tr onclick="load('${x.id}')"><td class="n">${i+1}</td><td><b>${x.n}</b><br>${x.desc}</td><td>${x.g}</td><td>${x.parts.filter(p=>p.cat=='cpu'||p.cat=='gpu').map(p=>p.n).join(' + ')}</td><td class="r">${x.p.toFixed(2)}</td></tr>`).join(''):'<tr><th></th><th>Item description</th><th>Location</th><th>Key specs</th><th>Tags</th><th>Status</th><th class="r">Unit price</th></tr>'+L.map((p,i)=>{const q=C[p.id]||0,b=q?'':iss(p);return`<tr class="${q?'sel':''}" onclick="pick('${p.id}')"><td class="n">${i+1}</td><td>${p.n}</td><td>112 Mississauga</td><td>${sp(p)}</td><td>${p.tags.join(', ')}</td><td class="${b?'err':''}">${q?'On order'+(q>1?' x'+q:''):b?'ERR: '+b:'OK'}</td><td class="r">${p.p.toFixed(2)}</td></tr>`}).join('');
-eg_.scrollTop=gs;$('ecnt').textContent=`View 1 - ${L.length} of ${L.length}`;
-const ln=SLOTS.flatMap(c=>LN().filter(p=>p.cat==c[0]).map(p=>[c,p]));
-$('eord').innerHTML=`<div class="ett">Sales Order Lines - SONL04011460</div><table><tr><th></th><th>Description</th><th>Category</th><th>Qty</th><th class="r">Unit price</th><th class="r">Line total</th><th></th></tr>${ln.map(([c,p],i)=>`<tr><td class="n">${i+1}</td><td>${p.n}</td><td>${c[1]}</td><td>${MULTI[p.cat]?lk('dec',p.id,'[ - ]')+' '+C[p.id]+' '+lk('add',p.id,'[ + ]'):1}</td><td class="r">${p.p.toFixed(2)}</td><td class="r">${(p.p*C[p.id]).toFixed(2)}</td><td class="lk" onclick="del('${p.id}')">[ Remove ]</td></tr>`).join('')||'<tr><td colspan="7" style="text-align:center;color:#777">No lines yet. Click a row above to add it to the order.</td></tr>'}</table><div class="esum">${s.c} cores / ${s.t} threads | ${s.v}GB VRAM | ${s.r}GB RAM | ${fs(s.st)} (${s.nv} NVMe, ${s.sa} SATA) | ${s.fn} added fans | est. ${s.w}W<br>Subtotal ${M(s.tot)} &nbsp; HST 13% ${M(s.tot*.13)} &nbsp; <b>Total ${M(s.tot*1.13)}</b> &nbsp; <button class="ebtn" onclick="copyQ()">Generate PO</button> <button class="ebtn" onclick="clr()">Clear</button>${bad.map(m=>`<div class="err">ERR: ${m}</div>`).join('')}</div>`}
-/* ===== OFFLINE DINO SPLASH ===== */
+function edraw(){
+  const s=sum(),n=ids().length,L=list(ec,$('eq').value),eg_=document.querySelector('.egrid'),gs=eg_.scrollTop,bad=s.rq.concat(s.is),lk=(f,id,t)=>`<span class="lk" onclick="event.stopPropagation();${f}('${id}')">${t}</span>`;
+  $('ealert').textContent=n?`${n} line${n>1?'s':''} on order${s.is.length?' - '+s.is.length+' issue(s)':''}`:'0 items on order';
+  $('ecs').value=ec;$('ett').textContent='Component Picking Report - '+CATS.find(c=>c[0]==ec)[1];$('esb').innerHTML='<input value="SONL04011460" readonly>'+['Employee','Product Manage','Sales Promotion','Purchase','Account','Customer Manage','Sales','Inventory','Service','System Setting','Production'].map(x=>`<div class="esi"><span class="dot" style="background:#8fc1ea"></span>${x}</div>`).join('')+CATS.map(c=>`<div class="esi ${c[0]==ec?'on':''}" onclick="eg('${c[0]}')"><span class="dot" style="background:${N[c[0]]?'#4c4':'#fc3'}"></span>${c[1]}</div>`).join('');
+  $('et').innerHTML=!L.length?'<tr><td style="padding:16px;text-align:center">0 records returned.</td></tr>':ec=='pb'?'<tr><th></th><th>Template</th><th>Group</th><th>Main components</th><th class="r">Est. price</th></tr>'+L.map((x,i)=>`<tr onclick="load('${x.id}')"><td class="n">${i+1}</td><td><b>${x.n}</b><br>${x.desc}</td><td>${x.g}</td><td>${x.parts.filter(p=>p.cat=='cpu'||p.cat=='gpu').map(p=>p.n).join(' + ')}</td><td class="r">${x.p.toFixed(2)}</td></tr>`).join(''):'<tr><th></th><th>Item description</th><th>Location</th><th>Key specs</th><th>Tags</th><th>Status</th><th class="r">Unit price</th></tr>'+L.map((p,i)=>{const q=C[p.id]||0,b=q?'':iss(p);return`<tr class="${q?'sel':''}" onclick="pick('${p.id}')"><td class="n">${i+1}</td><td>${p.n}</td><td>112 Mississauga</td><td>${sp(p)}</td><td>${p.tags.join(', ')}</td><td class="${b?'err':''}">${q?'On order'+(q>1?' x'+q:''):b?'ERR: '+b:'OK'}</td><td class="r">${p.p.toFixed(2)}</td></tr>`}).join('');
+  eg_.scrollTop=gs;$('ecnt').textContent=`View 1 - ${L.length} of ${L.length}`;
+  const ln=SLOTS.flatMap(c=>LN().filter(p=>p.cat==c[0]).map(p=>[c,p]));
+  $('eord').innerHTML=`<div class="ett">Sales Order Lines - SONL04011460</div><table><tr><th></th><th>Description</th><th>Category</th><th>Qty</th><th class="r">Unit price</th><th class="r">Line total</th><th></th></tr>${ln.map(([c,p],i)=>`<tr><td class="n">${i+1}</td><td>${p.n}</td><td>${c[1]}</td><td>${MULTI[p.cat]?lk('dec',p.id,'[ - ]')+' '+C[p.id]+' '+lk('add',p.id,'[ + ]'):1}</td><td class="r">${p.p.toFixed(2)}</td><td class="r">${(p.p*C[p.id]).toFixed(2)}</td><td class="lk" onclick="del('${p.id}')">[ Remove ]</td></tr>`).join('')||'<tr><td colspan="7" style="text-align:center;color:#777">No lines yet. Click a row above to add.</td></tr>'}</table><div class="esum">${s.c}C / ${s.t}T | ${s.v}GB VRAM | ${s.r}GB RAM | Subtotal ${M(s.tot)} &nbsp; Total ${M(s.tot*1.13)} &nbsp; <button class="ebtn" onclick="copyQ()">Generate PO</button>${bad.map(m=>`<div class="err">ERR: ${m}</div>`).join('')}</div>`;
+}
+
+/* ============================================================
+   OFFLINE DINO SPLASH — tap the dinosaur 20 times
+   ============================================================ */
 const dc=$('dc'),g=dc.getContext('2d'),SP='..........#######.|.........##.######|.........#########|.........#########|.........#####....|#.......######....|#......#######....|##....#########.#.|###..###########..|.################.|..##############..|...############...|....##########....|.....####..##.....|.....##....#......|.....#.....##.....'.split('|');
-let clicks=0,run=0,dy=0,vy=0,off=0,sc=0,cac=[420,760];
-function frame(){g.clearRect(0,0,600,150);g.fillStyle='#535353';
-if(run){off=(off+5)%600;sc+=.15;cac=cac.map(x=>x<-30?x+700+Math.random()*200:x-5)}
-if(vy||dy){dy+=vy;vy-=.9;if(dy<=0){dy=0;vy=0}}
-SP.forEach((r,y)=>[...r].forEach((c,x)=>c=='#'&&g.fillRect(30+x*2.4,95-dy+y*2.4,2.4,2.4)));
-cac.forEach(x=>{g.fillRect(x,100,8,34);g.fillRect(x-7,110,7,5);g.fillRect(x-7,110,4,15);g.fillRect(x+8,106,7,5);g.fillRect(x+11,96,4,15)});
-g.fillRect(0,134,600,1.5);g.font='14px monospace';g.fillText(String(Math.floor(sc)).padStart(5,'0'),540,20);
-g.strokeStyle='#ccc';[[120,40],[330,28],[500,50]].forEach(([x,y])=>g.strokeRect((x-off*.3+700)%700-50,y,46,10));
-requestAnimationFrame(frame)}frame();
-$('dino').addEventListener('pointerdown',()=>{run=1;if(!dy&&!vy)vy=11;if(++clicks>=20){clicks=0;$('pw').classList.add('show');$('pi').value='';$('pi').focus()}});
-$('pi').addEventListener('keydown',e=>{if(e.key=='Enter')tryPw();if(e.key=='Escape')$('pw').classList.remove('show')});
-function tryPw(){const m={P123:()=>openBuilder(''),PASSWORD1:openStealthBuilder,PASSWORD2:()=>openBuilder('chr')}[$('pi').value.trim().toUpperCase()];$('pw').classList.remove('show');if(m){$('dino').style.display='none';m()}else clicks=0}
-</script></body></html>
+let run=0,dy=0,vy=0,off=0,sc=0,cac=[420,760],taps=0;
+function frame(){
+  g.clearRect(0,0,600,150);g.fillStyle='#535353';
+  if(run){off=(off+5)%600;sc+=.15;cac=cac.map(x=>x<-30?x+700+Math.random()*200:x-5)}
+  if(vy||dy){dy+=vy;vy-=.9;if(dy<=0){dy=0;vy=0}}
+  SP.forEach((r,y)=>[...r].forEach((c,x)=>c=='#'&&g.fillRect(30+x*2.4,95-dy+y*2.4,2.4,2.4)));
+  cac.forEach(x=>{g.fillRect(x,100,8,34);g.fillRect(x-7,110,7,5);g.fillRect(x-7,110,4,15);g.fillRect(x+8,106,7,5);g.fillRect(x+11,96,4,15)});
+  g.fillRect(0,134,600,1.5);g.font='14px monospace';g.fillText(String(Math.floor(sc)).padStart(5,'0'),540,20);
+  requestAnimationFrame(frame);
+}
+frame();
+
+dc.addEventListener('click',e=>{
+  e.stopPropagation();
+  run=1;
+  if(!dy&&!vy)vy=11;
+  taps++;
+  $('tapCount').textContent=taps;
+  if(taps>=20){
+    taps=0;$('tapCount').textContent=0;
+    $('pw').classList.add('show');
+    $('pi').value='';$('pi').focus();
+  }
+});
+
+/* Password modal */
+function closePw(){$('pw').classList.remove('show')}
+$('pi').addEventListener('keydown',e=>{
+  if(e.key=='Enter')tryPw();
+  if(e.key=='Escape')closePw();
+});
+function tryPw(){
+  const val=$('pi').value.trim();
+  $('pw').classList.remove('show');
+  if(val==='Password1'){
+    $('dino').classList.add('gone');
+    setTimeout(()=>$('dino').style.display='none',500);
+    openBuilder('');
+    applyUI(1);
+    startMusic();
+  } else if(val==='Password2'){
+    $('dino').classList.add('gone');
+    setTimeout(()=>$('dino').style.display='none',500);
+    openStealthBuilder();
+    applyUI(2);
+    startMusic();
+  } else if(val==='Password3'){
+    $('dino').classList.add('gone');
+    setTimeout(()=>$('dino').style.display='none',500);
+    openBuilder('chr');
+    applyUI(3);
+    startMusic();
+  } else if(val==='Password4'){
+    $('dino').classList.add('gone');
+    setTimeout(()=>$('dino').style.display='none',500);
+    openBuilder('mobile-touch');
+    applyUI(4);
+    startMusic();
+  } else if(val==='Password5'){
+    $('dino').classList.add('gone');
+    setTimeout(()=>$('dino').style.display='none',500);
+    openBuilder('');
+    applyUI(5);
+    startMusic();
+  } else {
+    toast('Invalid password. Try Password1 - Password5');
+  }
+}
+
+/* Start music on first user interaction anywhere */
+['click','touchstart','keydown'].forEach(evt=>{
+  document.addEventListener(evt,()=>{
+    if(!musicStarted)startMusic();
+  },{once:true,passive:true});
+});
+
+/* Init pill state */
+applyUI(1);
+</script>
+</body>
+</html>
