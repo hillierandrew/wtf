@@ -38,7 +38,6 @@ input,select{font:inherit;color:inherit}
 ::-webkit-scrollbar-corner{background:transparent}
 *{scrollbar-width:thin;scrollbar-color:var(--border) transparent}
 
-/* Utility button styles */
 .btn-primary{background:linear-gradient(135deg,var(--a2),var(--a2-2));color:#fff;border:0;padding:13px 20px;border-radius:var(--btn-radius);font-weight:700;cursor:pointer;width:100%;font:inherit;box-shadow:0 4px 14px var(--accent-glow);transition:transform .1s,opacity .2s,box-shadow .2s;min-height:48px}
 .btn-primary:hover{opacity:.95}
 .btn-primary:active{transform:scale(.98)}
@@ -58,20 +57,10 @@ body.glass{
   --card-radius:22px;--btn-radius:16px;
   --card-shadow:0 20px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.12);
 }
-body.glass::before{
-  content:'';position:fixed;inset:0;z-index:-1;
-  background:
-    radial-gradient(circle at 15% 10%,rgba(90,200,250,.25),transparent 50%),
-    radial-gradient(circle at 85% 80%,rgba(191,90,242,.3),transparent 50%),
-    linear-gradient(180deg,#050a14,#0a1222);
-}
-body.glass .pc,body.glass .sl,body.glass .ri,body.glass .tg{
-  backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);
-}
+body.glass::before{content:'';position:fixed;inset:0;z-index:-1;background:radial-gradient(circle at 15% 10%,rgba(90,200,250,.25),transparent 50%),radial-gradient(circle at 85% 80%,rgba(191,90,242,.3),transparent 50%),linear-gradient(180deg,#050a14,#0a1222)}
+body.glass .pc,body.glass .sl,body.glass .ri,body.glass .tg{backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4)}
 body.glass .pc:hover{transform:translateY(-4px) scale(1.01);box-shadow:0 30px 80px rgba(90,200,250,.25),inset 0 1px 0 rgba(255,255,255,.15)}
 body.glass .pc{transition:transform .4s cubic-bezier(.2,.9,.3,1),box-shadow .4s,opacity .4s,filter .4s}
-body.glass .pc.reveal{opacity:0;transform:translateY(30px) scale(.96)}
-body.glass .pc.revealed{opacity:1;transform:translateY(0) scale(1)}
 body.glass .brand{background:linear-gradient(90deg,#5ac8fa,#bf5af2);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
 body.glass .grid{padding-bottom:120px}
 
@@ -88,9 +77,7 @@ body.brutalist{
   --font-weight-heading:900;--letter-spacing-heading:-.02em;
 }
 body.brutalist *{border-radius:0 !important}
-body.brutalist .pc,body.brutalist .sl,body.brutalist .ri,body.brutalist .tg{
-  border:3px solid #000 !important;box-shadow:5px 5px 0 #000;
-}
+body.brutalist .pc,body.brutalist .sl,body.brutalist .ri,body.brutalist .tg{border:3px solid #000 !important;box-shadow:5px 5px 0 #000}
 body.brutalist .pc:hover{transform:translate(-3px,-3px);box-shadow:8px 8px 0 #000}
 body.brutalist .pc.sel{background:#000;color:#fff}
 body.brutalist .pc.sel .pn,body.brutalist .pc.sel .ps,body.brutalist .pc.sel .pf,body.brutalist .pc.sel .pf b{color:#fff}
@@ -107,23 +94,13 @@ body.vaporwave{
   --accent-glow:rgba(255,79,163,.4);
   --border:rgba(255,79,163,.35);
 }
-body.vaporwave::before{
-  content:'';position:fixed;inset:0;z-index:-1;
-  background:
-    radial-gradient(ellipse at 50% 100%,rgba(255,79,163,.5),transparent 60%),
-    radial-gradient(ellipse at 20% 30%,rgba(0,240,255,.3),transparent 50%),
-    linear-gradient(180deg,#0d0522,#1a0d33 40%,#3d1a66);
-}
-body.vaporwave::after{
-  content:'';position:fixed;inset:0;z-index:99997;pointer-events:none;
-  background:repeating-linear-gradient(0deg,rgba(0,0,0,.15) 0,rgba(0,0,0,.15) 1px,transparent 1px,transparent 3px);
-  mix-blend-mode:overlay;
-}
+body.vaporwave::before{content:'';position:fixed;inset:0;z-index:-1;background:radial-gradient(ellipse at 50% 100%,rgba(255,79,163,.5),transparent 60%),radial-gradient(ellipse at 20% 30%,rgba(0,240,255,.3),transparent 50%),linear-gradient(180deg,#0d0522,#1a0d33 40%,#3d1a66)}
+body.vaporwave::after{content:'';position:fixed;inset:0;z-index:99997;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.15) 0,rgba(0,0,0,.15) 1px,transparent 1px,transparent 3px);mix-blend-mode:overlay}
 body.vaporwave .pc{background:linear-gradient(160deg,#2a1055,#3d1a66);border:2px solid rgba(255,79,163,.4);box-shadow:0 10px 40px rgba(255,79,163,.2)}
 body.vaporwave .pc:hover{border-color:#ff4fa3;box-shadow:0 20px 60px rgba(255,79,163,.5);transform:translateY(-3px)}
 body.vaporwave .pc.sel{border-color:#00f0ff;box-shadow:0 0 40px rgba(0,240,255,.6)}
-body.vaporwave .brand{background:linear-gradient(90deg,#ff4fa3,#00f0ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;text-shadow:0 0 30px #ff4fa3}
-body.vaporwave .gh{color:#00f0ff;text-shadow:0 0 20px #00f0ff;letter-spacing:.2em}
+body.vaporwave .brand{background:linear-gradient(90deg,#ff4fa3,#00f0ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+body.vaporwave .gh{color:#00f0ff;letter-spacing:.2em}
 
 body.terminal{
   --bg:#000000;--bg-card:#000d00;--bg-cart:#000d00;--bg-input:#001400;--bg-elev:#001400;
@@ -136,16 +113,13 @@ body.terminal{
   --card-shadow:0 0 20px rgba(51,255,51,.2);
 }
 body.terminal *{border-radius:2px !important}
-body.terminal::before{
-  content:'';position:fixed;inset:0;z-index:99997;pointer-events:none;
-  background:repeating-linear-gradient(0deg,rgba(51,255,51,.04) 0,rgba(51,255,51,.04) 1px,transparent 1px,transparent 3px);
-}
+body.terminal::before{content:'';position:fixed;inset:0;z-index:99997;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(51,255,51,.04) 0,rgba(51,255,51,.04) 1px,transparent 1px,transparent 3px)}
 body.terminal .brand::before{content:'> ';color:#33ff33}
 body.terminal .brand::after{content:'▊';animation:blink 1s infinite;color:#33ff33}
 @keyframes blink{50%{opacity:0}}
 body.terminal .pc{border:1px solid #33ff33;background:#000d00}
 body.terminal .pc:hover{border-color:#33ff33;box-shadow:0 0 30px rgba(51,255,51,.5);background:#001a00}
-body.terminal .pc.sel{border:2px solid #33ff33;background:#001a00;box-shadow:0 0 40px rgba(51,255,51,.7)}
+body.terminal .pc.sel{border:2px solid #33ff33;background:#001a00}
 body.terminal h2::before{content:'// '}
 body.terminal .gh::before{content:'> '}
 body.terminal .gh::after{content:'_';animation:blink 1s infinite}
@@ -160,24 +134,14 @@ body.kindle{
   --card-shadow:none;
   --font-size-base:16px;
 }
-body.kindle *{
-  box-shadow:none !important;
-  border-radius:0 !important;
-  background-image:none !important;
-  text-shadow:none !important;
-  transition:none !important;
-  animation:none !important;
-}
+body.kindle *{box-shadow:none !important;border-radius:0 !important;background-image:none !important;text-shadow:none !important}
 body.kindle::before,body.kindle::after{display:none}
-body.kindle .pc{border:1px solid #000 !important;background:#fff !important;padding:12px}
+body.kindle .pc{border:1px solid #000 !important;background:#fff !important;padding:12px;transition:none}
 body.kindle .pc:hover{background:#f0f0f0 !important;transform:none}
 body.kindle .pc.sel{border:3px solid #000 !important;background:#fffff0 !important}
-body.kindle .btn-primary,body.kindle .action-bar button,body.kindle .btn-ghost{
-  background:#fff !important;color:#000 !important;border:2px solid #000 !important;font-weight:800 !important;
-}
+body.kindle .btn-primary,body.kindle .action-bar button,body.kindle .btn-ghost{background:#fff !important;color:#000 !important;border:2px solid #000 !important;font-weight:800 !important}
 body.kindle .btn-primary:hover,body.kindle .action-bar button:hover{background:#e0e0e0 !important;color:#000 !important}
 body.kindle .action-bar button.suggest{background:#000 !important;color:#fff !important}
-body.kindle .action-bar button.suggest:hover{background:#333 !important}
 body.kindle .bp{background:#f0f0e8 !important;border-left:2px solid #000 !important}
 body.kindle .bh,body.kindle .filt-bar,body.kindle .compat-panel{background:#fff !important;border-bottom:1px solid #000 !important}
 body.kindle .bp .sl{border:1px solid #000 !important}
@@ -190,113 +154,95 @@ body.kindle .kp div,body.kindle .bar u{background:#fff !important;border:1px sol
 body.kindle .bar u{background:#000 !important}
 
 /* ============================================================
-   NEW STYLES (11-15) : DEVICE SIMULATORS
+   DEVICE SIMULATORS 11-15 — ONLY apply the frame on DESKTOP
+   (≥900px). On real phones these modes just render as normal
+   mobile layouts — that's the fix for "unusable on phone".
    ============================================================ */
-
-/* 11 - iPhone iOS */
-body.ios {
-  --bg: #000; --bg-card: #ffffff; --bg-cart: #f9f9f9; --bg-input: #efeff4; --bg-elev: #ffffff;
-  --fg: #000000; --fg-muted: #8e8e93; --a1: #ff3b30; --a2: #007aff; --a2-2: #0056b3; --a3: #af52de;
-  --card-radius: 16px; --btn-radius: 14px; --f: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+body.ios{
+  --bg:#000;--bg-card:#ffffff;--bg-cart:#f9f9f9;--bg-input:#efeff4;--bg-elev:#ffffff;
+  --fg:#000000;--fg-muted:#8e8e93;--a1:#ff3b30;--a2:#007aff;--a2-2:#0056b3;--a3:#af52de;
+  --card-radius:16px;--btn-radius:14px;--f:-apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;
+  --border:#e5e5ea;
 }
-body.ios ::-webkit-scrollbar { width: 4px; }
-@media(min-width: 600px) {
-  body.ios { background: #1c1c1e; }
-  body.ios #builder-app.show {
-    inset: 4vh auto auto 50%; max-width: 390px; height: 92vh; max-height: 844px;
-    transform: translateX(-50%); border-radius: 44px; border: 12px solid #000;
-    box-shadow: 0 0 0 2px #333, 0 30px 60px rgba(0,0,0,0.6); overflow: hidden;
-  }
-  body.ios #builder-app::before {
-    content: ''; position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
-    width: 120px; height: 32px; background: #000; border-radius: 20px; z-index: 99999; pointer-events: none;
-  }
-  body.ios .bh { padding-top: 48px; }
+body.android{
+  --bg:#1c1b1f;--bg-card:#2b2930;--bg-cart:#232128;--bg-input:#49454f;--bg-elev:#2b2930;
+  --fg:#e6e1e5;--fg-muted:#cac4d0;--a1:#f2b8b5;--a2:#d0bcff;--a2-2:#9a82db;
+  --card-radius:24px;--btn-radius:24px;--f:Roboto,sans-serif;--border:rgba(255,255,255,.12);
 }
-
-/* 12 - Android Material */
-body.android {
-  --bg: #1c1b1f; --bg-card: #2b2930; --bg-cart: #232128; --bg-input: #49454f; --bg-elev: #2b2930;
-  --fg: #e6e1e5; --fg-muted: #cac4d0; --a1: #f2b8b5; --a2: #d0bcff; --a2-2: #9a82db;
-  --card-radius: 24px; --btn-radius: 24px; --f: Roboto, sans-serif;
+body.tv{
+  --bg:#000000;--bg-card:#181818;--bg-cart:#111111;--bg-input:#2a2a2a;
+  --fg:#ffffff;--fg-muted:#aaaaaa;--a2:#e50914;--a2-2:#b81d24;
+  --font-size-base:18px;--border:rgba(255,255,255,.12);
 }
-body.android ::-webkit-scrollbar { width: 4px; }
-@media(min-width: 600px) {
-  body.android { background: #0f100e; }
-  body.android #builder-app.show {
-    inset: 4vh auto auto 50%; max-width: 412px; height: 92vh; max-height: 915px;
-    transform: translateX(-50%); border-radius: 36px; border: 8px solid #111;
-    box-shadow: 0 0 0 2px #333, 0 20px 50px rgba(0,0,0,0.7); overflow: hidden;
-  }
-  body.android #builder-app::before {
-    content: ''; position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
-    width: 18px; height: 18px; background: #000; border-radius: 50%; z-index: 99999; pointer-events: none;
-  }
-  body.android .bh { padding-top: 40px; }
+body.macos{
+  --bg:#f5f5f7;--bg-card:#ffffff;--bg-cart:#ffffff;--bg-input:#e8e8ed;
+  --fg:#000000;--fg-muted:#6e6e73;--a2:#0071e3;--a2-2:#0056b3;
+  --f:-apple-system,BlinkMacSystemFont,sans-serif;--border:rgba(0,0,0,.12);
+}
+body.win{
+  --bg:#202124;--bg-card:#292a2d;--bg-cart:#292a2d;--bg-input:#171717;
+  --fg:#e8eaed;--fg-muted:#9aa0a6;--a2:#8ab4f8;--a2-2:#72a0eb;
+  --card-radius:6px;--btn-radius:4px;--border:rgba(255,255,255,.1);
 }
 
-/* Force Mobile Layout for iOS and Android when on Desktop screens */
-@media(min-width: 600px) {
-  body.ios .bm, body.android .bm { grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; overflow-y: auto; }
-  body.ios .rail, body.android .rail { display: flex; overflow-x: auto; overflow-y: hidden; border: 0; border-bottom: 1px solid var(--border); padding: 8px; gap: 6px; flex-wrap: nowrap; min-height: 60px; }
-  body.ios .ri, body.android .ri { margin-bottom: 0; flex: 0 0 auto; }
-  body.ios .bp, body.android .bp { border: 0; border-top: 1px solid var(--border); max-height: 48vh; }
-  body.ios .grid, body.android .grid { grid-template-columns: 1fr; padding: 12px; gap: 12px; }
-  body.ios #musicCtl input[type=range], body.android #musicCtl input[type=range] { width: 64px; }
-}
+/* Only on desktop (≥900px) do the device frames apply */
+@media(min-width:900px) and (pointer:fine){
+  body.ios{background:#1c1c1e}
+  body.ios #builder-app.show{
+    inset:4vh auto auto 50%;max-width:390px;height:92vh;max-height:844px;
+    transform:translateX(-50%);border-radius:44px;border:12px solid #000;
+    box-shadow:0 0 0 2px #333,0 30px 60px rgba(0,0,0,.6);overflow:hidden;
+  }
+  body.ios #builder-app::before{
+    content:'';position:absolute;top:12px;left:50%;transform:translateX(-50%);
+    width:120px;height:32px;background:#000;border-radius:20px;z-index:99999;pointer-events:none;
+  }
+  body.ios .bh{padding-top:48px}
 
-/* 13 - Smart TV */
-body.tv {
-  --bg: #000000; --bg-card: #181818; --bg-cart: #111111; --bg-input: #2a2a2a;
-  --fg: #ffffff; --fg-muted: #aaaaaa; --a2: #e50914; --a2-2: #b81d24;
-  --font-size-base: 18px;
-}
-body.tv #builder-app.show { padding: 4vw; background: #000; }
-body.tv .bh { background: transparent; border: none; padding-bottom: 20px; }
-body.tv .pc { border: 4px solid transparent; transition: all 0.2s; background: #1a1a1a; }
-body.tv .pc:hover, body.tv .pc.sel { transform: scale(1.05); border-color: #fff; z-index: 10; box-shadow: 0 20px 40px rgba(0,0,0,0.8); background: #222; }
+  body.android{background:#0f100e}
+  body.android #builder-app.show{
+    inset:4vh auto auto 50%;max-width:412px;height:92vh;max-height:915px;
+    transform:translateX(-50%);border-radius:36px;border:8px solid #111;
+    box-shadow:0 0 0 2px #333,0 20px 50px rgba(0,0,0,.7);overflow:hidden;
+  }
+  body.android #builder-app::before{
+    content:'';position:absolute;top:14px;left:50%;transform:translateX(-50%);
+    width:18px;height:18px;background:#000;border-radius:50%;z-index:99999;pointer-events:none;
+  }
+  body.android .bh{padding-top:40px}
 
-/* 14 - macOS Safari */
-body.macos {
-  --bg: #f5f5f7; --bg-card: #ffffff; --bg-cart: #ffffff; --bg-input: #e8e8ed;
-  --f: -apple-system, BlinkMacSystemFont, sans-serif;
-}
-@media(min-width: 900px) {
-  body.macos { background: #333; }
-  body.macos #builder-app.show {
-    inset: 8vh auto auto 50%; width: 90%; max-width: 1200px; height: 80vh;
-    transform: translateX(-50%); border-radius: 12px; border: 1px solid rgba(0,0,0,0.2);
-    box-shadow: 0 30px 80px rgba(0,0,0,0.5); overflow: hidden;
-  }
-  body.macos .bh { padding-left: 80px; background: #e5e5ea; position: relative; }
-  body.macos .bh::before {
-    content: ''; position: absolute; left: 16px; top: 22px; width: 12px; height: 12px;
-    border-radius: 50%; background: #ff5f56; box-shadow: 20px 0 0 #ffbd2e, 40px 0 0 #27c93f;
-  }
-}
+  body.tv #builder-app.show{padding:4vw;background:#000}
+  body.tv .bh{background:transparent;border:none;padding-bottom:20px}
+  body.tv .pc{border:4px solid transparent;background:#1a1a1a}
+  body.tv .pc:hover,body.tv .pc.sel{transform:scale(1.05);border-color:#fff;z-index:10;background:#222}
 
-/* 15 - Windows Chrome */
-body.win {
-  --bg: #202124; --bg-card: #292a2d; --bg-cart: #292a2d; --bg-input: #171717;
-  --fg: #e8eaed; --fg-muted: #9aa0a6; --a2: #8ab4f8; --a2-2: #72a0eb;
-  --card-radius: 6px; --btn-radius: 4px;
-}
-@media(min-width: 900px) {
-  body.win { background: #111; }
-  body.win #builder-app.show {
-    inset: 6vh auto auto 50%; width: 92%; max-width: 1280px; height: 85vh;
-    transform: translateX(-50%); border-radius: 8px; border: 1px solid #3c4043;
-    box-shadow: 0 10px 50px rgba(0,0,0,0.8); overflow: hidden;
+  body.macos{background:#333}
+  body.macos #builder-app.show{
+    inset:8vh auto auto 50%;width:90%;max-width:1200px;height:80vh;
+    transform:translateX(-50%);border-radius:12px;border:1px solid rgba(0,0,0,.2);
+    box-shadow:0 30px 80px rgba(0,0,0,.5);overflow:hidden;
   }
-  body.win .bh { padding-top: 40px; background: #35363a; position: relative; border-bottom: 1px solid #000; }
-  body.win .bh::before {
-    content: ' BuildMyPC'; position: absolute; left: 0; top: 0; right: 0; height: 32px;
-    background: #202124; color: #9aa0a6; font-size: 12px; display: flex; align-items: center;
-    padding-left: 20px; border-radius: 8px 8px 0 0;
+  body.macos .bh{padding-left:80px;background:#e5e5ea;position:relative}
+  body.macos .bh::before{
+    content:'';position:absolute;left:16px;top:22px;width:12px;height:12px;
+    border-radius:50%;background:#ff5f56;box-shadow:20px 0 0 #ffbd2e,40px 0 0 #27c93f;
   }
-  body.win .bh::after {
-    content: '─ ◻ ✕'; position: absolute; right: 16px; top: 8px; font-size: 11px;
-    letter-spacing: 12px; color: #9aa0a6; pointer-events: none;
+
+  body.win{background:#111}
+  body.win #builder-app.show{
+    inset:6vh auto auto 50%;width:92%;max-width:1280px;height:85vh;
+    transform:translateX(-50%);border-radius:8px;border:1px solid #3c4043;
+    box-shadow:0 10px 50px rgba(0,0,0,.8);overflow:hidden;
+  }
+  body.win .bh{padding-top:40px;background:#35363a;position:relative;border-bottom:1px solid #000}
+  body.win .bh::before{
+    content:' BuildMyPC';position:absolute;left:0;top:0;right:0;height:32px;
+    background:#202124;color:#9aa0a6;font-size:12px;display:flex;align-items:center;
+    padding-left:20px;border-radius:8px 8px 0 0;
+  }
+  body.win .bh::after{
+    content:'─ ◻ ✕';position:absolute;right:16px;top:8px;font-size:11px;
+    letter-spacing:12px;color:#9aa0a6;pointer-events:none;
   }
 }
 
@@ -313,33 +259,29 @@ body.win {
 #dino small{color:#80868b;font-family:monospace}
 
 /* ============================================================
-   BOTTOM-LEFT CONTROLS — UI switcher + Play/Volume + Basic/Advanced
+   BOTTOM CONTROLS
    ============================================================ */
-#uiPill{position:fixed;left:14px;bottom:14px;z-index:99998;display:flex;gap:6px;align-items:center;background:rgba(0,0,0,.5);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,.35);transition:all .3s;max-width:calc(100vw - 28px);flex-wrap:wrap}
-#uiPill .main{display:flex;gap:4px;align-items:center;flex-wrap:wrap;max-width: 600px;}
-#uiPill button.uiBtn{width:38px;height:38px;border-radius:50%;border:0;background:transparent;color:#fff;font-size:1.05rem;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+#uiPill{position:fixed;left:14px;bottom:14px;z-index:99998;display:flex;gap:6px;align-items:center;background:rgba(0,0,0,.55);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,.35);transition:all .3s;max-width:calc(100vw - 28px);flex-wrap:wrap}
+#uiPill .main{display:flex;gap:4px;align-items:center;flex-wrap:wrap;max-width:520px;max-height:260px;overflow-y:auto}
+#uiPill button.uiBtn{width:36px;height:36px;border-radius:50%;border:0;background:transparent;color:#fff;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
 #uiPill button.uiBtn:hover{background:rgba(255,255,255,.15)}
 #uiPill button.uiBtn.active{background:#fff;color:#000}
 #uiPill .toggle{width:30px;height:30px;border-radius:50%;border:0;background:transparent;color:#fff;font-size:.85rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 #uiPill .toggle:hover{background:rgba(255,255,255,.15)}
 #uiPill.collapsed .main{display:none}
-#uiPill .pcBtn{width:38px;height:38px;border-radius:50%;border:0;background:linear-gradient(135deg,#00e5ff,#3b82f6);color:#fff;font-size:1.25rem;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+#uiPill .pcBtn{width:36px;height:36px;border-radius:50%;border:0;background:linear-gradient(135deg,#00e5ff,#3b82f6);color:#fff;font-size:1.2rem;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
 #uiPill .pcBtn:hover{transform:scale(1.06)}
 
-/* Right-side controls: Play/Volume + Basic/Advanced */
-#bottomRight{position:fixed;right:14px;bottom:14px;z-index:99998;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+#bottomRight{position:fixed;right:14px;bottom:14px;z-index:99998;display:flex;flex-direction:column;gap:8px;align-items:flex-end;max-width:calc(100vw - 28px)}
 #musicCtl{display:flex;gap:6px;align-items:center;background:rgba(0,0,0,.55);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:6px 10px 6px 6px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
-#musicCtl button{width:40px;height:40px;border-radius:50%;border:0;background:transparent;color:#fff;font-size:1.15rem;display:flex;align-items:center;justify-content:center;transition:all .2s}
+#musicCtl button{width:40px;height:40px;border-radius:50%;border:0;background:transparent;color:#fff;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:all .2s}
 #musicCtl button:hover{background:rgba(255,255,255,.15)}
 #musicCtl input[type=range]{width:80px;accent-color:#00e5ff}
-@media(max-width:600px){#musicCtl input[type=range]{width:64px}}
+@media(max-width:600px){#musicCtl input[type=range]{width:60px}}
 #modeToggle{display:flex;background:rgba(0,0,0,.55);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:4px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
-#modeToggle button{padding:8px 16px;border-radius:999px;border:0;background:transparent;color:#fff;font-size:.78rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;transition:all .2s}
+#modeToggle button{padding:8px 14px;border-radius:999px;border:0;background:transparent;color:#fff;font-size:.75rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;transition:all .2s}
 #modeToggle button.active{background:#fff;color:#000}
 #modeToggle button:hover:not(.active){background:rgba(255,255,255,.15)}
-
-/* When body.kindle, hide flair elements */
-body.kindle #bg,#meter{display:none}
 
 #uiBadge{position:fixed;left:50%;top:40px;transform:translateX(-50%) translateY(-20px);z-index:99999;padding:14px 28px;background:rgba(10,14,25,.92);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.2);border-radius:16px;color:#fff;font-weight:900;letter-spacing:.15em;font-size:1.1rem;text-transform:uppercase;box-shadow:0 20px 50px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:all .4s cubic-bezier(.3,1.3,.5,1)}
 #uiBadge.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -358,142 +300,138 @@ body.kindle #bg,#meter{display:none}
 #pw .close{position:absolute;top:16px;right:16px;width:40px;height:40px;border-radius:50%;border:0;background:var(--bg-input);color:var(--fg-muted);font-size:1.4rem;display:flex;align-items:center;justify-content:center}
 
 /* ============================================================
-   BUILDER APP
+   BUILDER APP — THE BIG FIX for scrolling & clipping
    ============================================================ */
-#builder-app{position:fixed;inset:0;z-index:100;display:none;flex-direction:column;background:var(--bg);padding-bottom:80px}
+#builder-app{position:fixed;inset:0;z-index:100;display:none;flex-direction:column;background:var(--bg);padding-bottom:88px}
 #builder-app.show{display:flex}
-body.kindle #builder-app{padding-bottom:90px}
+@media(max-width:900px){#builder-app{padding-bottom:96px}}
 
-.bh{display:flex;align-items:center;gap:12px;padding:12px 18px;background:var(--bg-card);border-bottom:1px solid var(--border);flex-wrap:wrap;flex-shrink:0}
-.brand{font-weight:900;font-size:1.2rem;color:var(--a2);white-space:nowrap;line-height:1.1;letter-spacing:.5px;display:flex;align-items:center;gap:8px;font-weight:var(--font-weight-heading);letter-spacing:var(--letter-spacing-heading)}
-.brand small{display:block;font-size:.6rem;color:var(--fg-muted);letter-spacing:2px;font-weight:600}
-.brand .logo{font-size:1.5rem}
-.bh .search{flex:1;min-width:180px;max-width:520px;background:var(--bg-input);border:1px solid var(--border);color:var(--fg);padding:11px 18px;border-radius:26px;outline:0;font:inherit;transition:all .2s;min-height:44px}
+.bh{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg-card);border-bottom:1px solid var(--border);flex-wrap:wrap;flex-shrink:0}
+.brand{font-weight:900;font-size:1.05rem;color:var(--a2);white-space:nowrap;line-height:1.1;letter-spacing:.4px;display:flex;align-items:center;gap:6px}
+.brand small{display:block;font-size:.55rem;color:var(--fg-muted);letter-spacing:1.5px;font-weight:600}
+.brand .logo{font-size:1.3rem}
+.bh .search{flex:1;min-width:120px;max-width:520px;background:var(--bg-input);border:1px solid var(--border);color:var(--fg);padding:10px 16px;border-radius:26px;outline:0;font:inherit;transition:all .2s;min-height:42px;font-size:.9rem}
 .bh .search:focus{border-color:var(--a2);box-shadow:0 0 0 3px var(--accent-glow)}
-.bh .right{display:flex;gap:8px;align-items:center;margin-left:auto;flex-wrap:wrap}
-.budget-wrap{display:flex;align-items:center;gap:6px;background:var(--bg-input);border:1px solid var(--border);border-radius:26px;padding:6px 6px 6px 14px;font-weight:800;color:var(--fg-muted);font-size:.82rem}
-.budget-wrap input{width:90px;background:transparent;border:0;color:var(--fg);font-weight:800;font-size:.95rem;outline:none;padding:6px}
-.icon-btn{width:44px;height:44px;border-radius:50%;background:var(--bg-input);border:1px solid var(--border);color:var(--fg);font-size:1.15rem;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.bh .right{display:flex;gap:6px;align-items:center;margin-left:auto;flex-wrap:wrap}
+.budget-wrap{display:flex;align-items:center;gap:4px;background:var(--bg-input);border:1px solid var(--border);border-radius:22px;padding:4px 4px 4px 10px;font-weight:800;color:var(--fg-muted);font-size:.75rem}
+.budget-wrap input{width:70px;background:transparent;border:0;color:var(--fg);font-weight:800;font-size:.9rem;outline:none;padding:5px}
+.icon-btn{width:40px;height:40px;border-radius:50%;background:var(--bg-input);border:1px solid var(--border);color:var(--fg);font-size:1.05rem;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
 .icon-btn:hover{background:var(--bg-card);border-color:var(--a2);color:var(--a2)}
 
-/* Filter bar */
-.filt-bar{display:flex;gap:8px;align-items:center;padding:10px 18px;border-bottom:1px solid var(--border);background:var(--bg-card);flex-wrap:wrap;flex-shrink:0}
-.filt-bar label{display:flex;align-items:center;gap:6px;font-size:.72rem;font-weight:800;color:var(--fg-muted);text-transform:uppercase;letter-spacing:.06em}
-.filt-bar select,.filt-bar input{background:var(--bg-input);color:var(--fg);border:1px solid var(--border);border-radius:10px;padding:8px 12px;font:inherit;min-height:38px;font-size:.85rem;font-weight:700;cursor:pointer}
-.filt-bar select{max-width:160px}
-.filt-bar input[type=number]{width:90px}
+.filt-bar{display:flex;gap:6px;align-items:center;padding:8px 14px;border-bottom:1px solid var(--border);background:var(--bg-card);flex-wrap:wrap;flex-shrink:0}
+.filt-bar label{display:flex;align-items:center;gap:4px;font-size:.65rem;font-weight:800;color:var(--fg-muted);text-transform:uppercase;letter-spacing:.05em}
+.filt-bar select,.filt-bar input{background:var(--bg-input);color:var(--fg);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font:inherit;min-height:36px;font-size:.8rem;font-weight:700;cursor:pointer;max-width:100%}
+.filt-bar select{max-width:150px}
+.filt-bar input[type=number]{width:76px}
 .filt-bar .spacer{flex:1;min-width:8px}
 
-/* Compat panel */
-.compat-panel{display:flex;gap:14px;align-items:flex-start;padding:14px 18px;background:var(--bg-card);border-bottom:1px solid var(--border);flex-shrink:0}
-.compat-panel .status{display:flex;align-items:center;gap:10px;font-weight:800;font-size:.9rem;white-space:nowrap}
-.compat-panel .status .dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.compat-panel{display:flex;gap:10px;align-items:flex-start;padding:10px 14px;background:var(--bg-card);border-bottom:1px solid var(--border);flex-shrink:0}
+.compat-panel .status{display:flex;align-items:center;gap:8px;font-weight:800;font-size:.82rem;white-space:nowrap}
+.compat-panel .status .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 .compat-panel.ok .status{color:var(--ok)}
-.compat-panel.ok .status .dot{background:var(--ok);box-shadow:0 0 12px var(--ok)}
+.compat-panel.ok .status .dot{background:var(--ok);box-shadow:0 0 10px var(--ok)}
 .compat-panel.bad .status{color:var(--bad)}
-.compat-panel.bad .status .dot{background:var(--bad);box-shadow:0 0 12px var(--bad);animation:pulseRed 1.6s infinite}
+.compat-panel.bad .status .dot{background:var(--bad);box-shadow:0 0 10px var(--bad);animation:pulseRed 1.6s infinite}
 @keyframes pulseRed{0%,100%{opacity:1}50%{opacity:.4}}
-.compat-panel .msgs{flex:1;font-size:.85rem;color:var(--fg-muted);line-height:1.55;min-width:0;max-height:120px;overflow-y:auto}
+.compat-panel .msgs{flex:1;font-size:.78rem;color:var(--fg-muted);line-height:1.5;min-width:0;max-height:80px;overflow-y:auto}
 .compat-panel .msgs .m{display:block}
 .compat-panel .msgs .m.err{color:var(--bad);font-weight:700}
 .compat-panel .msgs .m.warn{color:var(--warn);font-weight:700}
 
-/* Action bar */
-.action-bar{display:flex;gap:8px;padding:12px 18px;background:var(--bg-elev);border-bottom:1px solid var(--border);flex-wrap:wrap;flex-shrink:0}
-.action-bar button{display:flex;align-items:center;gap:8px;padding:11px 16px;border-radius:var(--btn-radius);font-weight:700;font-size:.85rem;border:1px solid var(--border);background:var(--bg-card);color:var(--fg);transition:all .2s;min-height:44px;white-space:nowrap}
-.action-bar button:hover{background:var(--bg-input);border-color:var(--a2);color:var(--a2);transform:translateY(-1px)}
-.action-bar button .ico{font-size:1.05rem}
+.action-bar{display:flex;gap:6px;padding:10px 14px;background:var(--bg-elev);border-bottom:1px solid var(--border);flex-wrap:wrap;flex-shrink:0;overflow-x:auto}
+.action-bar button{display:flex;align-items:center;gap:6px;padding:9px 14px;border-radius:var(--btn-radius);font-weight:700;font-size:.78rem;border:1px solid var(--border);background:var(--bg-card);color:var(--fg);transition:all .2s;min-height:40px;white-space:nowrap}
+.action-bar button:hover{background:var(--bg-input);border-color:var(--a2);color:var(--a2)}
+.action-bar button .ico{font-size:1rem}
 .action-bar button.suggest{background:linear-gradient(135deg,var(--a2),var(--a2-2));color:#fff;border:0;box-shadow:0 4px 14px var(--accent-glow)}
-.action-bar button.suggest:hover{transform:translateY(-2px)}
 .action-bar button.danger{background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff;border:0}
 .action-bar button.amazon{background:linear-gradient(135deg,#ff9900,#e47911);color:#111;border:0}
 .action-bar button.tour{background:var(--bg-input);border-color:var(--a3);color:var(--a3)}
 
-/* Layout */
+/* Layout — key fix: overflow hidden plus explicit min-heights so nothing clips */
 .bm{display:grid;grid-template-columns:220px 1fr 440px;flex:1;min-height:0;overflow:hidden}
 @media(max-width:1400px){.bm{grid-template-columns:190px 1fr 400px}}
-@media(max-width:1100px){.bm{grid-template-columns:1fr;grid-template-rows:auto 1fr auto;overflow-y:auto}}
+@media(max-width:1100px){.bm{grid-template-columns:1fr;grid-template-rows:auto 1fr auto;overflow-y:auto;overflow-x:hidden}}
 
-.rail{background:var(--bg-card);border-right:1px solid var(--border);overflow-y:auto;padding:10px;min-height:0}
-@media(max-width:1100px){.rail{display:flex;overflow-x:auto;overflow-y:hidden;border:0;border-bottom:1px solid var(--border);padding:8px;gap:6px;flex-wrap:nowrap;min-height:60px}}
-.ri{display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:var(--card-radius);cursor:pointer;color:var(--fg-muted);font-weight:700;transition:all .15s;margin-bottom:4px;font-size:.9rem;min-height:52px;white-space:nowrap}
+.rail{background:var(--bg-card);border-right:1px solid var(--border);overflow-y:auto;overflow-x:hidden;padding:10px;min-height:0}
+@media(max-width:1100px){.rail{display:flex;overflow-x:auto;overflow-y:hidden;border:0;border-bottom:1px solid var(--border);padding:8px;gap:6px;flex-wrap:nowrap;min-height:56px}}
+.ri{display:flex;gap:8px;align-items:center;padding:10px 12px;border-radius:var(--card-radius);cursor:pointer;color:var(--fg-muted);font-weight:700;transition:all .15s;margin-bottom:3px;font-size:.85rem;min-height:48px;white-space:nowrap}
 @media(max-width:1100px){.ri{margin-bottom:0;flex:0 0 auto}}
 .ri:hover{background:var(--bg-input);color:var(--fg)}
 .ri.on{background:linear-gradient(135deg,var(--a2),var(--a2-2));color:#fff;box-shadow:0 4px 14px var(--accent-glow)}
-.ri i{margin-left:auto;background:rgba(255,255,255,.25);padding:2px 9px;border-radius:20px;font-size:.72rem;font-style:normal;font-weight:800}
-.ri .emoji{font-size:1.15rem;line-height:1}
+.ri i{margin-left:auto;background:rgba(255,255,255,.25);padding:2px 8px;border-radius:20px;font-size:.68rem;font-style:normal;font-weight:800}
+.ri .emoji{font-size:1.05rem;line-height:1}
 
 .mid{display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden}
-.tags{display:flex;gap:6px;overflow-x:auto;padding:10px 16px;border-bottom:1px solid var(--border);flex:none;background:var(--bg);flex-shrink:0}
-.tg{white-space:nowrap;border:1px solid var(--border);background:var(--bg-card);color:var(--fg-muted);border-radius:999px;padding:8px 14px;font-size:.8rem;font-weight:700;cursor:pointer;transition:all .15s;min-height:38px;display:flex;align-items:center}
+.tags{display:flex;gap:5px;overflow-x:auto;padding:8px 12px;border-bottom:1px solid var(--border);flex:none;background:var(--bg);flex-shrink:0;-webkit-overflow-scrolling:touch}
+.tg{white-space:nowrap;border:1px solid var(--border);background:var(--bg-card);color:var(--fg-muted);border-radius:999px;padding:6px 12px;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .15s;min-height:34px;display:flex;align-items:center}
 .tg:hover{color:var(--fg);border-color:var(--a2)}
 .tg.on{background:linear-gradient(135deg,var(--a2),var(--a2-2));color:#fff;border-color:transparent;box-shadow:0 2px 10px var(--accent-glow)}
 
-.grid{flex:1;overflow-y:auto;padding:16px;display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));align-content:start;min-height:0}
-@media(max-width:600px){.grid{grid-template-columns:1fr;padding:12px;gap:12px}}
-.gh{grid-column:1/-1;margin:8px 0 0;color:var(--fg-muted);font-size:1.05rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+.grid{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px;display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));align-content:start;min-height:0;-webkit-overflow-scrolling:touch}
+@media(max-width:600px){.grid{grid-template-columns:1fr;padding:10px;gap:10px}}
+.gh{grid-column:1/-1;margin:6px 0 0;color:var(--fg-muted);font-size:.95rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
 
-.pc{background:var(--card-bg);border:var(--card-border);border-radius:var(--card-radius);padding:16px;display:flex;flex-direction:column;gap:10px;cursor:pointer;transition:all var(--transition-speed);position:relative;color:inherit;min-width:0;box-shadow:var(--card-shadow)}
+.pc{background:var(--card-bg);border:var(--card-border);border-radius:var(--card-radius);padding:14px;display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:all var(--transition-speed);position:relative;color:inherit;min-width:0;box-shadow:var(--card-shadow)}
 .pc:hover{border-color:var(--a2);transform:translateY(-2px)}
 .pc.sel{border:2px solid var(--a2);background:linear-gradient(160deg,var(--bg-card),var(--bg-input));box-shadow:0 0 0 3px var(--accent-glow)}
 .pc.dis{opacity:.55}
-.pc .pn{font-weight:800;line-height:1.35;font-size:1rem;color:var(--fg);word-break:break-word}
-.pc .ps{color:var(--fg-muted);font-size:.82rem;line-height:1.5;word-break:break-word}
-.pc .pt{display:flex;gap:5px;flex-wrap:wrap}
-.pc .pt span{font-size:.68rem;padding:3px 8px;border-radius:6px;background:var(--bg-input);border:1px solid var(--border);color:var(--fg-muted);font-weight:700;white-space:nowrap}
-.pc .pf{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:8px;color:var(--fg-muted);font-weight:800;gap:8px;flex-wrap:wrap}
-.pc .pf b{font-size:1.35rem;color:var(--a2);letter-spacing:-.02em}
-.pc .pr{color:var(--a1);font-size:.78rem;font-weight:700;background:rgba(239,68,68,.1);padding:7px 10px;border-radius:8px;line-height:1.4}
+.pc .pn{font-weight:800;line-height:1.35;font-size:.95rem;color:var(--fg);word-break:break-word}
+.pc .ps{color:var(--fg-muted);font-size:.78rem;line-height:1.5;word-break:break-word}
+.pc .pt{display:flex;gap:4px;flex-wrap:wrap}
+.pc .pt span{font-size:.64rem;padding:3px 7px;border-radius:6px;background:var(--bg-input);border:1px solid var(--border);color:var(--fg-muted);font-weight:700;white-space:nowrap}
+.pc .pf{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:6px;color:var(--fg-muted);font-weight:800;gap:6px;flex-wrap:wrap}
+.pc .pf b{font-size:1.25rem;color:var(--a2);letter-spacing:-.02em}
+.pc .pr{color:var(--a1);font-size:.72rem;font-weight:700;background:rgba(239,68,68,.1);padding:6px 9px;border-radius:8px;line-height:1.4}
 
 .qtyc{display:inline-flex;align-items:center;gap:0;background:var(--bg-input);border:1px solid var(--border);border-radius:999px;padding:3px;font-weight:900}
-.qtyc button{width:32px;height:32px;border-radius:50%;background:transparent;border:0;color:var(--fg);font-size:1.15rem;font-weight:900;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.qtyc button{width:30px;height:30px;border-radius:50%;background:transparent;border:0;color:var(--fg);font-size:1.05rem;font-weight:900;display:flex;align-items:center;justify-content:center;transition:background .15s}
 .qtyc button:hover{background:var(--a2);color:#fff}
-.qtyc span{min-width:28px;text-align:center;font-weight:900}
+.qtyc span{min-width:26px;text-align:center;font-weight:900;font-size:.9rem}
 
-.bp{background:var(--bg-cart);border-left:1px solid var(--border);overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;min-height:0}
-@media(max-width:1100px){.bp{border:0;border-top:1px solid var(--border);max-height:48vh}}
+.bp{background:var(--bg-cart);border-left:1px solid var(--border);overflow-y:auto;overflow-x:hidden;padding:14px;display:flex;flex-direction:column;gap:10px;min-height:0;-webkit-overflow-scrolling:touch}
+@media(max-width:1100px){.bp{border:0;border-top:1px solid var(--border);max-height:50vh}}
 .tot{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
-.tot b{font-size:1.6rem;color:var(--a2);letter-spacing:-.02em}
-.tot h2{font-size:1.15rem;font-weight:800}
-.st{padding:6px 12px;border-radius:8px;font-weight:800;font-size:.78rem}
-.cp{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:12px;padding:12px 14px;font-size:.85rem;font-weight:600;line-height:1.55;color:var(--a1)}
+.tot b{font-size:1.5rem;color:var(--a2);letter-spacing:-.02em}
+.tot h2{font-size:1.05rem;font-weight:800}
+.st{padding:5px 10px;border-radius:8px;font-weight:800;font-size:.72rem}
+.cp{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:12px;padding:10px 12px;font-size:.8rem;font-weight:600;line-height:1.5;color:var(--a1)}
 .cp.ok{background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.25);color:var(--ok)}
 .cp b{display:block;margin-bottom:4px;font-weight:800}
-.sl{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--card-bg);border:var(--card-border);border-radius:var(--card-radius);transition:border-color .15s}
+.sl{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--card-bg);border:var(--card-border);border-radius:var(--card-radius);transition:border-color .15s}
 .sl:hover{border-color:var(--a2)}
 .sl.e{border-style:dashed;color:var(--fg-muted);cursor:pointer;background:transparent}
 .sl.e:hover{background:var(--bg-card);color:var(--fg)}
-.sl small{display:block;font-size:.68rem;color:var(--fg-muted);font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
-.sl .body{flex:1;font-size:.88rem;font-weight:700;line-height:1.35;min-width:0;overflow:hidden;text-overflow:ellipsis}
-.sl .emoji{font-size:1.3rem;flex-shrink:0}
-.sl .rm{background:transparent;border:0;color:var(--a1);font-weight:900;padding:6px;border-radius:8px;font-size:1.1rem}
+.sl small{display:block;font-size:.62rem;color:var(--fg-muted);font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.sl .body{flex:1;font-size:.82rem;font-weight:700;line-height:1.35;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.sl .emoji{font-size:1.15rem;flex-shrink:0}
+.sl .rm{background:transparent;border:0;color:var(--a1);font-weight:900;padding:6px;border-radius:8px;font-size:1rem}
 .sl .rm:hover{background:rgba(239,68,68,.12)}
 
-.kp{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.kp div{background:var(--card-bg);border:var(--card-border);border-radius:10px;padding:10px 6px;text-align:center;font-size:.68rem;color:var(--fg-muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
-.kp b{display:block;font-size:1rem;color:var(--fg);margin-top:3px;text-transform:none;letter-spacing:0;font-weight:800}
+.kp{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.kp div{background:var(--card-bg);border:var(--card-border);border-radius:10px;padding:8px 5px;text-align:center;font-size:.62rem;color:var(--fg-muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.kp b{display:block;font-size:.9rem;color:var(--fg);margin-top:2px;text-transform:none;letter-spacing:0;font-weight:800}
 
-.bar{display:flex;align-items:center;gap:10px;font-size:.8rem;font-weight:800}
-.bar span.lbl{width:80px;color:var(--fg-muted)}
-.bar i{flex:1;height:10px;background:var(--bg-card);border-radius:5px;overflow:hidden;border:1px solid var(--border)}
-.bar u{display:block;height:100%;background:linear-gradient(90deg,var(--a2),#60a5fa);border-radius:5px;transition:width .4s}
-.bar .val{width:36px;text-align:right;color:var(--fg)}
+.bar{display:flex;align-items:center;gap:8px;font-size:.75rem;font-weight:800}
+.bar span.lbl{width:70px;color:var(--fg-muted)}
+.bar i{flex:1;height:8px;background:var(--bg-card);border-radius:4px;overflow:hidden;border:1px solid var(--border)}
+.bar u{display:block;height:100%;background:linear-gradient(90deg,var(--a2),#60a5fa);border-radius:4px;transition:width .4s}
+.bar .val{width:32px;text-align:right;color:var(--fg)}
 
 /* ============================================================
-   MODALS (shared)
+   MODALS
    ============================================================ */
-.modal{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;overflow:auto}
+.modal{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:16px;overflow-y:auto}
 .modal.show{display:flex}
-.modal .box{background:var(--bg-card);padding:26px;border-radius:20px;width:100%;max-width:900px;max-height:calc(100vh - 40px);overflow-y:auto;position:relative;border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,.6);color:var(--fg)}
-.modal .box h2{font-size:1.4rem;font-weight:800;margin-bottom:6px;color:var(--fg)}
-.modal .box .sub{color:var(--fg-muted);font-size:.88rem;margin-bottom:18px;line-height:1.5}
-.modal .close{position:absolute;top:16px;right:16px;width:42px;height:42px;border-radius:50%;border:0;background:var(--bg-input);color:var(--fg-muted);font-size:1.4rem;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.modal .box{background:var(--bg-card);padding:22px;border-radius:20px;width:100%;max-width:900px;max-height:calc(100dvh - 32px);overflow-y:auto;position:relative;border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,.6);color:var(--fg);-webkit-overflow-scrolling:touch}
+.modal .box h2{font-size:1.25rem;font-weight:800;margin-bottom:6px;color:var(--fg)}
+.modal .box .sub{color:var(--fg-muted);font-size:.82rem;margin-bottom:14px;line-height:1.5}
+.modal .close{position:absolute;top:12px;right:12px;width:38px;height:38px;border-radius:50%;border:0;background:var(--bg-input);color:var(--fg-muted);font-size:1.3rem;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .modal .close:hover{background:var(--bg-cart);color:var(--fg)}
 
-.datagrid{border:1px solid var(--border);border-radius:12px;overflow:hidden;max-height:56vh;overflow-y:auto}
-.datagrid table{width:100%;border-collapse:collapse;font-size:.82rem}
-.datagrid thead th{position:sticky;top:0;background:var(--bg-elev);color:var(--fg-muted);text-align:left;padding:10px 12px;font-weight:800;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border);z-index:1}
-.datagrid tbody td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--fg)}
+.datagrid{border:1px solid var(--border);border-radius:12px;overflow-y:auto;overflow-x:auto;max-height:56vh;-webkit-overflow-scrolling:touch}
+.datagrid table{width:100%;border-collapse:collapse;font-size:.78rem;min-width:640px}
+.datagrid thead th{position:sticky;top:0;background:var(--bg-elev);color:var(--fg-muted);text-align:left;padding:8px 10px;font-weight:800;font-size:.65rem;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);z-index:1}
+.datagrid tbody td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--fg)}
 .datagrid tbody tr{cursor:pointer;transition:background .12s}
 .datagrid tbody tr:hover td{background:var(--bg-input)}
 .datagrid tbody tr.sel td{background:var(--a2);color:#fff}
@@ -501,52 +439,52 @@ body.kindle #builder-app{padding-bottom:90px}
 .datagrid .status.ok{color:var(--ok)}
 .datagrid .status.err{color:var(--bad)}
 .datagrid .nm{font-weight:700;color:var(--fg)}
-.datagrid .spec{color:var(--fg-muted);font-size:.78rem}
+.datagrid .spec{color:var(--fg-muted);font-size:.72rem}
 .datagrid .tags{display:flex;flex-wrap:wrap;gap:3px}
-.datagrid .tags span{font-size:.66rem;padding:2px 6px;border-radius:4px;background:var(--bg-input);border:1px solid var(--border);color:var(--fg-muted);font-weight:700}
+.datagrid .tags span{font-size:.6rem;padding:2px 6px;border-radius:4px;background:var(--bg-input);border:1px solid var(--border);color:var(--fg-muted);font-weight:700}
 .datagrid .price{text-align:right;font-weight:800;color:var(--a2)}
 .datagrid tr.sel .price{color:#fff}
 
-.dg-tools{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
-.dg-tools input{flex:1;min-width:200px;background:var(--bg-input);color:var(--fg);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font:inherit;min-height:42px}
-.dg-tools select{background:var(--bg-input);color:var(--fg);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font:inherit;min-height:42px;font-weight:700}
-.dg-foot{display:flex;justify-content:space-between;align-items:center;padding:12px 4px 0;font-size:.82rem;color:var(--fg-muted);font-weight:700;flex-wrap:wrap;gap:10px}
-.dg-foot .pager{display:flex;gap:6px}
-.dg-foot .pager button{background:var(--bg-input);color:var(--fg);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-weight:800;min-width:36px;cursor:pointer}
+.dg-tools{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;align-items:center}
+.dg-tools input{flex:1;min-width:160px;background:var(--bg-input);color:var(--fg);border:1px solid var(--border);border-radius:10px;padding:9px 12px;font:inherit;min-height:40px}
+.dg-tools select{background:var(--bg-input);color:var(--fg);border:1px solid var(--border);border-radius:10px;padding:9px 12px;font:inherit;min-height:40px;font-weight:700}
+.dg-foot{display:flex;justify-content:space-between;align-items:center;padding:10px 4px 0;font-size:.78rem;color:var(--fg-muted);font-weight:700;flex-wrap:wrap;gap:8px}
+.dg-foot .pager{display:flex;gap:5px}
+.dg-foot .pager button{background:var(--bg-input);color:var(--fg);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-weight:800;min-width:34px;cursor:pointer}
 .dg-foot .pager button:hover:not(:disabled){background:var(--bg-cart);color:var(--a2);border-color:var(--a2)}
 .dg-foot .pager button:disabled{opacity:.5;cursor:default}
 
-.bench-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:18px}
-.bench-card{background:var(--bg-input);border:1px solid var(--border);border-radius:14px;padding:16px}
-.bench-card .lbl{font-size:.7rem;color:var(--fg-muted);font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
-.bench-card .val{font-size:1.8rem;font-weight:900;color:var(--a2);letter-spacing:-.02em}
-.bench-card .unit{font-size:.85rem;color:var(--fg-muted);font-weight:700;margin-left:4px}
-.bench-card .desc{font-size:.78rem;color:var(--fg-muted);margin-top:6px;line-height:1.4}
+.bench-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:14px}
+.bench-card{background:var(--bg-input);border:1px solid var(--border);border-radius:14px;padding:14px}
+.bench-card .lbl{font-size:.65rem;color:var(--fg-muted);font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.bench-card .val{font-size:1.6rem;font-weight:900;color:var(--a2);letter-spacing:-.02em}
+.bench-card .unit{font-size:.8rem;color:var(--fg-muted);font-weight:700;margin-left:4px}
+.bench-card .desc{font-size:.72rem;color:var(--fg-muted);margin-top:5px;line-height:1.4}
 
-.compare-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
-.compare-card{background:var(--bg-input);border:1px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;transition:all .15s}
+.compare-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.compare-card{background:var(--bg-input);border:1px solid var(--border);border-radius:14px;padding:14px;cursor:pointer;transition:all .15s}
 .compare-card:hover{border-color:var(--a2);transform:translateY(-2px)}
-.compare-card .title{font-weight:800;font-size:.95rem;margin-bottom:6px;color:var(--fg)}
-.compare-card .desc{font-size:.78rem;color:var(--fg-muted);line-height:1.5;margin-bottom:10px}
-.compare-card .price{font-size:1.1rem;font-weight:900;color:var(--a2)}
+.compare-card .title{font-weight:800;font-size:.9rem;margin-bottom:5px;color:var(--fg)}
+.compare-card .desc{font-size:.72rem;color:var(--fg-muted);line-height:1.5;margin-bottom:8px}
+.compare-card .price{font-size:1.05rem;font-weight:900;color:var(--a2)}
 
 .tour-overlay{position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,.65);display:none;pointer-events:none}
 .tour-overlay.show{display:block;pointer-events:auto}
 .tour-spot{position:absolute;border:3px solid var(--a3);border-radius:14px;box-shadow:0 0 0 4px rgba(168,85,247,.25),0 0 40px rgba(168,85,247,.5);transition:all .35s cubic-bezier(.3,1,.4,1);pointer-events:none}
-.tour-tip{position:absolute;background:var(--bg-card);border:2px solid var(--a3);border-radius:16px;padding:16px 18px;max-width:320px;box-shadow:0 20px 60px rgba(0,0,0,.6);color:var(--fg);pointer-events:auto;z-index:100001}
-.tour-tip h4{font-size:.92rem;font-weight:800;color:var(--a3);margin-bottom:6px;letter-spacing:.03em;text-transform:uppercase}
-.tour-tip p{font-size:.85rem;line-height:1.55;color:var(--fg);margin-bottom:12px}
+.tour-tip{position:absolute;background:var(--bg-card);border:2px solid var(--a3);border-radius:16px;padding:14px 16px;max-width:300px;box-shadow:0 20px 60px rgba(0,0,0,.6);color:var(--fg);pointer-events:auto;z-index:100001}
+.tour-tip h4{font-size:.85rem;font-weight:800;color:var(--a3);margin-bottom:5px;letter-spacing:.03em;text-transform:uppercase}
+.tour-tip p{font-size:.78rem;line-height:1.5;color:var(--fg);margin-bottom:10px}
 .tour-tip p em{color:var(--a2);font-style:normal;font-weight:700}
 .tour-tip .foot{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.tour-tip .count{font-size:.72rem;color:var(--fg-muted);font-weight:800;letter-spacing:.06em}
-.tour-tip .btns{display:flex;gap:6px}
-.tour-tip button{padding:8px 14px;border-radius:10px;font-weight:800;font-size:.78rem;border:1px solid var(--border);background:var(--bg-input);color:var(--fg);min-height:36px;cursor:pointer}
+.tour-tip .count{font-size:.68rem;color:var(--fg-muted);font-weight:800;letter-spacing:.05em}
+.tour-tip .btns{display:flex;gap:5px}
+.tour-tip button{padding:7px 12px;border-radius:10px;font-weight:800;font-size:.72rem;border:1px solid var(--border);background:var(--bg-input);color:var(--fg);min-height:34px;cursor:pointer}
 .tour-tip button.primary{background:linear-gradient(135deg,var(--a3),#7e22ce);color:#fff;border:0}
 
 /* ============================================================
    ERP MODE
    ============================================================ */
-#erp{position:fixed;inset:0;z-index:200;display:none;flex-direction:column;background:#fff;font:12px Tahoma,Arial,sans-serif;color:#222;padding-bottom:80px}
+#erp{position:fixed;inset:0;z-index:200;display:none;flex-direction:column;background:#fff;font:12px Tahoma,Arial,sans-serif;color:#222;padding-bottom:88px;overflow-y:auto}
 #erp.show{display:flex}
 body.dark-erp #erp{background:#1a1d24;color:#e0e0e0}
 body.dark-erp .emain{background:#1a1d24}
@@ -560,76 +498,88 @@ body.dark-erp .eord{border-color:#3a3f4a}
 body.dark-erp .esum{background:#232830;border-color:#3a3f4a}
 body.dark-erp .elogo{color:#7dd3fc}
 body.dark-erp .ett{color:#7dd3fc}
-.eh{display:flex;align-items:center;gap:10px;padding:6px 14px;min-height:52px;background:linear-gradient(#6d9fc9,#2e5f8f);color:#fff;border-bottom:1px solid #1d4468;flex-wrap:wrap}
+.eh{display:flex;align-items:center;gap:8px;padding:6px 12px;min-height:48px;background:linear-gradient(#6d9fc9,#2e5f8f);color:#fff;border-bottom:1px solid #1d4468;flex-wrap:wrap;flex-shrink:0}
 body.dark-erp .eh{background:linear-gradient(#1e3a52,#0d1f2d)}
-.elogo{font:italic bold 18px Georgia,serif;text-shadow:1px 1px 2px #0006;white-space:nowrap}
-.elogo small{display:block;font:italic 9px Arial}
-.ealert{flex:1;text-align:center;color:#ff3b2f;font:italic bold 15px Arial;text-shadow:0 1px 1px #0008;min-width:100px}
-.eh select,.ebtn{font:11px Tahoma,Arial;border:1px solid #8a9aa9;background:linear-gradient(#fff,#dde3e9);padding:5px 10px;color:#222;cursor:pointer;border-radius:4px;min-height:32px}
+.elogo{font:italic bold 16px Georgia,serif;text-shadow:1px 1px 2px #0006;white-space:nowrap}
+.elogo small{display:block;font:italic 8px Arial}
+.ealert{flex:1;text-align:center;color:#ff3b2f;font:italic bold 13px Arial;min-width:80px}
+.eh select,.ebtn{font:11px Tahoma,Arial;border:1px solid #8a9aa9;background:linear-gradient(#fff,#dde3e9);padding:5px 8px;color:#222;cursor:pointer;border-radius:4px;min-height:30px}
 .eh .ebtn{background:linear-gradient(#5aa0d8,#2a73b5);color:#fff;border-color:#1d4f80}
 body.dark-erp .eh select,body.dark-erp .eh .ebtn{border-color:#3a5a7a}
-.etabs{display:flex;gap:2px;padding:5px 8px 0;background:linear-gradient(#f3f5f7,#d4dbe2);border-bottom:1px solid #8fa0b0;overflow-x:auto;flex-shrink:0}
+.etabs{display:flex;gap:2px;padding:5px 8px 0;background:linear-gradient(#f3f5f7,#d4dbe2);border-bottom:1px solid #8fa0b0;overflow-x:auto;flex-shrink:0;scrollbar-width:thin}
 body.dark-erp .etabs{background:linear-gradient(#2a2f38,#1f242c);border-color:#3a3f4a}
-.etab{white-space:nowrap;padding:5px 14px;border:1px solid #9aa9b8;border-bottom:0;border-radius:5px 5px 0 0;background:linear-gradient(#f8f9fa,#e1e6eb);cursor:pointer;font-size:11px}
+.etab{white-space:nowrap;padding:5px 12px;border:1px solid #9aa9b8;border-bottom:0;border-radius:5px 5px 0 0;background:linear-gradient(#f8f9fa,#e1e6eb);cursor:pointer;font-size:11px}
 body.dark-erp .etab{background:linear-gradient(#2f3540,#262b33);border-color:#3a3f4a;color:#e0e0e0}
 .etab.on{background:#fff;font-weight:bold;position:relative;top:1px}
 body.dark-erp .etab.on{background:#1a1d24;color:#fff}
-.ebody{display:flex;flex:1;min-height:0;overflow:hidden}
-.esb{width:180px;flex:none;overflow-y:auto;background:linear-gradient(#4b84b6,#2b5a86);color:#fff}
+.ebody{display:flex;flex:1;min-height:400px;overflow:hidden}
+.esb{width:170px;flex:none;overflow-y:auto;background:linear-gradient(#4b84b6,#2b5a86);color:#fff}
 body.dark-erp .esb{background:linear-gradient(#1e3a52,#0d1f2d)}
 .esb input{width:calc(100% - 12px);margin:6px;padding:5px;border:1px solid #1d4468;font:11px Tahoma;background:rgba(255,255,255,.9)}
-.esi{display:flex;align-items:center;gap:8px;padding:9px 10px;border-bottom:1px solid rgba(0,0,0,.15);border-top:1px solid rgba(255,255,255,.1);cursor:pointer;font-size:11px;transition:background .12s}
+.esi{display:flex;align-items:center;gap:7px;padding:8px 9px;border-bottom:1px solid rgba(0,0,0,.15);border-top:1px solid rgba(255,255,255,.1);cursor:pointer;font-size:11px;transition:background .12s}
 .esi:hover{background:rgba(255,255,255,.1)}
 .esi.on{background:linear-gradient(#f7c948,#e0a20e);color:#222;font-weight:bold}
-.dot{width:11px;height:11px;border-radius:50%;border:1px solid rgba(255,255,255,.5);flex:none}
-.emain{flex:1;min-width:0;display:flex;flex-direction:column;padding:6px 10px;background:#fff;overflow:hidden}
+.dot{width:10px;height:10px;border-radius:50%;border:1px solid rgba(255,255,255,.5);flex:none}
+.emain{flex:1;min-width:0;display:flex;flex-direction:column;padding:6px 10px;background:#fff;overflow:hidden;min-height:0}
 body.dark-erp .emain{background:#1a1d24}
 .ett{font-weight:bold;color:#333;padding:5px 0;font-size:11px}
 body.dark-erp .ett{color:#7dd3fc}
-.etool{display:flex;gap:8px;align-items:center;padding:4px 0 8px;flex-wrap:wrap;flex-shrink:0}
-.etool input{width:240px;max-width:100%;padding:5px;border:1px solid #9aa;font:11px Tahoma;min-height:32px;border-radius:4px}
+.etool{display:flex;gap:6px;align-items:center;padding:4px 0 8px;flex-wrap:wrap;flex-shrink:0}
+.etool input{width:200px;max-width:100%;padding:5px;border:1px solid #9aa;font:11px Tahoma;min-height:30px;border-radius:4px}
 body.dark-erp .etool input{background:#232830;color:#fff;border-color:#3a3f4a}
-.egrid{flex:1;overflow:auto;border:1px solid #b5bec8;min-height:100px;background:#fff}
+.egrid{flex:1;overflow:auto;border:1px solid #b5bec8;min-height:200px;background:#fff;-webkit-overflow-scrolling:touch}
 body.dark-erp .egrid{background:#1a1d24}
-.emain table{width:100%;border-collapse:collapse;font-size:11px}
-.emain th{position:sticky;top:0;background:linear-gradient(#fff,#dde2e8);border:1px solid #c3cad2;padding:6px 8px;font-weight:600;color:#444;text-align:left;white-space:nowrap;z-index:1}
-.emain td{border:1px solid #dfe3e7;padding:6px 8px;height:28px;vertical-align:middle}
+.emain table{width:100%;border-collapse:collapse;font-size:11px;min-width:560px}
+.emain th{position:sticky;top:0;background:linear-gradient(#fff,#dde2e8);border:1px solid #c3cad2;padding:6px 7px;font-weight:600;color:#444;text-align:left;white-space:nowrap;z-index:1}
+.emain td{border:1px solid #dfe3e7;padding:5px 7px;height:26px;vertical-align:middle}
 .emain tr{cursor:pointer}
 .emain tr.sel td{background:#1d7fc6;color:#fff}
-.emain td.n{background:#eef0f2;color:#666;width:32px;text-align:center;font-weight:600}
+.emain td.n{background:#eef0f2;color:#666;width:28px;text-align:center;font-weight:600}
 .r{text-align:right!important}
 .err{color:#c00}
 .sel .err{color:#ffb4a8}
 .lk{color:#06c;text-decoration:underline;cursor:pointer;text-align:center;font-weight:700}
 .sel .lk{color:#fff}
-.epg{display:flex;gap:10px;align-items:center;padding:6px 2px;border-top:1px solid #ccc;color:#555;font-size:11px;flex-shrink:0}
+.epg{display:flex;gap:8px;align-items:center;padding:6px 2px;border-top:1px solid #ccc;color:#555;font-size:11px;flex-shrink:0;flex-wrap:wrap}
 body.dark-erp .epg{color:#aaa;border-color:#3a3f4a}
-.eord{max-height:40%;overflow:auto;border-top:2px solid #6f8ca6;margin-top:6px;flex-shrink:0}
+.eord{max-height:38vh;overflow:auto;border-top:2px solid #6f8ca6;margin-top:6px;flex-shrink:0;-webkit-overflow-scrolling:touch}
 .esum{padding:8px;background:#f2f4f6;border:1px solid #c5ccd3;line-height:1.7;font-size:11px}
 @media(max-width:800px){.esb,.ealert{display:none}.eh{gap:6px;padding:6px}.elogo{font-size:14px}}
 
+/* ============================================================
+   DISGUISE MODE — type google/amazon/netflix/etc anywhere
+   ============================================================ */
+#disguise{position:fixed;inset:0;z-index:200000;display:none;background:#fff;color:#000;overflow-y:auto}
+#disguise.show{display:block}
+.dis-header{padding:20px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.dis-logo{font-size:1.8rem;font-weight:900;letter-spacing:-.02em}
+.dis-search{flex:1;min-width:200px;padding:12px 18px;border:1px solid #ddd;border-radius:24px;font:inherit;font-size:.95rem;outline:none}
+.dis-search:focus{border-color:#4285f4;box-shadow:0 0 0 3px rgba(66,133,244,.15)}
+.dis-body{padding:30px 20px;max-width:900px;margin:0 auto}
+.dis-result{padding:16px 0;border-bottom:1px solid #eee}
+.dis-result h3{color:#1a0dab;font-size:1.05rem;margin-bottom:6px;font-weight:600;cursor:pointer}
+.dis-result h3:hover{text-decoration:underline}
+.dis-result .url{color:#006621;font-size:.8rem;margin-bottom:6px}
+.dis-result .desc{color:#545454;font-size:.85rem;line-height:1.5}
+.dis-close{position:fixed;top:16px;right:16px;background:#000;color:#fff;border:0;width:44px;height:44px;border-radius:50%;font-size:1.2rem;display:flex;align-items:center;justify-content:center;z-index:200001;cursor:pointer}
+
 /* Toast */
-#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(20,20,30,.95);color:#fff;padding:13px 22px;border-radius:12px;z-index:99999;font:700 14px var(--f);box-shadow:0 10px 30px rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.15);display:none;max-width:calc(100vw - 40px);text-align:center}
+#toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(20,20,30,.95);color:#fff;padding:12px 20px;border-radius:12px;z-index:99999;font:700 13px var(--f);box-shadow:0 10px 30px rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.15);display:none;max-width:calc(100vw - 40px);text-align:center}
 </style>
 </head>
 <body>
 
 <audio id="bgm" loop preload="auto" src="dreams.mp3"></audio>
 
-<!-- Dino Splash -->
 <div id="dino" class="ns">
-  <div class="top">
-    <canvas id="dc" width="420" height="110"></canvas>
-  </div>
+  <div class="top"><canvas id="dc" width="420" height="110"></canvas></div>
   <div class="stage">
     <h1>No internet connection</h1>
     <p>Check your network cables, modem, or router, or continue to authentication.</p>
     <small>ERR_INTERNET_DISCONNECTED</small>
-    <small style="display:block;margin-top:12px">gangbang coded by chatgpt, gemini, deepseek, claude, grok</small>
   </div>
 </div>
 
-<!-- Password Modal -->
 <div id="pw" class="ns">
   <div class="box">
     <button class="close" onclick="closePw()">✕</button>
@@ -640,75 +590,60 @@ body.dark-erp .epg{color:#aaa;border-color:#3a3f4a}
   </div>
 </div>
 
-<!-- Builder -->
 <div id="builder-app">
   <header class="bh">
     <div class="brand"><span class="logo">🖥️</span><span>BUILD<span style="color:var(--fg)">MY</span>PC<small>AI SYSTEM CONFIGURATOR</small></span></div>
-    <input class="search" id="q" placeholder="Search parts, specs or tags..." oninput="draw()">
+    <input class="search" id="q" placeholder="Search parts..." oninput="draw()">
     <div class="right">
       <div class="budget-wrap">💰 $<input id="budHdr" type="number" value="1500"></div>
-      <button class="icon-btn" id="tourBtn" onclick="startTour()" title="Guided Tour">🎓</button>
+      <button class="icon-btn" id="tourBtn" onclick="startTour()" title="Tour">🎓</button>
       <button class="icon-btn" id="themeBtn" onclick="cycleTheme()" title="Theme">🌙</button>
       <button class="icon-btn" id="layoutBtn" onclick="cycleLayout()" title="Layout">📱</button>
     </div>
   </header>
 
   <div class="filt-bar">
-    <label>Use-case
+    <label>Use
       <select id="uc" onchange="draw()">
         <option value="">Any</option>
         <option value="g">🎮 Gaming</option>
         <option value="s">📺 Streaming</option>
-        <option value="v">🎬 Video editing</option>
-        <option value="c">📐 CAD / workstation</option>
-        <option value="a">🎧 DJ / audio</option>
-        <option value="i">🧠 AI / ML</option>
-        <option value="w">🌐 Web server</option>
-        <option value="p">📼 Plex / media</option>
-        <option value="m">⛏️ Crypto mining</option>
+        <option value="v">🎬 Video</option>
+        <option value="c">📐 CAD</option>
+        <option value="a">🎧 Audio</option>
+        <option value="i">🧠 AI</option>
+        <option value="w">🌐 Server</option>
+        <option value="p">📼 Plex</option>
+        <option value="m">⛏️ Mining</option>
         <option value="o">💼 Office</option>
       </select>
     </label>
     <label>Platform
       <select id="plat" onchange="draw()">
-        <option value="">Any</option>
-        <option value="AMD">AMD</option>
-        <option value="Intel">Intel</option>
+        <option value="">Any</option><option value="AMD">AMD</option><option value="Intel">Intel</option>
       </select>
     </label>
     <label>Socket
       <select id="sock" onchange="draw()">
-        <option value="">Any</option>
-        <option value="AM4">AM4</option>
-        <option value="AM5">AM5</option>
-        <option value="LGA1700">LGA1700</option>
-        <option value="LGA1851">LGA1851</option>
+        <option value="">Any</option><option value="AM4">AM4</option><option value="AM5">AM5</option>
+        <option value="LGA1700">LGA1700</option><option value="LGA1851">LGA1851</option>
       </select>
     </label>
     <label>RAM
       <select id="ramSize" onchange="draw()">
-        <option value="">Any</option>
-        <option value="16">16GB</option>
-        <option value="32">32GB</option>
-        <option value="64">64GB</option>
-        <option value="128">128GB</option>
-        <option value="256">256GB</option>
+        <option value="">Any</option><option value="16">16GB</option><option value="32">32GB</option>
+        <option value="64">64GB</option><option value="128">128GB</option><option value="256">256GB</option>
       </select>
     </label>
     <label>DDR
       <select id="ramType" onchange="draw()">
-        <option value="">Any</option>
-        <option value="4">DDR4</option>
-        <option value="5">DDR5</option>
+        <option value="">Any</option><option value="4">DDR4</option><option value="5">DDR5</option>
       </select>
     </label>
     <label>Storage
       <select id="storType" onchange="draw()">
-        <option value="">Any</option>
-        <option value="NVMe Gen5">NVMe Gen5</option>
-        <option value="NVMe Gen4">NVMe Gen4</option>
-        <option value="SATA SSD">SATA SSD</option>
-        <option value="HDD">HDD</option>
+        <option value="">Any</option><option value="NVMe Gen5">NVMe Gen5</option>
+        <option value="NVMe Gen4">NVMe Gen4</option><option value="SATA SSD">SATA SSD</option><option value="HDD">HDD</option>
       </select>
     </label>
     <div class="spacer"></div>
@@ -721,18 +656,18 @@ body.dark-erp .epg{color:#aaa;border-color:#3a3f4a}
 
   <div id="compatPanel" class="compat-panel ok">
     <div class="status"><span class="dot"></span><span id="compatStatus">Ready to build</span></div>
-    <div class="msgs" id="compatMsgs"><span class="m">Pick parts to get started. All compatibility checks happen live.</span></div>
+    <div class="msgs" id="compatMsgs"><span class="m">Pick parts to get started.</span></div>
   </div>
 
   <div class="action-bar">
-    <button class="suggest" onclick="suggestBuild()"><span class="ico">✨</span>Suggest a Build</button>
-    <button onclick="openComponents()"><span class="ico">🧩</span>Add Components</button>
+    <button class="suggest" onclick="suggestBuild()"><span class="ico">✨</span>Suggest</button>
+    <button onclick="openComponents()"><span class="ico">🧩</span>Add Parts</button>
     <button onclick="openBenchmarks()"><span class="ico">📊</span>Benchmarks</button>
     <button class="danger" onclick="clr()"><span class="ico">🗑️</span>Clear</button>
     <button class="amazon" onclick="addToAmazon()"><span class="ico">📦</span>Add to Cart</button>
-    <button onclick="saveBuild()"><span class="ico">💾</span>Save / Share</button>
-    <button onclick="openCompare()"><span class="ico">🏆</span>Compare Builds</button>
-    <button class="tour" onclick="startTour()"><span class="ico">🎓</span>Guided Tour</button>
+    <button onclick="saveBuild()"><span class="ico">💾</span>Save</button>
+    <button onclick="openCompare()"><span class="ico">🏆</span>Compare</button>
+    <button class="tour" onclick="startTour()"><span class="ico">🎓</span>Tour</button>
   </div>
 
   <div class="bm">
@@ -745,14 +680,11 @@ body.dark-erp .epg{color:#aaa;border-color:#3a3f4a}
   </div>
 </div>
 
-<!-- ERP -->
 <div id="erp" class="ns">
   <div class="eh">
-    <div class="elogo">Enterprise ERP<small>Enterprise Resource Planning System</small></div>
+    <div class="elogo">Enterprise ERP<small>Resource Planning</small></div>
     <div class="ealert" id="ealert"></div>
     <select><option>PC Build Desk</option></select>
-    <span>Location:</span>
-    <select><option>112 Mississauga</option></select>
     <button class="ebtn" onclick="cycleTheme()">Theme</button>
   </div>
   <div class="etabs">
@@ -770,8 +702,8 @@ body.dark-erp .epg{color:#aaa;border-color:#3a3f4a}
         <button class="ebtn">🔍 Search</button>
         <input id="eq" placeholder="Description, spec or tag" oninput="edraw()">
         <select id="ecs" onchange="eg(this.value)"></select>
-        <input id="ebud" type="number" value="1500" style="width:90px">
-        <button class="ebtn" onclick="suggestBuild()">Suggest build</button>
+        <input id="ebud" type="number" value="1500" style="width:80px">
+        <button class="ebtn" onclick="suggestBuild()">Suggest</button>
       </div>
       <div class="egrid"><table id="et"></table></div>
       <div class="epg">
@@ -785,7 +717,6 @@ body.dark-erp .epg{color:#aaa;border-color:#3a3f4a}
   </div>
 </div>
 
-<!-- Modals -->
 <div id="mComponents" class="modal"><div class="box">
   <button class="close" onclick="closeModal('mComponents')">✕</button>
   <h2>Add Components</h2>
@@ -794,9 +725,7 @@ body.dark-erp .epg{color:#aaa;border-color:#3a3f4a}
     <select id="dgCat" onchange="renderComponents()"></select>
     <input id="dgQ" placeholder="Search components..." oninput="renderComponents()">
     <select id="dgSort" onchange="renderComponents()">
-      <option value="price-asc">Price ↑</option>
-      <option value="price-desc">Price ↓</option>
-      <option value="name">Name</option>
+      <option value="price-asc">Price ↑</option><option value="price-desc">Price ↓</option><option value="name">Name</option>
     </select>
   </div>
   <div class="datagrid" id="dgBody"></div>
@@ -822,7 +751,6 @@ body.dark-erp .epg{color:#aaa;border-color:#3a3f4a}
   <div id="tourTip" class="tour-tip"></div>
 </div>
 
-<!-- Bottom-left: UI pill + Basic/Advanced toggle -->
 <div id="uiPill" class="ns collapsed">
   <button class="pcBtn" id="pcBtn" title="Cycle UI style">💻</button>
   <button class="toggle" id="pillToggle" title="Expand">☰</button>
@@ -837,17 +765,16 @@ body.dark-erp .epg{color:#aaa;border-color:#3a3f4a}
     <button class="uiBtn" data-ui="8" title="Vaporwave">🌴</button>
     <button class="uiBtn" data-ui="9" title="Terminal">⌨️</button>
     <button class="uiBtn" data-ui="10" title="Kindle">📖</button>
-    <button class="uiBtn" data-ui="11" title="iPhone iOS">📱</button>
-    <button class="uiBtn" data-ui="12" title="Android Material">🤖</button>
+    <button class="uiBtn" data-ui="11" title="iPhone">📱</button>
+    <button class="uiBtn" data-ui="12" title="Android">🤖</button>
     <button class="uiBtn" data-ui="13" title="Smart TV">📺</button>
-    <button class="uiBtn" data-ui="14" title="macOS Safari">🍎</button>
-    <button class="uiBtn" data-ui="15" title="Windows Chrome">🖥️</button>
+    <button class="uiBtn" data-ui="14" title="macOS">🍎</button>
+    <button class="uiBtn" data-ui="15" title="Windows">🖥️</button>
   </div>
 </div>
 
 <div id="uiBadge" class="ns"><span id="uiBadgeName">Pro Builder</span><small id="uiBadgeDesc">Password1</small></div>
 
-<!-- Bottom-right: Music + Basic/Advanced -->
 <div id="bottomRight" class="ns">
   <div id="musicCtl">
     <button id="playBtn" title="Play/Pause">▶️</button>
@@ -855,58 +782,33 @@ body.dark-erp .epg{color:#aaa;border-color:#3a3f4a}
     <input type="range" id="volSlider" min="0" max="100" value="50" title="Volume">
   </div>
   <div id="modeToggle">
-    <button id="modeBasic" title="Basic mode — essential parts only">Basic</button>
-    <button id="modeAdvanced" class="active" title="Advanced mode — full catalog">Advanced</button>
+    <button id="modeBasic" title="Basic mode">Basic</button>
+    <button id="modeAdvanced" class="active" title="Advanced mode">Advanced</button>
   </div>
 </div>
 
+<!-- Disguise mode overlay -->
+<div id="disguise" class="ns"></div>
+
 <script>
 /* ============================================================
-   MUSIC — plays reliably with multiple sources
+   MUSIC
    ============================================================ */
 const bgm=document.getElementById('bgm'),playBtn=document.getElementById('playBtn'),muteBtn=document.getElementById('muteBtn'),volSlider=document.getElementById('volSlider');
 let musicStarted=false;
-const MUSIC_SOURCES=[
-  'dreams.mp3',
-  'https://raw.githubusercontent.com/hillierandrew/wtf/main/dreams.mp3',
-  'https://raw.githubusercontent.com/hillierandrew/wtf/main/dream.mp3',
-  'dream.mp3'
-];
+const MUSIC_SOURCES=['dreams.mp3','https://raw.githubusercontent.com/hillierandrew/wtf/main/dreams.mp3','https://raw.githubusercontent.com/hillierandrew/wtf/main/dream.mp3','dream.mp3'];
 let musicSourceIdx=0;
-bgm.addEventListener('error',()=>{
-  musicSourceIdx++;
-  if(musicSourceIdx<MUSIC_SOURCES.length){
-    bgm.src=MUSIC_SOURCES[musicSourceIdx];
-    bgm.load();
-    if(musicStarted)bgm.play().catch(()=>{});
-  }
-});
+bgm.addEventListener('error',()=>{musicSourceIdx++;if(musicSourceIdx<MUSIC_SOURCES.length){bgm.src=MUSIC_SOURCES[musicSourceIdx];bgm.load();if(musicStarted)bgm.play().catch(()=>{})}});
 function updatePlayIcon(){playBtn.textContent=bgm.paused?'▶️':'⏸️'}
-function startMusic(){
-  if(musicStarted){if(bgm.paused)bgm.play().catch(()=>{})}
-  else{musicStarted=true}
-  bgm.volume=(+volSlider.value)/100;
-  bgm.play().then(updatePlayIcon).catch(()=>{});
-}
-playBtn.addEventListener('click',()=>{
-  if(bgm.paused){bgm.volume=(+volSlider.value)/100;bgm.play().then(updatePlayIcon).catch(()=>toast('Tap anywhere first to allow audio.'))}
-  else{bgm.pause();updatePlayIcon()}
-});
-muteBtn.addEventListener('click',()=>{
-  bgm.muted=!bgm.muted;
-  muteBtn.textContent=bgm.muted?'🔇':(bgm.volume===0?'🔇':'🔊');
-});
-volSlider.addEventListener('input',()=>{
-  bgm.volume=(+volSlider.value)/100;
-  if(bgm.volume>0)bgm.muted=false;
-  muteBtn.textContent=bgm.muted?'🔇':(bgm.volume===0?'🔇':'🔊');
-});
-bgm.addEventListener('play',updatePlayIcon);
-bgm.addEventListener('pause',updatePlayIcon);
+function startMusic(){if(musicStarted){if(bgm.paused)bgm.play().catch(()=>{})}else{musicStarted=true}bgm.volume=(+volSlider.value)/100;bgm.play().then(updatePlayIcon).catch(()=>{})}
+playBtn.addEventListener('click',()=>{if(bgm.paused){bgm.volume=(+volSlider.value)/100;bgm.play().then(updatePlayIcon).catch(()=>toast('Tap anywhere first to allow audio.'))}else{bgm.pause();updatePlayIcon()}});
+muteBtn.addEventListener('click',()=>{bgm.muted=!bgm.muted;muteBtn.textContent=bgm.muted?'🔇':(bgm.volume===0?'🔇':'🔊')});
+volSlider.addEventListener('input',()=>{bgm.volume=(+volSlider.value)/100;if(bgm.volume>0)bgm.muted=false;muteBtn.textContent=bgm.muted?'🔇':(bgm.volume===0?'🔇':'🔊')});
+bgm.addEventListener('play',updatePlayIcon);bgm.addEventListener('pause',updatePlayIcon);
 ['click','touchstart','keydown'].forEach(t=>document.addEventListener(t,()=>{if(!musicStarted)startMusic()},{once:true,passive:true}));
 
 /* ============================================================
-   UI SWITCHER — 15 styles
+   UI SWITCHER
    ============================================================ */
 const UI_STYLES={
   1:{cls:'',title:'Pro Builder',theme:'dark',pwd:'Password1'},
@@ -918,7 +820,7 @@ const UI_STYLES={
   7:{cls:'brutalist',title:'Brutalist',theme:'light',pwd:'Password7'},
   8:{cls:'vaporwave',title:'Vaporwave',theme:'dark',pwd:'Password8',scrollFx:true},
   9:{cls:'terminal',title:'Terminal',theme:'dark',pwd:'Password9'},
-  10:{cls:'kindle',title:'Kindle / E-ink',theme:'light',pwd:'Password10'},
+  10:{cls:'kindle',title:'Kindle',theme:'light',pwd:'Password10'},
   11:{cls:'ios',title:'iPhone iOS',theme:'light',pwd:'Password11'},
   12:{cls:'android',title:'Android Material',theme:'light',pwd:'Password12'},
   13:{cls:'tv',title:'Smart TV',theme:'dark',pwd:'Password13'},
@@ -931,20 +833,14 @@ function applyUI(n,showB){
   n=+n;const s=UI_STYLES[n];if(!s)return;
   currentUI=n;
   document.body.className=s.cls;
-  document.body.classList.remove('light-mode','dark-erp','neon','glass','brutalist','vaporwave','terminal','kindle', 'ios', 'android', 'tv', 'macos', 'win');
+  document.body.classList.remove('light-mode','dark-erp','neon','glass','brutalist','vaporwave','terminal','kindle','ios','android','tv','macos','win');
   if(s.cls)document.body.classList.add(s.cls);
   currentTheme=s.theme;
   document.querySelectorAll('#uiPill .uiBtn').forEach(b=>{b.classList.toggle('active',+b.dataset.ui===n)});
   if(showB!==false)showBadge(n);
-  // Scroll FX for glass/vaporwave
   if(s.scrollFx)setupScrollFX();else teardownScrollFX();
 }
-function cycleUINext(){
-  let next=currentUI+1;if(next>15)next=1;applyUI(next);
-  const s=UI_STYLES[next];
-  if(s.erp){document.getElementById('builder-app').classList.remove('show');openStealthBuilder(true)}
-  else{document.getElementById('erp').classList.remove('show');document.getElementById('builder-app').classList.add('show');draw()}
-}
+function cycleUINext(){let next=currentUI+1;if(next>15)next=1;applyUI(next);const s=UI_STYLES[next];if(s.erp){document.getElementById('builder-app').classList.remove('show');openStealthBuilder(true)}else{document.getElementById('erp').classList.remove('show');document.getElementById('builder-app').classList.add('show');draw()}}
 document.getElementById('pcBtn').addEventListener('click',e=>{e.stopPropagation();cycleUINext()});
 document.getElementById('pillToggle').addEventListener('click',e=>{e.stopPropagation();const pill=document.getElementById('uiPill');pill.classList.toggle('collapsed');document.getElementById('pillToggle').textContent=pill.classList.contains('collapsed')?'☰':'✕'});
 document.querySelectorAll('#uiPill .uiBtn').forEach(b=>{b.addEventListener('click',()=>{const n=+b.dataset.ui;if(currentUI===n)return;applyUI(n);const s=UI_STYLES[n];if(s.erp){document.getElementById('builder-app').classList.remove('show');openStealthBuilder(true)}else{document.getElementById('erp').classList.remove('show');document.getElementById('builder-app').classList.add('show');draw()}})});
@@ -953,233 +849,40 @@ const THEMES=['dark','light','neon','dark-erp'];
 function cycleTheme(){const idx=THEMES.indexOf(currentTheme);currentTheme=THEMES[(idx+1)%THEMES.length];document.body.classList.remove('light-mode','dark-erp','neon');if(currentTheme==='light')document.body.classList.add('light-mode');if(currentTheme==='neon')document.body.classList.add('neon');if(currentTheme==='dark-erp')document.body.classList.add('dark-erp');document.getElementById('themeBtn').textContent=currentTheme==='light'?'☀️':currentTheme==='neon'?'⚡':currentTheme==='dark-erp'?'🏢':'🌙';toast('Theme: '+currentTheme.toUpperCase())}
 
 let currentLayout='wide';
-function cycleLayout(){currentLayout=currentLayout==='wide'?'compact':'wide';if(currentLayout==='compact'){document.body.classList.add('mobile-touch');document.getElementById('layoutBtn').textContent='📱';toast('Compact layout')}else{document.body.classList.remove('mobile-touch');document.getElementById('layoutBtn').textContent='🖥️';toast('Wide layout')}}
+function cycleLayout(){currentLayout=currentLayout==='wide'?'compact':'wide';if(currentLayout==='compact'){document.body.classList.add('mobile-touch');document.getElementById('layoutBtn').textContent='📱';toast('Compact')}else{document.body.classList.remove('mobile-touch');document.getElementById('layoutBtn').textContent='🖥️';toast('Wide')}}
 
-/* Basic / Advanced mode */
+/* Basic / Advanced */
 let basicMode=false;
 document.getElementById('modeBasic').addEventListener('click',()=>setMode(true));
 document.getElementById('modeAdvanced').addEventListener('click',()=>setMode(false));
-function setMode(basic){
-  basicMode=basic;
-  document.getElementById('modeBasic').classList.toggle('active',basic);
-  document.getElementById('modeAdvanced').classList.toggle('active',!basic);
-  // In basic mode, hide advanced filters and simplify grid
-  document.querySelectorAll('.filt-bar label').forEach(l=>{
-    const txt=l.textContent.trim();
-    if(/Platform|Socket|DDR|Storage|Price/i.test(txt))l.style.display=basic?'none':'flex';
-  });
-  document.body.classList.toggle('basic-mode',basic);
-  draw();edraw();
-  toast(basic?'Basic mode — essential parts only':'Advanced mode — full catalog')
-}
+function setMode(basic){basicMode=basic;document.getElementById('modeBasic').classList.toggle('active',basic);document.getElementById('modeAdvanced').classList.toggle('active',!basic);document.querySelectorAll('.filt-bar label').forEach(l=>{const txt=l.textContent.trim();if(/Platform|Socket|DDR|Storage|Price/i.test(txt))l.style.display=basic?'none':'flex'});document.body.classList.toggle('basic-mode',basic);draw();edraw();toast(basic?'Basic mode':'Advanced mode')}
 
-/* ============================================================
-   SCROLL FX (glass + vaporwave): reveal on scroll
-   ============================================================ */
+/* Scroll FX */
 let scrollFXTicking=false;
-function setupScrollFX(){
-  const grid=document.getElementById('grid');
-  if(!grid)return;
-  grid.addEventListener('scroll',scrollFX);
-  // initial
-  setTimeout(scrollFX,100);
-}
-function teardownScrollFX(){
-  const grid=document.getElementById('grid');
-  if(grid)grid.removeEventListener('scroll',scrollFX);
-}
-function scrollFX(){
-  if(scrollFXTicking)return;
-  scrollFXTicking=true;
-  requestAnimationFrame(()=>{
-    scrollFXTicking=false;
-    const grid=document.getElementById('grid');
-    if(!grid)return;
-    const rect=grid.getBoundingClientRect();
-    grid.querySelectorAll('.pc').forEach(card=>{
-      const r=card.getBoundingClientRect();
-      const vh=window.innerHeight;
-      const vis=Math.max(0,Math.min(1,(vh-r.top)/(vh*.6)));
-      card.style.opacity=Math.min(1,vis+0.15);
-      card.style.transform=`translateY(${(1-vis)*24}px) scale(${0.97+vis*0.03})`;
-    });
-  });
-}
+function setupScrollFX(){const grid=document.getElementById('grid');if(!grid)return;grid.addEventListener('scroll',scrollFX);setTimeout(scrollFX,100)}
+function teardownScrollFX(){const grid=document.getElementById('grid');if(grid)grid.removeEventListener('scroll',scrollFX)}
+function scrollFX(){if(scrollFXTicking)return;scrollFXTicking=true;requestAnimationFrame(()=>{scrollFXTicking=false;const grid=document.getElementById('grid');if(!grid)return;grid.querySelectorAll('.pc').forEach(card=>{const r=card.getBoundingClientRect();const vh=window.innerHeight;const vis=Math.max(0,Math.min(1,(vh-r.top)/(vh*.6)));card.style.opacity=Math.min(1,vis+0.15);card.style.transform=`translateY(${(1-vis)*24}px) scale(${0.97+vis*0.03})`})})}
 
-/* ============================================================
-   TOAST
-   ============================================================ */
 function toast(t){let e=document.getElementById('toast');if(!e){e=document.createElement('div');e.id='toast';document.body.appendChild(e)}e.textContent=t;e.style.display='block';clearTimeout(e._t);e._t=setTimeout(()=>e.style.display='none',2400)}
 function closeModal(id){document.getElementById(id).classList.remove('show')}
 
 /* ============================================================
-   CATALOG — expanded inventory, more tags
+   CATALOG
    ============================================================ */
 const CATS=[['pb','Ready-made builds','🚀'],['cpu','Processor','🧠'],['mb','Motherboard','🕹️'],['ram','Memory','📼'],['gpu','Graphics card','🎮'],['ssd','Storage','💾'],['cooler','CPU cooler','❄️'],['psu','Power supply','⚡'],['case','Case','📦'],['fan','Case fans','🌀']],SLOTS=CATS.slice(1),RK={ITX:1,mATX:2,ATX:3};
 const $=i=>document.getElementById(i),M=n=>'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}),fs=g=>g>=1000?g/1000+'TB':g+'GB';
 const FLD={cpu:'k n p sock d c t w ig oc f brand',mb:'k n p sock d form wifi oc brand',ram:'k n p d gb mhz lp brand',gpu:'k n p v b rec len tdp f brand',ssd:'k n p gb t brand',cooler:'k n p t size tdp s brand',psu:'k n p w form brand',case:'k n p form rad cl gl psu brand',fan:'k n p sz pk rgb brand'};
 
 const ROWS={
-cpu:[
-  ['r5600','AMD Ryzen 5 5600',159,'AM4','4',6,12,65,0,1,4,'AMD'],
-  ['r5600g','AMD Ryzen 5 5600G',189,'AM4','4',6,12,65,1,1,3,'AMD'],
-  ['r5700x3d','AMD Ryzen 7 5700X3D',329,'AM4','4',8,16,105,0,0,6,'AMD'],
-  ['r7600','AMD Ryzen 5 7600',269,'AM5','5',6,12,88,1,1,6,'AMD'],
-  ['r7600x3d','AMD Ryzen 5 7600X3D',349,'AM5','5',6,12,65,1,0,7,'AMD'],
-  ['r9600x','AMD Ryzen 5 9600X',329,'AM5','5',6,12,88,1,1,7,'AMD'],
-  ['r7700','AMD Ryzen 7 7700',389,'AM5','5',8,16,88,1,1,7,'AMD'],
-  ['r7800x3d','AMD Ryzen 7 7800X3D',549,'AM5','5',8,16,120,1,0,9,'AMD'],
-  ['r9700x','AMD Ryzen 7 9700X',469,'AM5','5',8,16,88,1,1,8,'AMD'],
-  ['r9800x3d','AMD Ryzen 7 9800X3D',689,'AM5','5',8,16,120,1,0,10,'AMD'],
-  ['r9900x','AMD Ryzen 9 9900X',569,'AM5','5',12,24,162,1,1,8,'AMD'],
-  ['r9900x3d','AMD Ryzen 9 9900X3D',799,'AM5','5',12,24,120,1,0,9,'AMD'],
-  ['r9950x','AMD Ryzen 9 9950X',899,'AM5','5',16,32,170,1,1,9,'AMD'],
-  ['r9950x3d','AMD Ryzen 9 9950X3D',969,'AM5','5',16,32,200,1,1,10,'AMD'],
-  ['i3-12100','Intel Core i3-12100',169,'LGA1700','45',4,8,89,1,0,3,'Intel'],
-  ['i3-14100','Intel Core i3-14100',189,'LGA1700','45',4,8,89,1,0,3,'Intel'],
-  ['i5-12400','Intel Core i5-12400',229,'LGA1700','45',6,12,117,1,0,5,'Intel'],
-  ['i5-14400f','Intel Core i5-14400F',249,'LGA1700','45',10,16,148,0,0,6,'Intel'],
-  ['i5-14600k','Intel Core i5-14600K',399,'LGA1700','45',14,20,181,1,1,8,'Intel'],
-  ['i7-14700k','Intel Core i7-14700K',549,'LGA1700','45',20,28,253,1,1,9,'Intel'],
-  ['i9-14900k','Intel Core i9-14900K',699,'LGA1700','45',24,32,253,1,1,10,'Intel'],
-  ['u5-225f','Intel Core Ultra 5 225F',209,'LGA1851','5',10,10,65,0,1,6,'Intel'],
-  ['u5-245k','Intel Core Ultra 5 245K',399,'LGA1851','5',14,14,159,1,1,8,'Intel'],
-  ['u7-265k','Intel Core Ultra 7 265K',549,'LGA1851','5',20,20,250,1,1,9,'Intel'],
-  ['u9-285k','Intel Core Ultra 9 285K',799,'LGA1851','5',24,24,250,1,1,10,'Intel']
-],
-mb:[
-  ['b550m','MSI B550M PRO-VDH WiFi',149,'AM4','4','mATX',1,1,'MSI'],
-  ['b550f','ASUS ROG STRIX B550-F GAMING WIFI II',249,'AM4','4','ATX',1,1,'ASUS'],
-  ['a620m','GIGABYTE A620M S2H',119,'AM5','5','mATX',0,0,'GIGABYTE'],
-  ['b650','GIGABYTE B650 EAGLE AX',229,'AM5','5','ATX',1,1,'GIGABYTE'],
-  ['b650m','MSI MAG B650M Mortar WiFi',249,'AM5','5','mATX',1,1,'MSI'],
-  ['b650i','ASUS ROG STRIX B650E-I GAMING WIFI',429,'AM5','5','ITX',1,1,'ASUS'],
-  ['x870','MSI MAG X870 Tomahawk WiFi',389,'AM5','5','ATX',1,1,'MSI'],
-  ['x870e','ASUS ROG STRIX X870E-E GAMING WIFI',699,'AM5','5','ATX',1,1,'ASUS'],
-  ['b760m4','GIGABYTE B760M DS3H DDR4',139,'LGA1700','4','mATX',0,0,'GIGABYTE'],
-  ['b760m5','GIGABYTE B760M AORUS ELITE AX',259,'LGA1700','5','mATX',1,0,'GIGABYTE'],
-  ['z790d4','ASUS PRIME Z790-P WIFI D4',289,'LGA1700','4','ATX',1,1,'ASUS'],
-  ['z790','MSI PRO Z790-A WiFi',339,'LGA1700','5','ATX',1,1,'MSI'],
-  ['z790i','ASUS ROG STRIX Z790-I GAMING WIFI',569,'LGA1700','5','ITX',1,1,'ASUS'],
-  ['b860m','ASUS PRIME B860M-A WiFi',239,'LGA1851','5','mATX',1,0,'ASUS'],
-  ['z890','MSI MAG Z890 TOMAHAWK WiFi',419,'LGA1851','5','ATX',1,1,'MSI'],
-  ['z890e','ASUS ROG STRIX Z890-E GAMING WIFI',729,'LGA1851','5','ATX',1,1,'ASUS']
-],
-ram:[
-  ['d4-16','TEAMGROUP T-Force Vulcan 16GB (2x8) DDR4-3200',55,'4',16,3200,0,'TEAMGROUP'],
-  ['d4-32','Corsair Vengeance LPX 32GB (2x16) DDR4-3600',99,'4',32,3600,1,'Corsair'],
-  ['d4-64','G.SKILL Ripjaws V 64GB (2x32) DDR4-3600',199,'4',64,3600,0,'G.SKILL'],
-  ['d5-16','Kingston FURY Beast 16GB (2x8) DDR5-5600',89,'5',16,5600,0,'Kingston'],
-  ['d5-32lp','Crucial Pro 32GB (2x16) DDR5-5600 Low Profile',129,'5',32,5600,1,'Crucial'],
-  ['d5-32','Corsair Vengeance 32GB (2x16) DDR5-6000 CL30',179,'5',32,6000,0,'Corsair'],
-  ['d5-32x','G.SKILL Trident Z5 RGB 32GB (2x16) DDR5-6400',229,'5',32,6400,0,'G.SKILL'],
-  ['d5-64','G.SKILL Trident Z5 RGB 64GB (2x32) DDR5-6400',329,'5',64,6400,0,'G.SKILL'],
-  ['d5-96','Corsair Dominator Titanium 96GB (2x48) DDR5-6600',599,'5',96,6600,0,'Corsair'],
-  ['d5-128','Crucial Pro 128GB (2x64) DDR5-5600',649,'5',128,5600,1,'Crucial'],
-  ['d5-192','Corsair Vengeance 192GB (4x48) DDR5-5200',1199,'5',192,5200,0,'Corsair'],
-  ['d5-256','G.SKILL Flare X5 256GB (4x64) DDR5-6000',1999,'5',256,6000,1,'G.SKILL']
-],
-gpu:[
-  ['rtx1030','NVIDIA GeForce GT 1030 2GB Low Profile',99,2,'N',300,150,30,2,'NVIDIA'],
-  ['rtx3050','NVIDIA GeForce RTX 3050 6GB',219,6,'N',450,200,70,4,'NVIDIA'],
-  ['b580','Intel Arc B580 12GB',349,12,'I',550,272,190,5,'Intel'],
-  ['4060','NVIDIA GeForce RTX 4060 8GB',389,8,'N',550,200,115,5,'NVIDIA'],
-  ['4060ti','NVIDIA GeForce RTX 4060 Ti 16GB',629,16,'N',550,250,165,6,'NVIDIA'],
-  ['4070s','NVIDIA GeForce RTX 4070 SUPER 12GB',859,12,'N',650,242,220,7,'NVIDIA'],
-  ['4070tis','NVIDIA GeForce RTX 4070 Ti SUPER 16GB',1149,16,'N',750,305,285,8,'NVIDIA'],
-  ['4080s','NVIDIA GeForce RTX 4080 SUPER 16GB',1499,16,'N',750,310,320,9,'NVIDIA'],
-  ['4090','NVIDIA GeForce RTX 4090 24GB',2999,24,'N',850,336,450,10,'NVIDIA'],
-  ['5060','NVIDIA GeForce RTX 5060 8GB',429,8,'N',550,240,145,5,'NVIDIA'],
-  ['5060ti','NVIDIA GeForce RTX 5060 Ti 16GB',599,16,'N',600,244,180,6,'NVIDIA'],
-  ['5070','NVIDIA GeForce RTX 5070 12GB',779,12,'N',650,242,250,7,'NVIDIA'],
-  ['5070ti','NVIDIA GeForce RTX 5070 Ti 16GB',1149,16,'N',750,300,300,8,'NVIDIA'],
-  ['5080','NVIDIA GeForce RTX 5080 16GB',1599,16,'N',850,304,360,9,'NVIDIA'],
-  ['5090','NVIDIA GeForce RTX 5090 32GB',3299,32,'N',1000,336,575,10,'NVIDIA'],
-  ['7600','AMD Radeon RX 7600 8GB',329,8,'A',550,204,165,4,'AMD'],
-  ['7800xt','AMD Radeon RX 7800 XT 16GB',679,16,'A',700,267,263,7,'AMD'],
-  ['7900xt','AMD Radeon RX 7900 XT 20GB',949,20,'A',750,276,315,8,'AMD'],
-  ['7900xtx','AMD Radeon RX 7900 XTX 24GB',1349,24,'A',800,287,355,9,'AMD'],
-  ['9060xt','AMD Radeon RX 9060 XT 16GB',459,16,'A',550,240,160,6,'AMD'],
-  ['9070','AMD Radeon RX 9070 16GB',849,16,'A',650,260,220,8,'AMD'],
-  ['9070xt','AMD Radeon RX 9070 XT 16GB',949,16,'A',750,330,304,8,'AMD'],
-  ['rtx2000','NVIDIA RTX 2000 Ada 16GB Low Profile',949,16,'N',300,167,70,5,'NVIDIA'],
-  ['rtx4000','NVIDIA RTX 4000 SFF Ada 20GB Low Profile',1999,20,'N',300,168,70,6,'NVIDIA'],
-  ['rtx5000','NVIDIA RTX 5000 Ada 32GB',4499,32,'N',400,267,250,8,'NVIDIA']
-],
-ssd:[
-  ['p3-1','Crucial P3 Plus 1TB NVMe',99,1000,'NVMe Gen4','Crucial'],
-  ['sn770-1','WD Black SN770 1TB NVMe',119,1000,'NVMe Gen4','WD'],
-  ['990evo-1','Samsung 990 EVO Plus 1TB NVMe',129,1000,'NVMe Gen4','Samsung'],
-  ['990evo-2','Samsung 990 EVO Plus 2TB NVMe',219,2000,'NVMe Gen4','Samsung'],
-  ['sn850x-2','WD Black SN850X 2TB NVMe',239,2000,'NVMe Gen4','WD'],
-  ['990pro-2','Samsung 990 Pro 2TB NVMe',279,2000,'NVMe Gen4','Samsung'],
-  ['990pro-4','Samsung 990 Pro 4TB NVMe',579,4000,'NVMe Gen4','Samsung'],
-  ['t705-2','Crucial T705 2TB NVMe',459,2000,'NVMe Gen5','Crucial'],
-  ['t705-4','Crucial T705 4TB NVMe',899,4000,'NVMe Gen5','Crucial'],
-  ['9100-2','Samsung 9100 Pro 2TB NVMe',349,2000,'NVMe Gen5','Samsung'],
-  ['870-1','Samsung 870 EVO 1TB 2.5" SSD',139,1000,'SATA SSD','Samsung'],
-  ['870-4','Samsung 870 EVO 4TB 2.5" SSD',449,4000,'SATA SSD','Samsung'],
-  ['bc-4t','Seagate BarraCuda 4TB HDD',119,4000,'HDD','Seagate'],
-  ['bc-8t','Seagate BarraCuda 8TB HDD',189,8000,'HDD','Seagate'],
-  ['ih-8t','Seagate IronWolf 8TB NAS HDD',239,8000,'HDD','Seagate'],
-  ['ih-16t','Seagate IronWolf Pro 16TB NAS HDD',499,16000,'HDD','Seagate'],
-  ['wr-12t','WD Red Plus 12TB NAS HDD',359,12000,'HDD','WD'],
-  ['wg-20t','WD Gold 20TB Enterprise HDD',599,20000,'HDD','WD']
-],
-cooler:[
-  ['stock','Stock AMD/Intel Cooler',0,'Air',70,95,'','OEM'],
-  ['ax120','Thermalright Assassin X 120 SE',29,'Air',148,180,'','Thermalright'],
-  ['pa120','Thermalright Peerless Assassin 120 SE',49,'Air',155,250,'','Thermalright'],
-  ['dh15','Noctua NH-D15 G2',169,'Air',168,300,'','Noctua'],
-  ['l9i','Noctua NH-L9i-17xx Low Profile',69,'Air',37,65,'I','Noctua'],
-  ['l9a','Noctua NH-L9a-AM5 Low Profile',69,'Air',37,65,'A','Noctua'],
-  ['lf240','Arctic Liquid Freezer III 240 AIO',119,'AIO',240,300,'','Arctic'],
-  ['lf360','Arctic Liquid Freezer III 360 AIO',159,'AIO',360,400,'','Arctic'],
-  ['lf420','Arctic Liquid Freezer III 420 AIO',199,'AIO',420,420,'','Arctic'],
-  ['h100i','Corsair iCUE H100i Elite 240 AIO',189,'AIO',240,300,'','Corsair'],
-  ['h150i','Corsair iCUE H150i Elite 360 AIO',239,'AIO',360,400,'','Corsair'],
-  ['kraken','NZXT Kraken Elite 360 LCD AIO',399,'AIO',360,400,'','NZXT']
-],
-psu:[
-  ['smart500','Thermaltake Smart 500W 80+',49,500,'ATX','Thermaltake'],
-  ['bq550','be quiet! Pure Power 12 M 550W Gold',99,550,'ATX','be quiet!'],
-  ['cx650','Corsair CX650 650W Bronze',99,650,'ATX','Corsair'],
-  ['rm750e','Corsair RM750e 750W Gold',149,750,'ATX','Corsair'],
-  ['mag850','MSI MAG A850GL PCIE5 850W Gold',169,850,'ATX','MSI'],
-  ['rm850e','Corsair RM850e 850W Gold',179,850,'ATX','Corsair'],
-  ['rm1000x','Corsair RM1000x 1000W Gold',269,1000,'ATX','Corsair'],
-  ['rm1200','Corsair RM1200x SHIFT 1200W Gold',339,1200,'ATX','Corsair'],
-  ['hx1500','Corsair HX1500i 1500W Platinum',499,1500,'ATX','Corsair'],
-  ['sf750','Corsair SF750 750W Platinum SFX',229,750,'SFX','Corsair'],
-  ['sf850','Corsair SF850 850W Platinum SFX',279,850,'SFX','Corsair'],
-  ['sf1000','Corsair SF1000 1000W Platinum SFX',339,1000,'SFX','Corsair']
-],
-fan:[
-  ['p12','Arctic P12 PWM PST 120mm',13,120,1,0,'Arctic'],
-  ['p14','Arctic P14 PWM PST 140mm',14,140,1,0,'Arctic'],
-  ['nfa12','Noctua NF-A12x25 PWM 120mm',38,120,1,0,'Noctua'],
-  ['nfa14','Noctua NF-A14 PWM 140mm',34,140,1,0,'Noctua'],
-  ['nfa9','Noctua NF-A9 PWM 92mm (SFF)',26,92,1,0,'Noctua'],
-  ['sw4','be quiet! Silent Wings 4 140mm PWM',34,140,1,0,'be quiet!'],
-  ['sp120','Corsair iCUE SP120 RGB ELITE 120mm 3-pack',49,120,3,1,'Corsair'],
-  ['tl12','Thermalright TL-C12C X3 120mm 3-pack',39,120,3,0,'Thermalright'],
-  ['sl120','Lian Li UNI FAN SL120 V2 120mm 3-pack',89,120,3,1,'Lian Li'],
-  ['sl140','Lian Li UNI FAN SL140 V2 140mm 3-pack',99,140,3,1,'Lian Li'],
-  ['sl140x','Lian Li UNI FAN SL140 V2 140mm reverse',109,140,3,1,'Lian Li']
-],
-case:[
-  ['air100','Montech AIR 100 ARGB Micro-ATX',79,'mATX',240,160,330,'ATX','Montech'],
-  ['h5','NZXT H5 Flow ATX',119,'ATX',280,165,365,'ATX','NZXT'],
-  ['4000d','Corsair 4000D Airflow ATX',129,'ATX',360,170,360,'ATX','Corsair'],
-  ['popsil','Fractal Design Pop Silent ATX',129,'ATX',280,170,405,'ATX','Fractal'],
-  ['h6','NZXT H6 Flow RGB ATX',169,'ATX',360,163,365,'ATX','NZXT'],
-  ['north','Fractal Design North ATX',199,'ATX',360,170,355,'ATX','Fractal'],
-  ['o11','Lian Li O11 Dynamic EVO ATX',229,'ATX',360,167,426,'ATX','Lian Li'],
-  ['o11xl','Lian Li O11 Dynamic EVO XL E-ATX',259,'E-ATX',420,167,460,'ATX','Lian Li'],
-  ['nr200','Cooler Master NR200P Mini-ITX',139,'ITX',280,155,330,'SFX','Cooler Master'],
-  ['terra','Fractal Design Terra Mini-ITX',239,'ITX',0,77,322,'SFX','Fractal'],
-  ['ridge','Fractal Design Ridge Mini-ITX',239,'ITX',0,70,325,'SFX','Fractal']
-]
+cpu:[['r5600','AMD Ryzen 5 5600',159,'AM4','4',6,12,65,0,1,4,'AMD'],['r5600g','AMD Ryzen 5 5600G',189,'AM4','4',6,12,65,1,1,3,'AMD'],['r5700x3d','AMD Ryzen 7 5700X3D',329,'AM4','4',8,16,105,0,0,6,'AMD'],['r7600','AMD Ryzen 5 7600',269,'AM5','5',6,12,88,1,1,6,'AMD'],['r7600x3d','AMD Ryzen 5 7600X3D',349,'AM5','5',6,12,65,1,0,7,'AMD'],['r9600x','AMD Ryzen 5 9600X',329,'AM5','5',6,12,88,1,1,7,'AMD'],['r7700','AMD Ryzen 7 7700',389,'AM5','5',8,16,88,1,1,7,'AMD'],['r7800x3d','AMD Ryzen 7 7800X3D',549,'AM5','5',8,16,120,1,0,9,'AMD'],['r9700x','AMD Ryzen 7 9700X',469,'AM5','5',8,16,88,1,1,8,'AMD'],['r9800x3d','AMD Ryzen 7 9800X3D',689,'AM5','5',8,16,120,1,0,10,'AMD'],['r9900x','AMD Ryzen 9 9900X',569,'AM5','5',12,24,162,1,1,8,'AMD'],['r9900x3d','AMD Ryzen 9 9900X3D',799,'AM5','5',12,24,120,1,0,9,'AMD'],['r9950x','AMD Ryzen 9 9950X',899,'AM5','5',16,32,170,1,1,9,'AMD'],['r9950x3d','AMD Ryzen 9 9950X3D',969,'AM5','5',16,32,200,1,1,10,'AMD'],['i3-12100','Intel Core i3-12100',169,'LGA1700','45',4,8,89,1,0,3,'Intel'],['i3-14100','Intel Core i3-14100',189,'LGA1700','45',4,8,89,1,0,3,'Intel'],['i5-12400','Intel Core i5-12400',229,'LGA1700','45',6,12,117,1,0,5,'Intel'],['i5-14400f','Intel Core i5-14400F',249,'LGA1700','45',10,16,148,0,0,6,'Intel'],['i5-14600k','Intel Core i5-14600K',399,'LGA1700','45',14,20,181,1,1,8,'Intel'],['i7-14700k','Intel Core i7-14700K',549,'LGA1700','45',20,28,253,1,1,9,'Intel'],['i9-14900k','Intel Core i9-14900K',699,'LGA1700','45',24,32,253,1,1,10,'Intel'],['u5-225f','Intel Core Ultra 5 225F',209,'LGA1851','5',10,10,65,0,1,6,'Intel'],['u5-245k','Intel Core Ultra 5 245K',399,'LGA1851','5',14,14,159,1,1,8,'Intel'],['u7-265k','Intel Core Ultra 7 265K',549,'LGA1851','5',20,20,250,1,1,9,'Intel'],['u9-285k','Intel Core Ultra 9 285K',799,'LGA1851','5',24,24,250,1,1,10,'Intel']],
+mb:[['b550m','MSI B550M PRO-VDH WiFi',149,'AM4','4','mATX',1,1,'MSI'],['b550f','ASUS ROG STRIX B550-F GAMING WIFI II',249,'AM4','4','ATX',1,1,'ASUS'],['a620m','GIGABYTE A620M S2H',119,'AM5','5','mATX',0,0,'GIGABYTE'],['b650','GIGABYTE B650 EAGLE AX',229,'AM5','5','ATX',1,1,'GIGABYTE'],['b650m','MSI MAG B650M Mortar WiFi',249,'AM5','5','mATX',1,1,'MSI'],['b650i','ASUS ROG STRIX B650E-I GAMING WIFI',429,'AM5','5','ITX',1,1,'ASUS'],['x870','MSI MAG X870 Tomahawk WiFi',389,'AM5','5','ATX',1,1,'MSI'],['x870e','ASUS ROG STRIX X870E-E GAMING WIFI',699,'AM5','5','ATX',1,1,'ASUS'],['b760m4','GIGABYTE B760M DS3H DDR4',139,'LGA1700','4','mATX',0,0,'GIGABYTE'],['b760m5','GIGABYTE B760M AORUS ELITE AX',259,'LGA1700','5','mATX',1,0,'GIGABYTE'],['z790d4','ASUS PRIME Z790-P WIFI D4',289,'LGA1700','4','ATX',1,1,'ASUS'],['z790','MSI PRO Z790-A WiFi',339,'LGA1700','5','ATX',1,1,'MSI'],['z790i','ASUS ROG STRIX Z790-I GAMING WIFI',569,'LGA1700','5','ITX',1,1,'ASUS'],['b860m','ASUS PRIME B860M-A WiFi',239,'LGA1851','5','mATX',1,0,'ASUS'],['z890','MSI MAG Z890 TOMAHAWK WiFi',419,'LGA1851','5','ATX',1,1,'MSI'],['z890e','ASUS ROG STRIX Z890-E GAMING WIFI',729,'LGA1851','5','ATX',1,1,'ASUS']],
+ram:[['d4-16','TEAMGROUP T-Force Vulcan 16GB (2x8) DDR4-3200',55,'4',16,3200,0,'TEAMGROUP'],['d4-32','Corsair Vengeance LPX 32GB (2x16) DDR4-3600',99,'4',32,3600,1,'Corsair'],['d4-64','G.SKILL Ripjaws V 64GB (2x32) DDR4-3600',199,'4',64,3600,0,'G.SKILL'],['d5-16','Kingston FURY Beast 16GB (2x8) DDR5-5600',89,'5',16,5600,0,'Kingston'],['d5-32lp','Crucial Pro 32GB (2x16) DDR5-5600 Low Profile',129,'5',32,5600,1,'Crucial'],['d5-32','Corsair Vengeance 32GB (2x16) DDR5-6000 CL30',179,'5',32,6000,0,'Corsair'],['d5-32x','G.SKILL Trident Z5 RGB 32GB (2x16) DDR5-6400',229,'5',32,6400,0,'G.SKILL'],['d5-64','G.SKILL Trident Z5 RGB 64GB (2x32) DDR5-6400',329,'5',64,6400,0,'G.SKILL'],['d5-96','Corsair Dominator Titanium 96GB (2x48) DDR5-6600',599,'5',96,6600,0,'Corsair'],['d5-128','Crucial Pro 128GB (2x64) DDR5-5600',649,'5',128,5600,1,'Crucial'],['d5-192','Corsair Vengeance 192GB (4x48) DDR5-5200',1199,'5',192,5200,0,'Corsair'],['d5-256','G.SKILL Flare X5 256GB (4x64) DDR5-6000',1999,'5',256,6000,1,'G.SKILL']],
+gpu:[['rtx1030','NVIDIA GeForce GT 1030 2GB Low Profile',99,2,'N',300,150,30,2,'NVIDIA'],['rtx3050','NVIDIA GeForce RTX 3050 6GB',219,6,'N',450,200,70,4,'NVIDIA'],['b580','Intel Arc B580 12GB',349,12,'I',550,272,190,5,'Intel'],['4060','NVIDIA GeForce RTX 4060 8GB',389,8,'N',550,200,115,5,'NVIDIA'],['4060ti','NVIDIA GeForce RTX 4060 Ti 16GB',629,16,'N',550,250,165,6,'NVIDIA'],['4070s','NVIDIA GeForce RTX 4070 SUPER 12GB',859,12,'N',650,242,220,7,'NVIDIA'],['4070tis','NVIDIA GeForce RTX 4070 Ti SUPER 16GB',1149,16,'N',750,305,285,8,'NVIDIA'],['4080s','NVIDIA GeForce RTX 4080 SUPER 16GB',1499,16,'N',750,310,320,9,'NVIDIA'],['4090','NVIDIA GeForce RTX 4090 24GB',2999,24,'N',850,336,450,10,'NVIDIA'],['5060','NVIDIA GeForce RTX 5060 8GB',429,8,'N',550,240,145,5,'NVIDIA'],['5060ti','NVIDIA GeForce RTX 5060 Ti 16GB',599,16,'N',600,244,180,6,'NVIDIA'],['5070','NVIDIA GeForce RTX 5070 12GB',779,12,'N',650,242,250,7,'NVIDIA'],['5070ti','NVIDIA GeForce RTX 5070 Ti 16GB',1149,16,'N',750,300,300,8,'NVIDIA'],['5080','NVIDIA GeForce RTX 5080 16GB',1599,16,'N',850,304,360,9,'NVIDIA'],['5090','NVIDIA GeForce RTX 5090 32GB',3299,32,'N',1000,336,575,10,'NVIDIA'],['7600','AMD Radeon RX 7600 8GB',329,8,'A',550,204,165,4,'AMD'],['7800xt','AMD Radeon RX 7800 XT 16GB',679,16,'A',700,267,263,7,'AMD'],['7900xt','AMD Radeon RX 7900 XT 20GB',949,20,'A',750,276,315,8,'AMD'],['7900xtx','AMD Radeon RX 7900 XTX 24GB',1349,24,'A',800,287,355,9,'AMD'],['9060xt','AMD Radeon RX 9060 XT 16GB',459,16,'A',550,240,160,6,'AMD'],['9070','AMD Radeon RX 9070 16GB',849,16,'A',650,260,220,8,'AMD'],['9070xt','AMD Radeon RX 9070 XT 16GB',949,16,'A',750,330,304,8,'AMD'],['rtx2000','NVIDIA RTX 2000 Ada 16GB Low Profile',949,16,'N',300,167,70,5,'NVIDIA'],['rtx4000','NVIDIA RTX 4000 SFF Ada 20GB Low Profile',1999,20,'N',300,168,70,6,'NVIDIA'],['rtx5000','NVIDIA RTX 5000 Ada 32GB',4499,32,'N',400,267,250,8,'NVIDIA']],
+ssd:[['p3-1','Crucial P3 Plus 1TB NVMe',99,1000,'NVMe Gen4','Crucial'],['sn770-1','WD Black SN770 1TB NVMe',119,1000,'NVMe Gen4','WD'],['990evo-1','Samsung 990 EVO Plus 1TB NVMe',129,1000,'NVMe Gen4','Samsung'],['990evo-2','Samsung 990 EVO Plus 2TB NVMe',219,2000,'NVMe Gen4','Samsung'],['sn850x-2','WD Black SN850X 2TB NVMe',239,2000,'NVMe Gen4','WD'],['990pro-2','Samsung 990 Pro 2TB NVMe',279,2000,'NVMe Gen4','Samsung'],['990pro-4','Samsung 990 Pro 4TB NVMe',579,4000,'NVMe Gen4','Samsung'],['t705-2','Crucial T705 2TB NVMe',459,2000,'NVMe Gen5','Crucial'],['t705-4','Crucial T705 4TB NVMe',899,4000,'NVMe Gen5','Crucial'],['9100-2','Samsung 9100 Pro 2TB NVMe',349,2000,'NVMe Gen5','Samsung'],['870-1','Samsung 870 EVO 1TB 2.5" SSD',139,1000,'SATA SSD','Samsung'],['870-4','Samsung 870 EVO 4TB 2.5" SSD',449,4000,'SATA SSD','Samsung'],['bc-4t','Seagate BarraCuda 4TB HDD',119,4000,'HDD','Seagate'],['bc-8t','Seagate BarraCuda 8TB HDD',189,8000,'HDD','Seagate'],['ih-8t','Seagate IronWolf 8TB NAS HDD',239,8000,'HDD','Seagate'],['ih-16t','Seagate IronWolf Pro 16TB NAS HDD',499,16000,'HDD','Seagate'],['wr-12t','WD Red Plus 12TB NAS HDD',359,12000,'HDD','WD'],['wg-20t','WD Gold 20TB Enterprise HDD',599,20000,'HDD','WD']],
+cooler:[['stock','Stock AMD/Intel Cooler',0,'Air',70,95,'','OEM'],['ax120','Thermalright Assassin X 120 SE',29,'Air',148,180,'','Thermalright'],['pa120','Thermalright Peerless Assassin 120 SE',49,'Air',155,250,'','Thermalright'],['dh15','Noctua NH-D15 G2',169,'Air',168,300,'','Noctua'],['l9i','Noctua NH-L9i-17xx Low Profile',69,'Air',37,65,'I','Noctua'],['l9a','Noctua NH-L9a-AM5 Low Profile',69,'Air',37,65,'A','Noctua'],['lf240','Arctic Liquid Freezer III 240 AIO',119,'AIO',240,300,'','Arctic'],['lf360','Arctic Liquid Freezer III 360 AIO',159,'AIO',360,400,'','Arctic'],['lf420','Arctic Liquid Freezer III 420 AIO',199,'AIO',420,420,'','Arctic'],['h100i','Corsair iCUE H100i Elite 240 AIO',189,'AIO',240,300,'','Corsair'],['h150i','Corsair iCUE H150i Elite 360 AIO',239,'AIO',360,400,'','Corsair'],['kraken','NZXT Kraken Elite 360 LCD AIO',399,'AIO',360,400,'','NZXT']],
+psu:[['smart500','Thermaltake Smart 500W 80+',49,500,'ATX','Thermaltake'],['bq550','be quiet! Pure Power 12 M 550W Gold',99,550,'ATX','be quiet!'],['cx650','Corsair CX650 650W Bronze',99,650,'ATX','Corsair'],['rm750e','Corsair RM750e 750W Gold',149,750,'ATX','Corsair'],['mag850','MSI MAG A850GL PCIE5 850W Gold',169,850,'ATX','MSI'],['rm850e','Corsair RM850e 850W Gold',179,850,'ATX','Corsair'],['rm1000x','Corsair RM1000x 1000W Gold',269,1000,'ATX','Corsair'],['rm1200','Corsair RM1200x SHIFT 1200W Gold',339,1200,'ATX','Corsair'],['hx1500','Corsair HX1500i 1500W Platinum',499,1500,'ATX','Corsair'],['sf750','Corsair SF750 750W Platinum SFX',229,750,'SFX','Corsair'],['sf850','Corsair SF850 850W Platinum SFX',279,850,'SFX','Corsair'],['sf1000','Corsair SF1000 1000W Platinum SFX',339,1000,'SFX','Corsair']],
+fan:[['p12','Arctic P12 PWM PST 120mm',13,120,1,0,'Arctic'],['p14','Arctic P14 PWM PST 140mm',14,140,1,0,'Arctic'],['nfa12','Noctua NF-A12x25 PWM 120mm',38,120,1,0,'Noctua'],['nfa14','Noctua NF-A14 PWM 140mm',34,140,1,0,'Noctua'],['nfa9','Noctua NF-A9 PWM 92mm (SFF)',26,92,1,0,'Noctua'],['sw4','be quiet! Silent Wings 4 140mm PWM',34,140,1,0,'be quiet!'],['sp120','Corsair iCUE SP120 RGB ELITE 120mm 3-pack',49,120,3,1,'Corsair'],['tl12','Thermalright TL-C12C X3 120mm 3-pack',39,120,3,0,'Thermalright'],['sl120','Lian Li UNI FAN SL120 V2 120mm 3-pack',89,120,3,1,'Lian Li'],['sl140','Lian Li UNI FAN SL140 V2 140mm 3-pack',99,140,3,1,'Lian Li'],['sl140x','Lian Li UNI FAN SL140 V2 140mm reverse',109,140,3,1,'Lian Li']],
+case:[['air100','Montech AIR 100 ARGB Micro-ATX',79,'mATX',240,160,330,'ATX','Montech'],['h5','NZXT H5 Flow ATX',119,'ATX',280,165,365,'ATX','NZXT'],['4000d','Corsair 4000D Airflow ATX',129,'ATX',360,170,360,'ATX','Corsair'],['popsil','Fractal Design Pop Silent ATX',129,'ATX',280,170,405,'ATX','Fractal'],['h6','NZXT H6 Flow RGB ATX',169,'ATX',360,163,365,'ATX','NZXT'],['north','Fractal Design North ATX',199,'ATX',360,170,355,'ATX','Fractal'],['o11','Lian Li O11 Dynamic EVO ATX',229,'ATX',360,167,426,'ATX','Lian Li'],['o11xl','Lian Li O11 Dynamic EVO XL E-ATX',259,'E-ATX',420,167,460,'ATX','Lian Li'],['nr200','Cooler Master NR200P Mini-ITX',139,'ITX',280,155,330,'SFX','Cooler Master'],['terra','Fractal Design Terra Mini-ITX',239,'ITX',0,77,322,'SFX','Fractal'],['ridge','Fractal Design Ridge Mini-ITX',239,'ITX',0,70,325,'SFX','Fractal']]
 };
 
 const PRE=[
@@ -1203,7 +906,7 @@ const PRE=[
 ['e3','Everyday','Family PC','Family,Budget,DDR4','Reliable, quiet, and easy to upgrade.','i5-12400,b760m4,d4-16,,870-1,stock,smart500,air100'],
 ['e4','Everyday','Crypto Mining Rig','Mining,Multi-GPU,Airflow','Multiple GPUs with high-airflow case.','r5600,b550m,d4-16,7600,p3-1,ax120,smart500,o11'],
 ['e5','Everyday','Ultra Compact ITX','SFF,Mini-ITX,Budget','Gaming in a small form factor.','r7600,b650i,d5-32lp,9060xt,990evo-1,l9a,sf750,terra'],
-['e6','Everyday','Silent / Audiophile PC','Quiet,Audio,No RGB','Sound-dampened case, low-noise fans, passive cooling.','r7700,b650,d5-32lp,rtx2000,990pro-2,dh15,bq550,popsil'],
+['e6','Everyday','Silent / Audiophile PC','Quiet,Audio,No RGB','Sound-dampened case, low-noise fans.','r7700,b650,d5-32lp,rtx2000,990pro-2,dh15,bq550,popsil'],
 ['e7','Everyday','Creator Starter Kit','Creator,Budget,RGB','Entry-level video and photo editing.','r9600x,b650,d5-32,4060ti,990evo-2,pa120,rm750e,h5'],
 ['e8','Everyday','Multi-Monitor Productivity','Productivity,Multi-monitor,Low power','Lots of outputs, quiet, efficient.','u5-245k,z890,d5-64,rtx2000,990pro-2,lf360,rm750e,popsil']
 ];
@@ -1211,103 +914,15 @@ const PRE=[
 function tg(o){
   const t=[],D=x=>[...x].map(d=>'DDR'+d);
   switch(o.cat){
-    case'cpu':{
-      t.push(o.sock,...D(o.d),o.ig?'Integrated graphics':'No iGPU',o.oc?'Overclockable':'Locked');
-      if(o.f>=8)t.push('Gaming');
-      if(o.t>=20)t.push('Creator / Pro');
-      if(o.p<260)t.push('Budget');
-      if(o.p>700)t.push('Enthusiast');
-      if(o.ig&&o.t<=12)t.push('Office / HTPC');
-      if(o.sock==='AM4')t.push('DDR4 Platform');
-      if(o.sock==='AM5')t.push('AM5 Platform');
-      if(o.sock==='LGA1700')t.push('LGA1700');
-      if(o.sock==='LGA1851')t.push('LGA1851');
-      break;
-    }
-    case'mb':{
-      t.push(o.sock,...D(o.d),o.form,o.wifi?'WiFi':'No WiFi');
-      if(o.oc)t.push('Overclockable');
-      if(o.form=='ITX')t.push('SFF');
-      if(o.form=='mATX')t.push('Compact');
-      if(o.form=='E-ATX')t.push('Workstation');
-      if(o.m2>=3)t.push(o.m2+'× M.2');
-      if(o.dimm>=4)t.push(o.dimm+' RAM slots');
-      break;
-    }
-    case'ram':{
-      t.push('DDR'+o.d,o.gb+'GB',o.mhz+'MHz');
-      if(o.lp)t.push('Low profile');
-      if(o.gb>=64)t.push('Creator / AI');
-      if(o.gb>=128)t.push('Workstation');
-      if(o.mhz>=6000)t.push('High speed');
-      if(o.gb===16)t.push('Budget');
-      if(o.gb===32)t.push('Standard');
-      break;
-    }
-    case'gpu':{
-      t.push({N:'NVIDIA',A:'AMD',I:'Intel'}[o.b],o.v+'GB VRAM');
-      if(o.f>=7)t.push('Gaming');
-      if(o.f>=9)t.push('4K Gaming');
-      if(o.v>=16)t.push('AI / LLM');
-      if(o.v>=24)t.push('AI Workstation');
-      if(o.len<=250)t.push('SFF GPU');
-      if(o.len<=170)t.push('Low profile');
-      if(o.tdp>=300)t.push('High wattage');
-      if(o.tdp<=100)t.push('Low power');
-      if(o.rec<=450)t.push('Small PSU OK');
-      if(o.rec>=850)t.push('Big PSU needed');
-      break;
-    }
-    case'ssd':{
-      t.push(o.t,fs(o.gb),/NVMe/.test(o.t)?'NVMe':'SATA');
-      if(/Gen5/.test(o.t))t.push('Fastest');
-      if(/Gen4/.test(o.t))t.push('Fast');
-      if(/HDD/.test(o.t))t.push('Bulk storage');
-      if(o.gb>=2000)t.push('Large');
-      if(o.gb>=4000)t.push('Massive');
-      if(o.gb<=1000)t.push('Budget');
-      break;
-    }
-    case'cooler':{
-      t.push(o.t=='AIO'?'Liquid':'Air');
-      if(o.t=='Air'&&o.size<=70)t.push('Low profile','SFF');
-      if(o.t=='Air'&&o.size>=160)t.push('Tall','Big air');
-      if(o.t=='AIO')t.push(o.size+'mm radiator');
-      if(o.tdp>=300)t.push('High TDP');
-      if(o.tdp<=100)t.push('Small CPU');
-      if(o.p===0)t.push('Stock');
-      break;
-    }
-    case'psu':{
-      t.push(o.w+'W',o.form);
-      if(o.form=='SFX')t.push('SFF PSU');
-      if(o.w>=1000)t.push('Enthusiast');
-      if(o.w>=1500)t.push('Workstation');
-      if(o.w<=550)t.push('Budget');
-      if(o.w>=750)t.push('High-end');
-      break;
-    }
-    case'case':{
-      t.push(o.form);
-      if(o.form=='ITX')t.push('SFF');
-      if(o.form=='mATX')t.push('Compact');
-      if(o.form=='ATX')t.push('Standard');
-      if(o.form=='E-ATX')t.push('Big');
-      if(o.gl>=380)t.push('Long GPU');
-      if(o.cl>=170)t.push('Tall cooler');
-      if(o.rad>=360)t.push('360 radiator');
-      if(o.rad>=420)t.push('420 radiator');
-      if(o.psu=='SFX')t.push('SFX PSU');
-      break;
-    }
-    case'fan':{
-      t.push(o.sz+'mm',o.pk>1?o.pk+'-pack':'Single');
-      if(o.rgb)t.push('ARGB');
-      if(o.sz>=140)t.push('Large');
-      if(o.sz<=92)t.push('SFF');
-      if(o.pk>=3)t.push('Bundle');
-      break;
-    }
+    case'cpu':t.push(o.sock,...D(o.d),o.ig?'Integrated graphics':'No iGPU',o.oc?'Overclockable':'Locked');if(o.f>=8)t.push('Gaming');if(o.t>=20)t.push('Creator / Pro');if(o.p<260)t.push('Budget');if(o.p>700)t.push('Enthusiast');if(o.ig&&o.t<=12)t.push('Office / HTPC');if(o.sock==='AM4')t.push('DDR4 Platform');if(o.sock==='AM5')t.push('AM5 Platform');if(o.sock==='LGA1700')t.push('LGA1700');if(o.sock==='LGA1851')t.push('LGA1851');break;
+    case'mb':t.push(o.sock,...D(o.d),o.form,o.wifi?'WiFi':'No WiFi');if(o.oc)t.push('Overclockable');if(o.form=='ITX')t.push('SFF');if(o.form=='mATX')t.push('Compact');if(o.form=='E-ATX')t.push('Workstation');if(o.m2>=3)t.push(o.m2+'× M.2');if(o.dimm>=4)t.push(o.dimm+' RAM slots');break;
+    case'ram':t.push('DDR'+o.d,o.gb+'GB',o.mhz+'MHz');if(o.lp)t.push('Low profile');if(o.gb>=64)t.push('Creator / AI');if(o.gb>=128)t.push('Workstation');if(o.mhz>=6000)t.push('High speed');if(o.gb===16)t.push('Budget');if(o.gb===32)t.push('Standard');break;
+    case'gpu':t.push({N:'NVIDIA',A:'AMD',I:'Intel'}[o.b],o.v+'GB VRAM');if(o.f>=7)t.push('Gaming');if(o.f>=9)t.push('4K Gaming');if(o.v>=16)t.push('AI / LLM');if(o.v>=24)t.push('AI Workstation');if(o.len<=250)t.push('SFF GPU');if(o.len<=170)t.push('Low profile');if(o.tdp>=300)t.push('High wattage');if(o.tdp<=100)t.push('Low power');if(o.rec<=450)t.push('Small PSU OK');if(o.rec>=850)t.push('Big PSU needed');break;
+    case'ssd':t.push(o.t,fs(o.gb),/NVMe/.test(o.t)?'NVMe':'SATA');if(/Gen5/.test(o.t))t.push('Fastest');if(/Gen4/.test(o.t))t.push('Fast');if(/HDD/.test(o.t))t.push('Bulk storage');if(o.gb>=2000)t.push('Large');if(o.gb>=4000)t.push('Massive');if(o.gb<=1000)t.push('Budget');break;
+    case'cooler':t.push(o.t=='AIO'?'Liquid':'Air');if(o.t=='Air'&&o.size<=70)t.push('Low profile','SFF');if(o.t=='Air'&&o.size>=160)t.push('Tall','Big air');if(o.t=='AIO')t.push(o.size+'mm radiator');if(o.tdp>=300)t.push('High TDP');if(o.tdp<=100)t.push('Small CPU');if(o.p===0)t.push('Stock');break;
+    case'psu':t.push(o.w+'W',o.form);if(o.form=='SFX')t.push('SFF PSU');if(o.w>=1000)t.push('Enthusiast');if(o.w>=1500)t.push('Workstation');if(o.w<=550)t.push('Budget');if(o.w>=750)t.push('High-end');break;
+    case'case':t.push(o.form);if(o.form=='ITX')t.push('SFF');if(o.form=='mATX')t.push('Compact');if(o.form=='ATX')t.push('Standard');if(o.form=='E-ATX')t.push('Big');if(o.gl>=380)t.push('Long GPU');if(o.cl>=170)t.push('Tall cooler');if(o.rad>=360)t.push('360 radiator');if(o.rad>=420)t.push('420 radiator');if(o.psu=='SFX')t.push('SFX PSU');break;
+    case'fan':t.push(o.sz+'mm',o.pk>1?o.pk+'-pack':'Single');if(o.rgb)t.push('ARGB');if(o.sz>=140)t.push('Large');if(o.sz<=92)t.push('SFF');if(o.pk>=3)t.push('Bundle');break;
   }
   return t;
 }
@@ -1355,7 +970,7 @@ function dec(id){--C[id]<1&&delete C[id];R()}
 function del(id){delete C[id];R()}
 function pick(id){!MULTI[PM[id].cat]&&C[id]?del(id):add(id)}
 function load(id){C={};DB.pb.find(o=>o.id==id).parts.forEach(p=>C[p.id]=1);R();if(UI_STYLES[currentUI].scrollFx)setTimeout(scrollFX,100)}
-function clr(){C={};R();toast('Build cleared — wallets intact. 💸')}
+function clr(){C={};R();toast('Build cleared 💸')}
 
 function list(c,q,t){
   q=(q||'').toLowerCase();
@@ -1365,7 +980,6 @@ function list(c,q,t){
     if(q&&!(p.n+' '+p.tags.join(' ')).toLowerCase().includes(q))return false;
     if(t&&!p.tags.includes(t))return false;
     if(basicMode&&c!=='pb'){
-      // Basic mode: hide premium/niche parts
       if(p.p>1500&&c!=='gpu')return false;
       if(c==='gpu'&&p.p>1200)return false;
       if(c==='cpu'&&p.t>16)return false;
@@ -1394,12 +1008,7 @@ function sum(){
   return{c:cp?cp.c:0,t:cp?cp.t:0,v:gp?gp.v:0,r:rg,st:q2('ssd',p=>p.gb),nv,sa,fn,w,is:[...is],rq,tot:L.reduce((a,p)=>a+p.p*C[p.id],0),sc:[gp?gp.f*.7+(cp?cf*.3:1.5):cf*.3,gp?Math.min(10,gp.v/3):0,Math.min(5,cp?cp.t/6:0)]}
 }
 
-function copyQ(){
-  const s=sum();let t='PC BUILD QUOTE\n\n';
-  SLOTS.forEach(c=>LN().filter(p=>p.cat==c[0]).forEach(p=>t+=`${c[1]}: ${p.n} x${C[p.id]} - ${M(p.p*C[p.id])}\n`));
-  t+=`\nSubtotal ${M(s.tot)}\nHST 13% ${M(s.tot*.13)}\nTOTAL ${M(s.tot*1.13)}\n`;
-  navigator.clipboard?navigator.clipboard.writeText(t).then(()=>toast('Quote copied to clipboard!')):toast('Copy failed');
-}
+function copyQ(){const s=sum();let t='PC BUILD QUOTE\n\n';SLOTS.forEach(c=>LN().filter(p=>p.cat==c[0]).forEach(p=>t+=`${c[1]}: ${p.n} x${C[p.id]} - ${M(p.p*C[p.id])}\n`));t+=`\nSubtotal ${M(s.tot)}\nHST 13% ${M(s.tot*.13)}\nTOTAL ${M(s.tot*1.13)}\n`;navigator.clipboard?navigator.clipboard.writeText(t).then(()=>toast('Quote copied!')):toast('Copy failed')}
 
 function openBuilder(sk){document.body.className=sk||'';document.title='BuildMyPC';$('builder-app').classList.add('show');R()}
 function openStealthBuilder(silent){document.body.className='';document.title='Sales Order - ERP';$('ecs').innerHTML=CATS.map(c=>`<option value="${c[0]}">${c[1]}</option>`).join('');$('erp').classList.add('show');if(!silent)applyUI(2);R()}
@@ -1408,21 +1017,9 @@ function go(c){tab=c;tag='';$('q').value='';draw();if(UI_STYLES[currentUI].scrol
 function updateCompatPanel(s){
   const panel=$('compatPanel'),status=$('compatStatus'),msgs=$('compatMsgs');
   const bad=s.is.length+s.rq.length;
-  if(!Object.keys(C).length){
-    panel.className='compat-panel ok';
-    status.textContent='Ready to build';
-    msgs.innerHTML='<span class="m">Pick parts to get started. All compatibility checks happen live.</span>';
-    return;
-  }
-  if(bad){
-    panel.className='compat-panel bad';
-    status.textContent=bad+' issue'+(bad>1?'s':'')+' detected';
-    msgs.innerHTML=s.rq.map(m=>`<span class="m warn">⚠ ${m}</span>`).join('')+s.is.map(m=>`<span class="m err">✕ ${m}</span>`).join('');
-  } else {
-    panel.className='compat-panel ok';
-    status.textContent='All components compatible';
-    msgs.innerHTML='<span class="m">✓ Every part plays nice together. Ready to build.</span>';
-  }
+  if(!Object.keys(C).length){panel.className='compat-panel ok';status.textContent='Ready to build';msgs.innerHTML='<span class="m">Pick parts to get started.</span>';return}
+  if(bad){panel.className='compat-panel bad';status.textContent=bad+' issue'+(bad>1?'s':'')+' detected';msgs.innerHTML=s.rq.map(m=>`<span class="m warn">⚠ ${m}</span>`).join('')+s.is.map(m=>`<span class="m err">✕ ${m}</span>`).join('')}
+  else{panel.className='compat-panel ok';status.textContent='All components compatible';msgs.innerHTML='<span class="m">✓ Ready to build.</span>'}
 }
 
 function draw(){
@@ -1431,22 +1028,11 @@ function draw(){
   const ts=new Set();DB[tab].forEach(p=>p.tags.forEach(t=>ts.add(t)));
   $('tags').innerHTML=[''].concat([...ts]).join(',').split(',').map(t=>`<button class="tg ${t==tag?'on':''}" onclick="tag='${t}';draw()">${t||'All'}</button>`).join('');
   const L=list(tab,$('q').value,tag),T=p=>p.tags.slice(0,5).map(t=>`<span>${t}</span>`).join(''),qs=p=>`<span class="qtyc" onclick="event.stopPropagation()"><button onclick="dec('${p.id}')">−</button><span>${C[p.id]}</span><button onclick="add('${p.id}')">+</button></span>`;
-
-  $('grid').innerHTML=!L.length?'<p class="ps" style="color:var(--fg-muted);padding:24px">No matching parts found. Try clearing filters.</p>':tab=='pb'?['Gaming','Professional','Everyday'].map(g=>{
-    const a=L.filter(x=>x.g==g);
-    return a.length?`<h3 class="gh">${g}</h3>`+a.map(x=>`<div class="pc" onclick="load('${x.id}')"><div class="pn">${x.n}</div><div class="ps">${x.desc}</div><div class="pt">${T(x)}</div><div class="pf"><b>${M(x.p)}</b><span>Load configuration →</span></div></div>`).join(''):''
-  }).join(''):L.map(p=>{
-    const q=C[p.id]||0,b=q?'':iss(p);
-    return`<div class="pc ${q?'sel':''} ${b&&!q?'dis':''}" onclick="pick('${p.id}')"><div class="pn">${p.n}</div><div class="ps">${sp(p)}</div><div class="pt">${T(p)}</div><div class="pf"><b>${M(p.p)}</b>${q&&MULTI[p.cat]?qs(p):q?'<span style="color:var(--ok);font-weight:800">✓ In build</span>':'<span>+ Add</span>'}</div>${b&&!q?`<div class="pr">⚠ ${b}</div>`:''}</div>`
-  }).join('');
-
+  $('grid').innerHTML=!L.length?'<p class="ps" style="color:var(--fg-muted);padding:24px">No matching parts.</p>':tab=='pb'?['Gaming','Professional','Everyday'].map(g=>{const a=L.filter(x=>x.g==g);return a.length?`<h3 class="gh">${g}</h3>`+a.map(x=>`<div class="pc" onclick="load('${x.id}')"><div class="pn">${x.n}</div><div class="ps">${x.desc}</div><div class="pt">${T(x)}</div><div class="pf"><b>${M(x.p)}</b><span>Load →</span></div></div>`).join(''):''}).join(''):L.map(p=>{const q=C[p.id]||0,b=q?'':iss(p);return`<div class="pc ${q?'sel':''} ${b&&!q?'dis':''}" onclick="pick('${p.id}')"><div class="pn">${p.n}</div><div class="ps">${sp(p)}</div><div class="pt">${T(p)}</div><div class="pf"><b>${M(p.p)}</b>${q&&MULTI[p.cat]?qs(p):q?'<span style="color:var(--ok);font-weight:800">✓ In build</span>':'<span>+ Add</span>'}</div>${b&&!q?`<div class="pr">⚠ ${b}</div>`:''}</div>`}).join('');
   $('grid').scrollTop=gs;
   $('bp').innerHTML=`<div class="tot"><h2>Your Build</h2><span class="st" style="background:var(--bg-input);color:var(--fg-muted)">${n} item${n==1?'':'s'}</span></div>
-  <div class="cp ${s.is.length+s.rq.length?'':'ok'}">${s.is.length+s.rq.length?'<b>Compatibility notice:</b>'+s.rq.concat(s.is).map(m=>'• '+m).join('<br>'):'✓ All components fully compatible'}</div>`
-  +SLOTS.map(c=>{
-    const a=LN().filter(p=>p.cat==c[0]);
-    return a.length?a.map(p=>`<div class="sl"><span class="emoji">${c[2]}</span><div class="body"><small>${c[1]}</small>${p.n}</div>${MULTI[p.cat]?qs(p):''}<b>${M(p.p*C[p.id])}</b><button class="rm" onclick="del('${p.id}')">✕</button></div>`).join(''):`<div class="sl e" onclick="go('${c[0]}')"><span class="emoji">${c[2]}</span><div class="body"><small>${c[1]}</small>+ Select ${c[1].toLowerCase()}</div></div>`
-  }).join('')
+  <div class="cp ${s.is.length+s.rq.length?'':'ok'}">${s.is.length+s.rq.length?'<b>Compatibility:</b>'+s.rq.concat(s.is).map(m=>'• '+m).join('<br>'):'✓ All compatible'}</div>`
+  +SLOTS.map(c=>{const a=LN().filter(p=>p.cat==c[0]);return a.length?a.map(p=>`<div class="sl"><span class="emoji">${c[2]}</span><div class="body"><small>${c[1]}</small>${p.n}</div>${MULTI[p.cat]?qs(p):''}<b>${M(p.p*C[p.id])}</b><button class="rm" onclick="del('${p.id}')">✕</button></div>`).join(''):`<div class="sl e" onclick="go('${c[0]}')"><span class="emoji">${c[2]}</span><div class="body"><small>${c[1]}</small>+ Select ${c[1].toLowerCase()}</div></div>`}).join('')
   +`<div class="kp"><div><b>${s.c}C / ${s.t}T</b>Cores</div><div><b>${s.v}GB</b>VRAM</div><div><b>${s.r}GB</b>Memory</div><div><b>${fs(s.st)}</b>Storage</div><div><b>~${s.w}W</b>Est. Load</div><div><b>${S.psu?S.psu.w+'W':'-'}</b>PSU</div></div>`
   +[['Gaming',s.sc[0]],['AI / LLM',s.sc[1]],['Creator',s.sc[2]]].map(([l,v])=>`<div class="bar"><span class="lbl">${l}</span><i><u style="width:${Math.min(100,v*10)}%"></u></i><span class="val">${v.toFixed(1)}</span></div>`).join('')
   +`<div><div class="tot"><span style="color:var(--fg-muted)">Subtotal</span><span>${M(s.tot)}</span></div><div class="tot"><span style="color:var(--fg-muted)">HST 13%</span><span>${M(s.tot*.13)}</span></div><div class="tot"><span style="font-weight:800">Total</span><b>${M(s.tot*1.13)}</b></div></div>
@@ -1456,46 +1042,25 @@ function draw(){
 }
 
 function suggestBuild(){
-  const b=+$('budHdr').value||1500;
-  const u=$('uc').value;
+  const b=+$('budHdr').value||1500,u=$('uc').value;
   const UCR={g:/Gaming/,s:/Streaming/,v:/Video|Creator/,c:/CAD|Workstation/,a:/Audio/,i:/AI|LLM/,w:/Server/,p:/Plex|Media/,m:/Mining/,o:/Office/};
   const a=DB.pb.filter(x=>!u||UCR[u].test(x.n+' '+x.tags.join(' ')));
   const pl=a.length?a:DB.pb;
   const ok=pl.filter(x=>x.p<=b).sort((x,y)=>y.p-x.p)[0]||[...pl].sort((x,y)=>x.p-y.p)[0];
-  if(ok){load(ok.id);toast('Suggested: '+ok.n+' — quick, filling, not always gourmet. ✨')}
-  else toast('No prebuilt fits that budget. Try a bigger number.')
+  if(ok){load(ok.id);toast('Suggested: '+ok.n+' ✨')}else toast('No prebuilt fits that budget.')
 }
 
-let dgCat='cpu',dgPage=0;
-const DG_PER=15;
-function openComponents(){
-  $('dgCat').innerHTML=CATS.filter(c=>c[0]!=='pb').map(c=>`<option value="${c[0]}">${c[2]} ${c[1]}</option>`).join('');
-  $('dgCat').value=dgCat;dgPage=0;
-  document.getElementById('mComponents').classList.add('show');
-  renderComponents();
-}
+let dgCat='cpu',dgPage=0;const DG_PER=15;
+function openComponents(){$('dgCat').innerHTML=CATS.filter(c=>c[0]!=='pb').map(c=>`<option value="${c[0]}">${c[2]} ${c[1]}</option>`).join('');$('dgCat').value=dgCat;dgPage=0;document.getElementById('mComponents').classList.add('show');renderComponents()}
 function renderComponents(){
   dgCat=$('dgCat').value;
-  const q=($('dgQ').value||'').toLowerCase();
-  const sort=$('dgSort').value;
+  const q=($('dgQ').value||'').toLowerCase(),sort=$('dgSort').value;
   let L=list(dgCat,q,'');
   L.sort((a,b)=>{if(sort==='price-asc')return a.p-b.p;if(sort==='price-desc')return b.p-a.p;return a.n.localeCompare(b.n)});
   const total=L.length,pages=Math.max(1,Math.ceil(total/DG_PER));
   if(dgPage>=pages)dgPage=pages-1;
   const slice=L.slice(dgPage*DG_PER,dgPage*DG_PER+DG_PER);
-  const rows=slice.map(p=>{
-    const q2=C[p.id]||0,err=q2?'':iss(p);
-    const cls=q2?'sel':'';
-    const statusTxt=q2?`On order${q2>1?' ×'+q2:''}`:(err?'ERR':'OK');
-    const statusCls=q2?'ok':(err?'err':'ok');
-    return`<tr class="${cls}" onclick="toggleDG('${p.id}')">
-      <td><div class="nm">${p.n}</div><div class="spec">${sp(p)}</div></td>
-      <td>Local</td>
-      <td><div class="tags">${p.tags.slice(0,4).map(t=>`<span>${t}</span>`).join('')}</div></td>
-      <td class="status ${statusCls}">${q2?'✔ ':''}${statusTxt}${err?'<br>'+err:''}</td>
-      <td class="price">${M(p.p)}</td>
-    </tr>`;
-  }).join('');
+  const rows=slice.map(p=>{const q2=C[p.id]||0,err=q2?'':iss(p);const cls=q2?'sel':'';const statusTxt=q2?`On order${q2>1?' ×'+q2:''}`:(err?'ERR':'OK');const statusCls=q2?'ok':(err?'err':'ok');return`<tr class="${cls}" onclick="toggleDG('${p.id}')"><td><div class="nm">${p.n}</div><div class="spec">${sp(p)}</div></td><td>Local</td><td><div class="tags">${p.tags.slice(0,4).map(t=>`<span>${t}</span>`).join('')}</div></td><td class="status ${statusCls}">${q2?'✔ ':''}${statusTxt}${err?'<br>'+err:''}</td><td class="price">${M(p.p)}</td></tr>`}).join('');
   $('dgBody').innerHTML=`<table><thead><tr><th>Description</th><th>Location</th><th>Tags</th><th>Status</th><th style="text-align:right">Unit price</th></tr></thead><tbody>${rows||'<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--fg-muted)">No parts match.</td></tr>'}</tbody></table>`;
   $('dgCount').textContent=`${total} item${total===1?'':'s'}`;
   $('dgPager').innerHTML=`<button onclick="dgPage=Math.max(0,dgPage-1);renderComponents()">◀</button><button disabled>${dgPage+1} / ${pages}</button><button onclick="dgPage=Math.min(${pages-1},dgPage+1);renderComponents()">▶</button>`;
@@ -1505,78 +1070,32 @@ function toggleDG(id){pick(id);renderComponents();draw()}
 function openBenchmarks(){
   document.getElementById('mBench').classList.add('show');
   const s=sum();
-  const fps={
-    '1080p eSports':'~'+(Math.round(180+s.sc[0]*30+s.c*4)),
-    '1080p AAA':'~'+(Math.round(80+s.sc[0]*12+s.c*2)),
-    '1440p AAA':'~'+(Math.round(50+s.sc[0]*8+s.v*1.2)),
-    '4K AAA':'~'+(Math.round(25+s.sc[0]*6+s.v*1.5))
-  };
-  const render='~'+(1.2+ (10-Math.min(10,s.t/3))*.9).toFixed(1)+' min';
+  const fps={'1080p eSports':'~'+(Math.round(180+s.sc[0]*30+s.c*4)),'1080p AAA':'~'+(Math.round(80+s.sc[0]*12+s.c*2)),'1440p AAA':'~'+(Math.round(50+s.sc[0]*8+s.v*1.2)),'4K AAA':'~'+(Math.round(25+s.sc[0]*6+s.v*1.5))};
+  const render='~'+(1.2+(10-Math.min(10,s.t/3))*.9).toFixed(1)+' min';
   const mlTraining='~'+(s.v*0.35).toFixed(1)+' it/s';
   const score=Math.round(s.sc[0]*120+s.sc[1]*180+s.sc[2]*90+s.c*80+s.r*3);
-  document.getElementById('benchBody').innerHTML=`
-    <div class="bench-grid">
-      <div class="bench-card"><div class="lbl">Gaming Score</div><div class="val">${score}<span class="unit">pts</span></div><div class="desc">Combined CPU + GPU synthetic score.</div></div>
-      <div class="bench-card"><div class="lbl">Total Cores / Threads</div><div class="val">${s.c}<span class="unit">/ ${s.t}</span></div><div class="desc">Physical cores / logical threads.</div></div>
-      <div class="bench-card"><div class="lbl">VRAM</div><div class="val">${s.v}<span class="unit">GB</span></div><div class="desc">Graphics memory.</div></div>
-      <div class="bench-card"><div class="lbl">System RAM</div><div class="val">${s.r}<span class="unit">GB</span></div><div class="desc">Total memory.</div></div>
-    </div>
-    <h3 style="font-size:.95rem;margin:18px 0 10px;color:var(--fg-muted);letter-spacing:.1em;text-transform:uppercase">Estimated FPS</h3>
-    <div class="bench-grid">${Object.entries(fps).map(([k,v])=>`<div class="bench-card"><div class="lbl">${k}</div><div class="val">${v.replace('~','')}<span class="unit">FPS</span></div><div class="desc">Average, high settings.</div></div>`).join('')}</div>
-    <h3 style="font-size:.95rem;margin:18px 0 10px;color:var(--fg-muted);letter-spacing:.1em;text-transform:uppercase">Productivity</h3>
-    <div class="bench-grid">
-      <div class="bench-card"><div class="lbl">4K Video Export</div><div class="val">${render}</div><div class="desc">Adobe Premiere, H.265, 5-min clip.</div></div>
-      <div class="bench-card"><div class="lbl">AI Training</div><div class="val">${mlTraining}</div><div class="desc">Stable Diffusion fine-tune loop.</div></div>
-    </div>`;
+  document.getElementById('benchBody').innerHTML=`<div class="bench-grid"><div class="bench-card"><div class="lbl">Gaming Score</div><div class="val">${score}<span class="unit">pts</span></div><div class="desc">Combined CPU + GPU.</div></div><div class="bench-card"><div class="lbl">Cores / Threads</div><div class="val">${s.c}<span class="unit">/ ${s.t}</span></div><div class="desc">Physical / logical.</div></div><div class="bench-card"><div class="lbl">VRAM</div><div class="val">${s.v}<span class="unit">GB</span></div><div class="desc">Graphics memory.</div></div><div class="bench-card"><div class="lbl">System RAM</div><div class="val">${s.r}<span class="unit">GB</span></div><div class="desc">Total memory.</div></div></div><h3 style="font-size:.85rem;margin:14px 0 8px;color:var(--fg-muted);letter-spacing:.08em;text-transform:uppercase">Estimated FPS</h3><div class="bench-grid">${Object.entries(fps).map(([k,v])=>`<div class="bench-card"><div class="lbl">${k}</div><div class="val">${v.replace('~','')}<span class="unit">FPS</span></div><div class="desc">Average, high settings.</div></div>`).join('')}</div><h3 style="font-size:.85rem;margin:14px 0 8px;color:var(--fg-muted);letter-spacing:.08em;text-transform:uppercase">Productivity</h3><div class="bench-grid"><div class="bench-card"><div class="lbl">4K Export</div><div class="val">${render}</div><div class="desc">5-min clip, H.265.</div></div><div class="bench-card"><div class="lbl">AI Training</div><div class="val">${mlTraining}</div><div class="desc">Stable Diffusion loop.</div></div></div>`;
 }
 
-function addToAmazon(){
-  const L=LN();
-  if(!L.length){toast('Add parts first.');return}
-  const kw=L.map(p=>p.n.split(' ').slice(0,4).join('+')).join('%20');
-  window.open('https://www.amazon.ca/s?k='+kw,'_blank');
-  toast('Opening Amazon search... 📦');
-}
+function addToAmazon(){const L=LN();if(!L.length){toast('Add parts first.');return}const kw=L.map(p=>p.n.split(' ').slice(0,4).join('+')).join('%20');window.open('https://www.amazon.ca/s?k='+kw,'_blank');toast('Opening Amazon 📦')}
+function saveBuild(){const ids=C;try{const hash=btoa(JSON.stringify(ids)).replace(/=+$/,'');history.replaceState(null,'','#'+hash)}catch(e){}const url=location.href;navigator.clipboard?navigator.clipboard.writeText(url).then(()=>toast('Link copied!')):prompt('Copy this link:',url)}
+function openCompare(){document.getElementById('mCompare').classList.add('show');const cur=sum();const rows=DB.pb.map(x=>{const diff=Math.round(x.p-cur.tot);return`<div class="compare-card" onclick="load('${x.id}');closeModal('mCompare')"><div class="title">${x.n}</div><div class="desc">${x.desc}</div><div class="price">${M(x.p)} <span style="font-size:.7rem;color:var(--${diff>0?'warn':'ok'})">${diff>0?'+':''}${M(diff)}</span></div></div>`}).join('');document.getElementById('compareBody').innerHTML=rows}
 
-function saveBuild(){
-  const ids=C;
-  try{const hash=btoa(JSON.stringify(ids)).replace(/=+$/,'');history.replaceState(null,'','#'+hash);}catch(e){}
-  const url=location.href;
-  navigator.clipboard?navigator.clipboard.writeText(url).then(()=>toast('Build saved — link copied to clipboard!')):prompt('Copy this link:',url);
-}
-
-function openCompare(){
-  document.getElementById('mCompare').classList.add('show');
-  const cur=sum();
-  const rows=DB.pb.map(x=>{
-    const diff=Math.round(x.p-cur.tot);
-    return`<div class="compare-card" onclick="load('${x.id}');closeModal('mCompare')">
-      <div class="title">${x.n}</div>
-      <div class="desc">${x.desc}</div>
-      <div class="price">${M(x.p)} <span style="font-size:.75rem;color:var(--${diff>0?'warn':'ok'})">${diff>0?'+':''}${M(diff)}</span></div>
-    </div>`;
-  }).join('');
-  document.getElementById('compareBody').innerHTML=rows;
-}
-
-/* Tour */
 const TOUR_STEPS=[
-  {target:'.brand',title:'Welcome',body:'Pick a budget, tap Suggest a Build, and we fill in a full PC that fits together.'},
+  {target:'.brand',title:'Welcome',body:'Pick a budget, tap Suggest, and we fill in a full PC.'},
   {target:'#budHdr',title:'Budget',body:'Type your wallet-friendly ceiling.'},
-  {target:'#uc',title:'Use-Case Filter',body:'Gaming? Streaming? CAD? We filter accordingly.'},
-  {target:'.action-bar button.suggest',title:'Suggest a Build',body:'One tap fills the whole cart. Quick, filling, not always gourmet.'},
-  {target:'.action-bar button.amazon',title:'Add to Cart',body:'Bundles everything into an Amazon search.'},
-  {target:'.action-bar button.danger',title:'Clear Build',body:'The big red button. Erases everything.'},
-  {target:'#compatPanel',title:'Compatibility Checker',body:'Live build health — sockets, RAM, PSU, clearances.'},
-  {target:'#bp',title:'Your Cart',body:'Live total, performance estimates, and Copy Quote when done.'}
+  {target:'#uc',title:'Use-Case',body:'Gaming? Streaming? CAD? We filter.'},
+  {target:'.action-bar button.suggest',title:'Suggest',body:'One tap fills the cart.'},
+  {target:'.action-bar button.amazon',title:'Add to Cart',body:'Bundles into an Amazon search.'},
+  {target:'.action-bar button.danger',title:'Clear',body:'Erases everything.'},
+  {target:'#compatPanel',title:'Compatibility',body:'Live build health.'},
+  {target:'#bp',title:'Cart',body:'Live total, estimates, Copy Quote.'}
 ];
 let tourIdx=0;
 function startTour(){tourIdx=0;document.getElementById('tourOverlay').classList.add('show');showStep()}
 function showStep(){
-  const step=TOUR_STEPS[tourIdx];
-  if(!step){endTour();return}
-  const el=document.querySelector(step.target);
-  if(!el){tourIdx++;showStep();return}
+  const step=TOUR_STEPS[tourIdx];if(!step){endTour();return}
+  const el=document.querySelector(step.target);if(!el){tourIdx++;showStep();return}
   el.scrollIntoView({block:'center',behavior:'smooth'});
   setTimeout(()=>{
     const r=el.getBoundingClientRect();
@@ -1584,13 +1103,8 @@ function showStep(){
     spot.style.left=(r.left-6)+'px';spot.style.top=(r.top-6)+'px';
     spot.style.width=(r.width+12)+'px';spot.style.height=(r.height+12)+'px';
     const tip=document.getElementById('tourTip');
-    tip.innerHTML=`<h4>${step.title}</h4><p>${step.body}</p>
-      <div class="foot"><span class="count">${tourIdx+1} / ${TOUR_STEPS.length}</span>
-      <div class="btns">${tourIdx>0?'<button onclick="tourIdx--;showStep()">Back</button>':''}
-      <button class="primary" onclick="tourIdx++;showStep()">${tourIdx===TOUR_STEPS.length-1?'Finish':'Next'}</button>
-      <button onclick="endTour()">Skip</button></div></div>`;
-    const tr=tip.getBoundingClientRect();
-    let top=r.bottom+14,left=r.left;
+    tip.innerHTML=`<h4>${step.title}</h4><p>${step.body}</p><div class="foot"><span class="count">${tourIdx+1} / ${TOUR_STEPS.length}</span><div class="btns">${tourIdx>0?'<button onclick="tourIdx--;showStep()">Back</button>':''}<button class="primary" onclick="tourIdx++;showStep()">${tourIdx===TOUR_STEPS.length-1?'Finish':'Next'}</button><button onclick="endTour()">Skip</button></div></div>`;
+    const tr=tip.getBoundingClientRect();let top=r.bottom+14,left=r.left;
     if(top+tr.height>window.innerHeight-20)top=r.top-tr.height-14;
     if(left+tr.width>window.innerWidth-20)left=window.innerWidth-tr.width-20;
     if(left<10)left=10;
@@ -1603,12 +1117,12 @@ function endTour(){document.getElementById('tourOverlay').classList.remove('show
 function eg(c){ec=c;$('eq').value='';edraw()}
 function edraw(){
   const s=sum(),n=ids().length,L=list(ec,$('eq').value,''),eg_=document.querySelector('.egrid'),gs=eg_.scrollTop,bad=s.rq.concat(s.is),lk=(f,id,t)=>`<span class="lk" onclick="event.stopPropagation();${f}('${id}')">${t}</span>`;
-  $('ealert').textContent=n?`${n} line${n>1?'s':''} on order${s.is.length?' - '+s.is.length+' issue(s)':''}`:'0 items on order';
+  $('ealert').textContent=n?`${n} line${n>1?'s':''} on order${s.is.length?' - '+s.is.length+' issue(s)':''}`:'0 items';
   $('ecs').value=ec;$('ett').textContent='Component Picking Report - '+CATS.find(c=>c[0]==ec)[1];$('esb').innerHTML='<input value="SONL04011460" readonly>'+['Employee','Product Manage','Sales Promotion','Purchase','Account','Customer Manage','Sales','Inventory','Service','System Setting','Production'].map(x=>`<div class="esi"><span class="dot" style="background:#8fc1ea"></span>${x}</div>`).join('')+CATS.map(c=>`<div class="esi ${c[0]==ec?'on':''}" onclick="eg('${c[0]}')"><span class="dot" style="background:${N[c[0]]?'#4c4':'#fc3'}"></span>${c[1]}</div>`).join('');
-  $('et').innerHTML=!L.length?'<tr><td style="padding:16px;text-align:center">0 records returned.</td></tr>':ec=='pb'?'<tr><th></th><th>Template</th><th>Group</th><th>Main components</th><th class="r">Est. price</th></tr>'+L.map((x,i)=>`<tr onclick="load('${x.id}')"><td class="n">${i+1}</td><td><b>${x.n}</b><br>${x.desc}</td><td>${x.g}</td><td>${x.parts.filter(p=>p.cat=='cpu'||p.cat=='gpu').map(p=>p.n).join(' + ')}</td><td class="r">${x.p.toFixed(2)}</td></tr>`).join(''):'<tr><th></th><th>Item description</th><th>Location</th><th>Key specs</th><th>Tags</th><th>Status</th><th class="r">Unit price</th></tr>'+L.map((p,i)=>{const q=C[p.id]||0,b=q?'':iss(p);return`<tr class="${q?'sel':''}" onclick="pick('${p.id}')"><td class="n">${i+1}</td><td>${p.n}</td><td>Local</td><td>${sp(p)}</td><td>${p.tags.join(', ')}</td><td class="${b?'err':''}">${q?'On order'+(q>1?' x'+q:''):b?'ERR: '+b:'OK'}</td><td class="r">${p.p.toFixed(2)}</td></tr>`}).join('');
+  $('et').innerHTML=!L.length?'<tr><td style="padding:16px;text-align:center">0 records.</td></tr>':ec=='pb'?'<tr><th></th><th>Template</th><th>Group</th><th>Components</th><th class="r">Est. price</th></tr>'+L.map((x,i)=>`<tr onclick="load('${x.id}')"><td class="n">${i+1}</td><td><b>${x.n}</b><br>${x.desc}</td><td>${x.g}</td><td>${x.parts.filter(p=>p.cat=='cpu'||p.cat=='gpu').map(p=>p.n).join(' + ')}</td><td class="r">${x.p.toFixed(2)}</td></tr>`).join(''):'<tr><th></th><th>Item</th><th>Location</th><th>Key specs</th><th>Tags</th><th>Status</th><th class="r">Unit price</th></tr>'+L.map((p,i)=>{const q=C[p.id]||0,b=q?'':iss(p);return`<tr class="${q?'sel':''}" onclick="pick('${p.id}')"><td class="n">${i+1}</td><td>${p.n}</td><td>Local</td><td>${sp(p)}</td><td>${p.tags.join(', ')}</td><td class="${b?'err':''}">${q?'On order'+(q>1?' x'+q:''):b?'ERR: '+b:'OK'}</td><td class="r">${p.p.toFixed(2)}</td></tr>`}).join('');
   eg_.scrollTop=gs;$('ecnt').textContent=`View 1 - ${L.length} of ${L.length}`;
   const ln=SLOTS.flatMap(c=>LN().filter(p=>p.cat==c[0]).map(p=>[c,p]));
-  $('eord').innerHTML=`<div class="ett">Sales Order Lines - SONL04011460</div><table><tr><th></th><th>Description</th><th>Category</th><th>Qty</th><th class="r">Unit price</th><th class="r">Line total</th><th></th></tr>${ln.map(([c,p],i)=>`<tr><td class="n">${i+1}</td><td>${p.n}</td><td>${c[1]}</td><td>${MULTI[p.cat]?lk('dec',p.id,'[ - ]')+' '+C[p.id]+' '+lk('add',p.id,'[ + ]'):1}</td><td class="r">${p.p.toFixed(2)}</td><td class="r">${(p.p*C[p.id]).toFixed(2)}</td><td class="lk" onclick="del('${p.id}')">[ Remove ]</td></tr>`).join('')||'<tr><td colspan="7" style="text-align:center;color:#777">No lines yet. Click a row above to add.</td></tr>'}</table><div class="esum">${s.c}C / ${s.t}T | ${s.v}GB VRAM | ${s.r}GB RAM | Subtotal ${M(s.tot)} &nbsp; Total ${M(s.tot*1.13)} &nbsp; <button class="ebtn" onclick="copyQ()">Generate PO</button>${bad.map(m=>`<div class="err">ERR: ${m}</div>`).join('')}</div>`;
+  $('eord').innerHTML=`<div class="ett">Sales Order Lines - SONL04011460</div><table><tr><th></th><th>Description</th><th>Category</th><th>Qty</th><th class="r">Unit price</th><th class="r">Line total</th><th></th></tr>${ln.map(([c,p],i)=>`<tr><td class="n">${i+1}</td><td>${p.n}</td><td>${c[1]}</td><td>${MULTI[p.cat]?lk('dec',p.id,'[ - ]')+' '+C[p.id]+' '+lk('add',p.id,'[ + ]'):1}</td><td class="r">${p.p.toFixed(2)}</td><td class="r">${(p.p*C[p.id]).toFixed(2)}</td><td class="lk" onclick="del('${p.id}')">[ Remove ]</td></tr>`).join('')||'<tr><td colspan="7" style="text-align:center;color:#777">No lines yet.</td></tr>'}</table><div class="esum">${s.c}C / ${s.t}T | ${s.v}GB VRAM | ${s.r}GB RAM | Subtotal ${M(s.tot)} &nbsp; Total ${M(s.tot*1.13)} &nbsp; <button class="ebtn" onclick="copyQ()">Generate PO</button>${bad.map(m=>`<div class="err">ERR: ${m}</div>`).join('')}</div>`;
 }
 
 /* Dino */
@@ -1617,30 +1131,88 @@ let run=0,dy=0,vy=0,sc=0,cac=[280,520],taps=0;
 function frame(){g.clearRect(0,0,420,110);g.fillStyle='#535353';if(run){sc+=.15;cac=cac.map(x=>x<-30?x+500+Math.random()*200:x-5)}if(vy||dy){dy+=vy;vy-=.9;if(dy<=0){dy=0;vy=0}}SP.forEach((r,y)=>[...r].forEach((c,x)=>c=='#'&&g.fillRect(20+x*2,70-dy+y*2,2,2)));cac.forEach(x=>{g.fillRect(x,74,6,25);g.fillRect(x-5,82,5,4);g.fillRect(x-5,82,3,11);g.fillRect(x+6,79,5,4);g.fillRect(x+8,71,3,11)});g.fillRect(0,100,420,1.2);g.font='12px monospace';g.fillText(String(Math.floor(sc)).padStart(5,'0'),380,16);requestAnimationFrame(frame)}
 frame();
 dc.addEventListener('click',e=>{e.stopPropagation();run=1;if(!dy&&!vy)vy=11;taps++;if(taps>=20){taps=0;$('pw').classList.add('show');$('pi').value='';$('pi').focus()}});
-function closePw(){$('pw').classList.remove('show')}$('pi').addEventListener('keydown',e=>{if(e.key=='Enter')tryPw();if(e.key=='Escape')closePw()});
+function closePw(){$('pw').classList.remove('show')}
+$('pi').addEventListener('keydown',e=>{if(e.key=='Enter')tryPw();if(e.key=='Escape')closePw()});
 function tryPw(){
   const val=$('pi').value.trim();$('pw').classList.remove('show');
   const map={'Password1':1,'Password2':2,'Password3':3,'Password4':4,'Password5':5,'Password6':6,'Password7':7,'Password8':8,'Password9':9,'Password10':10,'Password11':11,'Password12':12,'Password13':13,'Password14':14,'Password15':15};
-  if(map[val]){
-    const n=map[val];
-    $('dino').classList.add('gone');setTimeout(()=>$('dino').style.display='none',500);
-    applyUI(n,false);const s=UI_STYLES[n];
-    if(s.erp){document.getElementById('builder-app').classList.remove('show');openStealthBuilder(true)}
-    else{document.getElementById('erp').classList.remove('show');document.getElementById('builder-app').classList.add('show');draw()}
-    showBadge(n);startMusic();
-    setTimeout(()=>{if(!s.erp&&n<=3)startTour()},900);
-  } else toast('Invalid password.');
+  if(map[val]){const n=map[val];$('dino').classList.add('gone');setTimeout(()=>$('dino').style.display='none',500);applyUI(n,false);const s=UI_STYLES[n];if(s.erp){document.getElementById('builder-app').classList.remove('show');openStealthBuilder(true)}else{document.getElementById('erp').classList.remove('show');document.getElementById('builder-app').classList.add('show');draw()}showBadge(n);startMusic();setTimeout(()=>{if(!s.erp&&n<=3)startTour()},900)}
+  else toast('Invalid password.')
 }
 
-/* Load build from URL */
-function loadFromHash(){
-  if(!location.hash)return;
-  try{
-    const data=JSON.parse(atob(location.hash.slice(1)));
-    Object.keys(data).forEach(k=>{if(PM[k])C[k]=data[k]});
-    R();
-  }catch(e){}
+/* Load from hash */
+function loadFromHash(){if(!location.hash)return;try{const data=JSON.parse(atob(location.hash.slice(1)));Object.keys(data).forEach(k=>{if(PM[k])C[k]=data[k]});R()}catch(e){}}
+
+/* ============================================================
+   DISGUISE MODE — type google/amazon/netflix/github/etc
+   anywhere on the page and it transforms
+   ============================================================ */
+const DISGUISES={
+  google:{title:'Google',logo:'<span style="color:#4285f4">G</span><span style="color:#ea4335">o</span><span style="color:#fbbc05">o</span><span style="color:#4285f4">g</span><span style="color:#34a853">l</span><span style="color:#ea4335">e</span>',placeholder:'Search Google or type a URL',results:[
+    {t:'BuildMyPC - AI PC Builder',u:'buildmypc.dev',d:'Build a custom PC with AI-powered suggestions, live compatibility checks, and one-tap shopping.'},
+    {t:'PC Part Picker - Best PC Builder',u:'pcpartpicker.com',d:'Build your dream PC with real-time price tracking from dozens of retailers.'},
+    {t:'Tom\'s Hardware - Best PC Builds 2026',u:'tomshardware.com',d:'Expert-curated builds for every budget, from $500 office PCs to $5000 gaming rigs.'},
+    {t:'Wikipedia - Personal Computer',u:'en.wikipedia.org',d:'A personal computer is a multi-purpose microcomputer whose size, capabilities, and price make it feasible for individual use.'}
+  ]},
+  amazon:{title:'Amazon.ca',logo:'amazon',placeholder:'Search Amazon.ca',results:[
+    {t:'AMD Ryzen 7 9800X3D - Amazon.ca',u:'amazon.ca/dp/B0DKFXBLC1',d:'$619.99 · In Stock · Ships within 24 hours. Free delivery on orders over $35.'},
+    {t:'Corsair Vengeance 32GB DDR5-6000 - Amazon.ca',u:'amazon.ca/dp/B0C4Z9LDGH',d:'$179.99 · In Stock. Compatible with AMD AM5 and Intel LGA1851 platforms.'},
+    {t:'Corsair RM1000x 1000W Power Supply - Amazon.ca',u:'amazon.ca/dp/B08R5J4M5D',d:'$269.99 · In Stock. 80+ Gold certified, fully modular, 10-year warranty.'},
+    {t:'NVIDIA GeForce RTX 5080 16GB - Amazon.ca',u:'amazon.ca/dp/B0DGHYNF1L',d:'$1,599.99 · Usually ships within 3-5 days. Free delivery.'}
+  ]},
+  netflix:{title:'Netflix',logo:'<span style="color:#e50914;font-weight:900">NETFLIX</span>',placeholder:'Search shows, movies, genres',results:[
+    {t:'The Computer Chronicles (1983-2002)',u:'netflix.com/title/80201045',d:'98% Match. A classic documentary series covering the evolution of personal computing.'},
+    {t:'Silicon Valley',u:'netflix.com/title/80019312',d:'95% Match. Comedy series about the cutthroat world of tech startups.'},
+    {t:'Halt and Catch Fire',u:'netflix.com/title/70258993',d:'92% Match. Drama about the personal computer boom of the 1980s.'},
+    {t:'The Social Dilemma',u:'netflix.com/title/81254224',d:'89% Match. Documentary about the impact of social media on society.'}
+  ]},
+  github:{title:'GitHub',logo:'<span style="color:#000;font-weight:900">GitHub</span>',placeholder:'Search or jump to...',results:[
+    {t:'hillierandrew/wtf',u:'github.com/hillierandrew/wtf',d:'Personal website with AI PC builder, ERP mode, 15 UI themes, and easter eggs. ★ 42'},
+    {t:'microsoft/vscode',u:'github.com/microsoft/vscode',d:'Visual Studio Code. ★ 165k · TypeScript'},
+    {t:'facebook/react',u:'github.com/facebook/react',d:'The library for web and native user interfaces. ★ 232k · JavaScript'},
+    {t:'torvalds/linux',u:'github.com/torvalds/linux',d:'Linux kernel source tree. ★ 184k · C'}
+  ]},
+  kijiji:{title:'Kijiji',logo:'<span style="color:#3e9944;font-weight:900">kijiji</span>',placeholder:'Search kijiji.ca',results:[
+    {t:'Gaming PC - Ryzen 7 9800X3D + RTX 5080 - $2,800',u:'kijiji.ca/v-desktop-computers/toronto',d:'Barely used, still under warranty. Comes with Corsair 32GB DDR5 and 2TB NVMe.'},
+    {t:'Dell Optiplex 7050 - $180',u:'kijiji.ca/v-desktop-computers/mississauga',d:'i5-7500, 8GB RAM, 256GB SSD. Great office starter PC.'},
+    {t:'Custom Water-Cooled Build - $4,500',u:'kijiji.ca/v-desktop-computers/north-york',d:'Ryzen 9 9950X3D + RTX 4090, custom loop, RGB everything.'},
+    {t:'Vintage IBM PC 5150 - $650',u:'kijiji.ca/v-desktop-computers/vaughan',d:'Working condition. Collectible. Includes original keyboard and CRT monitor.'}
+  ]},
+  ebay:{title:'eBay',logo:'<span style="color:#e53238">e</span><span style="color:#0064d2">b</span><span style="color:#f5af02">a</span><span style="color:#86b817">y</span>',placeholder:'Search for anything',results:[
+    {t:'AMD Ryzen 9 9950X3D - Brand New',u:'ebay.ca/itm/385829xxx',d:'$929.98 · Free shipping · 1,847 sold. 99.2% positive feedback.'},
+    {t:'Vintage Intel Pentium 4 - Collectible',u:'ebay.ca/itm/295712xxx',d:'$24.99 · 3 bids. Working condition, socket 478.'},
+    {t:'NVIDIA RTX 3090 Founders Edition - Used',u:'ebay.ca/itm/175598xxx',d:'$549.00 · Buy It Now. Good condition, mining-free.'},
+    {t:'Corsair Dominator Titanium 64GB DDR5 - New',u:'ebay.ca/itm/195785xxx',d:'$1,857.99 · Free shipping · Top Rated Plus seller.'}
+  ]}
+};
+let disguiseOpen=false;
+function showDisguise(key){
+  const d=DISGUISES[key];
+  if(!d)return;
+  disguiseOpen=true;
+  const el=document.getElementById('disguise');
+  el.innerHTML=`
+    <button class="dis-close" onclick="closeDisguise()">✕</button>
+    <div class="dis-header">
+      <div class="dis-logo">${d.logo}</div>
+      <input class="dis-search" placeholder="${d.placeholder}" autofocus>
+    </div>
+    <div class="dis-body">
+      ${d.results.map(r=>`<div class="dis-result"><h3>${r.t}</h3><div class="url">${r.u}</div><div class="desc">${r.d}</div></div>`).join('')}
+    </div>`;
+  el.classList.add('show');
 }
+function closeDisguise(){document.getElementById('disguise').classList.remove('show');disguiseOpen=false}
+
+/* Global key buffer for disguise words */
+let keyBuf='';
+document.addEventListener('keydown',e=>{
+  if(disguiseOpen&&e.key==='Escape'){closeDisguise();return}
+  if(e.key.length===1&&/[a-z]/i.test(e.key)){
+    keyBuf=(keyBuf+e.key.toLowerCase()).slice(-20);
+    for(const key in DISGUISES){if(keyBuf.includes(key)){showDisguise(key);keyBuf='';return}}
+  }
+});
 
 /* Init */
 applyUI(1,false);
@@ -1648,10 +1220,10 @@ setTimeout(()=>{
   document.querySelectorAll('.action-bar button').forEach(b=>{
     const t=b.textContent;
     if(t.includes('Suggest'))b.onclick=suggestBuild;
-    else if(t.includes('Add Components'))b.onclick=openComponents;
+    else if(t.includes('Add Parts')||t.includes('Add Components'))b.onclick=openComponents;
     else if(t.includes('Benchmarks'))b.onclick=openBenchmarks;
     else if(t.includes('Clear'))b.onclick=clr;
-    else if(t.includes('Amazon')||t.includes('Add to Cart'))b.onclick=addToAmazon;
+    else if(t.includes('Amazon')||t.includes('Cart'))b.onclick=addToAmazon;
     else if(t.includes('Save'))b.onclick=saveBuild;
     else if(t.includes('Compare'))b.onclick=openCompare;
     else if(t.includes('Tour'))b.onclick=startTour;
@@ -1667,6 +1239,7 @@ window.cycleTheme=cycleTheme;window.cycleLayout=cycleLayout;
 window.copyQ=copyQ;window.tryPw=tryPw;window.closePw=closePw;
 window.openStealthBuilder=openStealthBuilder;
 window.showStep=showStep;
+window.showDisguise=showDisguise;window.closeDisguise=closeDisguise;
 </script>
 </body>
 </html>
