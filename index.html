@@ -9,67 +9,82 @@
   * { box-sizing: border-box; }
   html, body { margin: 0; min-height: 100%; background: #fff; }
   body { color: #5f6368; font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-  button, input { font: inherit; }
-  button { cursor: pointer; }
+  button, input { font: inherit; color: inherit; }
+  button { cursor: pointer; background: none; border: 0; padding: 0; }
   #gate { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; background: #fff; }
   .offline { width: min(540px, 100%); }
   #dino { display: block; width: min(100%, 420px); height: auto; background: #fff; touch-action: manipulation; }
   .offline h1 { font-weight: 500; font-size: 1.6em; color: #202124; margin: 18px 0 14px; }
   .offline ul { margin: 8px 0 16px; padding-left: 28px; }
-  .secret { background: none; border: 0; padding: 0; margin: 0; color: inherit; font: inherit; }
+  .secret { color: inherit; font: inherit; }
   .code { color: #80868b; font-size: 13px; }
 
-  #app { display: none; min-height: 100vh; background: #f5f5f7; color: #1d1d1f; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Helvetica, Arial, sans-serif; }
+  #app { display: none; min-height: 100vh; background: #fff; color: #1d1d1f; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
   #app.on { display: block; }
-  .nav { position: sticky; top: 0; z-index: 4; height: 52px; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; background: rgba(245,245,247,.86); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(0,0,0,.06); }
-  .nav b { font-size: 17px; letter-spacing: -0.02em; }
-  .nav button { background: none; border: 0; color: #1d1d1f; font-size: 17px; min-height: 44px; padding: 0 4px; }
-  .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 22px 80px; }
-  .wrap h1 { font-size: clamp(40px, 6vw, 56px); font-weight: 600; letter-spacing: -0.035em; margin: 8px 0 6px; }
-  .lede { color: #6e6e73; font-size: 19px; margin: 0 0 28px; }
-  .grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
-  .pcard, .detail { background: #fff; border-radius: 24px; text-align: center; padding: 28px 22px 26px; }
-  .pcard h2, .detail h2 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; margin: 8px 0 4px; }
-  .pcard p, .detail .line { color: #6e6e73; margin: 0; font-size: 17px; }
-  .pcard .cost, .detail .cost { color: #1d1d1f; font-size: 17px; margin: 8px 0 16px; }
-  .add, .auth button[type="submit"] { background: #0071e3; color: #fff; border: 0; border-radius: 980px; min-height: 44px; padding: 0 20px; font-size: 17px; }
-  .detail .add { display: block; margin: 28px auto 0; }
-  .auth p { user-select: none; }
-  .back { background: none; border: 0; color: #0066cc; font-size: 17px; min-height: 44px; padding: 0; }
-  .specs { text-align: left; max-width: 460px; margin: 8px auto 22px; }
-  .specs div { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-top: 1px solid #e8e8ed; font-size: 17px; }
+  .gnav { position: sticky; top: 0; z-index: 5; height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; background: rgba(251,251,253,.86); backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid rgba(0,0,0,.08); font-size: 12px; letter-spacing: -0.01em; }
+  .gnav button { font-size: 12px; min-height: 44px; color: #1d1d1f; }
+  .band { background: #f5f5f7; padding: 64px 0 28px; }
+  .band h1 { font-size: 40px; line-height: 1.1; font-weight: 600; letter-spacing: -0.02em; text-align: center; margin: 0 0 36px; }
+  .lineup { display: grid; grid-auto-flow: column; grid-auto-columns: 78vw; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 0 22px 56px; scrollbar-color: #d2d2d7 transparent; }
+  .unit { scroll-snap-align: center; text-align: center; padding: 0 8px 8px; min-width: 0; }
+  .unit h2 { font-size: 24px; font-weight: 600; letter-spacing: -0.015em; margin: 18px 0 0; }
+  .unit .which { color: #6e6e73; font-size: 14px; margin: 4px 0 0; min-height: 2.6em; }
+  .unit .from { font-size: 14px; margin: 10px 0 8px; }
+  .links { display: flex; justify-content: center; gap: 18px; }
+  .links button { color: #0066cc; font-size: 14px; min-height: 44px; }
+  .links button:hover { text-decoration: underline; }
+  svg.machine { width: min(280px, 100%); height: auto; display: block; margin: 0 auto; }
+  .buygrid { background: #fff; }
+  .config { padding: 28px 22px 120px; max-width: 520px; }
+  .config h1 { font-size: 40px; line-height: 1.05; font-weight: 600; letter-spacing: -0.025em; margin: 0; }
+  .config .price { font-size: 17px; margin: 8px 0 0; }
+  .config .which { color: #6e6e73; font-size: 14px; margin: 6px 0 28px; }
+  .config h3 { font-size: 21px; font-weight: 600; letter-spacing: -0.015em; margin: 28px 0 10px; }
+  .opt { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 16px; text-align: left; background: #fff; border: 1px solid #d2d2d7; border-radius: 12px; min-height: 72px; padding: 14px 16px; margin: 0 0 10px; }
+  .opt.on { border: 2px solid #0071e3; padding: 13px 15px; }
+  .opt b { display: block; font-size: 17px; font-weight: 600; }
+  .opt span { display: block; color: #6e6e73; font-size: 12px; margin-top: 2px; }
+  .opt em { font-style: normal; font-size: 14px; white-space: nowrap; }
+  .specs { margin-top: 8px; }
+  .specs div { display: flex; justify-content: space-between; gap: 16px; padding: 11px 0; border-top: 1px solid #d2d2d7; font-size: 14px; }
   .specs small { color: #6e6e73; }
-  .choice { margin: 18px auto 0; max-width: 460px; text-align: left; }
-  .choice h3 { font-size: 17px; margin: 0 0 8px; }
-  .pills { display: flex; flex-wrap: wrap; gap: 8px; }
-  .pills button { min-height: 44px; padding: 0 16px; border-radius: 980px; border: 1px solid #d2d2d7; background: #fff; color: #1d1d1f; }
-  .pills button.on { border: 2px solid #0071e3; color: #0071e3; }
-  .fine { color: #6e6e73; font-size: 12px; text-align: center; margin-top: 22px; }
-  .scrim { position: fixed; inset: 0; background: rgba(0,0,0,.28); z-index: 6; }
-  .bag { position: fixed; z-index: 7; top: 0; right: 0; bottom: 0; width: min(420px, 100%); background: #fff; color: #1d1d1f; padding: 22px 22px calc(22px + env(safe-area-inset-bottom)); overflow: auto; box-shadow: -8px 0 30px rgba(0,0,0,.08); }
-  .bag h2 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; margin: 12px 0 18px; }
-  .item { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 14px 0; border-top: 1px solid #e8e8ed; }
-  .item b { display: block; font-size: 17px; }
-  .item span { color: #6e6e73; font-size: 14px; }
-  .item button { background: none; border: 0; color: #0066cc; min-height: 44px; }
-  .total { display: flex; justify-content: space-between; font-size: 21px; font-weight: 600; margin-top: 12px; }
-  .cover { position: fixed; inset: 0; z-index: 20; background: rgba(0,0,0,.25); display: flex; align-items: center; justify-content: center; padding: 20px; }
-  .auth { width: min(380px, 100%); background: #fff; color: #1d1d1f; border-radius: 18px; padding: 28px 24px 24px; box-shadow: 0 12px 40px rgba(0,0,0,.12); }
-  .auth h2 { font: 600 28px/1.1 -apple-system, "Segoe UI", sans-serif; letter-spacing: -0.03em; margin: 0 0 8px; }
-  .auth p { color: #6e6e73; margin: 0 0 16px; font-size: 15px; }
-  .auth input { width: 100%; height: 48px; border: 1px solid #d2d2d7; border-radius: 12px; padding: 0 14px; font-size: 17px; background: #fff; color: #1d1d1f; margin-bottom: 10px; }
-  .auth .err { color: #b6443c; min-height: 0; margin: 0 0 12px; }
-  .auth button[type="submit"] { width: 100%; }
-  .auth .close { background: none; border: 0; color: #0066cc; margin-top: 8px; min-height: 44px; width: 100%; }
-  .dev { display: flex; flex-direction: column; gap: 8px; }
-  .dev button { min-height: 52px; border-radius: 14px; border: 1px solid #d2d2d7; background: #fff; color: #1d1d1f; text-align: left; padding: 0 16px; font-size: 17px; }
-  svg.machine { width: min(240px, 70%); height: auto; display: block; margin: 0 auto; }
-  @media (min-width: 800px) { .grid { grid-template-columns: 1fr 1fr; gap: 20px; } }
-  body.tv #app { font-size: 22px; }
-  body.tv .pcard h2 { font-size: 48px; }
-  body.kindle #app { background: #fff; color: #000; font-family: Georgia, "Times New Roman", serif; }
-  body.kindle .pcard, body.kindle .detail, body.kindle .bag, body.kindle .auth { border-radius: 0; border: 1px solid #000; }
-  body.kindle .add, body.kindle .auth button[type="submit"] { background: #000; border-radius: 0; }
+  .fine { color: #6e6e73; font-size: 12px; line-height: 1.4; margin: 18px 0 0; }
+  .buybar { position: sticky; bottom: 0; z-index: 4; display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 64px; padding: 10px 22px calc(10px + env(safe-area-inset-bottom)); background: rgba(255,255,255,.92); backdrop-filter: saturate(180%) blur(20px); border-top: 1px solid #d2d2d7; }
+  .buybar b { display: block; font-size: 14px; }
+  .buybar span { font-size: 14px; color: #1d1d1f; }
+  .bagbtn { background: #0071e3; color: #fff; border-radius: 8px; min-height: 40px; padding: 0 15px; font-size: 14px; }
+  .bagbtn:hover { background: #0077ed; }
+  .drop { position: fixed; z-index: 8; top: 48px; right: 12px; width: min(360px, calc(100% - 24px)); background: #fff; border-radius: 16px; box-shadow: 0 11px 34px rgba(0,0,0,.16); padding: 18px 18px 14px; color: #1d1d1f; }
+  .drop h2 { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 12px; }
+  .drop .empty { color: #6e6e73; font-size: 14px; margin: 8px 0 16px; }
+  .row { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 12px 0; border-top: 1px solid #d2d2d7; }
+  .row b { font-size: 14px; font-weight: 600; display: block; }
+  .row span { display: block; color: #6e6e73; font-size: 12px; }
+  .row button { color: #0066cc; font-size: 12px; min-height: 44px; }
+  .sum { display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; padding-top: 12px; }
+  .cover { position: fixed; inset: 0; z-index: 20; background: rgba(0,0,0,.4); display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .sheet { width: min(400px, 100%); background: #fff; color: #1d1d1f; border-radius: 18px; padding: 28px 24px 20px; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif; }
+  .sheet h2 { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 6px; }
+  .sheet p { color: #6e6e73; font-size: 14px; margin: 0 0 16px; }
+  .sheet input { width: 100%; height: 46px; border: 1px solid #d2d2d7; border-radius: 12px; padding: 0 14px; font-size: 17px; background: #fff; color: #1d1d1f; }
+  .sheet .err { color: #b6443c; font-size: 14px; margin: 8px 0 0; }
+  .sheet .go { width: 100%; margin-top: 16px; background: #0071e3; color: #fff; border-radius: 8px; min-height: 44px; font-size: 17px; }
+  .sheet .cancel { width: 100%; margin-top: 4px; color: #0066cc; min-height: 44px; font-size: 17px; }
+  .dev { display: flex; flex-direction: column; }
+  .dev button { text-align: left; min-height: 48px; border-top: 1px solid #d2d2d7; font-size: 17px; color: #0066cc; }
+  @media (min-width: 900px) {
+    .lineup { grid-auto-columns: 1fr; max-width: 1040px; margin: 0 auto; overflow: visible; gap: 28px; }
+    .buygrid { display: grid; grid-template-columns: 1fr 1fr; max-width: 1200px; margin: 0 auto; align-items: start; }
+    .stage { position: sticky; top: 44px; height: calc(100vh - 108px); display: flex; align-items: center; justify-content: center; }
+    .config { padding: 56px 64px 48px 12px; }
+    .stage svg.machine { width: 420px; }
+    .unit svg.machine { width: min(220px, 100%); }
+  }
+  body.tv .band h1, body.tv .config h1 { font-size: 64px; }
+  body.tv .unit h2 { font-size: 32px; }
+  body.kindle #app, body.kindle .band { background: #fff; color: #000; font-family: Georgia, "Times New Roman", serif; }
+  body.kindle .bagbtn, body.kindle .sheet .go { background: #000; border-radius: 0; }
+  body.kindle .opt.on { border-color: #000; }
 </style>
 </head>
 <body>
@@ -90,55 +105,35 @@
 <div id="app"></div>
 <script>
 (function () {
-  function machine(color) {
-    return '<svg class="machine" viewBox="0 0 320 250" aria-hidden="true"><rect x="46" y="18" width="228" height="150" rx="16" fill="#e8e8ed"/><rect x="58" y="30" width="204" height="118" rx="6" fill="' + color + '"/><circle cx="160" cy="40" r="2" fill="#d0d0d5"/><rect x="46" y="168" width="228" height="14" rx="3" fill="#d2d2d7"/><path d="M146 182 h28 l18 36 h-64 z" fill="#e4e4e8"/><rect x="112" y="218" width="96" height="6" rx="3" fill="#d2d2d7"/></svg>';
+  function machine(id, a, b) {
+    return '<svg class="machine" viewBox="0 0 360 300" aria-hidden="true"><defs><linearGradient id="alu' + id + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbfbfd"/><stop offset="1" stop-color="#d2d2d7"/></linearGradient><linearGradient id="scr' + id + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' + a + '"/><stop offset="1" stop-color="' + b + '"/></linearGradient></defs><rect x="50" y="18" width="260" height="186" rx="22" fill="url(#alu' + id + ')"/><rect x="64" y="32" width="232" height="146" rx="5" fill="url(#scr' + id + ')"/><rect x="64" y="32" width="232" height="46" rx="5" fill="#fff" opacity=".22"/><path d="M166 204c10 16 10 34 0 46h28c-10-12-10-30 0-46z" fill="#e3e3e8"/><ellipse cx="180" cy="254" rx="58" ry="6" fill="#d2d2d7"/></svg>';
   }
   var PRODUCTS = [
-    { id: "study", name: "Study", line: "Class, writing, and video.", price: 629, color: "#8fd0a8", parts: [["Processor", "Core i5-12400"], ["Memory", "16GB"], ["Graphics", "Built in"], ["Storage", "512GB"], ["Power", "500W"], ["Case", "Compact"]], memory: ["16GB", "32GB"], memPrice: [0, 44], storage: ["512GB", "1TB", "2TB"], storePrice: [0, 50, 170], graphics: ["Built in"], gpuPrice: [0] },
-    { id: "desk", name: "Desk", line: "Mail, documents, and calls.", price: 913, color: "#9eb6e0", parts: [["Processor", "Ryzen 5 7600"], ["Memory", "16GB"], ["Graphics", "Built in"], ["Storage", "1TB"], ["Power", "650W"], ["Case", "Compact"]], memory: ["16GB", "32GB"], memPrice: [0, 90], storage: ["1TB", "2TB"], storePrice: [0, 120], graphics: ["Built in"], gpuPrice: [0] },
-    { id: "play", name: "Play", line: "1080p games.", price: 888, color: "#7ea6e0", parts: [["Processor", "Ryzen 5 5600"], ["Memory", "16GB"], ["Graphics", "RTX 3050"], ["Storage", "1TB"], ["Power", "650W"], ["Case", "Compact"]], memory: ["16GB", "32GB"], memPrice: [0, 44], storage: ["1TB", "2TB"], storePrice: [0, 120], graphics: ["RTX 3050", "RTX 4060"], gpuPrice: [0, 170] },
-    { id: "pro", name: "Pro", line: "1440p games.", price: 1482, color: "#5c7cfa", parts: [["Processor", "Ryzen 5 7600"], ["Memory", "32GB"], ["Graphics", "RTX 4060"], ["Storage", "1TB"], ["Power", "750W"], ["Case", "Standard"]], memory: ["32GB"], memPrice: [0], storage: ["1TB", "2TB"], storePrice: [0, 120], graphics: ["RTX 4060", "RTX 5070"], gpuPrice: [0, 390] }
+    { id: "study", name: "Study", line: "Class, writing, and video.", price: 629, a: "#e8fff2", b: "#1f7a4d", parts: [["Processor", "Core i5-12400"], ["Graphics", "Built-in"], ["Power", "500W"], ["Case", "Compact"]], memory: ["16GB unified", "32GB unified"], memPrice: [0, 44], memNote: ["Enough for class.", "For more tabs and files."], storage: ["512GB SSD", "1TB SSD", "2TB SSD"], storePrice: [0, 50, 170], graphics: ["Built-in"], gpuPrice: [0], gpuNote: ["The picture comes from the processor."] },
+    { id: "desk", name: "Desk", line: "Mail, documents, and a full day of work.", price: 913, a: "#f4f7ff", b: "#3d5278", parts: [["Processor", "Ryzen 5 7600"], ["Graphics", "Built-in"], ["Power", "650W"], ["Case", "Compact"]], memory: ["16GB", "32GB"], memPrice: [0, 90], memNote: ["Comfortable for work.", "Room for larger files."], storage: ["1TB SSD", "2TB SSD"], storePrice: [0, 120], graphics: ["Built-in"], gpuPrice: [0], gpuNote: ["No separate graphics card."] },
+    { id: "play", name: "Play", line: "Games at 1080p.", price: 888, a: "#eef5ff", b: "#1a3e6e", parts: [["Processor", "Ryzen 5 5600"], ["Power", "650W"], ["Case", "Compact"]], memory: ["16GB", "32GB"], memPrice: [0, 44], memNote: ["Fine for most games.", "For more programs at once."], storage: ["1TB SSD", "2TB SSD"], storePrice: [0, 120], graphics: ["RTX 3050", "RTX 4060"], gpuPrice: [0, 170], gpuNote: ["1080p.", "Higher settings, still 1080p."] },
+    { id: "pro", name: "Pro", line: "Games at 1440p.", price: 1482, a: "#eef1ff", b: "#24306e", parts: [["Processor", "Ryzen 5 7600"], ["Power", "750W"], ["Case", "Standard"]], memory: ["32GB"], memPrice: [0], memNote: ["Included."], storage: ["1TB SSD", "2TB SSD"], storePrice: [0, 120], graphics: ["RTX 4060", "RTX 5070"], gpuPrice: [0, 390], gpuNote: ["1440p.", "Higher settings at 1440p."] }
   ];
-  var mode = "phone";
-  var view = "store";
-  var openId = "study";
-  var picks = {};
-  var cart = [];
-  var bag = false;
+  var mode = "phone", view = "lineup", openId = "study", bag = false, cart = [], picks = {};
   var dinoHits = 0, cactusHits = 0, nHits = 0;
   for (var i = 0; i < PRODUCTS.length; i++) picks[PRODUCTS[i].id] = { m: 0, s: 0, g: 0 };
-
   function product(id) { for (var i = 0; i < PRODUCTS.length; i++) if (PRODUCTS[i].id === id) return PRODUCTS[i]; return PRODUCTS[0]; }
   function priceOf(p) { var c = picks[p.id]; return p.price + p.memPrice[c.m] + p.storePrice[c.s] + p.gpuPrice[c.g]; }
-  function specOf(p) {
-    var c = picks[p.id];
-    var bits = [];
-    for (var i = 0; i < p.parts.length; i++) {
-      var label = p.parts[i][0], value = p.parts[i][1];
-      if (label === "Memory") value = p.memory[c.m];
-      if (label === "Storage") value = p.storage[c.s];
-      if (label === "Graphics") value = p.graphics[c.g];
-      bits.push([label, value]);
-    }
-    return bits;
-  }
   function money(n) { return "$" + Math.round(n).toLocaleString(); }
-
-  var gate = document.getElementById("gate");
-  var app = document.getElementById("app");
-  var modal = document.getElementById("modal");
+  function delta(n) { if (!n) return ""; return (n > 0 ? "+ " : "− ") + money(Math.abs(n)); }
+  var gate = document.getElementById("gate"), app = document.getElementById("app"), modal = document.getElementById("modal");
 
   function showApp() {
     gate.style.display = "none";
     modal.innerHTML = "";
     app.className = "on";
     document.body.className = mode;
-    document.title = "Store";
-    view = "store";
+    document.title = "PC";
+    view = "lineup";
     draw();
   }
   function askDevice() {
-    modal.innerHTML = '<div class="cover"><form class="auth" onsubmit="return false"><h2>Where are you?</h2><p>Same computers. The type gets larger.</p><div class="dev" id="devs"></div><button type="button" class="close" id="x">Close</button></form></div>';
+    modal.innerHTML = '<div class="cover"><div class="sheet"><h2>Where are you?</h2><p>The computers stay the same.</p><div class="dev" id="devs"></div><button type="button" class="cancel" id="x">Close</button></div></div>';
     var opts = [["phone", "iPhone"], ["desk", "Desktop"], ["tv", "TV"], ["kindle", "Kindle"]];
     var box = document.getElementById("devs");
     for (var i = 0; i < opts.length; i++) {
@@ -152,12 +147,11 @@
     document.getElementById("x").onclick = function () { modal.innerHTML = ""; };
   }
   function askPassword() {
-    modal.innerHTML = '<div class="cover"><form class="auth" id="pw"><h2>Password</h2><p>Capital letters matter.</p><input id="pwv" type="password" autocomplete="off" placeholder="Password"><p class="err" id="pwe" hidden></p><button type="submit">Continue</button><button type="button" class="close" id="x">Cancel</button></form></div>';
+    modal.innerHTML = '<div class="cover"><form class="sheet" id="pw"><h2>Sign in</h2><p>Capital letters matter.</p><input id="pwv" type="password" autocomplete="off" placeholder="Password"><p class="err" id="pwe" hidden></p><button class="go" type="submit">Continue</button><button class="cancel" type="button" id="x">Cancel</button></form></div>';
     document.getElementById("x").onclick = function () { modal.innerHTML = ""; };
     document.getElementById("pw").onsubmit = function (e) {
       e.preventDefault();
-      var v = document.getElementById("pwv").value.trim();
-      if (v === "Password1") { mode = "desk"; showApp(); return; }
+      if (document.getElementById("pwv").value.trim() === "Password1") { mode = "desk"; showApp(); return; }
       var err = document.getElementById("pwe");
       err.hidden = false;
       err.textContent = "That password is not on the list.";
@@ -165,74 +159,74 @@
     };
     document.getElementById("pwv").focus();
   }
-
+  function specs(p) {
+    var c = picks[p.id];
+    var rows = [["Memory", p.memory[c.m]], ["Storage", p.storage[c.s]], ["Graphics", p.graphics[c.g]]];
+    for (var i = 0; i < p.parts.length; i++) rows.push(p.parts[i]);
+    return rows;
+  }
+  function blurb(p) {
+    var c = picks[p.id];
+    return [p.parts[0][1], p.memory[c.m], p.graphics[c.g], p.storage[c.s]].join(" · ");
+  }
+  function group(title, labels, notes, prices, on, key) {
+    var html = '<h3>' + title + '</h3>';
+    for (var i = 0; i < labels.length; i++) {
+      html += '<button type="button" class="opt' + (i === on ? " on" : "") + '" data-pick="' + key + '" data-i="' + i + '"><span><b>' + labels[i] + '</b><span>' + notes[i] + '</span></span><em>' + delta(prices[i] - prices[on]) + '</em></button>';
+    }
+    return html;
+  }
   function draw() {
-    var count = cart.length;
-    var html = '<div class="nav"><b>Store</b><button type="button" id="bagbtn">Bag' + (count ? " (" + count + ")" : "") + '</button></div><div class="wrap">';
-    if (view === "store") {
-      html += '<h1>Four computers.</h1><p class="lede">Each one is finished. Add it to your bag, or open it and change memory, storage, or graphics.</p><div class="grid">';
+    var html = '<div class="gnav"><button type="button" id="home">PC</button><button type="button" id="bagbtn">Bag' + (cart.length ? " (" + cart.length + ")" : "") + '</button></div>';
+    if (view === "lineup") {
+      html += '<section class="band"><h1>The lineup.</h1><div class="lineup">';
       for (var i = 0; i < PRODUCTS.length; i++) {
         var p = PRODUCTS[i];
-        html += '<article class="pcard">' + machine(p.color) + '<h2>' + p.name + '</h2><p>' + p.line + '</p><p class="cost">' + money(priceOf(p)) + '</p><button type="button" class="add" data-add="' + p.id + '">Add to Bag</button><div><button type="button" class="back" data-open="' + p.id + '">See what’s inside</button></div></article>';
+        html += '<article class="unit">' + machine(p.id, p.a, p.b) + '<h2>' + p.name + '</h2><p class="which">' + p.line + '</p><p class="from">' + money(priceOf(p)) + '</p><div class="links"><button type="button" data-open="' + p.id + '">Learn more ›</button><button type="button" data-open="' + p.id + '">Buy ›</button></div></article>';
       }
-      html += '</div><p class="fine">Catalog prices, not a store. No display is included.</p>';
+      html += '</div></section>';
     } else {
       var cur = product(openId);
-      var bits = specOf(cur);
-      html += '<button type="button" class="back" id="back">Store</button><div class="detail">' + machine(cur.color) + '<h2>' + cur.name + '</h2><p class="line">' + cur.line + '</p><p class="cost">' + money(priceOf(cur)) + '</p><div class="specs">';
-      for (var s = 0; s < bits.length; s++) html += '<div><small>' + bits[s][0] + '</small><b>' + bits[s][1] + '</b></div>';
-      html += '</div>';
-      html += pills("Memory", cur.memory, picks[cur.id].m, "m");
-      html += pills("Storage", cur.storage, picks[cur.id].s, "s");
-      if (cur.graphics.length > 1) html += pills("Graphics", cur.graphics, picks[cur.id].g, "g");
-      html += '<button type="button" class="add" data-add="' + cur.id + '">Add to Bag</button></div>';
+      var c = picks[cur.id];
+      var rows = specs(cur);
+      html += '<div class="buygrid"><div class="stage">' + machine(cur.id + "b", cur.a, cur.b) + '</div><div class="config"><button type="button" class="links" id="back" style="color:#0066cc;font-size:14px;min-height:44px">‹ The lineup</button><h1>' + cur.name + '</h1><p class="price">' + money(priceOf(cur)) + '</p><p class="which">' + cur.line + '</p>';
+      html += group("Memory", cur.memory, cur.memNote, cur.memPrice, c.m, "m");
+      html += group("Storage", cur.storage, cur.storage.map(function () { return "Solid-state."; }), cur.storePrice, c.s, "s");
+      if (cur.graphics.length > 1) html += group("Graphics", cur.graphics, cur.gpuNote, cur.gpuPrice, c.g, "g");
+      html += '<div class="specs">';
+      for (var s = 0; s < rows.length; s++) html += '<div><small>' + rows[s][0] + '</small><b>' + rows[s][1] + '</b></div>';
+      html += '</div><p class="fine">Catalog prices, not a checkout. A display is not included.</p></div></div>';
+      html += '<div class="buybar"><div><b>' + cur.name + '</b><span>' + money(priceOf(cur)) + '</span></div><button type="button" class="bagbtn" id="add">Add to Bag</button></div>';
     }
-    html += '</div>';
     if (bag) {
-      html += '<div class="scrim" id="scrim"></div><aside class="bag"><button type="button" class="back" id="closebag">Close</button><h2>Bag</h2>';
-      if (!cart.length) html += '<p class="lede">Your bag is empty.</p>';
+      html += '<div class="drop" id="drop"><h2>Bag</h2>';
+      if (!cart.length) html += '<p class="empty">Your Bag is empty.</p>';
       var sum = 0;
-      for (var c = 0; c < cart.length; c++) {
-        sum += cart[c].price;
-        html += '<div class="item"><div><b>' + cart[c].name + '</b><span>' + cart[c].blurb + '</span></div><button type="button" data-del="' + c + '">Remove</button></div>';
+      for (var n = 0; n < cart.length; n++) {
+        sum += cart[n].price;
+        html += '<div class="row"><div><b>' + cart[n].name + '</b><span>' + cart[n].blurb + '</span></div><div><b>' + money(cart[n].price) + '</b><button type="button" data-del="' + n + '">Remove</button></div></div>';
       }
-      if (cart.length) html += '<div class="total"><span>Total</span><span>' + money(sum) + '</span></div><p class="fine">A list on this page. Nothing is charged.</p>';
-      html += '</aside>';
+      if (cart.length) html += '<div class="sum"><span>Total</span><span>' + money(sum) + '</span></div><p class="fine">A list on this page. Nothing is charged.</p>';
+      html += '</div>';
     }
     app.innerHTML = html;
-    window.scrollTo(0, 0);
-    var bagBtn = document.getElementById("bagbtn");
-    if (bagBtn) bagBtn.onclick = function () { bag = !bag; draw(); };
-    var scrim = document.getElementById("scrim");
-    if (scrim) scrim.onclick = function () { bag = false; draw(); };
-    var close = document.getElementById("closebag");
-    if (close) close.onclick = function () { bag = false; draw(); };
+    document.getElementById("home").onclick = function () { view = "lineup"; bag = false; draw(); };
+    document.getElementById("bagbtn").onclick = function () { bag = !bag; draw(); };
     var back = document.getElementById("back");
-    if (back) back.onclick = function () { view = "store"; draw(); };
-    var adds = document.querySelectorAll("[data-add]");
-    for (var a = 0; a < adds.length; a++) adds[a].onclick = function () {
-      var p = product(this.getAttribute("data-add"));
-      var bits = specOf(p);
-      var blurb = [];
-      for (var k = 0; k < bits.length; k++) if (bits[k][0] === "Processor" || bits[k][0] === "Graphics" || bits[k][0] === "Memory" || bits[k][0] === "Storage") blurb.push(bits[k][1]);
-      cart.push({ name: p.name, price: priceOf(p), blurb: blurb.join(" · ") });
+    if (back) back.onclick = function () { view = "lineup"; draw(); };
+    var add = document.getElementById("add");
+    if (add) add.onclick = function () {
+      var p = product(openId);
+      cart.push({ name: p.name, price: priceOf(p), blurb: blurb(p) });
       bag = true;
       draw();
     };
     var opens = document.querySelectorAll("[data-open]");
-    for (var o = 0; o < opens.length; o++) opens[o].onclick = function () { openId = this.getAttribute("data-open"); view = "detail"; bag = false; draw(); };
+    for (var o = 0; o < opens.length; o++) opens[o].onclick = function () { openId = this.getAttribute("data-open"); view = "buy"; bag = false; draw(); window.scrollTo(0, 0); };
     var opts = document.querySelectorAll("[data-pick]");
-    for (var n = 0; n < opts.length; n++) opts[n].onclick = function () {
-      picks[openId][this.getAttribute("data-pick")] = Number(this.getAttribute("data-i"));
-      draw();
-    };
+    for (var k = 0; k < opts.length; k++) opts[k].onclick = function () { picks[openId][this.getAttribute("data-pick")] = Number(this.getAttribute("data-i")); draw(); };
     var dels = document.querySelectorAll("[data-del]");
-    for (var d = 0; d < dels.length; d++) dels[d].onclick = function () { cart.splice(Number(this.getAttribute("data-del")), 1); draw(); };
-  }
-  function pills(title, labels, on, key) {
-    var html = '<div class="choice"><h3>' + title + '</h3><div class="pills">';
-    for (var i = 0; i < labels.length; i++) html += '<button type="button" class="' + (i === on ? "on" : "") + '" data-pick="' + key + '" data-i="' + i + '">' + labels[i] + '</button>';
-    return html + '</div></div>';
+    for (var d = 0; d < dels.length; d++) dels[d].onclick = function (e) { e.stopPropagation(); cart.splice(Number(this.getAttribute("data-del")), 1); draw(); };
   }
 
   var canvas = document.getElementById("dino");
@@ -257,15 +251,8 @@
     var r = canvas.getBoundingClientRect();
     var x = ((e.clientX - r.left) / r.width) * 420;
     var y = ((e.clientY - r.top) / r.height) * 110;
-    if (x > cactusX - 24 && x < cactusX + 36 && y > 50 && y < 108) {
-      cactusHits += 1;
-      if (cactusHits >= 3) showApp();
-      return;
-    }
-    if (x < 70 && y > 30) {
-      dinoHits += 1;
-      if (dinoHits >= 3) { askPassword(); return; }
-    }
+    if (x > cactusX - 24 && x < cactusX + 36 && y > 50 && y < 108) { cactusHits += 1; if (cactusHits >= 3) showApp(); return; }
+    if (x < 70 && y > 30) { dinoHits += 1; if (dinoHits >= 3) { askPassword(); return; } }
     if (!dy && !vy) vy = 10;
   });
   function hitN() { nHits += 1; if (nHits >= 3) askDevice(); }
