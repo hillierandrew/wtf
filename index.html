@@ -26,41 +26,44 @@
   .card .err { color: #c5221f; font-weight: 700; }
   .stack { display: flex; flex-direction: column; gap: 8px; }
   .stack button, .go { min-height: 52px; border: 1px solid #dadce0; background: #fff; color: #202124; border-radius: 4px; text-align: left; padding: 0 14px; font-weight: 650; }
-  #app { display: none; min-height: 100%; background: #f4f5f7; color: #111; }
+  #app { display: none; min-height: 100%; background: #fbfbfd; color: #1d1d1f; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
   #app.on { display: block; }
-  .wrap { max-width: 1100px; margin: 0 auto; padding: 20px 16px 96px; }
-  h1 { font-size: clamp(32px, 6vw, 48px); line-height: 1.05; margin: 0 0 8px; }
-  .sub { color: #444; margin: 0 0 18px; font-size: 18px; }
-  .choices { display: flex; flex-direction: column; gap: 10px; }
-  .choices button, .bar button, .pc button.change {
-    min-height: 72px; border: 2px solid #111; background: #fff; color: #111; border-radius: 12px;
-    padding: 12px 16px; text-align: left; font-size: 22px; font-weight: 800;
-  }
-  .choices button small, .pc small { display: block; font-weight: 500; font-size: 16px; color: #333; }
-  .back { background: none; border: 0; color: #1a73e8; font-weight: 800; min-height: 48px; padding: 0; }
-  .pc { display: flex; flex-direction: column; gap: 8px; }
-  .row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; background: #fff; border: 2px solid #111; border-radius: 12px; padding: 12px; }
-  .row b { font-size: 18px; }
-  .row em { font-style: normal; color: #333; }
-  .status { font-size: 22px; font-weight: 800; margin: 8px 0; }
-  .status.bad { color: #9b1c1c; }
-  .status.ok { color: #0b5; }
-  .total { font-size: 28px; font-weight: 800; }
-  .note { color: #555; font-size: 14px; }
-  .bar { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
-  .bar button { flex: 1; min-width: 140px; }
-  body.desk #app .wrap { display: block; }
-  body.desk .stage { display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: 16px; align-items: start; }
-  body.tv { background: #000; }
-  body.tv #app { background: #000; color: #fff; }
-  body.tv .choices button, body.tv .row, body.tv .bar button, body.tv .pc button.change { background: #000; color: #fff; border-color: #fff; min-height: 96px; font-size: 32px; }
-  body.tv .sub, body.tv small, body.tv .note, body.tv em { color: #ddd; }
-  body.tv h1 { font-size: 64px; }
+  .buy { max-width: 1180px; margin: 0 auto; padding: 0 20px 120px; }
+  .nav { position: sticky; top: 0; z-index: 4; background: rgba(251,251,253,.9); border-bottom: 1px solid #d2d2d7; padding: 14px 22px; font-weight: 600; letter-spacing: -0.02em; }
+  .hero-col { padding: 28px 0 8px; }
+  .imac { width: min(100%, 420px); margin: 0 auto 12px; }
+  .display { height: 230px; border-radius: 18px 18px 0 0; background: linear-gradient(160deg, #8ec5ff, #1d4e89); border: 10px solid #d7d7dc; border-bottom-width: 18px; }
+  .chin { height: 14px; background: #c8c8ce; border-radius: 0 0 10px 10px; }
+  .stand { width: 86px; height: 70px; margin: 0 auto; background: linear-gradient(#d2d2d7, #eee); clip-path: polygon(38% 0, 62% 0, 100% 100%, 0 100%); }
+  .foot { width: 150px; height: 8px; margin: -2px auto 0; background: #c7c7cc; border-radius: 8px; }
+  .eyebrow { color: #6e6e73; margin: 0; font-size: 17px; }
+  .hero-col h1 { font-size: clamp(48px, 8vw, 72px); font-weight: 600; letter-spacing: -0.04em; margin: 0; line-height: .95; }
+  .price { font-size: 24px; margin: 8px 0; }
+  .status { margin: 0; color: #1d1d1f; }
+  .status.bad { color: #b00020; }
+  .group h2 { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; margin: 34px 0 4px; }
+  .group .hint { color: #6e6e73; margin: 0 0 12px; }
+  .opt { display: block; width: 100%; text-align: left; background: #fff; border: 1px solid #d2d2d7; border-radius: 12px; min-height: 76px; padding: 14px 16px; margin: 0 0 10px; color: #1d1d1f; }
+  .opt.on { border: 2px solid #0071e3; }
+  .opt:disabled { opacity: .38; }
+  .opt b { display: block; font-size: 17px; font-weight: 600; }
+  .opt span { display: block; color: #6e6e73; font-size: 14px; margin-top: 2px; }
+  .opt i { float: right; font-style: normal; font-size: 14px; }
+  .note { color: #6e6e73; font-size: 12px; }
+  .bag { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 12px 22px calc(12px + env(safe-area-inset-bottom)); background: rgba(255,255,255,.88); border-top: 1px solid #d2d2d7; backdrop-filter: blur(16px); }
+  .bag b { font-size: 21px; }
+  .bag button { background: #0071e3; color: #fff; border: 0; border-radius: 980px; min-height: 44px; padding: 0 20px; font-weight: 600; }
+  body.desk .buy { display: grid; grid-template-columns: minmax(280px, 42%) minmax(0, 1fr); column-gap: 28px; max-width: 1180px; }
+  body.desk .hero-col { position: sticky; top: 52px; align-self: start; height: calc(100vh - 52px); display: flex; flex-direction: column; justify-content: center; }
+  body.desk .opts { padding-top: 24px; }
+  body.tv .hero-col h1 { font-size: 80px; }
+  body.tv .opt { min-height: 96px; font-size: 22px; }
+  body.tv .group h2 { font-size: 40px; }
   body.kindle #app { background: #fff; color: #000; font-family: Georgia, "Times New Roman", serif; }
-  body.kindle .choices button, body.kindle .row, body.kindle .bar button { border-radius: 0; background: #fff; color: #000; }
-  body.phone .choices button { width: 100%; font-size: 26px; min-height: 84px; }
-  .one { background: #fff; border: 2px solid #111; padding: 20px; }
-  .one h2 { font-size: 28px; margin: 0 0 8px; }
+  body.kindle .opt, body.kindle .bag button { border-radius: 0; }
+  body.kindle .display { background: #fff; border-color: #000; }
+  .step { display: flex; gap: 8px; }
+  .step button { flex: 1; min-height: 52px; background: #fff; border: 1px solid #111; font-weight: 700; }
 </style>
 </head>
 <body>
@@ -146,8 +149,8 @@
   var screen = "job";
   var job = "school";
   var build = copy(RECIPES.school);
-  var editing = "cpu";
-  var page = 0;
+  var budget = 700;
+  var section = 0;
   var dinoHits = 0;
   var cactusHits = 0;
   var nHits = 0;
@@ -207,6 +210,7 @@
     gate.style.display = "none";
     modal.innerHTML = "";
     app.className = "on";
+    screen = "buy";
     document.body.className = mode;
     document.title = "Build a PC";
     draw();
@@ -240,98 +244,83 @@
     document.getElementById("pwv").focus();
   }
 
-  function draw() {
-    if (screen === "job") {
-      el('<div class="wrap"><p class="sub">DREW.WTF</p><h1>What is this computer for?</h1><p class="sub">Tap one. You can change the parts after.</p><div class="choices">' +
-        btn("school", "School", "Homework, videos, and Word.") +
-        btn("work", "Work", "Email, spreadsheets, and calls.") +
-        btn("games", "Games", "Playing games on a monitor.") +
-        btn("music", "Music", "Recording and making songs. Quiet.") +
-        btn("web", "Just the internet", "Browsing and YouTube.") +
-        "</div></div>");
-      wireJobs();
-      return;
-    }
-    if (screen === "money") {
-      el('<div class="wrap"><button class="back" id="back" type="button">Back</button><h1>How much money?</h1><p class="sub">These are example prices, not a store.</p><div class="choices">' +
-        moneyBtn(700) + moneyBtn(1000) + moneyBtn(1500) + moneyBtn(2500) +
-        "</div></div>");
-      document.getElementById("back").onclick = function () { screen = "job"; draw(); };
-      var nodes = document.querySelectorAll("[data-cash]");
-      for (var i = 0; i < nodes.length; i++) nodes[i].onclick = function () {
-        var cash = Number(this.getAttribute("data-cash"));
-        build = copy(RECIPES[recipeFor(job, cash)]);
-        screen = "pc";
-        draw();
-      };
-      return;
-    }
-    if (screen === "pick") {
-      var list = PARTS[editing];
-      var html = '<div class="wrap"><button class="back" id="back" type="button">Back to the PC</button><h1>Pick a ' + LABEL[editing].toLowerCase() + '</h1><div class="choices">';
-      if (mode === "kindle") {
-        var options = [];
-        for (var k = 0; k < list.length; k++) if (fits(editing, list[k].id) || list[k].id === build[editing]) options.push(list[k]);
-        if (!options.length) options = list;
-        if (page >= options.length) page = 0;
-        var item = options[page];
-        html = '<div class="wrap"><button class="back" id="back" type="button">Back</button><div class="one"><p>' + (page + 1) + ' of ' + options.length + '</p><h2>' + item.name + '</h2><p>' + item.plain + '</p><p class="total">' + money(item.price) + '</p></div><div class="bar"><button type="button" id="prev">Previous</button><button type="button" id="use">Use this</button><button type="button" id="next">Next</button></div></div>';
-        el(html);
-        document.getElementById("back").onclick = function () { screen = "pc"; draw(); };
-        document.getElementById("prev").onclick = function () { page = Math.max(0, page - 1); draw(); };
-        document.getElementById("next").onclick = function () { page = Math.min(options.length - 1, page + 1); draw(); };
-        document.getElementById("use").onclick = function () { build[editing] = item.id; screen = "pc"; draw(); };
-        return;
-      }
-      for (var j = 0; j < list.length; j++) {
-        var ok = fits(editing, list[j].id) || list[j].id === build[editing];
-        if (!ok) continue;
-        html += '<button type="button" data-id="' + list[j].id + '"><b>' + list[j].name + '</b><small>' + list[j].plain + ' ' + money(list[j].price) + '</small></button>';
-      }
-      html += '</div><p class="note">Only parts that fit this PC are shown.</p></div>';
-      el(html);
-      document.getElementById("back").onclick = function () { screen = "pc"; draw(); };
-      var picks = document.querySelectorAll("[data-id]");
-      for (var p = 0; p < picks.length; p++) picks[p].onclick = function () {
-        build[editing] = this.getAttribute("data-id");
-        screen = "pc";
-        draw();
-      };
-      return;
-    }
-    var bad = problems();
-    var rows = "";
-    for (var n = 0; n < ORDER.length; n++) {
-      var g = ORDER[n];
-      var part = find(g, build[g]);
-      rows += '<div class="row"><div><small>' + LABEL[g] + '</small><b>' + part.name + '</b><br><em>' + part.plain + '</em></div><button class="change" type="button" data-edit="' + g + '">Change</button></div>';
-    }
-    el('<div class="wrap"><button class="back" id="home" type="button">Start over</button>' +
-      (mode === "desk" ? '<div class="stage"><div>' : '<div>') +
-      '<h1>Your PC</h1><p class="total">' + money(total()) + '</p>' +
-      '<p class="status ' + (bad.length ? "bad" : "ok") + '">' + (bad.length ? bad[0] : "This PC works.") + '</p>' +
-      (mode === "desk" ? '</div><div class="pc">' + rows + '</div></div>' : '<div class="pc">' + rows + '</div>') +
-      '<p class="note">Example prices from a catalog. Not a live store. No monitor in this list.</p></div>');
-    document.getElementById("home").onclick = function () { screen = "job"; draw(); };
-    var edits = document.querySelectorAll("[data-edit]");
-    for (var e = 0; e < edits.length; e++) edits[e].onclick = function () {
-      editing = this.getAttribute("data-edit");
-      page = 0;
-      screen = "pick";
-      draw();
-    };
+  var WALL = { school: "linear-gradient(160deg,#b7f5c8,#1f7a4d)", work: "linear-gradient(160deg,#d9e4ff,#3a4d7c)", games: "linear-gradient(160deg,#8ec5ff,#123a73)", music: "linear-gradient(160deg,#f3c6ff,#5b2a6b)", web: "linear-gradient(160deg,#ffe7a3,#c47b16)" };
+
+  function delta(group, item) {
+    var now = find(group, build[group]).price;
+    var d = item.price - now;
+    if (item.id === build[group]) return "";
+    if (d === 0) return "same price";
+    return (d > 0 ? "+ " : "− ") + money(Math.abs(d));
   }
 
-  function btn(id, title, text) {
-    return '<button type="button" data-job="' + id + '">' + title + '<small>' + text + '</small></button>';
+  function optButton(group, item, on) {
+    var ok = fits(group, item.id) || on;
+    var why = "";
+    if (!ok) {
+      var old = build[group];
+      build[group] = item.id;
+      why = problems()[0] || "Does not fit.";
+      build[group] = old;
+    }
+    return '<button type="button" class="opt' + (on ? " on" : "") + '" data-g="' + group + '" data-id="' + item.id + '"' + (ok ? "" : " disabled") + '><i>' + (on ? "" : delta(group, item)) + '</i><b>' + item.name + '</b><span>' + (ok ? item.plain : why) + '</span></button>';
   }
-  function moneyBtn(n) { return '<button type="button" data-cash="' + n + '">' + money(n) + '</button>'; }
-  function wireJobs() {
-    var nodes = document.querySelectorAll("[data-job]");
-    for (var i = 0; i < nodes.length; i++) nodes[i].onclick = function () {
+
+  function draw() {
+    var bad = problems();
+    var groups = "";
+    var uses = [["school", "School", "Homework and videos."], ["work", "Work", "Email, sheets, and calls."], ["games", "Games", "Play on a monitor."], ["music", "Music", "Record and make songs."], ["web", "Internet", "Browsing and YouTube."]];
+    var useHtml = "";
+    for (var u = 0; u < uses.length; u++) useHtml += '<button type="button" class="opt' + (job === uses[u][0] ? " on" : "") + '" data-job="' + uses[u][0] + '"><b>' + uses[u][1] + '</b><span>' + uses[u][2] + '</span></button>';
+    var cashHtml = "";
+    var cashes = [700, 1000, 1500, 2500];
+    for (var c = 0; c < cashes.length; c++) cashHtml += '<button type="button" class="opt' + (budget === cashes[c] ? " on" : "") + '" data-cash="' + cashes[c] + '"><b>' + money(cashes[c]) + '</b><span>Suggested PC around this price.</span></button>';
+    var partHtml = "";
+    for (var n = 0; n < ORDER.length; n++) {
+      var gname = ORDER[n];
+      var cards = "";
+      var list = PARTS[gname];
+      for (var j = 0; j < list.length; j++) cards += optButton(gname, list[j], list[j].id === build[gname]);
+      partHtml += '<section class="group" data-sec="' + (n + 2) + '"><h2>' + LABEL[gname] + '.</h2><p class="hint">Only a choice that fits can be selected.</p>' + cards + '</section>';
+    }
+    groups = '<section class="group" data-sec="0"><h2>Use.</h2><p class="hint">This picks a starting PC. You can change every part after.</p>' + useHtml + '</section>' +
+      '<section class="group" data-sec="1"><h2>Budget.</h2><p class="hint">Example catalog prices, not a store.</p>' + cashHtml + '</section>' + partHtml;
+    if (mode === "kindle") {
+      var secs = groups.match(/<section[\s\S]*?<\/section>/g) || [];
+      if (section >= secs.length) section = 0;
+      groups = secs[section] + '<div class="step"><button type="button" id="prev">Previous</button><button type="button" id="next">Next</button></div>';
+    }
+    el('<div class="nav">DREW · PC</div><div class="buy"><div class="hero-col"><div class="imac" aria-hidden="true"><div class="display" id="screen"></div><div class="chin"></div><div class="stand"></div><div class="foot"></div></div><p class="eyebrow">Buy</p><h1>PC</h1><p class="price">' + money(total()) + '</p><p class="status ' + (bad.length ? "bad" : "") + '">' + (bad.length ? bad[0] : "This PC works.") + '</p></div><div class="opts">' + groups + '<p class="note">No monitor in this list. Prices are catalog examples.</p></div></div><div class="bag"><div><b>' + money(total()) + '</b><div class="note">' + (bad.length ? "Fix the part above" : "Ready") + '</div></div><button type="button" id="bag">Add to Bag</button></div>');
+    var screenEl = document.getElementById("screen");
+    if (screenEl) screenEl.style.background = WALL[job] || WALL.web;
+    var jobBtns = document.querySelectorAll("[data-job]");
+    for (var a = 0; a < jobBtns.length; a++) jobBtns[a].onclick = function () {
       job = this.getAttribute("data-job");
-      screen = "money";
+      build = copy(RECIPES[recipeFor(job, budget)]);
       draw();
+    };
+    var cashBtns = document.querySelectorAll("[data-cash]");
+    for (var b = 0; b < cashBtns.length; b++) cashBtns[b].onclick = function () {
+      budget = Number(this.getAttribute("data-cash"));
+      build = copy(RECIPES[recipeFor(job, budget)]);
+      draw();
+    };
+    var partBtns = document.querySelectorAll("[data-g]");
+    for (var p = 0; p < partBtns.length; p++) partBtns[p].onclick = function () {
+      if (this.disabled) return;
+      build[this.getAttribute("data-g")] = this.getAttribute("data-id");
+      draw();
+    };
+    var prev = document.getElementById("prev");
+    var next = document.getElementById("next");
+    if (prev) prev.onclick = function () { section = Math.max(0, section - 1); draw(); };
+    if (next) next.onclick = function () { section += 1; draw(); };
+    document.getElementById("bag").onclick = function () {
+      var lines = "PC " + money(total());
+      for (var i = 0; i < ORDER.length; i++) lines += "\n" + LABEL[ORDER[i]] + ": " + find(ORDER[i], build[ORDER[i]]).name;
+      var self = this;
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(lines);
+      self.textContent = bad.length ? "Not yet" : "Added";
     };
   }
 
