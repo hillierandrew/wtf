@@ -3,67 +3,81 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#fbfbfd">
 <title>No internet connection</title>
 <style>
   * { box-sizing: border-box; }
-  html, body { margin: 0; height: 100%; }
-  body { font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-  button, select, input { font: inherit; }
+  html, body { margin: 0; min-height: 100%; background: #fff; }
+  body { font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #5f6368; }
+  button, input { font: inherit; color: inherit; }
   button { cursor: pointer; }
-  #gate { min-height: 100%; background: #fff; color: #5f6368; display: flex; align-items: center; justify-content: center; padding: 24px; }
-  .offline { width: min(540px, 100%); text-align: left; }
-  #dino { display: block; width: min(100%, 420px); height: auto; background: #fff; touch-action: manipulation; }
+  #gate { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .offline { width: min(540px, 100%); }
+  #dino { display: block; width: min(100%, 420px); height: auto; touch-action: manipulation; }
   .offline h1 { font-weight: 500; font-size: 1.6em; color: #202124; margin: 18px 0 14px; }
   .offline ul { margin: 8px 0 16px; padding-left: 28px; }
-  .secret { background: none; border: 0; padding: 0; margin: 0; color: inherit; font: inherit; cursor: pointer; }
+  .secret { background: none; border: 0; padding: 0; margin: 0; color: inherit; font: inherit; }
   .code { color: #80868b; font-size: 13px; }
-  .cover { position: fixed; inset: 0; background: rgba(255,255,255,.78); display: flex; align-items: center; justify-content: center; padding: 16px; }
-  .card { width: min(440px, 100%); background: #fff; color: #202124; border: 1px solid #dadce0; border-radius: 8px; padding: 22px; box-shadow: 0 1px 3px rgba(60,64,67,.3); }
+  .cover { position: fixed; inset: 0; background: rgba(255,255,255,.82); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 20; }
+  .card { width: min(420px, 100%); background: #fff; color: #202124; border: 1px solid #dadce0; border-radius: 8px; padding: 22px; box-shadow: 0 1px 3px rgba(60,64,67,.3); }
   .card h2 { font-weight: 500; margin: 0 0 8px; }
-  .card p { color: #5f6368; margin: 0 0 12px; }
+  .card p { color: #5f6368; }
   .card input { width: 100%; min-height: 48px; border: 1px solid #dadce0; border-radius: 4px; padding: 0 12px; }
   .card .err { color: #c5221f; font-weight: 700; }
   .stack { display: flex; flex-direction: column; gap: 8px; }
-  .stack button, .go { min-height: 52px; border: 1px solid #dadce0; background: #fff; color: #202124; border-radius: 4px; text-align: left; padding: 0 14px; font-weight: 650; }
-  #app { display: none; min-height: 100%; background: #fbfbfd; color: #1d1d1f; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+  .stack button { min-height: 52px; border: 1px solid #dadce0; background: #fff; color: #202124; border-radius: 4px; text-align: left; padding: 0 14px; font-weight: 650; }
+
+  #app { display: none; min-height: 100vh; background: #fbfbfd; color: #1d1d1f; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Helvetica, Arial, sans-serif; }
   #app.on { display: block; }
-  .buy { max-width: 1180px; margin: 0 auto; padding: 0 20px 120px; }
-  .nav { position: sticky; top: 0; z-index: 4; background: rgba(251,251,253,.9); border-bottom: 1px solid #d2d2d7; padding: 14px 22px; font-weight: 600; letter-spacing: -0.02em; }
-  .hero-col { padding: 28px 0 8px; }
-  .imac { width: min(100%, 420px); margin: 0 auto 12px; }
-  .display { height: 230px; border-radius: 18px 18px 0 0; background: linear-gradient(160deg, #8ec5ff, #1d4e89); border: 10px solid #d7d7dc; border-bottom-width: 18px; }
-  .chin { height: 14px; background: #c8c8ce; border-radius: 0 0 10px 10px; }
-  .stand { width: 86px; height: 70px; margin: 0 auto; background: linear-gradient(#d2d2d7, #eee); clip-path: polygon(38% 0, 62% 0, 100% 100%, 0 100%); }
-  .foot { width: 150px; height: 8px; margin: -2px auto 0; background: #c7c7cc; border-radius: 8px; }
-  .eyebrow { color: #6e6e73; margin: 0; font-size: 17px; }
-  .hero-col h1 { font-size: clamp(48px, 8vw, 72px); font-weight: 600; letter-spacing: -0.04em; margin: 0; line-height: .95; }
-  .price { font-size: 24px; margin: 8px 0; }
-  .status { margin: 0; color: #1d1d1f; }
-  .status.bad { color: #b00020; }
-  .group h2 { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; margin: 34px 0 4px; }
-  .group .hint { color: #6e6e73; margin: 0 0 12px; }
-  .opt { display: block; width: 100%; text-align: left; background: #fff; border: 1px solid #d2d2d7; border-radius: 12px; min-height: 76px; padding: 14px 16px; margin: 0 0 10px; color: #1d1d1f; }
-  .opt.on { border: 2px solid #0071e3; }
-  .opt:disabled { opacity: .38; }
+  .nav { height: 48px; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 600; letter-spacing: -0.02em; }
+  .stage { max-width: 1100px; margin: 0 auto; padding: 8px 22px 140px; }
+  .product { text-align: center; padding: 12px 0 8px; }
+  .imac { width: min(280px, 70vw); margin: 0 auto 18px; }
+  .display { height: 168px; border-radius: 16px 16px 0 0; border: 8px solid #e8e8ed; border-bottom-width: 16px; background: linear-gradient(165deg, #d6e6ff, #2f5f9e); }
+  .chin { height: 10px; background: #d2d2d7; border-radius: 0 0 8px 8px; }
+  .stand { width: 64px; height: 52px; margin: 0 auto; background: linear-gradient(#dedee3, #f5f5f7); clip-path: polygon(40% 0, 60% 0, 100% 100%, 0 100%); }
+  .foot { width: 120px; height: 6px; margin: -1px auto 0; background: #d2d2d7; border-radius: 6px; }
+  .product h1 { font-size: 40px; line-height: 1; font-weight: 600; letter-spacing: -0.03em; margin: 0; }
+  .product .price { font-size: 21px; margin: 8px 0 0; }
+  .product .ok { color: #86868b; margin: 6px 0 0; font-size: 14px; }
+  .product .ok.bad { color: #b6443c; }
+  .ask { max-width: 520px; margin: 28px auto 0; }
+  .ask h2 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; margin: 0 0 6px; }
+  .ask .lead { color: #86868b; margin: 0 0 18px; font-size: 17px; }
+  .opt { width: 100%; display: flex; justify-content: space-between; gap: 16px; align-items: center; text-align: left; background: #fff; border: 1px solid #d2d2d7; border-radius: 16px; min-height: 76px; padding: 16px 18px; margin: 0 0 12px; color: #1d1d1f; transition: border-color .2s ease, transform .2s ease; }
+  .opt:active { transform: scale(0.985); }
+  .opt.on { border: 2px solid #0071e3; padding: 15px 17px; }
   .opt b { display: block; font-size: 17px; font-weight: 600; }
-  .opt span { display: block; color: #6e6e73; font-size: 14px; margin-top: 2px; }
-  .opt i { float: right; font-style: normal; font-size: 14px; }
-  .note { color: #6e6e73; font-size: 12px; }
-  .bag { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 12px 22px calc(12px + env(safe-area-inset-bottom)); background: rgba(255,255,255,.88); border-top: 1px solid #d2d2d7; backdrop-filter: blur(16px); }
-  .bag b { font-size: 21px; }
-  .bag button { background: #0071e3; color: #fff; border: 0; border-radius: 980px; min-height: 44px; padding: 0 20px; font-weight: 600; }
-  body.desk .buy { display: grid; grid-template-columns: minmax(280px, 42%) minmax(0, 1fr); column-gap: 28px; max-width: 1180px; }
-  body.desk .hero-col { position: sticky; top: 52px; align-self: start; height: calc(100vh - 52px); display: flex; flex-direction: column; justify-content: center; }
-  body.desk .opts { padding-top: 24px; }
-  body.tv .hero-col h1 { font-size: 80px; }
-  body.tv .opt { min-height: 96px; font-size: 22px; }
-  body.tv .group h2 { font-size: 40px; }
+  .opt span { display: block; color: #86868b; font-size: 14px; margin-top: 2px; }
+  .opt em { font-style: normal; color: #1d1d1f; white-space: nowrap; }
+  .lines { max-width: 640px; margin: 28px auto 0; background: #fff; border-radius: 18px; overflow: hidden; }
+  .line { width: 100%; display: flex; justify-content: space-between; gap: 16px; align-items: center; text-align: left; background: #fff; border: 0; border-bottom: 1px solid #f0f0f2; min-height: 68px; padding: 12px 18px; color: #1d1d1f; }
+  .line:last-child { border-bottom: 0; }
+  .line small { display: block; color: #86868b; font-size: 12px; }
+  .line b { font-weight: 600; font-size: 17px; }
+  .line em { font-style: normal; color: #86868b; }
+  .fine { max-width: 640px; margin: 14px auto 0; color: #86868b; font-size: 12px; text-align: center; }
+  .dock { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; display: flex; justify-content: flex-end; padding: 12px 22px calc(12px + env(safe-area-inset-bottom)); background: rgba(251,251,253,.92); border-top: 1px solid rgba(0,0,0,.06); backdrop-filter: blur(18px); }
+  .dock button { background: #0071e3; color: #fff; border: 0; border-radius: 980px; min-height: 48px; padding: 0 22px; font-size: 17px; font-weight: 500; }
+  .dock button:disabled { background: #d2d2d7; color: #fff; }
+  body.desk .stage { display: grid; grid-template-columns: minmax(300px, 1fr) minmax(320px, 520px); gap: 40px; align-items: start; padding-top: 24px; }
+  body.desk .product { position: sticky; top: 64px; }
+  body.desk .imac { width: 360px; }
+  body.desk .display { height: 210px; }
+  body.desk .ask, body.desk .lines, body.desk .fine { margin-left: 0; margin-right: 0; max-width: none; }
+  body.tv .ask h2, body.tv .product h1 { font-size: 64px; }
+  body.tv .opt { min-height: 104px; }
+  body.tv .opt b, body.tv .line b { font-size: 28px; }
   body.kindle #app { background: #fff; color: #000; font-family: Georgia, "Times New Roman", serif; }
-  body.kindle .opt, body.kindle .bag button { border-radius: 0; }
-  body.kindle .display { background: #fff; border-color: #000; }
-  .step { display: flex; gap: 8px; }
-  .step button { flex: 1; min-height: 52px; background: #fff; border: 1px solid #111; font-weight: 700; }
+  body.kindle .opt, body.kindle .lines, body.kindle .dock button { border-radius: 0; }
+  body.kindle .display { background: #fff !important; border-color: #000; }
+  body.kindle .opt.on { border-color: #000; }
+  body.kindle .dock button { background: #000; }
+  .sheet { position: fixed; inset: 0; background: rgba(0,0,0,.35); display: flex; align-items: flex-end; justify-content: center; z-index: 8; }
+  .sheet .panel { width: min(560px, 100%); background: #fff; border-radius: 18px 18px 0 0; padding: 22px 22px calc(22px + env(safe-area-inset-bottom)); color: #1d1d1f; }
+  .sheet h2 { margin: 0 0 8px; font-size: 28px; font-weight: 600; letter-spacing: -0.03em; }
+  .sheet pre { white-space: pre-wrap; font: 15px/1.5 -apple-system, "Segoe UI", sans-serif; margin: 0 0 16px; }
+  .sheet button { width: 100%; min-height: 48px; border-radius: 980px; border: 0; background: #0071e3; color: #fff; font-weight: 500; }
 </style>
 </head>
 <body>
@@ -86,74 +100,79 @@
 (function () {
   var PARTS = {
     cpu: [
-      { id: "12400", name: "Intel Core i5-12400", price: 229, sock: "LGA1700", ddr: "4", ig: 1, w: 117, plain: "Fine for school and work. Can draw a picture without a picture card." },
-      { id: "5600", name: "AMD Ryzen 5 5600", price: 159, sock: "AM4", ddr: "4", ig: 0, w: 65, plain: "Cheap brain for games. It cannot draw a picture by itself." },
-      { id: "7600", name: "AMD Ryzen 5 7600", price: 269, sock: "AM5", ddr: "5", ig: 1, w: 88, plain: "A normal new brain. Can draw a picture by itself." },
-      { id: "7800x3d", name: "AMD Ryzen 7 7800X3D", price: 549, sock: "AM5", ddr: "5", ig: 0, w: 120, plain: "Very good at games. Needs a picture card." }
+      { id: "12400", name: "Core i5-12400", price: 229, sock: "LGA1700", ddr: "4", ig: 1, w: 117, plain: "Everyday speed. Graphics included." },
+      { id: "5600", name: "Ryzen 5 5600", price: 159, sock: "AM4", ddr: "4", ig: 0, w: 65, plain: "For 1080p games. Needs a graphics card." },
+      { id: "7600", name: "Ryzen 5 7600", price: 269, sock: "AM5", ddr: "5", ig: 1, w: 88, plain: "Current, quick, graphics included." },
+      { id: "7800x3d", name: "Ryzen 7 7800X3D", price: 549, sock: "AM5", ddr: "5", ig: 0, w: 120, plain: "For high-frame-rate games. Needs a graphics card." }
     ],
     mb: [
-      { id: "b760", name: "GIGABYTE B760M DS3H DDR4", price: 139, sock: "LGA1700", ddr: "4", form: "mATX", plain: "A small board for the Intel school brain." },
-      { id: "b550", name: "MSI B550M PRO-VDH WiFi", price: 149, sock: "AM4", ddr: "4", form: "mATX", plain: "A small board for the cheap AMD brain." },
-      { id: "b650m", name: "MSI MAG B650M Mortar WiFi", price: 249, sock: "AM5", ddr: "5", form: "mATX", plain: "A small board for a new AMD brain." },
-      { id: "b650", name: "GIGABYTE B650 EAGLE AX", price: 229, sock: "AM5", ddr: "5", form: "ATX", plain: "A full-size board for a new AMD brain." }
+      { id: "b760", name: "B760 motherboard", price: 139, sock: "LGA1700", ddr: "4", form: "mATX" },
+      { id: "b550", name: "B550 motherboard", price: 149, sock: "AM4", ddr: "4", form: "mATX" },
+      { id: "b650m", name: "B650 motherboard", price: 249, sock: "AM5", ddr: "5", form: "mATX" },
+      { id: "b650", name: "B650 motherboard", price: 229, sock: "AM5", ddr: "5", form: "ATX" }
     ],
     ram: [
-      { id: "d4-16", name: "16GB DDR4 memory", price: 55, ddr: "4", plain: "Enough for school, work, and lighter games." },
-      { id: "d4-32", name: "32GB DDR4 memory", price: 99, ddr: "4", plain: "More room for lots of tabs and programs." },
-      { id: "d5-16", name: "16GB DDR5 memory", price: 89, ddr: "5", plain: "Enough memory for a new AMD board." },
-      { id: "d5-32", name: "32GB DDR5 memory", price: 179, ddr: "5", plain: "The comfortable amount for games and work." }
+      { id: "d4-16", name: "16GB memory", price: 55, ddr: "4", plain: "Enough for work and school." },
+      { id: "d4-32", name: "32GB memory", price: 99, ddr: "4", plain: "Room for more programs." },
+      { id: "d5-16", name: "16GB memory", price: 89, ddr: "5", plain: "Enough for a current PC." },
+      { id: "d5-32", name: "32GB memory", price: 179, ddr: "5", plain: "Comfortable for games and work." }
     ],
     gpu: [
-      { id: "none", name: "No picture card", price: 0, w: 0, len: 0, need: 0, plain: "Only works if the brain can draw a picture itself." },
-      { id: "3050", name: "NVIDIA GeForce RTX 3050", price: 219, w: 70, len: 200, need: 450, plain: "Plays games at 1080p. Not a big card." },
-      { id: "4060", name: "NVIDIA GeForce RTX 4060", price: 389, w: 115, len: 200, need: 550, plain: "A normal card for 1080p and some 1440p." },
-      { id: "5070", name: "NVIDIA GeForce RTX 5070", price: 779, w: 250, len: 242, need: 650, plain: "A strong card for 1440p." }
+      { id: "none", name: "Built-in graphics", price: 0, w: 0, len: 0, need: 0, plain: "The picture comes from the processor." },
+      { id: "3050", name: "GeForce RTX 3050", price: 219, w: 70, len: 200, need: 450, plain: "1080p games." },
+      { id: "4060", name: "GeForce RTX 4060", price: 389, w: 115, len: 200, need: 550, plain: "Smooth 1080p, capable 1440p." },
+      { id: "5070", name: "GeForce RTX 5070", price: 779, w: 250, len: 242, need: 650, plain: "Serious 1440p." }
     ],
     ssd: [
-      { id: "500", name: "500GB storage", price: 49, plain: "Enough for Windows and some homework." },
-      { id: "1tb", name: "1TB storage", price: 99, plain: "Windows plus a bunch of games." },
-      { id: "2tb", name: "2TB storage", price: 219, plain: "Lots of games, music, or video." }
+      { id: "500", name: "512GB storage", price: 49, plain: "The system and your files." },
+      { id: "1tb", name: "1TB storage", price: 99, plain: "The system and a shelf of games." },
+      { id: "2tb", name: "2TB storage", price: 219, plain: "Games, music, and video." }
     ],
     cool: [
-      { id: "ax", name: "Small tower fan", price: 29, h: 148, plain: "Quiet enough. Fits most boxes." },
-      { id: "pa", name: "Big tower fan", price: 49, h: 155, plain: "Keeps a hotter brain cool." }
+      { id: "ax", name: "Standard cooling", price: 29, h: 148 },
+      { id: "pa", name: "Quiet cooling", price: 49, h: 155 }
     ],
     psu: [
-      { id: "500", name: "500W power box", price: 49, watts: 500, plain: "Only for a PC with no big picture card." },
-      { id: "650", name: "650W power box", price: 99, watts: 650, plain: "Enough for a normal picture card." },
-      { id: "750", name: "750W power box", price: 149, watts: 750, plain: "Room for a stronger picture card." },
-      { id: "850", name: "850W power box", price: 179, watts: 850, plain: "For a strong picture card." }
+      { id: "500", name: "500W power", price: 49, watts: 500 },
+      { id: "650", name: "650W power", price: 99, watts: 650 },
+      { id: "750", name: "750W power", price: 149, watts: 750 },
+      { id: "850", name: "850W power", price: 179, watts: 850 }
     ],
     box: [
-      { id: "air", name: "Small Montech box", price: 79, form: "mATX", cool: 160, gpu: 330, plain: "A small box. The board must be small too." },
-      { id: "h5", name: "NZXT H5 Flow box", price: 119, form: "ATX", cool: 165, gpu: 365, plain: "A normal tower. Fits a full-size board." },
-      { id: "d", name: "Corsair 4000D box", price: 129, form: "ATX", cool: 170, gpu: 360, plain: "A normal tower with room for a long picture card." }
+      { id: "air", name: "Compact case", price: 79, form: "mATX", cool: 160, gpu: 330 },
+      { id: "h5", name: "Standard case", price: 119, form: "ATX", cool: 165, gpu: 365 },
+      { id: "d", name: "Standard case", price: 129, form: "ATX", cool: 170, gpu: 360 }
     ]
   };
-
   var ORDER = ["cpu", "mb", "ram", "gpu", "ssd", "cool", "psu", "box"];
-  var LABEL = { cpu: "Brain", mb: "Board", ram: "Memory", gpu: "Picture card", ssd: "Storage", cool: "Fan", psu: "Power box", box: "Box" };
+  var LABEL = { cpu: "Processor", mb: "Motherboard", ram: "Memory", gpu: "Graphics", ssd: "Storage", cool: "Cooling", psu: "Power", box: "Case" };
   var RANK = { ITX: 1, mATX: 2, ATX: 3 };
-
   var RECIPES = {
     school: { cpu: "12400", mb: "b760", ram: "d4-16", gpu: "none", ssd: "500", cool: "ax", psu: "500", box: "air" },
     work: { cpu: "7600", mb: "b650m", ram: "d5-16", gpu: "none", ssd: "1tb", cool: "ax", psu: "650", box: "air" },
     games: { cpu: "5600", mb: "b550", ram: "d4-16", gpu: "3050", ssd: "1tb", cool: "ax", psu: "650", box: "air" },
-    "games-big": { cpu: "7600", mb: "b650", ram: "d5-32", gpu: "4060", ssd: "1tb", cool: "pa", psu: "750", box: "h5" },
-    "games-huge": { cpu: "7800x3d", mb: "b650", ram: "d5-32", gpu: "5070", ssd: "2tb", cool: "pa", psu: "850", box: "d" },
+    big: { cpu: "7600", mb: "b650", ram: "d5-32", gpu: "4060", ssd: "1tb", cool: "pa", psu: "750", box: "h5" },
+    huge: { cpu: "7800x3d", mb: "b650", ram: "d5-32", gpu: "5070", ssd: "2tb", cool: "pa", psu: "850", box: "d" },
     music: { cpu: "7600", mb: "b650m", ram: "d5-32", gpu: "none", ssd: "2tb", cool: "pa", psu: "650", box: "air" },
     web: { cpu: "12400", mb: "b760", ram: "d4-16", gpu: "none", ssd: "500", cool: "ax", psu: "500", box: "air" }
   };
+  var WALL = { school: "linear-gradient(165deg,#d9ffe8,#1f7a4d)", work: "linear-gradient(165deg,#e7eeff,#3c4f7a)", games: "linear-gradient(165deg,#d6e6ff,#163e78)", music: "linear-gradient(165deg,#f8e1ff,#5c2d6e)", web: "linear-gradient(165deg,#fff1c9,#b86a12)" };
+  var USES = [
+    ["school", "School", "Writing, class, and video."],
+    ["work", "Work", "Mail, documents, and calls."],
+    ["games", "Games", "Playing on a monitor."],
+    ["music", "Music", "Recording. Kept quiet."],
+    ["web", "Every day", "The internet, and not much else."]
+  ];
 
   var mode = "phone";
-  var screen = "job";
+  var step = "use";
+  var backTo = "";
   var job = "school";
-  var build = copy(RECIPES.school);
   var budget = 700;
-  var section = 0;
-  var dinoHits = 0;
-  var cactusHits = 0;
-  var nHits = 0;
+  var build = copy(RECIPES.school);
+  var dinoHits = 0, cactusHits = 0, nHits = 0;
+  var bagOpen = false;
 
   function copy(o) { var n = {}; for (var k in o) n[k] = o[k]; return n; }
   function find(group, id) {
@@ -161,7 +180,7 @@
     for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
     return list[0];
   }
-  function money(n) { return "$" + n.toLocaleString(); }
+  function money(n) { return "$" + Math.round(n).toLocaleString(); }
   function total() {
     var t = 0;
     for (var i = 0; i < ORDER.length; i++) t += find(ORDER[i], build[ORDER[i]]).price;
@@ -171,36 +190,79 @@
     var cpu = find("cpu", build.cpu), mb = find("mb", build.mb), ram = find("ram", build.ram);
     var gpu = find("gpu", build.gpu), cool = find("cool", build.cool), psu = find("psu", build.psu), box = find("box", build.box);
     var out = [];
-    if (cpu.sock !== mb.sock) out.push("The brain does not fit this board. It needs a " + cpu.sock + " board.");
-    if (ram.ddr !== mb.ddr) out.push("The memory is the wrong kind. This board wants DDR" + mb.ddr + ".");
-    if (!cpu.ig && gpu.id === "none") out.push("This brain cannot draw a picture. Add a picture card or the screen stays black.");
-    if (gpu.id !== "none" && psu.watts < gpu.need) out.push("The power box is too small for that picture card. It wants " + gpu.need + " watts or more.");
-    var draw = cpu.w + gpu.w + 80;
-    if (psu.watts < draw) out.push("The power box should be at least " + draw + " watts for this brain and picture card.");
-    if (RANK[mb.form] > RANK[box.form]) out.push("The board is too big for that box.");
-    if (cool.h > box.cool) out.push("The fan is too tall for that box.");
-    if (gpu.len > box.gpu) out.push("The picture card is too long for that box.");
+    if (cpu.sock !== mb.sock) out.push("This processor needs a " + cpu.sock + " motherboard.");
+    if (String(ram.ddr) !== String(mb.ddr)) out.push("This motherboard uses DDR" + mb.ddr + " memory.");
+    if (!cpu.ig && gpu.id === "none") out.push("This processor needs a graphics card.");
+    if (gpu.id !== "none" && psu.watts < gpu.need) out.push("This graphics card wants a " + gpu.need + "W power supply.");
+    if (psu.watts < cpu.w + gpu.w + 80) out.push("The power supply is too small.");
+    if (RANK[mb.form] > RANK[box.form]) out.push("The motherboard does not fit this case.");
+    if (cool.h > box.cool) out.push("The cooler does not fit this case.");
+    if (gpu.len > box.gpu) out.push("The graphics card does not fit this case.");
     return out;
   }
-  function fits(group, id) {
-    var old = build[group];
-    build[group] = id;
-    var ok = problems().length === 0;
-    build[group] = old;
-    return ok;
-  }
-
   function recipeFor(which, dollars) {
-    if (which === "games" && dollars >= 2500) return "games-huge";
-    if (which === "games" && dollars >= 1500) return "games-big";
+    if (which === "games" && dollars >= 2500) return "huge";
+    if (which === "games" && dollars >= 1500) return "big";
     if (which === "games") return "games";
     if (which === "music") return "music";
     if (which === "work" && dollars >= 1000) return "work";
     if (which === "web") return "web";
     return "school";
   }
-
-  function el(html) { app.innerHTML = html; }
+  function loadRecipe() { build = copy(RECIPES[recipeFor(job, budget)]); }
+  function settle(group, id) {
+    var snap = copy(build);
+    function works(next) {
+      build = next;
+      return problems().length === 0;
+    }
+    var direct = copy(snap);
+    direct[group] = id;
+    if (works(direct)) return true;
+    var cpuId = group === "cpu" ? id : snap.cpu;
+    var cpu = find("cpu", cpuId);
+    var gpuIds = group === "gpu" ? [id] : [snap.gpu, "none", "3050", "4060", "5070"];
+    var seen = {};
+    var psus = ["500", "650", "750", "850"];
+    var boxes = ["air", "h5", "d"];
+    var cools = ["ax", "pa"];
+    for (var g = 0; g < gpuIds.length; g++) {
+      if (seen[gpuIds[g]]) continue;
+      seen[gpuIds[g]] = 1;
+      for (var b = 0; b < PARTS.mb.length; b++) {
+        var board = PARTS.mb[b];
+        if (board.sock !== cpu.sock) continue;
+        if (group === "mb" && board.id !== id) continue;
+        for (var r = 0; r < PARTS.ram.length; r++) {
+          var ram = PARTS.ram[r];
+          if (String(ram.ddr) !== String(board.ddr)) continue;
+          if (group === "ram" && ram.id !== id) continue;
+          for (var p = 0; p < psus.length; p++) {
+            if (group === "psu" && psus[p] !== id) continue;
+            for (var c = 0; c < boxes.length; c++) {
+              if (group === "box" && boxes[c] !== id) continue;
+              for (var k = 0; k < cools.length; k++) {
+                if (group === "cool" && cools[k] !== id) continue;
+                var next = {
+                  cpu: cpuId,
+                  mb: board.id,
+                  ram: group === "ram" ? id : ram.id,
+                  gpu: gpuIds[g],
+                  ssd: group === "ssd" ? id : snap.ssd,
+                  cool: cools[k],
+                  psu: psus[p],
+                  box: boxes[c]
+                };
+                if (works(next)) return true;
+              }
+            }
+          }
+        }
+      }
+    }
+    build = snap;
+    return false;
+  }
 
   var gate = document.getElementById("gate");
   var app = document.getElementById("app");
@@ -210,15 +272,14 @@
     gate.style.display = "none";
     modal.innerHTML = "";
     app.className = "on";
-    screen = "buy";
     document.body.className = mode;
-    document.title = "Build a PC";
+    document.title = "PC";
+    step = "use";
     draw();
   }
-
   function askDevice() {
-    modal.innerHTML = '<div class="cover"><div class="card"><h2>What are you using?</h2><p>This only changes the buttons. The computer parts stay the same.</p><div class="stack" id="devs"></div></div></div>';
-    var opts = [["phone", "Phone"], ["desk", "Computer"], ["tv", "TV"], ["kindle", "Kindle"]];
+    modal.innerHTML = '<div class="cover"><div class="card"><h2>What are you using?</h2><p>Same PC. The layout changes.</p><div class="stack" id="devs"></div></div></div>';
+    var opts = [["phone", "iPhone"], ["desk", "Mac"], ["tv", "TV"], ["kindle", "Kindle"]];
     var box = document.getElementById("devs");
     for (var i = 0; i < opts.length; i++) {
       var b = document.createElement("button");
@@ -229,7 +290,6 @@
       box.appendChild(b);
     }
   }
-
   function askPassword() {
     modal.innerHTML = '<div class="cover"><form class="card" id="pw"><h2>System authentication</h2><p>Capital letters matter.</p><input id="pwv" type="password" autocomplete="off" placeholder="Password"><p class="err" id="pwe" hidden></p><div class="stack"><button type="submit">Authenticate</button></div></form></div>';
     document.getElementById("pw").onsubmit = function (e) {
@@ -238,117 +298,122 @@
       if (v === "Password1") { mode = "desk"; showApp(); return; }
       var err = document.getElementById("pwe");
       err.hidden = false;
-      err.textContent = "That password is not on the list. Sending you to Bing.";
-      setTimeout(function () { location.href = "https://www.bing.ca/"; }, 900);
+      err.textContent = "That password is not on the list.";
+      setTimeout(function () { location.href = "https://www.bing.ca/"; }, 700);
     };
     document.getElementById("pwv").focus();
   }
 
-  var WALL = { school: "linear-gradient(160deg,#b7f5c8,#1f7a4d)", work: "linear-gradient(160deg,#d9e4ff,#3a4d7c)", games: "linear-gradient(160deg,#8ec5ff,#123a73)", music: "linear-gradient(160deg,#f3c6ff,#5b2a6b)", web: "linear-gradient(160deg,#ffe7a3,#c47b16)" };
-
-  function delta(group, item) {
-    var now = find(group, build[group]).price;
-    var d = item.price - now;
-    if (item.id === build[group]) return "";
-    if (d === 0) return "same price";
-    return (d > 0 ? "+ " : "− ") + money(Math.abs(d));
+  function product() {
+    var bad = problems();
+    return '<div class="product"><div class="imac" aria-hidden="true"><div class="display" id="screen"></div><div class="chin"></div><div class="stand"></div><div class="foot"></div></div><h1>PC</h1><p class="price">' + money(total()) + '</p><p class="ok' + (bad.length ? " bad" : "") + '">' + (bad.length ? bad[0] : "Ready to build.") + '</p></div>';
   }
-
-  function optButton(group, item, on) {
-    var ok = fits(group, item.id) || on;
-    var why = "";
-    if (!ok) {
-      var old = build[group];
-      build[group] = item.id;
-      why = problems()[0] || "Does not fit.";
-      build[group] = old;
-    }
-    return '<button type="button" class="opt' + (on ? " on" : "") + '" data-g="' + group + '" data-id="' + item.id + '"' + (ok ? "" : " disabled") + '><i>' + (on ? "" : delta(group, item)) + '</i><b>' + item.name + '</b><span>' + (ok ? item.plain : why) + '</span></button>';
+  function paint() {
+    var screen = document.getElementById("screen");
+    if (screen) screen.style.background = mode === "kindle" ? "#fff" : (WALL[job] || WALL.web);
   }
+  function go(next) { step = next; bagOpen = false; draw(); window.scrollTo(0, 0); }
 
   function draw() {
-    var bad = problems();
-    var groups = "";
-    var uses = [["school", "School", "Homework and videos."], ["work", "Work", "Email, sheets, and calls."], ["games", "Games", "Play on a monitor."], ["music", "Music", "Record and make songs."], ["web", "Internet", "Browsing and YouTube."]];
-    var useHtml = "";
-    for (var u = 0; u < uses.length; u++) useHtml += '<button type="button" class="opt' + (job === uses[u][0] ? " on" : "") + '" data-job="' + uses[u][0] + '"><b>' + uses[u][1] + '</b><span>' + uses[u][2] + '</span></button>';
-    var cashHtml = "";
-    var cashes = [700, 1000, 1500, 2500];
-    for (var c = 0; c < cashes.length; c++) cashHtml += '<button type="button" class="opt' + (budget === cashes[c] ? " on" : "") + '" data-cash="' + cashes[c] + '"><b>' + money(cashes[c]) + '</b><span>Suggested PC around this price.</span></button>';
-    var partHtml = "";
-    for (var n = 0; n < ORDER.length; n++) {
-      var gname = ORDER[n];
-      var cards = "";
-      var list = PARTS[gname];
-      for (var j = 0; j < list.length; j++) cards += optButton(gname, list[j], list[j].id === build[gname]);
-      partHtml += '<section class="group" data-sec="' + (n + 2) + '"><h2>' + LABEL[gname] + '.</h2><p class="hint">Only a choice that fits can be selected.</p>' + cards + '</section>';
+    var html = '<div class="nav">PC</div><div class="stage">' + product() + '<div class="panel">';
+    if (step === "use") {
+      html += '<div class="ask"><h2>What is it for?</h2><p class="lead">Pick one. We’ll choose parts that belong together.</p>';
+      for (var i = 0; i < USES.length; i++) html += '<button type="button" class="opt' + (job === USES[i][0] ? " on" : "") + '" data-job="' + USES[i][0] + '"><span><b>' + USES[i][1] + '</b><span>' + USES[i][2] + '</span></span></button>';
+      html += '</div>';
+    } else if (step === "money") {
+      html += '<div class="ask"><h2>Choose a budget.</h2><p class="lead">Catalog prices. Not a store.</p>';
+      var cashes = [700, 1000, 1500, 2500];
+      for (var c = 0; c < cashes.length; c++) html += '<button type="button" class="opt' + (budget === cashes[c] ? " on" : "") + '" data-cash="' + cashes[c] + '"><b>' + money(cashes[c]) + '</b></button>';
+      html += '</div>';
+    } else if (step === "review") {
+      html += '<div class="lines">';
+      var shown = ["cpu", "ram", "gpu", "ssd", "mb", "psu", "cool", "box"];
+      for (var n = 0; n < shown.length; n++) {
+        var g = shown[n];
+        var part = find(g, build[g]);
+        html += '<button type="button" class="line" data-edit="' + g + '"><span><small>' + LABEL[g] + '</small><b>' + part.name + '</b></span><em>' + money(part.price) + '</em></button>';
+      }
+      html += '</div><p class="fine">No display is included. Prices are examples.</p>';
+    } else {
+      var group = step;
+      html += '<div class="ask"><h2>' + LABEL[group] + '.</h2><p class="lead">Tap one. Anything here will fit.</p>';
+      var list = PARTS[group];
+      for (var j = 0; j < list.length; j++) {
+        var trial = copy(build);
+        build = copy(build);
+        var ok = settle(group, list[j].id);
+        build = trial;
+        if (!ok && list[j].id !== build[group]) continue;
+        var on = list[j].id === build[group];
+        html += '<button type="button" class="opt' + (on ? " on" : "") + '" data-g="' + group + '" data-id="' + list[j].id + '"><span><b>' + list[j].name + '</b><span>' + (list[j].plain || LABEL[group]) + '</span></span><em>' + money(list[j].price) + '</em></button>';
+      }
+      html += '</div>';
     }
-    groups = '<section class="group" data-sec="0"><h2>Use.</h2><p class="hint">This picks a starting PC. You can change every part after.</p>' + useHtml + '</section>' +
-      '<section class="group" data-sec="1"><h2>Budget.</h2><p class="hint">Example catalog prices, not a store.</p>' + cashHtml + '</section>' + partHtml;
-    if (mode === "kindle") {
-      var secs = groups.match(/<section[\s\S]*?<\/section>/g) || [];
-      if (section >= secs.length) section = 0;
-      groups = secs[section] + '<div class="step"><button type="button" id="prev">Previous</button><button type="button" id="next">Next</button></div>';
+    html += '</div></div>';
+    if (step === "review") html += '<div class="dock"><button type="button" id="bag">Add to Bag</button></div>';
+    if (bagOpen) {
+      var text = "PC  " + money(total());
+      for (var t = 0; t < ORDER.length; t++) text += "\n" + LABEL[ORDER[t]] + "  " + find(ORDER[t], build[ORDER[t]]).name;
+      html += '<div class="sheet"><div class="panel"><h2>Added to Bag.</h2><pre id="list">' + text + '</pre><button type="button" id="closebag">Done</button></div></div>';
     }
-    el('<div class="nav">DREW · PC</div><div class="buy"><div class="hero-col"><div class="imac" aria-hidden="true"><div class="display" id="screen"></div><div class="chin"></div><div class="stand"></div><div class="foot"></div></div><p class="eyebrow">Buy</p><h1>PC</h1><p class="price">' + money(total()) + '</p><p class="status ' + (bad.length ? "bad" : "") + '">' + (bad.length ? bad[0] : "This PC works.") + '</p></div><div class="opts">' + groups + '<p class="note">No monitor in this list. Prices are catalog examples.</p></div></div><div class="bag"><div><b>' + money(total()) + '</b><div class="note">' + (bad.length ? "Fix the part above" : "Ready") + '</div></div><button type="button" id="bag">Add to Bag</button></div>');
-    var screenEl = document.getElementById("screen");
-    if (screenEl) screenEl.style.background = WALL[job] || WALL.web;
-    var jobBtns = document.querySelectorAll("[data-job]");
-    for (var a = 0; a < jobBtns.length; a++) jobBtns[a].onclick = function () {
+    app.innerHTML = html;
+    paint();
+
+    var jobs = document.querySelectorAll("[data-job]");
+    for (var a = 0; a < jobs.length; a++) jobs[a].onclick = function () {
       job = this.getAttribute("data-job");
-      build = copy(RECIPES[recipeFor(job, budget)]);
-      draw();
+      loadRecipe();
+      go(backTo || "money");
+      backTo = "";
     };
-    var cashBtns = document.querySelectorAll("[data-cash]");
-    for (var b = 0; b < cashBtns.length; b++) cashBtns[b].onclick = function () {
+    var cash = document.querySelectorAll("[data-cash]");
+    for (var b = 0; b < cash.length; b++) cash[b].onclick = function () {
       budget = Number(this.getAttribute("data-cash"));
-      build = copy(RECIPES[recipeFor(job, budget)]);
+      loadRecipe();
+      go(backTo || "review");
+      backTo = "";
+    };
+    var edits = document.querySelectorAll("[data-edit]");
+    for (var e = 0; e < edits.length; e++) edits[e].onclick = function () {
+      backTo = "review";
+      go(this.getAttribute("data-edit"));
+    };
+    var picks = document.querySelectorAll("[data-g]");
+    for (var p = 0; p < picks.length; p++) picks[p].onclick = function () {
+      settle(this.getAttribute("data-g"), this.getAttribute("data-id"));
+      go(backTo || "review");
+      backTo = "";
+    };
+    var bag = document.getElementById("bag");
+    if (bag) bag.onclick = function () {
+      if (problems().length) return;
+      bagOpen = true;
       draw();
+      var list = document.getElementById("list");
+      if (list && navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(list.textContent).catch(function () {});
+      }
     };
-    var partBtns = document.querySelectorAll("[data-g]");
-    for (var p = 0; p < partBtns.length; p++) partBtns[p].onclick = function () {
-      if (this.disabled) return;
-      build[this.getAttribute("data-g")] = this.getAttribute("data-id");
-      draw();
-    };
-    var prev = document.getElementById("prev");
-    var next = document.getElementById("next");
-    if (prev) prev.onclick = function () { section = Math.max(0, section - 1); draw(); };
-    if (next) next.onclick = function () { section += 1; draw(); };
-    document.getElementById("bag").onclick = function () {
-      var lines = "PC " + money(total());
-      for (var i = 0; i < ORDER.length; i++) lines += "\n" + LABEL[ORDER[i]] + ": " + find(ORDER[i], build[ORDER[i]]).name;
-      var self = this;
-      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(lines);
-      self.textContent = bad.length ? "Not yet" : "Added";
-    };
+    var close = document.getElementById("closebag");
+    if (close) close.onclick = function () { bagOpen = false; draw(); };
   }
 
   var canvas = document.getElementById("dino");
-  var g = canvas.getContext("2d");
-  var cactus = [280, 540];
-  var run = 0, dy = 0, vy = 0;
+  var ctx = canvas.getContext("2d");
+  var cactusX = 250;
+  var dy = 0, vy = 0;
   function frame() {
-    g.clearRect(0, 0, 420, 110);
-    g.fillStyle = "#535353";
-    if (run) {
-      for (var i = 0; i < cactus.length; i++) {
-        cactus[i] -= 4;
-        if (cactus[i] < -30) cactus[i] = 500 + Math.random() * 200;
-      }
-    }
+    ctx.clearRect(0, 0, 420, 110);
+    ctx.fillStyle = "#535353";
     if (vy || dy) { dy += vy; vy -= 0.8; if (dy < 0) { dy = 0; vy = 0; } }
-    g.fillRect(24, 78 - dy, 18, 22);
-    g.fillRect(36, 70 - dy, 10, 8);
-    g.fillRect(24, 96 - dy, 6, 8);
-    g.fillRect(34, 96 - dy, 6, 8);
-    for (var c = 0; c < cactus.length; c++) {
-      var x = cactus[c];
-      g.fillRect(x, 70, 8, 30);
-      g.fillRect(x - 8, 80, 8, 6);
-      g.fillRect(x + 8, 76, 8, 6);
-    }
-    g.fillRect(0, 104, 420, 2);
+    ctx.fillRect(24, 78 - dy, 18, 22);
+    ctx.fillRect(36, 70 - dy, 10, 8);
+    ctx.fillRect(24, 96 - dy, 6, 8);
+    ctx.fillRect(34, 96 - dy, 6, 8);
+    ctx.fillRect(cactusX, 62, 10, 42);
+    ctx.fillRect(cactusX - 12, 74, 12, 7);
+    ctx.fillRect(cactusX + 10, 70, 12, 7);
+    ctx.fillRect(0, 104, 420, 2);
     requestAnimationFrame(frame);
   }
   frame();
@@ -356,18 +421,15 @@
     var r = canvas.getBoundingClientRect();
     var x = ((e.clientX - r.left) / r.width) * 420;
     var y = ((e.clientY - r.top) / r.height) * 110;
-    var onCactus = false;
-    for (var i = 0; i < cactus.length; i++) if (x > cactus[i] - 10 && x < cactus[i] + 20 && y > 66 && y < 104) onCactus = true;
-    if (onCactus) {
+    if (x > cactusX - 24 && x < cactusX + 36 && y > 50 && y < 108) {
       cactusHits += 1;
       if (cactusHits >= 3) showApp();
       return;
     }
-    if (x >= 18 && x <= 52 && y >= 40 && y <= 104) {
+    if (x < 70 && y > 30) {
       dinoHits += 1;
       if (dinoHits >= 3) { askPassword(); return; }
     }
-    run = 1;
     if (!dy && !vy) vy = 10;
   });
   function hitN() { nHits += 1; if (nHits >= 3) askDevice(); }
