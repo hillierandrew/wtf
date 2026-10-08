@@ -222,6 +222,7 @@
   var state = blank();
   var mode = "phone";
   var section = "home";
+  var driveKind = "";
   var bag = false;
   var cart = [];
   var note = "";
@@ -475,50 +476,47 @@
 
   function viewHome() {
     var tiles = [
-      ["pick", "", "Picking", "cart", "#e15b45"],
-      ["goto", "build", "Bin Item List", "box", "#5b78e8"],
-      ["goto", "build", "Update Bin", "folder", "#e0b23e"],
-      ["bag", "", "Bin Transfer", "swap", "#7a6fd0"],
-      ["save", "", "Sales Order", "doc", "#5caf68"],
-      ["goto", "orders", "SO Picking", "check", "#67b86d"],
-      ["goto", "build", "Stock Count", "home", "#d15a48"],
-      ["goto", "mb", "View Stock", "cube", "#6478e4"],
-      ["goto", "cpu", "View Item", "item", "#7464b4"],
-      ["goto", "psu", "Transfer Ship Confirm", "ship", "#d4ae55"],
-      ["bag", "", "Receive Transfer", "in", "#e06a58"],
-      ["goto", "box", "Skid Load/UnLoad", "skid", "#4f7fe0"]
+      ["goto", "cpu", "CPU", "cpu", "#e15b45"],
+      ["goto", "cool", "Cooler", "cool", "#5b78e8"],
+      ["goto", "mb", "Board", "mb", "#e0b23e"],
+      ["goto", "ram", "Memory", "ram", "#7a6fd0"],
+      ["goto", "gpu", "GPU", "gpu", "#5caf68"],
+      ["drives", "nvme", "NVMe", "nvme", "#67b86d"],
+      ["drives", "hdd", "Hard Drive", "hdd", "#d15a48"],
+      ["goto", "psu", "Power", "psu", "#6478e4"],
+      ["goto", "box", "Case", "case", "#7464b4"],
+      ["goto", "fans", "Fans", "fan", "#d4ae55"],
+      ["goto", "build", "Build", "build", "#e06a58"],
+      ["goto", "orders", "Computers", "pcs", "#4f7fe0"]
     ];
     var h = '<div class="tiles">';
     for (var i = 0; i < tiles.length; i++) {
       var t = tiles[i];
-      var label = t[2].replace(" ", "<br>");
-      if (t[2] === "Transfer Ship Confirm") label = "Transfer Ship<br>Confirm";
-      if (t[2] === "Receive Transfer") label = "Receive<br>Transfer";
-      if (t[2] === "Skid Load/UnLoad") label = "Skid<br>Load/UnLoad";
-      h += '<button type="button" class="tile" data-act="' + t[0] + '"' + (t[1] ? ' data-id="' + t[1] + '"' : "") + '><span class="ico">' + glyph(t[3], t[4]) + '</span>' + (t[2] === "SO Picking" ? '<span class="badge">4</span>' : "") + '<span>' + label + '</span></button>';
+      var label = t[2] === "Hard Drive" ? "Hard<br>Drive" : t[2];
+      h += '<button type="button" class="tile" data-act="' + t[0] + '" data-id="' + t[1] + '"><span class="ico">' + glyph(t[3], t[4]) + '</span>' + (t[2] === "Computers" ? '<span class="badge">4</span>' : "") + '<span>' + label + '</span></button>';
     }
     return h + '</div>';
   }
   function glyph(name, color) {
     var s = {
-      cart: '<path d="M4 6h2.2l1.6 8.2h9.4l1.8-5.4H8.2" fill="none" stroke="' + color + '" stroke-width="1.7" stroke-linejoin="round"/><circle cx="9" cy="17.2" r="1.3" fill="' + color + '"/><circle cx="15" cy="17.2" r="1.3" fill="' + color + '"/>',
-      box: '<path d="M4 8l8-3.5L20 8l-8 3.5L4 8z" fill="' + color + '"/><path d="M4 8v8l8 3.5V11.5L4 8zm16 0v8l-8 3.5V11.5L20 8z" fill="' + color + '" opacity=".55"/>',
-      folder: '<path d="M3 7.5h6l1.6 2H21v8.2a1.4 1.4 0 0 1-1.4 1.4H4.4A1.4 1.4 0 0 1 3 17.7V7.5z" fill="' + color + '"/>',
-      swap: '<path d="M7 7h9l-2.2-2.2M17 17H8l2.2 2.2" fill="none" stroke="' + color + '" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 4.8L18.4 7 16 9.2M8 14.8L5.6 17 8 19.2" fill="none" stroke="' + color + '" stroke-width="1.7" stroke-linecap="round"/>',
-      doc: '<path d="M7 3.5h7l4 4V20a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1z" fill="' + color + '"/><path d="M14 3.8V8h4.2" fill="#fff" opacity=".85"/>',
-      check: '<path d="M6 4h12a1 1 0 0 1 1 1v14l-2.2-1.4L14.6 19l-2.2-1.4L10.2 19 8 17.6 6 19V5a1 1 0 0 1 0 0z" fill="' + color + '"/><path d="M9 11.2l2 2 4-4.2" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>',
-      home: '<path d="M4 11.2L12 4l8 7.2V20H4v-8.8z" fill="' + color + '"/><rect x="10" y="13" width="4" height="7" fill="#fff"/>',
-      cube: '<path d="M12 3l8 4.2v8.6L12 21l-8-5.2V7.2L12 3z" fill="' + color + '"/><path d="M12 12l8-4.2M12 12v9M12 12L4 7.8" fill="none" stroke="#fff" stroke-width="1.2"/>',
-      item: '<rect x="6" y="3.5" width="12" height="17" rx="1.4" fill="' + color + '"/><path d="M9 8h6M9 12h6M9 16h4" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/>',
-      ship: '<path d="M4 14h10l2-4h3l1 4" fill="none" stroke="' + color + '" stroke-width="1.7" stroke-linejoin="round"/><circle cx="8" cy="17" r="1.5" fill="' + color + '"/><circle cx="16" cy="17" r="1.5" fill="' + color + '"/><path d="M3 14V9h6" fill="none" stroke="' + color + '" stroke-width="1.7"/>',
-      in: '<path d="M12 4v10" stroke="' + color + '" stroke-width="1.8" stroke-linecap="round"/><path d="M8 10l4 4 4-4" fill="none" stroke="' + color + '" stroke-width="1.8" stroke-linecap="round"/><path d="M5 18h14" stroke="' + color + '" stroke-width="1.8" stroke-linecap="round"/>',
-      skid: '<rect x="3" y="8" width="14" height="8" rx="1" fill="' + color + '"/><path d="M17 10h3v4h-3" fill="' + color + '"/><circle cx="7" cy="17.5" r="1.2" fill="' + color + '"/><circle cx="13" cy="17.5" r="1.2" fill="' + color + '"/>'
+      cpu: '<rect x="5" y="5" width="14" height="14" rx="2" fill="' + color + '"/><rect x="9" y="9" width="6" height="6" fill="#fff"/><path d="M8 3.2h2M12 3.2h2M16 3.2h.2M8 20.8h2M12 20.8h2M3.2 8v2M3.2 12v2M20.8 8v2M20.8 12v2" stroke="' + color + '" stroke-width="1.3" stroke-linecap="round"/>',
+      cool: '<rect x="9" y="3" width="6" height="14" rx="1" fill="' + color + '"/><path d="M7 5h10M7 8h10M7 11h10M7 14h10" stroke="#fff" stroke-width="1"/><rect x="10.5" y="17" width="3" height="4" fill="' + color + '"/>',
+      mb: '<rect x="3" y="4" width="18" height="16" rx="1.5" fill="' + color + '"/><rect x="5" y="6" width="6" height="6" fill="#fff"/><path d="M13 7h6M13 10h6M13 14h4" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/>',
+      ram: '<rect x="8" y="3" width="8" height="18" rx="1" fill="' + color + '"/><path d="M10 6h4M10 9h4M10 12h4M10 15h4" stroke="#fff" stroke-width="1.2"/>',
+      gpu: '<rect x="2" y="8" width="20" height="8" rx="1.5" fill="' + color + '"/><circle cx="8" cy="12" r="2.2" fill="#fff"/><circle cx="14" cy="12" r="2.2" fill="#fff"/>',
+      nvme: '<rect x="3" y="9" width="18" height="6" rx="1" fill="' + color + '"/><rect x="5" y="11" width="6" height="2" fill="#fff"/>',
+      hdd: '<rect x="4" y="6" width="16" height="12" rx="2" fill="' + color + '"/><circle cx="12" cy="12" r="3.2" fill="none" stroke="#fff" stroke-width="1.4"/><circle cx="12" cy="12" r="1" fill="#fff"/>',
+      psu: '<rect x="4" y="5" width="16" height="14" rx="1.5" fill="' + color + '"/><circle cx="10" cy="12" r="3" fill="none" stroke="#fff" stroke-width="1.3"/><path d="M15 9v6" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/>',
+      case: '<path d="M7 3h8l2 3v15H5V6l2-3z" fill="' + color + '"/><rect x="10" y="8" width="4" height="3" fill="#fff"/>',
+      fan: '<circle cx="12" cy="12" r="7" fill="none" stroke="' + color + '" stroke-width="1.8"/><circle cx="12" cy="12" r="2" fill="' + color + '"/><path d="M12 5v3M12 16v3M5 12h3M16 12h3" stroke="' + color + '" stroke-width="1.6" stroke-linecap="round"/>',
+      build: '<rect x="5" y="4" width="14" height="16" rx="1.5" fill="' + color + '"/><path d="M8 8h8M8 12h8M8 16h5" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/>',
+      pcs: '<rect x="3" y="5" width="18" height="11" rx="1.5" fill="' + color + '"/><path d="M9 19h6" stroke="' + color + '" stroke-width="1.6" stroke-linecap="round"/>'
     };
-    return '<svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true">' + (s[name] || s.box) + '</svg>';
+    return '<svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true">' + (s[name] || s.cpu) + '</svg>';
   }
   function viewOrders() {
     var keys = [["study", "Class, writing, and video."], ["desk", "A full day of work."], ["play", "Games at 1080p."], ["pro", "Games at 1440p."]];
-    var h = '<div class="block"><h2>SO Picking</h2><p class="fine">Four finished computers. Pick one and it loads onto the bench.</p>';
+    var h = '<div class="block"><h2>Computers</h2><p class="fine">Four finished computers. Pick one and it loads.</p>';
     for (var i = 0; i < keys.length; i++) {
       var r = RECIPES[keys[i][0]];
       h += '<button type="button" class="part" data-act="recipe" data-id="' + keys[i][0] + '"><span><b>' + r.name + '</b><small>' + keys[i][1] + '</small></span><em>' + money(priceOf(r)) + '</em></button>';
@@ -604,9 +602,12 @@
     }
     if (section === "store") {
       var mb2 = find(MB, state.mb);
-      h += '<h2 class="display">Storage</h2>' + (mb2 ? boardSlots() : '<p class="fine">Choose a board to know how many drives fit.</p>');
+      var storeTitle = driveKind === "nvme" ? "NVMe" : driveKind === "hdd" ? "Hard Drive" : "Storage";
+      h += '<h2 class="display">' + storeTitle + '</h2>' + (mb2 ? boardSlots() : '<p class="fine">Choose a board to know how many drives fit.</p>');
       for (var s = 0; s < DRIVE.length; s++) {
         var d = DRIVE[s];
+        if (driveKind === "nvme" && d.kind !== "nvme") continue;
+        if (driveKind === "hdd" && !(d.rpm > 0)) continue;
         var spec = d.kind === "nvme" ? "PCIe " + d.gen + " ×4 · " + d.read.toLocaleString() + " / " + d.write.toLocaleString() + " MB/s · M.2 " + d.form : (d.rpm ? d.rpm + " RPM · " + d.cache + " cache · " + d.iface : d.iface + " · " + d.form);
         var oks = true, whys = "Fits";
         if (!mb2) { oks = false; whys = "Choose a board first."; }
@@ -664,7 +665,7 @@
     var y = 0;
     var mainEl = document.querySelector(".main");
     if (mainEl) y = mainEl.scrollTop || window.scrollY;
-    var html = '<header class="topbar"><button type="button" data-act="home" aria-label="112 Mississauga"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3.2a6.2 6.2 0 0 0-6.2 6.2c0 4.6 6.2 11.4 6.2 11.4s6.2-6.8 6.2-11.4A6.2 6.2 0 0 0 12 3.2zm0 8.3a2.1 2.1 0 1 1 0-4.2 2.1 2.1 0 0 1 0 4.2z" fill="#fff"/></svg>112 Mississauga<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M7 10l5 5 5-5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></button><button type="button" data-act="bag" aria-label="Andrew.H"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="8" r="3.2" fill="#fff"/><path d="M5.5 19.2c1.2-3 3.5-4.4 6.5-4.4s5.3 1.4 6.5 4.4" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>Andrew.H</button></header>';
+    var html = '<header class="topbar"><button type="button" data-act="home">PC</button><button type="button" data-act="bag">Bag' + (cart.length ? " " + cart.length : "") + '</button></header>';
     if (boot) {
       html += '<div class="boot"><p class="kicker">' + boot.name + '</p><h1 class="display">Building it.</h1><ul>';
       for (var i = 0; i < boot.steps.length; i++) html += '<li class="' + (i <= boot.at ? "on" : "") + '">' + (i < boot.at ? "✓ " : i === boot.at ? "● " : "○ ") + boot.steps[i] + '</li>';
@@ -731,7 +732,8 @@
     if (act === "home") { section = "home"; bag = false; note = ""; draw(); window.scrollTo(0, 0); return; }
     if (act === "pick") { section = state.cpu ? "build" : "orders"; bag = false; note = ""; draw(); window.scrollTo(0, 0); return; }
     if (act === "bag") { bag = !bag; draw(); return; }
-    if (act === "goto") { section = id; note = ""; draw(); window.scrollTo(0, 0); return; }
+    if (act === "goto") { driveKind = ""; section = id; note = ""; draw(); window.scrollTo(0, 0); return; }
+    if (act === "drives") { driveKind = id; section = "store"; note = ""; bag = false; draw(); window.scrollTo(0, 0); return; }
     if (act === "recipe") { bag = false; startBoot(RECIPES[id]); return; }
     if (act === "empty") { state = blank(); section = "build"; note = ""; draw(); return; }
     if (act === "setcpu") { state.cpu = id; section = "build"; draw(); return; }
