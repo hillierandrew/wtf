@@ -44,7 +44,18 @@
   .dev button { text-align: left; border-top: 1px solid rgba(28,25,21,.12); }
 
   #app { display: none; min-height: 100vh; min-height: 100dvh; background: var(--bg); color: var(--ink); font-family: "Avenir Next", "Segoe UI", Helvetica, Arial, sans-serif; }
-  #app.on { display: block; }
+  #app.on { display: block; background: #eef2f8; color: #4a5364; font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  #app.on .display { font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-weight: 650; letter-spacing: 0; }
+  .topbar { position: sticky; top: 0; z-index: 5; min-height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 12px 8px; background: #3d74e8; color: #fff; }
+  .topbar button { background: none; border: 0; color: #fff; min-height: 44px; font-size: 16px; display: flex; align-items: center; gap: 6px; padding: 0; }
+  .topbar svg { flex: 0 0 auto; }
+  .tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 6px; max-width: 480px; margin: 0 auto; padding: 16px 10px 28px; }
+  .tile { position: relative; background: transparent; border: 0; color: #7b8494; min-height: 112px; padding: 6px 4px 8px; display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 13px; line-height: 1.15; text-align: center; }
+  .tile .ico { width: 74px; height: 66px; border-radius: 14px; background: rgba(255,255,255,.72); display: flex; align-items: center; justify-content: center; }
+  .tile .badge { position: absolute; top: 2px; right: 18px; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; background: #e53935; color: #fff; font-size: 12px; font-weight: 700; line-height: 22px; }
+  #app.on .block { background: #fff; border-radius: 12px; border-color: rgba(61,116,232,.12); }
+  #app.on .texty.primary { background: #3d74e8; color: #fff; border-color: #3d74e8; }
+  #app.on .back { color: #3d74e8; }
   .display { font-family: "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, serif; font-weight: 500; letter-spacing: -0.03em; }
   .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
   .nav { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; padding: 0 18px; background: var(--bg); background: color-mix(in srgb, var(--bg) 88%, transparent); border-bottom: 1px solid var(--line); backdrop-filter: blur(16px); }
@@ -359,6 +370,8 @@
     app.className = "on";
     document.body.className = mode + " inapp";
     document.title = "DREW.WTF";
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", "#3d74e8");
     section = "home";
     applyTheme();
     draw();
@@ -461,13 +474,56 @@
   }
 
   function viewHome() {
+    var tiles = [
+      ["pick", "", "Picking", "cart", "#e15b45"],
+      ["goto", "build", "Bin Item List", "box", "#5b78e8"],
+      ["goto", "build", "Update Bin", "folder", "#e0b23e"],
+      ["bag", "", "Bin Transfer", "swap", "#7a6fd0"],
+      ["save", "", "Sales Order", "doc", "#5caf68"],
+      ["goto", "orders", "SO Picking", "check", "#67b86d"],
+      ["goto", "build", "Stock Count", "home", "#d15a48"],
+      ["goto", "mb", "View Stock", "cube", "#6478e4"],
+      ["goto", "cpu", "View Item", "item", "#7464b4"],
+      ["goto", "psu", "Transfer Ship Confirm", "ship", "#d4ae55"],
+      ["bag", "", "Receive Transfer", "in", "#e06a58"],
+      ["goto", "box", "Skid Load/UnLoad", "skid", "#4f7fe0"]
+    ];
+    var h = '<div class="tiles">';
+    for (var i = 0; i < tiles.length; i++) {
+      var t = tiles[i];
+      var label = t[2].replace(" ", "<br>");
+      if (t[2] === "Transfer Ship Confirm") label = "Transfer Ship<br>Confirm";
+      if (t[2] === "Receive Transfer") label = "Receive<br>Transfer";
+      if (t[2] === "Skid Load/UnLoad") label = "Skid<br>Load/UnLoad";
+      h += '<button type="button" class="tile" data-act="' + t[0] + '"' + (t[1] ? ' data-id="' + t[1] + '"' : "") + '><span class="ico">' + glyph(t[3], t[4]) + '</span>' + (t[2] === "SO Picking" ? '<span class="badge">4</span>' : "") + '<span>' + label + '</span></button>';
+    }
+    return h + '</div>';
+  }
+  function glyph(name, color) {
+    var s = {
+      cart: '<path d="M4 6h2.2l1.6 8.2h9.4l1.8-5.4H8.2" fill="none" stroke="' + color + '" stroke-width="1.7" stroke-linejoin="round"/><circle cx="9" cy="17.2" r="1.3" fill="' + color + '"/><circle cx="15" cy="17.2" r="1.3" fill="' + color + '"/>',
+      box: '<path d="M4 8l8-3.5L20 8l-8 3.5L4 8z" fill="' + color + '"/><path d="M4 8v8l8 3.5V11.5L4 8zm16 0v8l-8 3.5V11.5L20 8z" fill="' + color + '" opacity=".55"/>',
+      folder: '<path d="M3 7.5h6l1.6 2H21v8.2a1.4 1.4 0 0 1-1.4 1.4H4.4A1.4 1.4 0 0 1 3 17.7V7.5z" fill="' + color + '"/>',
+      swap: '<path d="M7 7h9l-2.2-2.2M17 17H8l2.2 2.2" fill="none" stroke="' + color + '" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 4.8L18.4 7 16 9.2M8 14.8L5.6 17 8 19.2" fill="none" stroke="' + color + '" stroke-width="1.7" stroke-linecap="round"/>',
+      doc: '<path d="M7 3.5h7l4 4V20a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1z" fill="' + color + '"/><path d="M14 3.8V8h4.2" fill="#fff" opacity=".85"/>',
+      check: '<path d="M6 4h12a1 1 0 0 1 1 1v14l-2.2-1.4L14.6 19l-2.2-1.4L10.2 19 8 17.6 6 19V5a1 1 0 0 1 0 0z" fill="' + color + '"/><path d="M9 11.2l2 2 4-4.2" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>',
+      home: '<path d="M4 11.2L12 4l8 7.2V20H4v-8.8z" fill="' + color + '"/><rect x="10" y="13" width="4" height="7" fill="#fff"/>',
+      cube: '<path d="M12 3l8 4.2v8.6L12 21l-8-5.2V7.2L12 3z" fill="' + color + '"/><path d="M12 12l8-4.2M12 12v9M12 12L4 7.8" fill="none" stroke="#fff" stroke-width="1.2"/>',
+      item: '<rect x="6" y="3.5" width="12" height="17" rx="1.4" fill="' + color + '"/><path d="M9 8h6M9 12h6M9 16h4" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/>',
+      ship: '<path d="M4 14h10l2-4h3l1 4" fill="none" stroke="' + color + '" stroke-width="1.7" stroke-linejoin="round"/><circle cx="8" cy="17" r="1.5" fill="' + color + '"/><circle cx="16" cy="17" r="1.5" fill="' + color + '"/><path d="M3 14V9h6" fill="none" stroke="' + color + '" stroke-width="1.7"/>',
+      in: '<path d="M12 4v10" stroke="' + color + '" stroke-width="1.8" stroke-linecap="round"/><path d="M8 10l4 4 4-4" fill="none" stroke="' + color + '" stroke-width="1.8" stroke-linecap="round"/><path d="M5 18h14" stroke="' + color + '" stroke-width="1.8" stroke-linecap="round"/>',
+      skid: '<rect x="3" y="8" width="14" height="8" rx="1" fill="' + color + '"/><path d="M17 10h3v4h-3" fill="' + color + '"/><circle cx="7" cy="17.5" r="1.2" fill="' + color + '"/><circle cx="13" cy="17.5" r="1.2" fill="' + color + '"/>'
+    };
+    return '<svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true">' + (s[name] || s.box) + '</svg>';
+  }
+  function viewOrders() {
     var keys = [["study", "Class, writing, and video."], ["desk", "A full day of work."], ["play", "Games at 1080p."], ["pro", "Games at 1440p."]];
-    var h = '<div class="home"><p class="kicker">DREW.WTF</p><h1 class="display">One computer.</h1><p class="lede">Six parts make it real: processor, board, memory, storage, power, case. Everything else is optional, and the page will say when something does not fit.</p><div class="starts">';
+    var h = '<div class="block"><h2>SO Picking</h2><p class="fine">Four finished computers. Pick one and it loads onto the bench.</p>';
     for (var i = 0; i < keys.length; i++) {
       var r = RECIPES[keys[i][0]];
-      h += '<button type="button" class="start" data-act="recipe" data-id="' + keys[i][0] + '">' + sil(keys[i][0] === "play" || keys[i][0] === "pro" ? "gpu" : "cpu") + '<span><b>' + r.name + '</b><span>' + keys[i][1] + '</span></span><em>' + money(priceOf(r)) + '</em></button>';
+      h += '<button type="button" class="part" data-act="recipe" data-id="' + keys[i][0] + '"><span><b>' + r.name + '</b><small>' + keys[i][1] + '</small></span><em>' + money(priceOf(r)) + '</em></button>';
     }
-    h += '</div><div class="tools"><button type="button" class="texty" data-act="empty">Start empty</button></div><p class="fine">Catalog prices. Nothing is charged. A display is not included.</p></div>';
+    h += '<button type="button" class="texty" data-act="empty">Start empty</button></div>';
     return h;
   }
   function viewBuild() {
@@ -608,14 +664,15 @@
     var y = 0;
     var mainEl = document.querySelector(".main");
     if (mainEl) y = mainEl.scrollTop || window.scrollY;
-    var html = '<header class="nav"><button type="button" class="mark" data-act="home">DREW.WTF</button><div class="seg" role="group" aria-label="Appearance"><button type="button" data-act="theme" data-id="light" class="' + (appearance === "light" ? "on" : "") + '">Light</button><button type="button" data-act="theme" data-id="dark" class="' + (appearance === "dark" ? "on" : "") + '">Dark</button><button type="button" data-act="theme" data-id="system" class="' + (appearance === "system" ? "on" : "") + '">System</button></div><button type="button" class="bagbtn" data-act="bag">Bag' + (cart.length ? " " + cart.length : "") + '</button></header>';
+    var html = '<header class="topbar"><button type="button" data-act="home" aria-label="112 Mississauga"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3.2a6.2 6.2 0 0 0-6.2 6.2c0 4.6 6.2 11.4 6.2 11.4s6.2-6.8 6.2-11.4A6.2 6.2 0 0 0 12 3.2zm0 8.3a2.1 2.1 0 1 1 0-4.2 2.1 2.1 0 0 1 0 4.2z" fill="#fff"/></svg>112 Mississauga<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M7 10l5 5 5-5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></button><button type="button" data-act="bag" aria-label="Andrew.H"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="8" r="3.2" fill="#fff"/><path d="M5.5 19.2c1.2-3 3.5-4.4 6.5-4.4s5.3 1.4 6.5 4.4" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>Andrew.H</button></header>';
     if (boot) {
       html += '<div class="boot"><p class="kicker">' + boot.name + '</p><h1 class="display">Building it.</h1><ul>';
       for (var i = 0; i < boot.steps.length; i++) html += '<li class="' + (i <= boot.at ? "on" : "") + '">' + (i < boot.at ? "✓ " : i === boot.at ? "● " : "○ ") + boot.steps[i] + '</li>';
       html += '</ul></div>';
     } else if (section === "home") html += viewHome();
+    else if (section === "orders") html += '<div class="workspace"><button type="button" class="back" data-act="home">‹ Menu</button>' + viewOrders() + '</div>';
     else {
-      html += '<div class="workspace">' + meter() + '<div class="layout">' + cats() + '<div class="main">' + (section === "build" ? viewBuild() : viewPick()) + '</div>' + summary() + '</div>';
+      html += '<div class="workspace"><button type="button" class="back" data-act="home">‹ Menu</button>' + meter() + '<div class="layout">' + cats() + '<div class="main">' + (section === "build" ? viewBuild() : viewPick()) + '</div>' + summary() + '</div>';
       var list = issues();
       html += '<div class="mobbar"><div><b>' + money(total()) + '</b><div class="fine">' + doneCount() + '/6 · ' + watts() + 'W' + (list.length ? ' · Check' : ' · OK') + '</div></div><button type="button" class="texty primary" data-act="save">Add to Bag</button></div></div>';
     }
@@ -672,6 +729,7 @@
     var id = t.getAttribute("data-id");
     if (act === "theme") { appearance = id; applyTheme(); draw(); return; }
     if (act === "home") { section = "home"; bag = false; note = ""; draw(); window.scrollTo(0, 0); return; }
+    if (act === "pick") { section = state.cpu ? "build" : "orders"; bag = false; note = ""; draw(); window.scrollTo(0, 0); return; }
     if (act === "bag") { bag = !bag; draw(); return; }
     if (act === "goto") { section = id; note = ""; draw(); window.scrollTo(0, 0); return; }
     if (act === "recipe") { bag = false; startBoot(RECIPES[id]); return; }
