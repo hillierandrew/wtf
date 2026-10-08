@@ -3,81 +3,73 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#fbfbfd">
+<meta name="theme-color" content="#f5f5f7">
 <title>No internet connection</title>
 <style>
   * { box-sizing: border-box; }
   html, body { margin: 0; min-height: 100%; background: #fff; }
-  body { font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #5f6368; }
-  button, input { font: inherit; color: inherit; }
+  body { color: #5f6368; font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  button, input { font: inherit; }
   button { cursor: pointer; }
-  #gate { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  #gate { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; background: #fff; }
   .offline { width: min(540px, 100%); }
-  #dino { display: block; width: min(100%, 420px); height: auto; touch-action: manipulation; }
+  #dino { display: block; width: min(100%, 420px); height: auto; background: #fff; touch-action: manipulation; }
   .offline h1 { font-weight: 500; font-size: 1.6em; color: #202124; margin: 18px 0 14px; }
   .offline ul { margin: 8px 0 16px; padding-left: 28px; }
   .secret { background: none; border: 0; padding: 0; margin: 0; color: inherit; font: inherit; }
   .code { color: #80868b; font-size: 13px; }
-  .cover { position: fixed; inset: 0; background: rgba(255,255,255,.82); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 20; }
-  .card { width: min(420px, 100%); background: #fff; color: #202124; border: 1px solid #dadce0; border-radius: 8px; padding: 22px; box-shadow: 0 1px 3px rgba(60,64,67,.3); }
-  .card h2 { font-weight: 500; margin: 0 0 8px; }
-  .card p { color: #5f6368; }
-  .card input { width: 100%; min-height: 48px; border: 1px solid #dadce0; border-radius: 4px; padding: 0 12px; }
-  .card .err { color: #c5221f; font-weight: 700; }
-  .stack { display: flex; flex-direction: column; gap: 8px; }
-  .stack button { min-height: 52px; border: 1px solid #dadce0; background: #fff; color: #202124; border-radius: 4px; text-align: left; padding: 0 14px; font-weight: 650; }
 
-  #app { display: none; min-height: 100vh; background: #fbfbfd; color: #1d1d1f; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Helvetica, Arial, sans-serif; }
+  #app { display: none; min-height: 100vh; background: #f5f5f7; color: #1d1d1f; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Helvetica, Arial, sans-serif; }
   #app.on { display: block; }
-  .nav { height: 48px; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 600; letter-spacing: -0.02em; }
-  .stage { max-width: 1100px; margin: 0 auto; padding: 8px 22px 140px; }
-  .product { text-align: center; padding: 12px 0 8px; }
-  .imac { width: min(280px, 70vw); margin: 0 auto 18px; }
-  .display { height: 168px; border-radius: 16px 16px 0 0; border: 8px solid #e8e8ed; border-bottom-width: 16px; background: linear-gradient(165deg, #d6e6ff, #2f5f9e); }
-  .chin { height: 10px; background: #d2d2d7; border-radius: 0 0 8px 8px; }
-  .stand { width: 64px; height: 52px; margin: 0 auto; background: linear-gradient(#dedee3, #f5f5f7); clip-path: polygon(40% 0, 60% 0, 100% 100%, 0 100%); }
-  .foot { width: 120px; height: 6px; margin: -1px auto 0; background: #d2d2d7; border-radius: 6px; }
-  .product h1 { font-size: 40px; line-height: 1; font-weight: 600; letter-spacing: -0.03em; margin: 0; }
-  .product .price { font-size: 21px; margin: 8px 0 0; }
-  .product .ok { color: #86868b; margin: 6px 0 0; font-size: 14px; }
-  .product .ok.bad { color: #b6443c; }
-  .ask { max-width: 520px; margin: 28px auto 0; }
-  .ask h2 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; margin: 0 0 6px; }
-  .ask .lead { color: #86868b; margin: 0 0 18px; font-size: 17px; }
-  .opt { width: 100%; display: flex; justify-content: space-between; gap: 16px; align-items: center; text-align: left; background: #fff; border: 1px solid #d2d2d7; border-radius: 16px; min-height: 76px; padding: 16px 18px; margin: 0 0 12px; color: #1d1d1f; transition: border-color .2s ease, transform .2s ease; }
-  .opt:active { transform: scale(0.985); }
-  .opt.on { border: 2px solid #0071e3; padding: 15px 17px; }
-  .opt b { display: block; font-size: 17px; font-weight: 600; }
-  .opt span { display: block; color: #86868b; font-size: 14px; margin-top: 2px; }
-  .opt em { font-style: normal; color: #1d1d1f; white-space: nowrap; }
-  .lines { max-width: 640px; margin: 28px auto 0; background: #fff; border-radius: 18px; overflow: hidden; }
-  .line { width: 100%; display: flex; justify-content: space-between; gap: 16px; align-items: center; text-align: left; background: #fff; border: 0; border-bottom: 1px solid #f0f0f2; min-height: 68px; padding: 12px 18px; color: #1d1d1f; }
-  .line:last-child { border-bottom: 0; }
-  .line small { display: block; color: #86868b; font-size: 12px; }
-  .line b { font-weight: 600; font-size: 17px; }
-  .line em { font-style: normal; color: #86868b; }
-  .fine { max-width: 640px; margin: 14px auto 0; color: #86868b; font-size: 12px; text-align: center; }
-  .dock { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; display: flex; justify-content: flex-end; padding: 12px 22px calc(12px + env(safe-area-inset-bottom)); background: rgba(251,251,253,.92); border-top: 1px solid rgba(0,0,0,.06); backdrop-filter: blur(18px); }
-  .dock button { background: #0071e3; color: #fff; border: 0; border-radius: 980px; min-height: 48px; padding: 0 22px; font-size: 17px; font-weight: 500; }
-  .dock button:disabled { background: #d2d2d7; color: #fff; }
-  body.desk .stage { display: grid; grid-template-columns: minmax(300px, 1fr) minmax(320px, 520px); gap: 40px; align-items: start; padding-top: 24px; }
-  body.desk .product { position: sticky; top: 64px; }
-  body.desk .imac { width: 360px; }
-  body.desk .display { height: 210px; }
-  body.desk .ask, body.desk .lines, body.desk .fine { margin-left: 0; margin-right: 0; max-width: none; }
-  body.tv .ask h2, body.tv .product h1 { font-size: 64px; }
-  body.tv .opt { min-height: 104px; }
-  body.tv .opt b, body.tv .line b { font-size: 28px; }
+  .nav { position: sticky; top: 0; z-index: 4; height: 52px; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; background: rgba(245,245,247,.86); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(0,0,0,.06); }
+  .nav b { font-size: 17px; letter-spacing: -0.02em; }
+  .nav button { background: none; border: 0; color: #1d1d1f; font-size: 17px; min-height: 44px; padding: 0 4px; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 22px 80px; }
+  .wrap h1 { font-size: clamp(40px, 6vw, 56px); font-weight: 600; letter-spacing: -0.035em; margin: 8px 0 6px; }
+  .lede { color: #6e6e73; font-size: 19px; margin: 0 0 28px; }
+  .grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+  .pcard, .detail { background: #fff; border-radius: 24px; text-align: center; padding: 28px 22px 26px; }
+  .pcard h2, .detail h2 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; margin: 8px 0 4px; }
+  .pcard p, .detail .line { color: #6e6e73; margin: 0; font-size: 17px; }
+  .pcard .cost, .detail .cost { color: #1d1d1f; font-size: 17px; margin: 8px 0 16px; }
+  .add, .auth button[type="submit"] { background: #0071e3; color: #fff; border: 0; border-radius: 980px; min-height: 44px; padding: 0 20px; font-size: 17px; }
+  .detail .add { display: block; margin: 28px auto 0; }
+  .auth p { user-select: none; }
+  .back { background: none; border: 0; color: #0066cc; font-size: 17px; min-height: 44px; padding: 0; }
+  .specs { text-align: left; max-width: 460px; margin: 8px auto 22px; }
+  .specs div { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-top: 1px solid #e8e8ed; font-size: 17px; }
+  .specs small { color: #6e6e73; }
+  .choice { margin: 18px auto 0; max-width: 460px; text-align: left; }
+  .choice h3 { font-size: 17px; margin: 0 0 8px; }
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pills button { min-height: 44px; padding: 0 16px; border-radius: 980px; border: 1px solid #d2d2d7; background: #fff; color: #1d1d1f; }
+  .pills button.on { border: 2px solid #0071e3; color: #0071e3; }
+  .fine { color: #6e6e73; font-size: 12px; text-align: center; margin-top: 22px; }
+  .scrim { position: fixed; inset: 0; background: rgba(0,0,0,.28); z-index: 6; }
+  .bag { position: fixed; z-index: 7; top: 0; right: 0; bottom: 0; width: min(420px, 100%); background: #fff; color: #1d1d1f; padding: 22px 22px calc(22px + env(safe-area-inset-bottom)); overflow: auto; box-shadow: -8px 0 30px rgba(0,0,0,.08); }
+  .bag h2 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; margin: 12px 0 18px; }
+  .item { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 14px 0; border-top: 1px solid #e8e8ed; }
+  .item b { display: block; font-size: 17px; }
+  .item span { color: #6e6e73; font-size: 14px; }
+  .item button { background: none; border: 0; color: #0066cc; min-height: 44px; }
+  .total { display: flex; justify-content: space-between; font-size: 21px; font-weight: 600; margin-top: 12px; }
+  .cover { position: fixed; inset: 0; z-index: 20; background: rgba(0,0,0,.25); display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .auth { width: min(380px, 100%); background: #fff; color: #1d1d1f; border-radius: 18px; padding: 28px 24px 24px; box-shadow: 0 12px 40px rgba(0,0,0,.12); }
+  .auth h2 { font: 600 28px/1.1 -apple-system, "Segoe UI", sans-serif; letter-spacing: -0.03em; margin: 0 0 8px; }
+  .auth p { color: #6e6e73; margin: 0 0 16px; font-size: 15px; }
+  .auth input { width: 100%; height: 48px; border: 1px solid #d2d2d7; border-radius: 12px; padding: 0 14px; font-size: 17px; background: #fff; color: #1d1d1f; margin-bottom: 10px; }
+  .auth .err { color: #b6443c; min-height: 0; margin: 0 0 12px; }
+  .auth button[type="submit"] { width: 100%; }
+  .auth .close { background: none; border: 0; color: #0066cc; margin-top: 8px; min-height: 44px; width: 100%; }
+  .dev { display: flex; flex-direction: column; gap: 8px; }
+  .dev button { min-height: 52px; border-radius: 14px; border: 1px solid #d2d2d7; background: #fff; color: #1d1d1f; text-align: left; padding: 0 16px; font-size: 17px; }
+  svg.machine { width: min(240px, 70%); height: auto; display: block; margin: 0 auto; }
+  @media (min-width: 800px) { .grid { grid-template-columns: 1fr 1fr; gap: 20px; } }
+  body.tv #app { font-size: 22px; }
+  body.tv .pcard h2 { font-size: 48px; }
   body.kindle #app { background: #fff; color: #000; font-family: Georgia, "Times New Roman", serif; }
-  body.kindle .opt, body.kindle .lines, body.kindle .dock button { border-radius: 0; }
-  body.kindle .display { background: #fff !important; border-color: #000; }
-  body.kindle .opt.on { border-color: #000; }
-  body.kindle .dock button { background: #000; }
-  .sheet { position: fixed; inset: 0; background: rgba(0,0,0,.35); display: flex; align-items: flex-end; justify-content: center; z-index: 8; }
-  .sheet .panel { width: min(560px, 100%); background: #fff; border-radius: 18px 18px 0 0; padding: 22px 22px calc(22px + env(safe-area-inset-bottom)); color: #1d1d1f; }
-  .sheet h2 { margin: 0 0 8px; font-size: 28px; font-weight: 600; letter-spacing: -0.03em; }
-  .sheet pre { white-space: pre-wrap; font: 15px/1.5 -apple-system, "Segoe UI", sans-serif; margin: 0 0 16px; }
-  .sheet button { width: 100%; min-height: 48px; border-radius: 980px; border: 0; background: #0071e3; color: #fff; font-weight: 500; }
+  body.kindle .pcard, body.kindle .detail, body.kindle .bag, body.kindle .auth { border-radius: 0; border: 1px solid #000; }
+  body.kindle .add, body.kindle .auth button[type="submit"] { background: #000; border-radius: 0; }
 </style>
 </head>
 <body>
@@ -98,171 +90,39 @@
 <div id="app"></div>
 <script>
 (function () {
-  var PARTS = {
-    cpu: [
-      { id: "12400", name: "Core i5-12400", price: 229, sock: "LGA1700", ddr: "4", ig: 1, w: 117, plain: "Everyday speed. Graphics included." },
-      { id: "5600", name: "Ryzen 5 5600", price: 159, sock: "AM4", ddr: "4", ig: 0, w: 65, plain: "For 1080p games. Needs a graphics card." },
-      { id: "7600", name: "Ryzen 5 7600", price: 269, sock: "AM5", ddr: "5", ig: 1, w: 88, plain: "Current, quick, graphics included." },
-      { id: "7800x3d", name: "Ryzen 7 7800X3D", price: 549, sock: "AM5", ddr: "5", ig: 0, w: 120, plain: "For high-frame-rate games. Needs a graphics card." }
-    ],
-    mb: [
-      { id: "b760", name: "B760 motherboard", price: 139, sock: "LGA1700", ddr: "4", form: "mATX" },
-      { id: "b550", name: "B550 motherboard", price: 149, sock: "AM4", ddr: "4", form: "mATX" },
-      { id: "b650m", name: "B650 motherboard", price: 249, sock: "AM5", ddr: "5", form: "mATX" },
-      { id: "b650", name: "B650 motherboard", price: 229, sock: "AM5", ddr: "5", form: "ATX" }
-    ],
-    ram: [
-      { id: "d4-16", name: "16GB memory", price: 55, ddr: "4", plain: "Enough for work and school." },
-      { id: "d4-32", name: "32GB memory", price: 99, ddr: "4", plain: "Room for more programs." },
-      { id: "d5-16", name: "16GB memory", price: 89, ddr: "5", plain: "Enough for a current PC." },
-      { id: "d5-32", name: "32GB memory", price: 179, ddr: "5", plain: "Comfortable for games and work." }
-    ],
-    gpu: [
-      { id: "none", name: "Built-in graphics", price: 0, w: 0, len: 0, need: 0, plain: "The picture comes from the processor." },
-      { id: "3050", name: "GeForce RTX 3050", price: 219, w: 70, len: 200, need: 450, plain: "1080p games." },
-      { id: "4060", name: "GeForce RTX 4060", price: 389, w: 115, len: 200, need: 550, plain: "Smooth 1080p, capable 1440p." },
-      { id: "5070", name: "GeForce RTX 5070", price: 779, w: 250, len: 242, need: 650, plain: "Serious 1440p." }
-    ],
-    ssd: [
-      { id: "500", name: "512GB storage", price: 49, plain: "The system and your files." },
-      { id: "1tb", name: "1TB storage", price: 99, plain: "The system and a shelf of games." },
-      { id: "2tb", name: "2TB storage", price: 219, plain: "Games, music, and video." }
-    ],
-    cool: [
-      { id: "ax", name: "Standard cooling", price: 29, h: 148 },
-      { id: "pa", name: "Quiet cooling", price: 49, h: 155 }
-    ],
-    psu: [
-      { id: "500", name: "500W power", price: 49, watts: 500 },
-      { id: "650", name: "650W power", price: 99, watts: 650 },
-      { id: "750", name: "750W power", price: 149, watts: 750 },
-      { id: "850", name: "850W power", price: 179, watts: 850 }
-    ],
-    box: [
-      { id: "air", name: "Compact case", price: 79, form: "mATX", cool: 160, gpu: 330 },
-      { id: "h5", name: "Standard case", price: 119, form: "ATX", cool: 165, gpu: 365 },
-      { id: "d", name: "Standard case", price: 129, form: "ATX", cool: 170, gpu: 360 }
-    ]
-  };
-  var ORDER = ["cpu", "mb", "ram", "gpu", "ssd", "cool", "psu", "box"];
-  var LABEL = { cpu: "Processor", mb: "Motherboard", ram: "Memory", gpu: "Graphics", ssd: "Storage", cool: "Cooling", psu: "Power", box: "Case" };
-  var RANK = { ITX: 1, mATX: 2, ATX: 3 };
-  var RECIPES = {
-    school: { cpu: "12400", mb: "b760", ram: "d4-16", gpu: "none", ssd: "500", cool: "ax", psu: "500", box: "air" },
-    work: { cpu: "7600", mb: "b650m", ram: "d5-16", gpu: "none", ssd: "1tb", cool: "ax", psu: "650", box: "air" },
-    games: { cpu: "5600", mb: "b550", ram: "d4-16", gpu: "3050", ssd: "1tb", cool: "ax", psu: "650", box: "air" },
-    big: { cpu: "7600", mb: "b650", ram: "d5-32", gpu: "4060", ssd: "1tb", cool: "pa", psu: "750", box: "h5" },
-    huge: { cpu: "7800x3d", mb: "b650", ram: "d5-32", gpu: "5070", ssd: "2tb", cool: "pa", psu: "850", box: "d" },
-    music: { cpu: "7600", mb: "b650m", ram: "d5-32", gpu: "none", ssd: "2tb", cool: "pa", psu: "650", box: "air" },
-    web: { cpu: "12400", mb: "b760", ram: "d4-16", gpu: "none", ssd: "500", cool: "ax", psu: "500", box: "air" }
-  };
-  var WALL = { school: "linear-gradient(165deg,#d9ffe8,#1f7a4d)", work: "linear-gradient(165deg,#e7eeff,#3c4f7a)", games: "linear-gradient(165deg,#d6e6ff,#163e78)", music: "linear-gradient(165deg,#f8e1ff,#5c2d6e)", web: "linear-gradient(165deg,#fff1c9,#b86a12)" };
-  var USES = [
-    ["school", "School", "Writing, class, and video."],
-    ["work", "Work", "Mail, documents, and calls."],
-    ["games", "Games", "Playing on a monitor."],
-    ["music", "Music", "Recording. Kept quiet."],
-    ["web", "Every day", "The internet, and not much else."]
+  function machine(color) {
+    return '<svg class="machine" viewBox="0 0 320 250" aria-hidden="true"><rect x="46" y="18" width="228" height="150" rx="16" fill="#e8e8ed"/><rect x="58" y="30" width="204" height="118" rx="6" fill="' + color + '"/><circle cx="160" cy="40" r="2" fill="#d0d0d5"/><rect x="46" y="168" width="228" height="14" rx="3" fill="#d2d2d7"/><path d="M146 182 h28 l18 36 h-64 z" fill="#e4e4e8"/><rect x="112" y="218" width="96" height="6" rx="3" fill="#d2d2d7"/></svg>';
+  }
+  var PRODUCTS = [
+    { id: "study", name: "Study", line: "Class, writing, and video.", price: 629, color: "#8fd0a8", parts: [["Processor", "Core i5-12400"], ["Memory", "16GB"], ["Graphics", "Built in"], ["Storage", "512GB"], ["Power", "500W"], ["Case", "Compact"]], memory: ["16GB", "32GB"], memPrice: [0, 44], storage: ["512GB", "1TB", "2TB"], storePrice: [0, 50, 170], graphics: ["Built in"], gpuPrice: [0] },
+    { id: "desk", name: "Desk", line: "Mail, documents, and calls.", price: 913, color: "#9eb6e0", parts: [["Processor", "Ryzen 5 7600"], ["Memory", "16GB"], ["Graphics", "Built in"], ["Storage", "1TB"], ["Power", "650W"], ["Case", "Compact"]], memory: ["16GB", "32GB"], memPrice: [0, 90], storage: ["1TB", "2TB"], storePrice: [0, 120], graphics: ["Built in"], gpuPrice: [0] },
+    { id: "play", name: "Play", line: "1080p games.", price: 888, color: "#7ea6e0", parts: [["Processor", "Ryzen 5 5600"], ["Memory", "16GB"], ["Graphics", "RTX 3050"], ["Storage", "1TB"], ["Power", "650W"], ["Case", "Compact"]], memory: ["16GB", "32GB"], memPrice: [0, 44], storage: ["1TB", "2TB"], storePrice: [0, 120], graphics: ["RTX 3050", "RTX 4060"], gpuPrice: [0, 170] },
+    { id: "pro", name: "Pro", line: "1440p games.", price: 1482, color: "#5c7cfa", parts: [["Processor", "Ryzen 5 7600"], ["Memory", "32GB"], ["Graphics", "RTX 4060"], ["Storage", "1TB"], ["Power", "750W"], ["Case", "Standard"]], memory: ["32GB"], memPrice: [0], storage: ["1TB", "2TB"], storePrice: [0, 120], graphics: ["RTX 4060", "RTX 5070"], gpuPrice: [0, 390] }
   ];
-
   var mode = "phone";
-  var step = "use";
-  var backTo = "";
-  var job = "school";
-  var budget = 700;
-  var build = copy(RECIPES.school);
+  var view = "store";
+  var openId = "study";
+  var picks = {};
+  var cart = [];
+  var bag = false;
   var dinoHits = 0, cactusHits = 0, nHits = 0;
-  var bagOpen = false;
+  for (var i = 0; i < PRODUCTS.length; i++) picks[PRODUCTS[i].id] = { m: 0, s: 0, g: 0 };
 
-  function copy(o) { var n = {}; for (var k in o) n[k] = o[k]; return n; }
-  function find(group, id) {
-    var list = PARTS[group];
-    for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
-    return list[0];
+  function product(id) { for (var i = 0; i < PRODUCTS.length; i++) if (PRODUCTS[i].id === id) return PRODUCTS[i]; return PRODUCTS[0]; }
+  function priceOf(p) { var c = picks[p.id]; return p.price + p.memPrice[c.m] + p.storePrice[c.s] + p.gpuPrice[c.g]; }
+  function specOf(p) {
+    var c = picks[p.id];
+    var bits = [];
+    for (var i = 0; i < p.parts.length; i++) {
+      var label = p.parts[i][0], value = p.parts[i][1];
+      if (label === "Memory") value = p.memory[c.m];
+      if (label === "Storage") value = p.storage[c.s];
+      if (label === "Graphics") value = p.graphics[c.g];
+      bits.push([label, value]);
+    }
+    return bits;
   }
   function money(n) { return "$" + Math.round(n).toLocaleString(); }
-  function total() {
-    var t = 0;
-    for (var i = 0; i < ORDER.length; i++) t += find(ORDER[i], build[ORDER[i]]).price;
-    return t;
-  }
-  function problems() {
-    var cpu = find("cpu", build.cpu), mb = find("mb", build.mb), ram = find("ram", build.ram);
-    var gpu = find("gpu", build.gpu), cool = find("cool", build.cool), psu = find("psu", build.psu), box = find("box", build.box);
-    var out = [];
-    if (cpu.sock !== mb.sock) out.push("This processor needs a " + cpu.sock + " motherboard.");
-    if (String(ram.ddr) !== String(mb.ddr)) out.push("This motherboard uses DDR" + mb.ddr + " memory.");
-    if (!cpu.ig && gpu.id === "none") out.push("This processor needs a graphics card.");
-    if (gpu.id !== "none" && psu.watts < gpu.need) out.push("This graphics card wants a " + gpu.need + "W power supply.");
-    if (psu.watts < cpu.w + gpu.w + 80) out.push("The power supply is too small.");
-    if (RANK[mb.form] > RANK[box.form]) out.push("The motherboard does not fit this case.");
-    if (cool.h > box.cool) out.push("The cooler does not fit this case.");
-    if (gpu.len > box.gpu) out.push("The graphics card does not fit this case.");
-    return out;
-  }
-  function recipeFor(which, dollars) {
-    if (which === "games" && dollars >= 2500) return "huge";
-    if (which === "games" && dollars >= 1500) return "big";
-    if (which === "games") return "games";
-    if (which === "music") return "music";
-    if (which === "work" && dollars >= 1000) return "work";
-    if (which === "web") return "web";
-    return "school";
-  }
-  function loadRecipe() { build = copy(RECIPES[recipeFor(job, budget)]); }
-  function settle(group, id) {
-    var snap = copy(build);
-    function works(next) {
-      build = next;
-      return problems().length === 0;
-    }
-    var direct = copy(snap);
-    direct[group] = id;
-    if (works(direct)) return true;
-    var cpuId = group === "cpu" ? id : snap.cpu;
-    var cpu = find("cpu", cpuId);
-    var gpuIds = group === "gpu" ? [id] : [snap.gpu, "none", "3050", "4060", "5070"];
-    var seen = {};
-    var psus = ["500", "650", "750", "850"];
-    var boxes = ["air", "h5", "d"];
-    var cools = ["ax", "pa"];
-    for (var g = 0; g < gpuIds.length; g++) {
-      if (seen[gpuIds[g]]) continue;
-      seen[gpuIds[g]] = 1;
-      for (var b = 0; b < PARTS.mb.length; b++) {
-        var board = PARTS.mb[b];
-        if (board.sock !== cpu.sock) continue;
-        if (group === "mb" && board.id !== id) continue;
-        for (var r = 0; r < PARTS.ram.length; r++) {
-          var ram = PARTS.ram[r];
-          if (String(ram.ddr) !== String(board.ddr)) continue;
-          if (group === "ram" && ram.id !== id) continue;
-          for (var p = 0; p < psus.length; p++) {
-            if (group === "psu" && psus[p] !== id) continue;
-            for (var c = 0; c < boxes.length; c++) {
-              if (group === "box" && boxes[c] !== id) continue;
-              for (var k = 0; k < cools.length; k++) {
-                if (group === "cool" && cools[k] !== id) continue;
-                var next = {
-                  cpu: cpuId,
-                  mb: board.id,
-                  ram: group === "ram" ? id : ram.id,
-                  gpu: gpuIds[g],
-                  ssd: group === "ssd" ? id : snap.ssd,
-                  cool: cools[k],
-                  psu: psus[p],
-                  box: boxes[c]
-                };
-                if (works(next)) return true;
-              }
-            }
-          }
-        }
-      }
-    }
-    build = snap;
-    return false;
-  }
 
   var gate = document.getElementById("gate");
   var app = document.getElementById("app");
@@ -273,13 +133,13 @@
     modal.innerHTML = "";
     app.className = "on";
     document.body.className = mode;
-    document.title = "PC";
-    step = "use";
+    document.title = "Store";
+    view = "store";
     draw();
   }
   function askDevice() {
-    modal.innerHTML = '<div class="cover"><div class="card"><h2>What are you using?</h2><p>Same PC. The layout changes.</p><div class="stack" id="devs"></div></div></div>';
-    var opts = [["phone", "iPhone"], ["desk", "Mac"], ["tv", "TV"], ["kindle", "Kindle"]];
+    modal.innerHTML = '<div class="cover"><form class="auth" onsubmit="return false"><h2>Where are you?</h2><p>Same computers. The type gets larger.</p><div class="dev" id="devs"></div><button type="button" class="close" id="x">Close</button></form></div>';
+    var opts = [["phone", "iPhone"], ["desk", "Desktop"], ["tv", "TV"], ["kindle", "Kindle"]];
     var box = document.getElementById("devs");
     for (var i = 0; i < opts.length; i++) {
       var b = document.createElement("button");
@@ -289,9 +149,11 @@
       b.onclick = function () { mode = this.getAttribute("data-mode"); showApp(); };
       box.appendChild(b);
     }
+    document.getElementById("x").onclick = function () { modal.innerHTML = ""; };
   }
   function askPassword() {
-    modal.innerHTML = '<div class="cover"><form class="card" id="pw"><h2>System authentication</h2><p>Capital letters matter.</p><input id="pwv" type="password" autocomplete="off" placeholder="Password"><p class="err" id="pwe" hidden></p><div class="stack"><button type="submit">Authenticate</button></div></form></div>';
+    modal.innerHTML = '<div class="cover"><form class="auth" id="pw"><h2>Password</h2><p>Capital letters matter.</p><input id="pwv" type="password" autocomplete="off" placeholder="Password"><p class="err" id="pwe" hidden></p><button type="submit">Continue</button><button type="button" class="close" id="x">Cancel</button></form></div>';
+    document.getElementById("x").onclick = function () { modal.innerHTML = ""; };
     document.getElementById("pw").onsubmit = function (e) {
       e.preventDefault();
       var v = document.getElementById("pwv").value.trim();
@@ -304,104 +166,78 @@
     document.getElementById("pwv").focus();
   }
 
-  function product() {
-    var bad = problems();
-    return '<div class="product"><div class="imac" aria-hidden="true"><div class="display" id="screen"></div><div class="chin"></div><div class="stand"></div><div class="foot"></div></div><h1>PC</h1><p class="price">' + money(total()) + '</p><p class="ok' + (bad.length ? " bad" : "") + '">' + (bad.length ? bad[0] : "Ready to build.") + '</p></div>';
-  }
-  function paint() {
-    var screen = document.getElementById("screen");
-    if (screen) screen.style.background = mode === "kindle" ? "#fff" : (WALL[job] || WALL.web);
-  }
-  function go(next) { step = next; bagOpen = false; draw(); window.scrollTo(0, 0); }
-
   function draw() {
-    var html = '<div class="nav">PC</div><div class="stage">' + product() + '<div class="panel">';
-    if (step === "use") {
-      html += '<div class="ask"><h2>What is it for?</h2><p class="lead">Pick one. We’ll choose parts that belong together.</p>';
-      for (var i = 0; i < USES.length; i++) html += '<button type="button" class="opt' + (job === USES[i][0] ? " on" : "") + '" data-job="' + USES[i][0] + '"><span><b>' + USES[i][1] + '</b><span>' + USES[i][2] + '</span></span></button>';
-      html += '</div>';
-    } else if (step === "money") {
-      html += '<div class="ask"><h2>Choose a budget.</h2><p class="lead">Catalog prices. Not a store.</p>';
-      var cashes = [700, 1000, 1500, 2500];
-      for (var c = 0; c < cashes.length; c++) html += '<button type="button" class="opt' + (budget === cashes[c] ? " on" : "") + '" data-cash="' + cashes[c] + '"><b>' + money(cashes[c]) + '</b></button>';
-      html += '</div>';
-    } else if (step === "review") {
-      html += '<div class="lines">';
-      var shown = ["cpu", "ram", "gpu", "ssd", "mb", "psu", "cool", "box"];
-      for (var n = 0; n < shown.length; n++) {
-        var g = shown[n];
-        var part = find(g, build[g]);
-        html += '<button type="button" class="line" data-edit="' + g + '"><span><small>' + LABEL[g] + '</small><b>' + part.name + '</b></span><em>' + money(part.price) + '</em></button>';
+    var count = cart.length;
+    var html = '<div class="nav"><b>Store</b><button type="button" id="bagbtn">Bag' + (count ? " (" + count + ")" : "") + '</button></div><div class="wrap">';
+    if (view === "store") {
+      html += '<h1>Four computers.</h1><p class="lede">Each one is finished. Add it to your bag, or open it and change memory, storage, or graphics.</p><div class="grid">';
+      for (var i = 0; i < PRODUCTS.length; i++) {
+        var p = PRODUCTS[i];
+        html += '<article class="pcard">' + machine(p.color) + '<h2>' + p.name + '</h2><p>' + p.line + '</p><p class="cost">' + money(priceOf(p)) + '</p><button type="button" class="add" data-add="' + p.id + '">Add to Bag</button><div><button type="button" class="back" data-open="' + p.id + '">See what’s inside</button></div></article>';
       }
-      html += '</div><p class="fine">No display is included. Prices are examples.</p>';
+      html += '</div><p class="fine">Catalog prices, not a store. No display is included.</p>';
     } else {
-      var group = step;
-      html += '<div class="ask"><h2>' + LABEL[group] + '.</h2><p class="lead">Tap one. Anything here will fit.</p>';
-      var list = PARTS[group];
-      for (var j = 0; j < list.length; j++) {
-        var trial = copy(build);
-        build = copy(build);
-        var ok = settle(group, list[j].id);
-        build = trial;
-        if (!ok && list[j].id !== build[group]) continue;
-        var on = list[j].id === build[group];
-        html += '<button type="button" class="opt' + (on ? " on" : "") + '" data-g="' + group + '" data-id="' + list[j].id + '"><span><b>' + list[j].name + '</b><span>' + (list[j].plain || LABEL[group]) + '</span></span><em>' + money(list[j].price) + '</em></button>';
-      }
+      var cur = product(openId);
+      var bits = specOf(cur);
+      html += '<button type="button" class="back" id="back">Store</button><div class="detail">' + machine(cur.color) + '<h2>' + cur.name + '</h2><p class="line">' + cur.line + '</p><p class="cost">' + money(priceOf(cur)) + '</p><div class="specs">';
+      for (var s = 0; s < bits.length; s++) html += '<div><small>' + bits[s][0] + '</small><b>' + bits[s][1] + '</b></div>';
       html += '</div>';
+      html += pills("Memory", cur.memory, picks[cur.id].m, "m");
+      html += pills("Storage", cur.storage, picks[cur.id].s, "s");
+      if (cur.graphics.length > 1) html += pills("Graphics", cur.graphics, picks[cur.id].g, "g");
+      html += '<button type="button" class="add" data-add="' + cur.id + '">Add to Bag</button></div>';
     }
-    html += '</div></div>';
-    if (step === "review") html += '<div class="dock"><button type="button" id="bag">Add to Bag</button></div>';
-    if (bagOpen) {
-      var text = "PC  " + money(total());
-      for (var t = 0; t < ORDER.length; t++) text += "\n" + LABEL[ORDER[t]] + "  " + find(ORDER[t], build[ORDER[t]]).name;
-      html += '<div class="sheet"><div class="panel"><h2>Added to Bag.</h2><pre id="list">' + text + '</pre><button type="button" id="closebag">Done</button></div></div>';
+    html += '</div>';
+    if (bag) {
+      html += '<div class="scrim" id="scrim"></div><aside class="bag"><button type="button" class="back" id="closebag">Close</button><h2>Bag</h2>';
+      if (!cart.length) html += '<p class="lede">Your bag is empty.</p>';
+      var sum = 0;
+      for (var c = 0; c < cart.length; c++) {
+        sum += cart[c].price;
+        html += '<div class="item"><div><b>' + cart[c].name + '</b><span>' + cart[c].blurb + '</span></div><button type="button" data-del="' + c + '">Remove</button></div>';
+      }
+      if (cart.length) html += '<div class="total"><span>Total</span><span>' + money(sum) + '</span></div><p class="fine">A list on this page. Nothing is charged.</p>';
+      html += '</aside>';
     }
     app.innerHTML = html;
-    paint();
-
-    var jobs = document.querySelectorAll("[data-job]");
-    for (var a = 0; a < jobs.length; a++) jobs[a].onclick = function () {
-      job = this.getAttribute("data-job");
-      loadRecipe();
-      go(backTo || "money");
-      backTo = "";
-    };
-    var cash = document.querySelectorAll("[data-cash]");
-    for (var b = 0; b < cash.length; b++) cash[b].onclick = function () {
-      budget = Number(this.getAttribute("data-cash"));
-      loadRecipe();
-      go(backTo || "review");
-      backTo = "";
-    };
-    var edits = document.querySelectorAll("[data-edit]");
-    for (var e = 0; e < edits.length; e++) edits[e].onclick = function () {
-      backTo = "review";
-      go(this.getAttribute("data-edit"));
-    };
-    var picks = document.querySelectorAll("[data-g]");
-    for (var p = 0; p < picks.length; p++) picks[p].onclick = function () {
-      settle(this.getAttribute("data-g"), this.getAttribute("data-id"));
-      go(backTo || "review");
-      backTo = "";
-    };
-    var bag = document.getElementById("bag");
-    if (bag) bag.onclick = function () {
-      if (problems().length) return;
-      bagOpen = true;
-      draw();
-      var list = document.getElementById("list");
-      if (list && navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(list.textContent).catch(function () {});
-      }
-    };
+    window.scrollTo(0, 0);
+    var bagBtn = document.getElementById("bagbtn");
+    if (bagBtn) bagBtn.onclick = function () { bag = !bag; draw(); };
+    var scrim = document.getElementById("scrim");
+    if (scrim) scrim.onclick = function () { bag = false; draw(); };
     var close = document.getElementById("closebag");
-    if (close) close.onclick = function () { bagOpen = false; draw(); };
+    if (close) close.onclick = function () { bag = false; draw(); };
+    var back = document.getElementById("back");
+    if (back) back.onclick = function () { view = "store"; draw(); };
+    var adds = document.querySelectorAll("[data-add]");
+    for (var a = 0; a < adds.length; a++) adds[a].onclick = function () {
+      var p = product(this.getAttribute("data-add"));
+      var bits = specOf(p);
+      var blurb = [];
+      for (var k = 0; k < bits.length; k++) if (bits[k][0] === "Processor" || bits[k][0] === "Graphics" || bits[k][0] === "Memory" || bits[k][0] === "Storage") blurb.push(bits[k][1]);
+      cart.push({ name: p.name, price: priceOf(p), blurb: blurb.join(" · ") });
+      bag = true;
+      draw();
+    };
+    var opens = document.querySelectorAll("[data-open]");
+    for (var o = 0; o < opens.length; o++) opens[o].onclick = function () { openId = this.getAttribute("data-open"); view = "detail"; bag = false; draw(); };
+    var opts = document.querySelectorAll("[data-pick]");
+    for (var n = 0; n < opts.length; n++) opts[n].onclick = function () {
+      picks[openId][this.getAttribute("data-pick")] = Number(this.getAttribute("data-i"));
+      draw();
+    };
+    var dels = document.querySelectorAll("[data-del]");
+    for (var d = 0; d < dels.length; d++) dels[d].onclick = function () { cart.splice(Number(this.getAttribute("data-del")), 1); draw(); };
+  }
+  function pills(title, labels, on, key) {
+    var html = '<div class="choice"><h3>' + title + '</h3><div class="pills">';
+    for (var i = 0; i < labels.length; i++) html += '<button type="button" class="' + (i === on ? "on" : "") + '" data-pick="' + key + '" data-i="' + i + '">' + labels[i] + '</button>';
+    return html + '</div></div>';
   }
 
   var canvas = document.getElementById("dino");
   var ctx = canvas.getContext("2d");
-  var cactusX = 250;
-  var dy = 0, vy = 0;
+  var cactusX = 250, dy = 0, vy = 0;
   function frame() {
     ctx.clearRect(0, 0, 420, 110);
     ctx.fillStyle = "#535353";
