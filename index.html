@@ -3,88 +3,130 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#f5f5f7">
+<meta name="theme-color" content="#f3f0e8">
 <title>No internet connection</title>
 <style>
+  :root { color-scheme: light; }
+  [data-theme="light"] {
+    --bg: #f3f0e8; --paper: #fffdf8; --ink: #1c1915; --muted: #6b645c;
+    --line: rgba(28,25,21,.14); --accent: #8c3a22; --on: #fffaf6;
+    --good: #1e6b45; --bad: #8f2d2d; --track: rgba(28,25,21,.1); --fill: #1c1915;
+    --shadow: 0 16px 40px rgba(40,30,20,.08);
+  }
+  [data-theme="dark"] {
+    --bg: #101114; --paper: #181b20; --ink: #ece7df; --muted: #a39b90;
+    --line: rgba(236,231,223,.14); --accent: #e2a07a; --on: #1a120e;
+    --good: #8fceb0; --bad: #f0a8a0; --track: rgba(236,231,223,.1); --fill: #ece7df;
+    --shadow: 0 16px 40px rgba(0,0,0,.35);
+  }
   * { box-sizing: border-box; }
-  html, body { margin: 0; min-height: 100%; background: #fff; }
+  html, body { margin: 0; min-height: 100%; }
+  html { background: #fff; }
   body { color: #5f6368; font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
   button, input { font: inherit; color: inherit; }
-  button { cursor: pointer; background: none; border: 0; padding: 0; }
-  #gate { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; background: #fff; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  #gate { min-height: 100vh; min-height: 100dvh; display: flex; align-items: center; justify-content: center; padding: 24px; background: #fff; }
   .offline { width: min(540px, 100%); }
   #dino { display: block; width: min(100%, 420px); height: auto; background: #fff; touch-action: manipulation; }
   .offline h1 { font-weight: 500; font-size: 1.6em; color: #202124; margin: 18px 0 14px; }
   .offline ul { margin: 8px 0 16px; padding-left: 28px; }
-  .secret { color: inherit; font: inherit; }
+  .secret { background: none; border: 0; padding: 0; margin: 0; color: inherit; font: inherit; }
   .code { color: #80868b; font-size: 13px; }
+  .cover { position: fixed; inset: 0; z-index: 30; background: rgba(0,0,0,.4); display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .sheet { width: min(400px, 100%); background: #fff; color: #1c1915; border-radius: 18px; padding: 28px 24px 20px; font-family: Georgia, Palatino, serif; }
+  .sheet h2 { font-size: 28px; font-weight: 500; margin: 0 0 6px; }
+  .sheet p { color: #6b645c; font-family: "Segoe UI", sans-serif; font-size: 14px; margin: 0 0 16px; }
+  .sheet input { width: 100%; height: 48px; border: 1px solid rgba(28,25,21,.2); border-radius: 12px; padding: 0 14px; font-size: 17px; background: #fff; color: #1c1915; font-family: "Segoe UI", sans-serif; }
+  .sheet .err { color: #8f2d2d; margin: 8px 0 0; }
+  .sheet .go { width: 100%; margin-top: 16px; background: #1c1915; color: #fffaf6; border: 0; border-radius: 8px; min-height: 48px; font-family: "Segoe UI", sans-serif; font-size: 16px; }
+  .sheet .cancel, .dev button { width: 100%; background: none; border: 0; color: #8c3a22; min-height: 48px; font-family: "Segoe UI", sans-serif; font-size: 16px; }
+  .dev button { text-align: left; border-top: 1px solid rgba(28,25,21,.12); }
 
-  #app { display: none; min-height: 100vh; background: #fff; color: #1d1d1f; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+  #app { display: none; min-height: 100vh; min-height: 100dvh; background: var(--bg); color: var(--ink); font-family: "Avenir Next", "Segoe UI", Helvetica, Arial, sans-serif; }
   #app.on { display: block; }
-  .gnav { position: sticky; top: 0; z-index: 5; height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; background: rgba(251,251,253,.86); backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid rgba(0,0,0,.08); font-size: 12px; letter-spacing: -0.01em; }
-  .gnav button { font-size: 12px; min-height: 44px; color: #1d1d1f; }
-  .band { background: #f5f5f7; padding: 64px 0 28px; }
-  .band h1 { font-size: 40px; line-height: 1.1; font-weight: 600; letter-spacing: -0.02em; text-align: center; margin: 0 0 36px; }
-  .lineup { display: grid; grid-auto-flow: column; grid-auto-columns: 78vw; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 0 22px 56px; scrollbar-color: #d2d2d7 transparent; }
-  .unit { scroll-snap-align: center; text-align: center; padding: 0 8px 8px; min-width: 0; }
-  .unit h2 { font-size: 24px; font-weight: 600; letter-spacing: -0.015em; margin: 18px 0 0; }
-  .unit .which { color: #6e6e73; font-size: 14px; margin: 4px 0 0; min-height: 2.6em; }
-  .unit .from { font-size: 14px; margin: 10px 0 8px; }
-  .links { display: flex; justify-content: center; gap: 18px; }
-  .links button { color: #0066cc; font-size: 14px; min-height: 44px; }
-  .links button:hover { text-decoration: underline; }
-  svg.machine { width: min(280px, 100%); height: auto; display: block; margin: 0 auto; }
-  .buygrid { background: #fff; }
-  .config { padding: 28px 22px 120px; max-width: 520px; }
-  .config h1 { font-size: 40px; line-height: 1.05; font-weight: 600; letter-spacing: -0.025em; margin: 0; }
-  .config .price { font-size: 17px; margin: 8px 0 0; }
-  .config .which { color: #6e6e73; font-size: 14px; margin: 6px 0 28px; }
-  .config h3 { font-size: 21px; font-weight: 600; letter-spacing: -0.015em; margin: 28px 0 10px; }
-  .opt { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 16px; text-align: left; background: #fff; border: 1px solid #d2d2d7; border-radius: 12px; min-height: 72px; padding: 14px 16px; margin: 0 0 10px; }
-  .opt.on { border: 2px solid #0071e3; padding: 13px 15px; }
-  .opt b { display: block; font-size: 17px; font-weight: 600; }
-  .opt span { display: block; color: #6e6e73; font-size: 12px; margin-top: 2px; }
-  .opt em { font-style: normal; font-size: 14px; white-space: nowrap; }
-  .specs { margin-top: 8px; }
-  .specs div { display: flex; justify-content: space-between; gap: 16px; padding: 11px 0; border-top: 1px solid #d2d2d7; font-size: 14px; }
-  .specs small { color: #6e6e73; }
-  .fine { color: #6e6e73; font-size: 12px; line-height: 1.4; margin: 18px 0 0; }
-  .buybar { position: sticky; bottom: 0; z-index: 4; display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 64px; padding: 10px 22px calc(10px + env(safe-area-inset-bottom)); background: rgba(255,255,255,.92); backdrop-filter: saturate(180%) blur(20px); border-top: 1px solid #d2d2d7; }
-  .buybar b { display: block; font-size: 14px; }
-  .buybar span { font-size: 14px; color: #1d1d1f; }
-  .bagbtn { background: #0071e3; color: #fff; border-radius: 8px; min-height: 40px; padding: 0 15px; font-size: 14px; }
-  .bagbtn:hover { background: #0077ed; }
-  .drop { position: fixed; z-index: 8; top: 48px; right: 12px; width: min(360px, calc(100% - 24px)); background: #fff; border-radius: 16px; box-shadow: 0 11px 34px rgba(0,0,0,.16); padding: 18px 18px 14px; color: #1d1d1f; }
-  .drop h2 { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 12px; }
-  .drop .empty { color: #6e6e73; font-size: 14px; margin: 8px 0 16px; }
-  .row { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 12px 0; border-top: 1px solid #d2d2d7; }
-  .row b { font-size: 14px; font-weight: 600; display: block; }
-  .row span { display: block; color: #6e6e73; font-size: 12px; }
-  .row button { color: #0066cc; font-size: 12px; min-height: 44px; }
-  .sum { display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; padding-top: 12px; }
-  .cover { position: fixed; inset: 0; z-index: 20; background: rgba(0,0,0,.4); display: flex; align-items: center; justify-content: center; padding: 20px; }
-  .sheet { width: min(400px, 100%); background: #fff; color: #1d1d1f; border-radius: 18px; padding: 28px 24px 20px; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif; }
-  .sheet h2 { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 6px; }
-  .sheet p { color: #6e6e73; font-size: 14px; margin: 0 0 16px; }
-  .sheet input { width: 100%; height: 46px; border: 1px solid #d2d2d7; border-radius: 12px; padding: 0 14px; font-size: 17px; background: #fff; color: #1d1d1f; }
-  .sheet .err { color: #b6443c; font-size: 14px; margin: 8px 0 0; }
-  .sheet .go { width: 100%; margin-top: 16px; background: #0071e3; color: #fff; border-radius: 8px; min-height: 44px; font-size: 17px; }
-  .sheet .cancel { width: 100%; margin-top: 4px; color: #0066cc; min-height: 44px; font-size: 17px; }
-  .dev { display: flex; flex-direction: column; }
-  .dev button { text-align: left; min-height: 48px; border-top: 1px solid #d2d2d7; font-size: 17px; color: #0066cc; }
-  @media (min-width: 900px) {
-    .lineup { grid-auto-columns: 1fr; max-width: 1040px; margin: 0 auto; overflow: visible; gap: 28px; }
-    .buygrid { display: grid; grid-template-columns: 1fr 1fr; max-width: 1200px; margin: 0 auto; align-items: start; }
-    .stage { position: sticky; top: 44px; height: calc(100vh - 108px); display: flex; align-items: center; justify-content: center; }
-    .config { padding: 56px 64px 48px 12px; }
-    .stage svg.machine { width: 420px; }
-    .unit svg.machine { width: min(220px, 100%); }
+  .display { font-family: "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, serif; font-weight: 500; letter-spacing: -0.03em; }
+  .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  .nav { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; padding: 0 18px; background: var(--bg); background: color-mix(in srgb, var(--bg) 88%, transparent); border-bottom: 1px solid var(--line); backdrop-filter: blur(16px); }
+  .mark { background: none; border: 0; color: var(--ink); font-weight: 650; letter-spacing: .08em; font-size: 13px; min-height: 44px; }
+  .seg { display: flex; border: 1px solid var(--line); border-radius: 999px; padding: 2px; background: var(--paper); }
+  .seg button { border: 0; background: transparent; color: var(--muted); min-height: 32px; padding: 0 10px; border-radius: 999px; font-size: 12px; }
+  .seg button.on { background: var(--ink); color: var(--bg); }
+  .bagbtn { background: none; border: 0; color: var(--ink); min-height: 44px; font-size: 14px; }
+  .home { max-width: 920px; margin: 0 auto; padding: 48px 22px 80px; }
+  .home h1 { font-size: clamp(48px, 9vw, 88px); line-height: .92; margin: 0 0 12px; }
+  .lede { font-size: 18px; color: var(--muted); max-width: 38em; margin: 0 0 28px; }
+  .kicker { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+  .starts { display: grid; grid-template-columns: 1fr; gap: 10px; }
+  .start, .part, .rowbtn { width: 100%; text-align: left; background: var(--paper); color: var(--ink); border: 1px solid var(--line); border-radius: 16px; padding: 16px; }
+  .start { display: grid; grid-template-columns: 72px 1fr auto; gap: 14px; align-items: center; min-height: 88px; }
+  .start b, .part b, .chosen b { display: block; font-size: 17px; }
+  .start span, .part small, .chosen small, .fine { color: var(--muted); font-size: 13px; }
+  .part small, .slots small { display: block; margin-top: 2px; }
+  .start em, .part em, .chosen em { font-style: normal; font-variant-numeric: tabular-nums; }
+  .workspace { max-width: 1180px; margin: 0 auto; padding: 18px 18px 108px; display: grid; gap: 18px; }
+  .meter { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; }
+  .meter .top, .sum .top { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+  .meter p { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
+  .track { height: 4px; background: var(--track); border-radius: 99px; margin-top: 8px; overflow: hidden; }
+  .track i { display: block; height: 100%; background: var(--fill); width: 0; transition: width .25s ease; }
+  .layout { display: grid; gap: 16px; }
+  .cats { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
+  .cats button { flex: 0 0 auto; min-height: 44px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--ink); }
+  .cats button.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .main { min-width: 0; }
+  .block { background: var(--paper); border: 1px solid var(--line); border-radius: 18px; padding: 16px; margin: 0 0 12px; }
+  .block h2 { font-size: 28px; margin: 0 0 4px; }
+  .slots { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px; }
+  .slots b { display: block; font-size: 11px; letter-spacing: .08em; color: var(--muted); font-weight: 650; }
+  .dots { display: flex; gap: 4px; margin-top: 4px; }
+  .dots i { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--ink); display: block; }
+  .dots i.on { background: var(--ink); }
+  .chosen { display: grid; grid-template-columns: 56px 1fr auto; gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
+  .chosen:first-of-type { border-top: 0; }
+  .qty { display: flex; align-items: center; gap: 6px; }
+  .qty button, .texty { min-width: 44px; min-height: 44px; border-radius: 10px; border: 1px solid var(--line); background: transparent; color: var(--ink); }
+  .tools { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .texty { padding: 0 12px; width: auto; }
+  .texty.primary { background: var(--accent); color: var(--on); border-color: var(--accent); }
+  .part { display: grid; grid-template-columns: 64px 1fr auto; gap: 12px; align-items: center; margin: 0 0 8px; }
+  .part:disabled { opacity: .45; }
+  .part .fit { color: var(--good); }
+  .part .no { color: var(--bad); }
+  .sil { width: 64px; height: 40px; color: var(--ink); }
+  .sil svg { width: 100%; height: 100%; display: block; }
+  details { margin-top: 6px; color: var(--muted); font-size: 13px; }
+  summary { min-height: 36px; cursor: pointer; color: var(--accent); }
+  .issue { border-left: 3px solid var(--bad); padding: 8px 0 8px 12px; margin: 8px 0; }
+  .issue b { display: block; }
+  .sum { position: sticky; top: 70px; background: var(--paper); border: 1px solid var(--line); border-radius: 18px; padding: 16px; }
+  .sum .money { font-size: 32px; margin: 4px 0; }
+  .ok { color: var(--good); } .bad { color: var(--bad); }
+  .mobbar { position: sticky; bottom: 0; z-index: 6; display: flex; justify-content: space-between; gap: 12px; align-items: center; margin: 0 -18px; padding: 10px 18px calc(10px + env(safe-area-inset-bottom)); background: color-mix(in srgb, var(--paper) 92%, transparent); border-top: 1px solid var(--line); backdrop-filter: blur(16px); }
+  .drop { position: fixed; z-index: 8; top: 60px; right: 12px; width: min(380px, calc(100% - 24px)); max-height: min(70dvh, 560px); overflow: auto; background: var(--paper); color: var(--ink); border-radius: 16px; box-shadow: var(--shadow); padding: 16px; border: 1px solid var(--line); }
+  .boot { max-width: 520px; margin: 10vh auto; padding: 0 22px; }
+  .boot li { list-style: none; padding: 8px 0; border-bottom: 1px solid var(--line); color: var(--muted); }
+  .boot li.on { color: var(--ink); }
+  .back { background: none; border: 0; color: var(--accent); min-height: 44px; padding: 0; }
+  @media (min-width: 980px) {
+    .starts { grid-template-columns: 1fr 1fr; }
+    .layout { grid-template-columns: 168px minmax(0,1fr) 260px; align-items: start; }
+    .cats { display: flex; flex-direction: column; position: sticky; top: 70px; overflow: visible; }
+    .cats button { width: 100%; text-align: left; border-radius: 10px; }
+    .mobbar { display: none; }
   }
-  body.tv .band h1, body.tv .config h1 { font-size: 64px; }
-  body.tv .unit h2 { font-size: 32px; }
-  body.kindle #app, body.kindle .band { background: #fff; color: #000; font-family: Georgia, "Times New Roman", serif; }
-  body.kindle .bagbtn, body.kindle .sheet .go { background: #000; border-radius: 0; }
-  body.kindle .opt.on { border-color: #000; }
+  @media (max-width: 979px) {
+    .sum { display: none; }
+  }
+  body.plain #app { font-family: Georgia, "Times New Roman", serif; }
+  body.plain .sil, body.plain .seg, body.plain .track { display: none; }
+  body.plain .nav, body.plain .mobbar, body.plain .sum { position: static; backdrop-filter: none; }
+  body.plain .start, body.plain .part, body.plain .block { border-radius: 0; }
+  body.tv .home h1 { font-size: 80px; }
+  body.tv .part, body.tv .start, body.tv .cats button { min-height: 72px; font-size: 22px; }
+  @media (prefers-reduced-motion: reduce) {
+    .track i { transition: none; }
+  }
 </style>
 </head>
 <body>
@@ -105,43 +147,232 @@
 <div id="app"></div>
 <script>
 (function () {
-  function machine(id, a, b) {
-    return '<svg class="machine" viewBox="0 0 360 300" aria-hidden="true"><defs><linearGradient id="alu' + id + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbfbfd"/><stop offset="1" stop-color="#d2d2d7"/></linearGradient><linearGradient id="scr' + id + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' + a + '"/><stop offset="1" stop-color="' + b + '"/></linearGradient></defs><rect x="50" y="18" width="260" height="186" rx="22" fill="url(#alu' + id + ')"/><rect x="64" y="32" width="232" height="146" rx="5" fill="url(#scr' + id + ')"/><rect x="64" y="32" width="232" height="46" rx="5" fill="#fff" opacity=".22"/><path d="M166 204c10 16 10 34 0 46h28c-10-12-10-30 0-46z" fill="#e3e3e8"/><ellipse cx="180" cy="254" rx="58" ry="6" fill="#d2d2d7"/></svg>';
-  }
-  var PRODUCTS = [
-    { id: "study", name: "Study", line: "Class, writing, and video.", price: 629, a: "#e8fff2", b: "#1f7a4d", parts: [["Processor", "Core i5-12400"], ["Graphics", "Built-in"], ["Power", "500W"], ["Case", "Compact"]], memory: ["16GB unified", "32GB unified"], memPrice: [0, 44], memNote: ["Enough for class.", "For more tabs and files."], storage: ["512GB SSD", "1TB SSD", "2TB SSD"], storePrice: [0, 50, 170], graphics: ["Built-in"], gpuPrice: [0], gpuNote: ["The picture comes from the processor."] },
-    { id: "desk", name: "Desk", line: "Mail, documents, and a full day of work.", price: 913, a: "#f4f7ff", b: "#3d5278", parts: [["Processor", "Ryzen 5 7600"], ["Graphics", "Built-in"], ["Power", "650W"], ["Case", "Compact"]], memory: ["16GB", "32GB"], memPrice: [0, 90], memNote: ["Comfortable for work.", "Room for larger files."], storage: ["1TB SSD", "2TB SSD"], storePrice: [0, 120], graphics: ["Built-in"], gpuPrice: [0], gpuNote: ["No separate graphics card."] },
-    { id: "play", name: "Play", line: "Games at 1080p.", price: 888, a: "#eef5ff", b: "#1a3e6e", parts: [["Processor", "Ryzen 5 5600"], ["Power", "650W"], ["Case", "Compact"]], memory: ["16GB", "32GB"], memPrice: [0, 44], memNote: ["Fine for most games.", "For more programs at once."], storage: ["1TB SSD", "2TB SSD"], storePrice: [0, 120], graphics: ["RTX 3050", "RTX 4060"], gpuPrice: [0, 170], gpuNote: ["1080p.", "Higher settings, still 1080p."] },
-    { id: "pro", name: "Pro", line: "Games at 1440p.", price: 1482, a: "#eef1ff", b: "#24306e", parts: [["Processor", "Ryzen 5 7600"], ["Power", "750W"], ["Case", "Standard"]], memory: ["32GB"], memPrice: [0], memNote: ["Included."], storage: ["1TB SSD", "2TB SSD"], storePrice: [0, 120], graphics: ["RTX 4060", "RTX 5070"], gpuPrice: [0, 390], gpuNote: ["1440p.", "Higher settings at 1440p."] }
+  var CPU = [
+    { id: "12400", name: "Core i5-12400", price: 229, sock: "LGA1700", ddr: "4", ig: 1, w: 117, cores: "6C / 12T", tdp: "65W base, 117W peak", pcie: "PCIe 5.0", cache: "18MB", plain: "Everyday work. Draws the picture itself." },
+    { id: "5600", name: "Ryzen 5 5600", price: 159, sock: "AM4", ddr: "4", ig: 0, w: 65, cores: "6C / 12T", tdp: "65W", pcie: "PCIe 4.0", cache: "32MB", plain: "For 1080p games. Needs a graphics card." },
+    { id: "7600", name: "Ryzen 5 7600", price: 269, sock: "AM5", ddr: "5", ig: 1, w: 88, cores: "6C / 12T", tdp: "65W base, 88W peak", pcie: "PCIe 5.0", cache: "32MB", plain: "Current. Graphics included." },
+    { id: "7800x3d", name: "Ryzen 7 7800X3D", price: 549, sock: "AM5", ddr: "5", ig: 0, w: 120, cores: "8C / 16T", tdp: "120W", pcie: "PCIe 5.0", cache: "96MB", plain: "High frame rates. Needs a graphics card." }
   ];
-  var mode = "phone", view = "lineup", openId = "study", bag = false, cart = [], picks = {};
-  var dinoHits = 0, cactusHits = 0, nHits = 0;
-  for (var i = 0; i < PRODUCTS.length; i++) picks[PRODUCTS[i].id] = { m: 0, s: 0, g: 0 };
-  function product(id) { for (var i = 0; i < PRODUCTS.length; i++) if (PRODUCTS[i].id === id) return PRODUCTS[i]; return PRODUCTS[0]; }
-  function priceOf(p) { var c = picks[p.id]; return p.price + p.memPrice[c.m] + p.storePrice[c.s] + p.gpuPrice[c.g]; }
+  var MB = [
+    { id: "b760", name: "B760M", price: 139, sock: "LGA1700", ddr: "4", form: "mATX", dimm: 2, sata: 4, m2: ["4.0", "4.0"], plain: "Small board for the Intel chip." },
+    { id: "b550", name: "B550M", price: 149, sock: "AM4", ddr: "4", form: "mATX", dimm: 4, sata: 4, m2: ["4.0", "3.0"], plain: "Small board for the Ryzen 5000 chip." },
+    { id: "b650m", name: "B650M", price: 249, sock: "AM5", ddr: "5", form: "mATX", dimm: 4, sata: 4, m2: ["5.0", "4.0"], plain: "Small current board. One PCIe 5.0 slot." },
+    { id: "b650", name: "B650", price: 229, sock: "AM5", ddr: "5", form: "ATX", dimm: 4, sata: 4, m2: ["5.0", "4.0", "4.0"], plain: "Full-size board. Three M.2 slots." }
+  ];
+  var RAM = [
+    { id: "d4-16", name: "16GB DDR4-3200", price: 28, ddr: "4", gb: 16, speed: "DDR4-3200", cl: "CL16", ecc: "No", plain: "One module. Add a second for dual channel." },
+    { id: "d5-16", name: "16GB DDR5-6000", price: 45, ddr: "5", gb: 16, speed: "DDR5-6000", cl: "CL30", ecc: "No", plain: "A current module." },
+    { id: "d5-32", name: "32GB DDR5-6000", price: 90, ddr: "5", gb: 32, speed: "DDR5-6000", cl: "CL30", ecc: "No", plain: "A large current module." }
+  ];
+  var GPU = [
+    { id: "none", name: "Built-in graphics", price: 0, w: 0, len: 0, eight: 0, sixteen: 0, plain: "Uses the processor. No extra power plug." },
+    { id: "3050", name: "GeForce RTX 3050", price: 219, w: 70, len: 200, eight: 0, sixteen: 0, plain: "1080p. Power comes from the slot." },
+    { id: "4060", name: "GeForce RTX 4060", price: 389, w: 115, len: 200, eight: 1, sixteen: 0, plain: "1080p, and lighter 1440p. One 8-pin." },
+    { id: "5070", name: "GeForce RTX 5070", price: 779, w: 250, len: 242, eight: 0, sixteen: 1, plain: "1440p. Needs a 16-pin power plug." }
+  ];
+  var DRIVE = [
+    { id: "nv1", kind: "nvme", name: "1TB NVMe", price: 99, gb: 1000, gen: "4.0", read: 7400, write: 6800, form: "2280", tbw: "600 TB", plain: "Fast everyday storage." },
+    { id: "nv2", kind: "nvme", name: "2TB NVMe", price: 219, gb: 2000, gen: "4.0", read: 7400, write: 6800, form: "2280", tbw: "1200 TB", plain: "Room for games." },
+    { id: "nv5", kind: "nvme", name: "2TB NVMe", price: 279, gb: 2000, gen: "5.0", read: 14000, write: 12000, form: "2280", tbw: "1400 TB", plain: "Fastest here. Needs a PCIe 5.0 slot to hit these speeds." },
+    { id: "sata1", kind: "sata", name: "1TB SATA SSD", price: 69, gb: 1000, rpm: 0, cache: "—", form: "2.5\"", iface: "SATA III", plain: "Quiet extra storage." },
+    { id: "hd4", kind: "sata", name: "4TB hard drive", price: 79, gb: 4000, rpm: 5400, cache: "64MB", form: "3.5\"", iface: "SATA III", plain: "A lot of space. Slower, and audible." },
+    { id: "hd8", kind: "sata", name: "8TB hard drive", price: 159, gb: 8000, rpm: 7200, cache: "256MB", form: "3.5\"", iface: "SATA III", plain: "Large and quicker than a 5400 RPM drive." }
+  ];
+  var COOL = [
+    { id: "stock", name: "Included cooler", price: 0, h: 70, plain: "Comes with the processor. Fine at stock speed." },
+    { id: "ax", name: "Tower cooler", price: 29, h: 148, plain: "Quieter than the included fan." },
+    { id: "pa", name: "Quiet tower", price: 49, h: 155, plain: "For a hotter chip." }
+  ];
+  var PSU = [
+    { id: "500", name: "500W power", price: 49, watts: 500, eight: 1, sixteen: 0, plain: "Enough without a big graphics card." },
+    { id: "650", name: "650W power", price: 99, watts: 650, eight: 2, sixteen: 0, plain: "A normal card, with some headroom." },
+    { id: "750", name: "750W power", price: 149, watts: 750, eight: 2, sixteen: 1, plain: "Has the 16-pin plug." },
+    { id: "850", name: "850W power", price: 179, watts: 850, eight: 3, sixteen: 1, plain: "Headroom for a strong card." }
+  ];
+  var CASE = [
+    { id: "air", name: "Compact case", price: 79, form: "mATX", gpu: 330, cool: 160, mounts: [{ size: 140, n: 2, where: "Front" }, { size: 120, n: 2, where: "Top" }, { size: 120, n: 1, where: "Rear" }], plain: "Small. The board must be small too." },
+    { id: "h5", name: "Standard case", price: 119, form: "ATX", gpu: 365, cool: 165, mounts: [{ size: 120, n: 3, where: "Front" }, { size: 140, n: 2, where: "Top" }, { size: 120, n: 1, where: "Rear" }], plain: "A normal tower." }
+  ];
+  var FAN = [
+    { id: "f120", name: "120mm fan", price: 12, size: 120, rpm: 1500, cfm: 50, sp: "1.6 mmH₂O", noise: "22 dBA", rgb: "ARGB", conn: "4-pin PWM", plain: "Fits most rear and top mounts." },
+    { id: "f140", name: "140mm fan", price: 16, size: 140, rpm: 1200, cfm: 62, sp: "1.2 mmH₂O", noise: "18 dBA", rgb: "No", conn: "4-pin PWM", plain: "Moves more air at a lower speed." }
+  ];
+  var RANK = { mATX: 1, ATX: 2 };
+  var NEED = ["cpu", "mb", "ram", "store", "psu", "box"];
+  var NEEDL = { cpu: "Processor", mb: "Board", ram: "Memory", store: "Storage", psu: "Power", box: "Case" };
+
+  function find(list, id) { for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i]; return null; }
   function money(n) { return "$" + Math.round(n).toLocaleString(); }
-  function delta(n) { if (!n) return ""; return (n > 0 ? "+ " : "− ") + money(Math.abs(n)); }
+  function blank() { return { cpu: null, mb: null, ram: [], gpu: null, drives: [], cool: null, psu: null, box: null, fans: [], name: "This build" }; }
+  function copyBuild(b) { return JSON.parse(JSON.stringify(b)); }
+  function qtySum(list) { var n = 0; for (var i = 0; i < list.length; i++) n += list[i].qty; return n; }
+  function lineQty(list, id) { for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i].qty; return 0; }
+
+  var state = blank();
+  var mode = "phone";
+  var section = "home";
+  var bag = false;
+  var cart = [];
+  var note = "";
+  var appearance = "system";
+  var boot = null;
+  var bootTimer = null;
+  var dinoHits = 0, cactusHits = 0, nHits = 0;
+
+  function resolvedTheme() {
+    if (appearance === "dark" || appearance === "light") return appearance;
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }
+  function applyTheme() {
+    var t = resolvedTheme();
+    document.documentElement.setAttribute("data-theme", t);
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (document.body.classList.contains("inapp") && meta) meta.setAttribute("content", t === "dark" ? "#101114" : "#f3f0e8");
+    try { localStorage.setItem("drew-appearance", appearance); } catch (e) {}
+  }
+  try { appearance = localStorage.getItem("drew-appearance") || "system"; } catch (e) {}
+  applyTheme();
+  if (window.matchMedia) window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function () { if (appearance === "system") applyTheme(); });
+
+  function nvmeCount() { var n = 0; for (var i = 0; i < state.drives.length; i++) if (find(DRIVE, state.drives[i].id).kind === "nvme") n += state.drives[i].qty; return n; }
+  function sataCount() { var n = 0; for (var i = 0; i < state.drives.length; i++) if (find(DRIVE, state.drives[i].id).kind === "sata") n += state.drives[i].qty; return n; }
+  function watts() {
+    var w = 40;
+    var cpu = find(CPU, state.cpu), gpu = find(GPU, state.gpu);
+    if (cpu) w += cpu.w;
+    if (gpu) w += gpu.w;
+    w += qtySum(state.ram) * 4 + qtySum(state.drives) * 6 + qtySum(state.fans) * 3;
+    return w;
+  }
+  function recommend() {
+    var gpu = find(GPU, state.gpu);
+    var n = Math.ceil((watts() * 1.5) / 50) * 50;
+    if (gpu && gpu.w >= 200) n = Math.max(n, 650);
+    else if (gpu && gpu.w >= 100) n = Math.max(n, 550);
+    return Math.max(450, n);
+  }
+  function fanSlots(box) { var n = 0; if (!box) return 0; for (var i = 0; i < box.mounts.length; i++) n += box.mounts[i].n; return n; }
+  function fansFit(box, fans) {
+    if (!box) return "Choose a case before adding fans.";
+    var mounts = [];
+    for (var i = 0; i < box.mounts.length; i++) mounts.push({ size: box.mounts[i].size, n: box.mounts[i].n });
+    var need = [];
+    for (var f = 0; f < fans.length; f++) for (var q = 0; q < fans[f].qty; q++) need.push(find(FAN, fans[f].id).size);
+    need.sort(function (a, b) { return b - a; });
+    for (var k = 0; k < need.length; k++) {
+      var slot = null;
+      for (var m = 0; m < mounts.length; m++) if (mounts[m].size === need[k] && mounts[m].n > 0) { slot = mounts[m]; break; }
+      if (!slot) for (var m2 = 0; m2 < mounts.length; m2++) if (mounts[m2].size > need[k] && mounts[m2].n > 0) { slot = mounts[m2]; break; }
+      if (!slot) return "This case has no open " + need[k] + "mm fan position. A 120mm fan can use a larger mount. A 140mm fan cannot use a 120mm mount.";
+      slot.n--;
+    }
+    return "";
+  }
+  function issues() {
+    var out = [];
+    var cpu = find(CPU, state.cpu), mb = find(MB, state.mb), gpu = find(GPU, state.gpu);
+    var cool = find(COOL, state.cool), psu = find(PSU, state.psu), box = find(CASE, state.box);
+    if (cpu && mb && cpu.sock !== mb.sock) out.push({ t: "The processor does not fit this board.", w: "The chip needs a " + cpu.sock + " socket. This board is " + mb.sock + ".", f: "Choose a " + cpu.sock + " board, or a different processor." });
+    if (mb) for (var i = 0; i < state.ram.length; i++) {
+      var stick = find(RAM, state.ram[i].id);
+      if (stick.ddr !== mb.ddr) out.push({ t: "The memory is the wrong kind.", w: stick.name + " is DDR" + stick.ddr + ". This board takes DDR" + mb.ddr + ".", f: "Remove it and add DDR" + mb.ddr + "." });
+    }
+    if (mb && qtySum(state.ram) > mb.dimm) out.push({ t: "Too many memory modules.", w: "This board has " + mb.dimm + " slots. The build has " + qtySum(state.ram) + ".", f: "Lower the quantity." });
+    if (cpu && gpu && gpu.id === "none" && !cpu.ig) out.push({ t: "The screen will stay black.", w: cpu.name + " cannot draw a picture.", f: "Add a graphics card." });
+    if (gpu && gpu.id !== "none" && box && gpu.len > box.gpu) out.push({ t: "The graphics card does not fit the case.", w: "The card is " + gpu.len + "mm long. The case allows " + box.gpu + "mm.", f: "Choose a shorter card or a larger case." });
+    if (mb && box && RANK[mb.form] > RANK[box.form]) out.push({ t: "The board does not fit the case.", w: mb.form + " is larger than this " + box.form + " case.", f: "Use a smaller board or a larger case." });
+    if (cool && box && cool.h > box.cool) out.push({ t: "The cooler does not fit the case.", w: "The cooler is " + cool.h + "mm tall. The case allows " + box.cool + "mm.", f: "Use a shorter cooler or a taller case." });
+    if (mb && nvmeCount() > mb.m2.length) out.push({ t: "Not enough M.2 slots.", w: "This board has " + mb.m2.length + ". The build has " + nvmeCount() + " NVMe drives.", f: "Remove a drive or use a board with more M.2 slots." });
+    if (mb && sataCount() > mb.sata) out.push({ t: "Not enough SATA ports.", w: "This board has " + mb.sata + " ports. The build uses " + sataCount() + ".", f: "Remove a SATA drive." });
+    if (psu && gpu && gpu.sixteen > psu.sixteen) out.push({ t: "The power supply has the wrong plug.", w: gpu.name + " needs a 16-pin cable. This unit does not include one.", f: "Choose the 750W or 850W unit." });
+    if (psu && gpu && gpu.eight > psu.eight) out.push({ t: "Not enough 8-pin cables.", w: gpu.name + " needs " + gpu.eight + ". This unit has " + psu.eight + ".", f: "Choose a larger power supply." });
+    var rec = recommend();
+    if (psu && psu.watts < rec) out.push({ t: "The power supply is tight.", w: "The parts draw about " + watts() + "W. A " + rec + "W unit leaves room for peaks. This one is " + psu.watts + "W.", f: "Choose at least " + rec + "W." });
+    var fanMsg = fansFit(box, state.fans);
+    if (fanMsg && qtySum(state.fans)) out.push({ t: "The fans do not all mount.", w: fanMsg, f: "Remove a fan or choose a case with more positions." });
+    return out;
+  }
+  function have(key) {
+    if (key === "cpu") return !!state.cpu;
+    if (key === "mb") return !!state.mb;
+    if (key === "ram") return qtySum(state.ram) > 0;
+    if (key === "store") return qtySum(state.drives) > 0;
+    if (key === "psu") return !!state.psu;
+    if (key === "box") return !!state.box;
+    return false;
+  }
+  function doneCount() { var n = 0; for (var i = 0; i < NEED.length; i++) if (have(NEED[i])) n++; return n; }
+  function missingLabel() { for (var i = 0; i < NEED.length; i++) if (!have(NEED[i])) return NEEDL[NEED[i]]; return ""; }
+  function total() {
+    var t = 0;
+    function add(p, q) { if (p) t += p.price * (q || 1); }
+    add(find(CPU, state.cpu)); add(find(MB, state.mb)); add(find(GPU, state.gpu)); add(find(COOL, state.cool)); add(find(PSU, state.psu)); add(find(CASE, state.box));
+    for (var i = 0; i < state.ram.length; i++) add(find(RAM, state.ram[i].id), state.ram[i].qty);
+    for (var d = 0; d < state.drives.length; d++) add(find(DRIVE, state.drives[d].id), state.drives[d].qty);
+    for (var f = 0; f < state.fans.length; f++) add(find(FAN, state.fans[f].id), state.fans[f].qty);
+    return t;
+  }
+  function bump(list, id, delta, limitFn) {
+    var next = JSON.parse(JSON.stringify(list));
+    var found = false;
+    for (var i = 0; i < next.length; i++) if (next[i].id === id) { next[i].qty += delta; found = true; if (next[i].qty <= 0) next.splice(i, 1); break; }
+    if (!found && delta > 0) next.push({ id: id, qty: 1 });
+    var why = limitFn(next);
+    if (why) { note = why; return list; }
+    note = "";
+    return next;
+  }
+
+  var RECIPES = {
+    study: { name: "Study", cpu: "12400", mb: "b760", ram: [{ id: "d4-16", qty: 1 }], gpu: "none", drives: [{ id: "nv1", qty: 1 }], cool: "stock", psu: "500", box: "air", fans: [{ id: "f120", qty: 1 }] },
+    desk: { name: "Desk", cpu: "7600", mb: "b650m", ram: [{ id: "d5-16", qty: 2 }], gpu: "none", drives: [{ id: "nv1", qty: 1 }], cool: "ax", psu: "650", box: "air", fans: [{ id: "f120", qty: 2 }] },
+    play: { name: "Play", cpu: "5600", mb: "b550", ram: [{ id: "d4-16", qty: 2 }], gpu: "3050", drives: [{ id: "nv1", qty: 1 }], cool: "ax", psu: "650", box: "air", fans: [{ id: "f120", qty: 2 }] },
+    pro: { name: "Pro", cpu: "7600", mb: "b650", ram: [{ id: "d5-32", qty: 2 }], gpu: "4060", drives: [{ id: "nv2", qty: 1 }], cool: "pa", psu: "750", box: "h5", fans: [{ id: "f120", qty: 3 }] }
+  };
+
+  function sil(kind) {
+    var p = {
+      cpu: '<rect x="8" y="6" width="48" height="28" rx="3" fill="none" stroke="currentColor"/><rect x="22" y="12" width="20" height="16" fill="currentColor"/>',
+      mb: '<rect x="4" y="4" width="56" height="32" rx="2" fill="none" stroke="currentColor"/><rect x="8" y="8" width="14" height="14" fill="currentColor"/><rect x="26" y="10" width="28" height="3"/><rect x="26" y="16" width="28" height="3"/><rect x="26" y="26" width="18" height="6" fill="none" stroke="currentColor"/>',
+      ram: '<rect x="16" y="4" width="14" height="32" fill="none" stroke="currentColor"/><rect x="18" y="8" width="10" height="4"/><rect x="18" y="14" width="10" height="4"/><rect x="18" y="20" width="10" height="4"/>',
+      gpu: '<rect x="2" y="12" width="60" height="16" rx="2" fill="none" stroke="currentColor"/><circle cx="16" cy="20" r="5" fill="none" stroke="currentColor"/><circle cx="30" cy="20" r="5" fill="none" stroke="currentColor"/>',
+      nvme: '<rect x="6" y="14" width="52" height="12" rx="1" fill="none" stroke="currentColor"/><rect x="10" y="17" width="16" height="6" fill="currentColor"/>',
+      hdd: '<rect x="8" y="8" width="48" height="24" rx="2" fill="none" stroke="currentColor"/><circle cx="32" cy="20" r="7" fill="none" stroke="currentColor"/>',
+      psu: '<rect x="8" y="6" width="48" height="28" fill="none" stroke="currentColor"/><circle cx="24" cy="20" r="7" fill="none" stroke="currentColor"/>',
+      box: '<path d="M20 4 h28 l6 8 v24 h-40 v-24 z" fill="none" stroke="currentColor"/>',
+      fan: '<circle cx="32" cy="20" r="14" fill="none" stroke="currentColor"/><circle cx="32" cy="20" r="3" fill="currentColor"/>',
+      cool: '<rect x="22" y="6" width="20" height="28" fill="none" stroke="currentColor"/><path d="M24 10 h16 M24 16 h16 M24 22 h16 M24 28 h16" stroke="currentColor"/>'
+    };
+    return '<span class="sil" aria-hidden="true"><svg viewBox="0 0 64 40">' + (p[kind] || p.cpu) + '</svg></span>';
+  }
+  function dots(on, total) {
+    var h = '<span class="dots" aria-label="' + on + ' of ' + total + ' used">';
+    for (var i = 0; i < total; i++) h += '<i class="' + (i < on ? "on" : "") + '"></i>';
+    return h + '</span>';
+  }
+
   var gate = document.getElementById("gate"), app = document.getElementById("app"), modal = document.getElementById("modal");
 
   function showApp() {
     gate.style.display = "none";
     modal.innerHTML = "";
     app.className = "on";
-    document.body.className = mode;
-    document.title = "PC";
-    view = "lineup";
+    document.body.className = mode + " inapp";
+    document.title = "DREW.WTF";
+    section = "home";
+    applyTheme();
     draw();
   }
   function askDevice() {
-    modal.innerHTML = '<div class="cover"><div class="sheet"><h2>Where are you?</h2><p>The computers stay the same.</p><div class="dev" id="devs"></div><button type="button" class="cancel" id="x">Close</button></div></div>';
-    var opts = [["phone", "iPhone"], ["desk", "Desktop"], ["tv", "TV"], ["kindle", "Kindle"]];
+    modal.innerHTML = '<div class="cover"><div class="sheet"><h2>Where are you?</h2><p>Same build. Smaller screens get a plainer page.</p><div class="dev" id="devs"></div><button type="button" class="cancel" id="x">Close</button></div></div>';
+    var opts = [["phone", "iPhone"], ["desk", "Desktop"], ["tv", "TV"], ["kindle", "Kindle"], ["berry", "BlackBerry"]];
     var box = document.getElementById("devs");
     for (var i = 0; i < opts.length; i++) {
       var b = document.createElement("button");
       b.type = "button";
       b.textContent = opts[i][1];
       b.setAttribute("data-mode", opts[i][0]);
-      b.onclick = function () { mode = this.getAttribute("data-mode"); showApp(); };
+      b.onclick = function () { mode = this.getAttribute("data-mode"); if (mode === "kindle" || mode === "berry") mode = mode + " plain"; showApp(); };
       box.appendChild(b);
     }
     document.getElementById("x").onclick = function () { modal.innerHTML = ""; };
@@ -159,75 +390,315 @@
     };
     document.getElementById("pwv").focus();
   }
-  function specs(p) {
-    var c = picks[p.id];
-    var rows = [["Memory", p.memory[c.m]], ["Storage", p.storage[c.s]], ["Graphics", p.graphics[c.g]]];
-    for (var i = 0; i < p.parts.length; i++) rows.push(p.parts[i]);
-    return rows;
+
+  function priceOf(recipe) {
+    var keep = state;
+    state = copyBuild(recipe);
+    var n = total();
+    state = keep;
+    return n;
   }
-  function blurb(p) {
-    var c = picks[p.id];
-    return [p.parts[0][1], p.memory[c.m], p.graphics[c.g], p.storage[c.s]].join(" · ");
+  function startBoot(recipe) {
+    var steps = ["Reading the job", "Checking the budget", "Selecting the processor", "Matching the board", "Checking memory", "Checking power", "Build ready"];
+    boot = { name: recipe.name, at: 0, steps: steps, recipe: recipe };
+    clearInterval(bootTimer);
+    draw();
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) { finishBoot(); return; }
+    bootTimer = setInterval(function () {
+      boot.at++;
+      if (boot.at >= boot.steps.length) { clearInterval(bootTimer); finishBoot(); return; }
+      draw();
+    }, 140);
   }
-  function group(title, labels, notes, prices, on, key) {
-    var html = '<h3>' + title + '</h3>';
-    for (var i = 0; i < labels.length; i++) {
-      html += '<button type="button" class="opt' + (i === on ? " on" : "") + '" data-pick="' + key + '" data-i="' + i + '"><span><b>' + labels[i] + '</b><span>' + notes[i] + '</span></span><em>' + delta(prices[i] - prices[on]) + '</em></button>';
+  function finishBoot() {
+    state = copyBuild(boot.recipe);
+    boot = null;
+    section = "build";
+    note = "";
+    draw();
+  }
+
+  function meter() {
+    var n = doneCount(), pct = Math.round(n / NEED.length * 100), miss = missingLabel();
+    var label = n === NEED.length ? "Build complete" : "Your build";
+    var sub = n === NEED.length ? "The six required parts are in. Fans, a graphics card, and extra drives are optional." : "Missing " + miss.toLowerCase() + ". " + n + " of 6 required.";
+    return '<section class="meter"><div class="top"><b class="display">' + label + '</b><span class="mono">' + n + ' / 6</span></div><div class="track" aria-hidden="true"><i style="width:' + pct + '%"></i></div><p>' + sub + '</p></section>';
+  }
+  function summary() {
+    var list = issues();
+    var head = !list.length ? '<p class="ok">Compatible</p>' : '<p class="bad">' + list[0].t + '</p>';
+    return '<aside class="sum"><div class="kicker">Build</div><div class="money display">' + money(total()) + '</div>' + head + '<p class="fine mono">' + watts() + 'W drawn · ' + recommend() + 'W suggested</p><button type="button" class="texty" data-act="goto" data-id="build" style="width:100%;margin-top:10px">View build</button><button type="button" class="texty primary" data-act="save" style="width:100%;margin-top:8px">Add to Bag</button></aside>';
+  }
+  function cats() {
+    var items = [["build", "Build"], ["cpu", "Processor"], ["mb", "Board"], ["ram", "Memory"], ["gpu", "Graphics"], ["store", "Storage"], ["cool", "Cooling"], ["psu", "Power"], ["box", "Case"], ["fans", "Fans"]];
+    var h = '<nav class="cats" aria-label="Parts">';
+    for (var i = 0; i < items.length; i++) h += '<button type="button" class="' + (section === items[i][0] ? "on" : "") + '" data-act="goto" data-id="' + items[i][0] + '">' + items[i][1] + '</button>';
+    return h + '</nav>';
+  }
+  function chosen(kind, title, sub, price, id, group) {
+    return '<div class="chosen">' + sil(kind) + '<div><b>' + title + '</b><small>' + sub + '</small></div><div><em>' + money(price) + '</em><div class="qty"><button type="button" data-act="dec" data-group="' + group + '" data-id="' + id + '" aria-label="Fewer">−</button><button type="button" data-act="inc" data-group="' + group + '" data-id="' + id + '" aria-label="More">+</button></div></div></div>';
+  }
+  function partBtn(kind, name, spec, fit, price, act, id, tech) {
+    return '<div class="partwrap"><button type="button" class="part" data-act="' + act + '" data-id="' + id + '"' + (fit.ok ? "" : " disabled") + '>' + sil(kind) + '<span><b>' + name + '</b><small>' + spec + '</small><small class="' + (fit.ok ? "fit" : "no") + '">' + fit.text + '</small></span><em>' + money(price) + '</em></button><details><summary>Technical details</summary><p>' + tech + '</p></details></div>';
+  }
+
+  function boardSlots() {
+    var mb = find(MB, state.mb);
+    if (!mb) return '<p class="fine">Choose a board to see M.2 slots, SATA ports, and memory slots.</p>';
+    var nv = nvmeCount(), sa = sataCount(), rm = qtySum(state.ram);
+    var m2 = '<div><b>M.2</b>' + dots(Math.min(nv, mb.m2.length), mb.m2.length);
+    for (var i = 0; i < mb.m2.length; i++) m2 += '<small>' + (i < nv ? "Slot " + (i + 1) + " occupied" : "Slot " + (i + 1) + " open · PCIe " + mb.m2[i] + " · 2280") + '</small>';
+    m2 += '</div>';
+    return '<div class="slots">' + m2 + '<div><b>SATA</b>' + dots(Math.min(sa, mb.sata), mb.sata) + '<small>' + sa + ' / ' + mb.sata + ' used</small></div><div><b>MEMORY</b>' + dots(Math.min(rm, mb.dimm), mb.dimm) + '<small>' + rm + ' / ' + mb.dimm + ' modules</small></div></div>';
+  }
+  function caseFans() {
+    var box = find(CASE, state.box);
+    if (!box) return "";
+    var h = "";
+    for (var i = 0; i < box.mounts.length; i++) h += "<small>" + box.mounts[i].where + " · " + box.mounts[i].n + " × " + box.mounts[i].size + "mm</small>";
+    return '<div class="slots"><div><b>FAN POSITIONS</b>' + dots(Math.min(qtySum(state.fans), fanSlots(box)), fanSlots(box)) + h + '<small>' + qtySum(state.fans) + " / " + fanSlots(box) + " used</small></div></div>";
+  }
+
+  function viewHome() {
+    var keys = [["study", "Class, writing, and video."], ["desk", "A full day of work."], ["play", "Games at 1080p."], ["pro", "Games at 1440p."]];
+    var h = '<div class="home"><p class="kicker">DREW.WTF</p><h1 class="display">One computer.</h1><p class="lede">Six parts make it real: processor, board, memory, storage, power, case. Everything else is optional, and the page will say when something does not fit.</p><div class="starts">';
+    for (var i = 0; i < keys.length; i++) {
+      var r = RECIPES[keys[i][0]];
+      h += '<button type="button" class="start" data-act="recipe" data-id="' + keys[i][0] + '">' + sil(keys[i][0] === "play" || keys[i][0] === "pro" ? "gpu" : "cpu") + '<span><b>' + r.name + '</b><span>' + keys[i][1] + '</span></span><em>' + money(priceOf(r)) + '</em></button>';
     }
-    return html;
+    h += '</div><div class="tools"><button type="button" class="texty" data-act="empty">Start empty</button></div><p class="fine">Catalog prices. Nothing is charged. A display is not included.</p></div>';
+    return h;
   }
-  function draw() {
-    var html = '<div class="gnav"><button type="button" id="home">PC</button><button type="button" id="bagbtn">Bag' + (cart.length ? " (" + cart.length + ")" : "") + '</button></div>';
-    if (view === "lineup") {
-      html += '<section class="band"><h1>The lineup.</h1><div class="lineup">';
-      for (var i = 0; i < PRODUCTS.length; i++) {
-        var p = PRODUCTS[i];
-        html += '<article class="unit">' + machine(p.id, p.a, p.b) + '<h2>' + p.name + '</h2><p class="which">' + p.line + '</p><p class="from">' + money(priceOf(p)) + '</p><div class="links"><button type="button" data-open="' + p.id + '">Learn more ›</button><button type="button" data-open="' + p.id + '">Buy ›</button></div></article>';
+  function viewBuild() {
+    var cpu = find(CPU, state.cpu), mb = find(MB, state.mb), gpu = find(GPU, state.gpu), cool = find(COOL, state.cool), psu = find(PSU, state.psu), box = find(CASE, state.box);
+    var h = '<div class="block"><h2 class="display">' + state.name + '</h2><p class="fine">' + money(total()) + ' · about ' + watts() + 'W · suggest ' + recommend() + 'W</p>';
+    var list = issues();
+    for (var i = 0; i < list.length; i++) h += '<div class="issue"><b>' + list[i].t + '</b><span class="fine">' + list[i].w + ' ' + list[i].f + '</span></div>';
+    if (!list.length && doneCount() === 6) h += '<p class="ok">Nothing is blocking this build.</p>';
+    if (note) h += '<p class="bad">' + note + '</p>';
+    h += '</div>';
+    h += '<div class="block"><h2 class="display">Processor</h2>' + (cpu ? '<div class="chosen">' + sil("cpu") + '<div><b>' + cpu.name + '</b><small>' + cpu.cores + ' · ' + cpu.sock + '</small></div><em>' + money(cpu.price) + '</em></div>' : '<p class="fine">No processor yet.</p>') + '<button class="texty" type="button" data-act="goto" data-id="cpu">Change</button></div>';
+    h += '<div class="block"><h2 class="display">Board</h2>' + (mb ? '<div class="chosen">' + sil("mb") + '<div><b>' + mb.name + '</b><small>' + mb.sock + ' · DDR' + mb.ddr + ' · ' + mb.dimm + ' slots</small></div><em>' + money(mb.price) + '</em></div>' + boardSlots() : '<p class="fine">No board yet.</p>') + '<button class="texty" type="button" data-act="goto" data-id="mb">Change</button></div>';
+    h += '<div class="block"><h2 class="display">Memory</h2>';
+    if (!state.ram.length) h += '<p class="fine">' + (mb ? "No memory yet. This board has " + mb.dimm + " slots for DDR" + mb.ddr + "." : "Choose a board first, so the memory matches.") + '</p>';
+    var gb = 0;
+    for (var r = 0; r < state.ram.length; r++) { var stick = find(RAM, state.ram[r].id); gb += stick.gb * state.ram[r].qty; h += chosen("ram", stick.name, state.ram[r].qty + " × " + stick.gb + "GB · " + stick.speed + " · " + stick.cl, stick.price * state.ram[r].qty, stick.id, "ram"); }
+    if (gb) h += '<p class="fine">' + gb + "GB total. ECC: no.</p>";
+    if (mb) h += dots(Math.min(qtySum(state.ram), mb.dimm), mb.dimm);
+    h += '<div class="tools"><button class="texty" type="button" data-act="goto" data-id="ram">Add memory</button></div></div>';
+    h += '<div class="block"><h2 class="display">Graphics</h2>' + (gpu ? '<div class="chosen">' + sil("gpu") + '<div><b>' + gpu.name + '</b><small>' + (gpu.w ? gpu.w + 'W' : 'No extra power') + '</small></div><em>' + money(gpu.price) + '</em></div>' : '<p class="fine">' + (cpu && cpu.ig ? "No card yet. This processor can draw the picture." : "No card yet.") + '</p>') + '<button class="texty" type="button" data-act="goto" data-id="gpu">Change</button></div>';
+    h += '<div class="block"><h2 class="display">Storage</h2>';
+    if (!state.drives.length) h += '<p class="fine">No storage yet.' + (mb ? " " + mb.m2.length + " M.2 slots and " + mb.sata + " SATA ports are open." : "") + '</p>';
+    for (var d = 0; d < state.drives.length; d++) {
+      var drive = find(DRIVE, state.drives[d].id);
+      var sub = drive.kind === "nvme" ? "PCIe " + drive.gen + " · " + drive.read.toLocaleString() + " MB/s read" : (drive.rpm ? drive.rpm + " RPM · " + drive.iface : drive.iface);
+      h += chosen(drive.kind === "nvme" ? "nvme" : "hdd", drive.name + " ×" + state.drives[d].qty, sub, drive.price * state.drives[d].qty, drive.id, "drives");
+    }
+    if (mb) h += boardSlots();
+    h += '<div class="tools"><button class="texty" type="button" data-act="goto" data-id="store">Add a drive</button></div></div>';
+    h += '<div class="block"><h2 class="display">Cooling</h2>' + (cool ? '<div class="chosen">' + sil("cool") + '<div><b>' + cool.name + '</b><small>' + cool.h + 'mm tall</small></div><em>' + money(cool.price) + '</em></div>' : '<p class="fine">No cooler selected. The processor needs one.</p>') + '<button class="texty" type="button" data-act="goto" data-id="cool">Change</button></div>';
+    h += '<div class="block"><h2 class="display">Power</h2>' + (psu ? '<div class="chosen">' + sil("psu") + '<div><b>' + psu.name + '</b><small>' + watts() + 'W drawn · ' + recommend() + 'W suggested</small></div><em>' + money(psu.price) + '</em></div>' : '<p class="fine">No power supply. The parts want about ' + recommend() + 'W.</p>') + '<button class="texty" type="button" data-act="goto" data-id="psu">Change</button></div>';
+    h += '<div class="block"><h2 class="display">Case</h2>' + (box ? '<div class="chosen">' + sil("box") + '<div><b>' + box.name + '</b><small>' + box.form + ' · graphics to ' + box.gpu + 'mm</small></div><em>' + money(box.price) + '</em></div>' + caseFans() : '<p class="fine">No case yet.</p>') + '<button class="texty" type="button" data-act="goto" data-id="box">Change</button></div>';
+    h += '<div class="block"><h2 class="display">Fans</h2>';
+    if (!state.fans.length) h += '<p class="fine">' + (box ? "No extra fans yet. " + fanSlots(box) + " positions are open." : "Choose a case to see fan positions.") + '</p>';
+    for (var f = 0; f < state.fans.length; f++) { var fan = find(FAN, state.fans[f].id); h += chosen("fan", fan.name + " ×" + state.fans[f].qty, fan.size + "mm · " + fan.rpm + " RPM · " + fan.noise, fan.price * state.fans[f].qty, fan.id, "fans"); }
+    h += caseFans() + '<div class="tools"><button class="texty" type="button" data-act="goto" data-id="fans">Add a fan</button></div></div>';
+    return h;
+  }
+  function fitText(ok, yes, no) { return { ok: ok, text: ok ? yes : no }; }
+  function viewPick() {
+    var h = '<button type="button" class="back" data-act="goto" data-id="build">‹ Build</button>';
+    if (note) h += '<p class="bad">' + note + '</p>';
+    if (section === "cpu") {
+      h += '<h2 class="display">Processor</h2>';
+      for (var i = 0; i < CPU.length; i++) {
+        var mb = find(MB, state.mb);
+        var ok = !mb || mb.sock === CPU[i].sock;
+        h += partBtn("cpu", CPU[i].name, CPU[i].cores + " · " + CPU[i].sock, fitText(ok, "Fits this board", "Needs a " + CPU[i].sock + " board"), CPU[i].price, "setcpu", CPU[i].id, CPU[i].plain + " " + CPU[i].tdp + ". " + CPU[i].pcie + ". Cache " + CPU[i].cache + ". " + (CPU[i].ig ? "Has graphics." : "No graphics."));
       }
-      html += '</div></section>';
-    } else {
-      var cur = product(openId);
-      var c = picks[cur.id];
-      var rows = specs(cur);
-      html += '<div class="buygrid"><div class="stage">' + machine(cur.id + "b", cur.a, cur.b) + '</div><div class="config"><button type="button" class="links" id="back" style="color:#0066cc;font-size:14px;min-height:44px">‹ The lineup</button><h1>' + cur.name + '</h1><p class="price">' + money(priceOf(cur)) + '</p><p class="which">' + cur.line + '</p>';
-      html += group("Memory", cur.memory, cur.memNote, cur.memPrice, c.m, "m");
-      html += group("Storage", cur.storage, cur.storage.map(function () { return "Solid-state."; }), cur.storePrice, c.s, "s");
-      if (cur.graphics.length > 1) html += group("Graphics", cur.graphics, cur.gpuNote, cur.gpuPrice, c.g, "g");
-      html += '<div class="specs">';
-      for (var s = 0; s < rows.length; s++) html += '<div><small>' + rows[s][0] + '</small><b>' + rows[s][1] + '</b></div>';
-      html += '</div><p class="fine">Catalog prices, not a checkout. A display is not included.</p></div></div>';
-      html += '<div class="buybar"><div><b>' + cur.name + '</b><span>' + money(priceOf(cur)) + '</span></div><button type="button" class="bagbtn" id="add">Add to Bag</button></div>';
+    }
+    if (section === "mb") {
+      h += '<h2 class="display">Board</h2>';
+      for (var b = 0; b < MB.length; b++) {
+        var cpu = find(CPU, state.cpu);
+        var okb = !cpu || cpu.sock === MB[b].sock;
+        h += partBtn("mb", MB[b].name, MB[b].sock + " · " + MB[b].m2.length + " M.2 · " + MB[b].sata + " SATA · " + MB[b].dimm + " DIMM", fitText(okb, "Fits this processor", "This processor needs " + (cpu ? cpu.sock : "")), MB[b].price, "setmb", MB[b].id, MB[b].plain + " DDR" + MB[b].ddr + ". M.2 is PCIe " + MB[b].m2.join(" and ") + ", all 2280.");
+      }
+    }
+    if (section === "ram") {
+      var board = find(MB, state.mb);
+      h += '<h2 class="display">Memory</h2>' + (board ? '<p class="fine">' + board.dimm + ' slots · DDR' + board.ddr + ' · ' + qtySum(state.ram) + ' used</p>' : '<p class="fine">Choose a board first.</p>');
+      for (var r = 0; r < RAM.length; r++) {
+        var okr = board && RAM[r].ddr === board.ddr && qtySum(state.ram) < board.dimm;
+        var why = !board ? "Choose a board first." : (RAM[r].ddr !== board.ddr ? "This board wants DDR" + board.ddr + "." : "Your motherboard has " + board.dimm + " memory slots.");
+        h += partBtn("ram", RAM[r].name, RAM[r].speed + " · " + RAM[r].cl, fitText(okr, "One more fits", why), RAM[r].price, "addram", RAM[r].id, RAM[r].plain + " " + RAM[r].gb + "GB per module. ECC: " + RAM[r].ecc + ".");
+      }
+    }
+    if (section === "gpu") {
+      h += '<h2 class="display">Graphics</h2>';
+      var cpu2 = find(CPU, state.cpu), box = find(CASE, state.box), psu = find(PSU, state.psu);
+      for (var g = 0; g < GPU.length; g++) {
+        var okg = true, whyg = "Fits";
+        if (GPU[g].id === "none" && cpu2 && !cpu2.ig) { okg = false; whyg = "This processor cannot draw a picture."; }
+        else if (box && GPU[g].len > box.gpu) { okg = false; whyg = "Too long for this case (" + box.gpu + "mm)."; }
+        else if (psu && GPU[g].sixteen > psu.sixteen) { okg = false; whyg = "Needs a 16-pin cable."; }
+        h += partBtn("gpu", GPU[g].name, GPU[g].id === "none" ? "No card" : GPU[g].w + "W · " + GPU[g].len + "mm", fitText(okg, "Fits", whyg), GPU[g].price, "setgpu", GPU[g].id, GPU[g].plain);
+      }
+    }
+    if (section === "store") {
+      var mb2 = find(MB, state.mb);
+      h += '<h2 class="display">Storage</h2>' + (mb2 ? boardSlots() : '<p class="fine">Choose a board to know how many drives fit.</p>');
+      for (var s = 0; s < DRIVE.length; s++) {
+        var d = DRIVE[s];
+        var spec = d.kind === "nvme" ? "PCIe " + d.gen + " ×4 · " + d.read.toLocaleString() + " / " + d.write.toLocaleString() + " MB/s · M.2 " + d.form : (d.rpm ? d.rpm + " RPM · " + d.cache + " cache · " + d.iface : d.iface + " · " + d.form);
+        var oks = true, whys = "Fits";
+        if (!mb2) { oks = false; whys = "Choose a board first."; }
+        else if (d.kind === "nvme" && nvmeCount() >= mb2.m2.length) { oks = false; whys = "All " + mb2.m2.length + " M.2 slots are full."; }
+        else if (d.kind === "sata" && sataCount() >= mb2.sata) { oks = false; whys = "All " + mb2.sata + " SATA ports are full."; }
+        else if (d.kind === "nvme" && d.gen === "5.0" && mb2.m2[0] !== "5.0") whys = "Fits, but this board tops out at PCIe 4.0, so the drive will be slower.";
+        h += partBtn(d.kind === "nvme" ? "nvme" : "hdd", d.name, spec, fitText(oks, whys === "Fits" ? "Fits" : whys, whys), d.price, "adddrive", d.id, d.plain + (d.tbw ? " TBW " + d.tbw + "." : ""));
+      }
+    }
+    if (section === "cool") {
+      h += '<h2 class="display">Cooling</h2>';
+      var box2 = find(CASE, state.box);
+      for (var c = 0; c < COOL.length; c++) {
+        var okc = !box2 || COOL[c].h <= box2.cool;
+        h += partBtn("cool", COOL[c].name, COOL[c].h + "mm", fitText(okc, "Fits this case", "Too tall for this case"), COOL[c].price, "setcool", COOL[c].id, COOL[c].plain);
+      }
+    }
+    if (section === "psu") {
+      h += '<h2 class="display">Power</h2><p class="fine">About ' + watts() + 'W drawn. Suggest ' + recommend() + 'W so peaks have room.</p>';
+      var gpu = find(GPU, state.gpu);
+      for (var p = 0; p < PSU.length; p++) {
+        var okp = PSU[p].watts >= recommend() && (!gpu || (gpu.sixteen <= PSU[p].sixteen && gpu.eight <= PSU[p].eight));
+        var why = PSU[p].watts < recommend() ? "Under the " + recommend() + "W suggestion." : "Missing a cable this graphics card needs.";
+        h += partBtn("psu", PSU[p].name, PSU[p].watts + "W", fitText(okp, "Enough", why), PSU[p].price, "setpsu", PSU[p].id, PSU[p].plain);
+      }
+    }
+    if (section === "box") {
+      h += '<h2 class="display">Case</h2>';
+      var mb3 = find(MB, state.mb), gpu3 = find(GPU, state.gpu), cool3 = find(COOL, state.cool);
+      for (var k = 0; k < CASE.length; k++) {
+        var okk = true, whyk = "Fits";
+        if (mb3 && RANK[mb3.form] > RANK[CASE[k].form]) { okk = false; whyk = "Board is too big."; }
+        else if (gpu3 && gpu3.len > CASE[k].gpu) { okk = false; whyk = "Graphics card is too long."; }
+        else if (cool3 && cool3.h > CASE[k].cool) { okk = false; whyk = "Cooler is too tall."; }
+        h += partBtn("box", CASE[k].name, CASE[k].form + " · " + fanSlots(CASE[k]) + " fan positions", fitText(okk, "Fits", whyk), CASE[k].price, "setbox", CASE[k].id, CASE[k].plain);
+      }
+    }
+    if (section === "fans") {
+      var box4 = find(CASE, state.box);
+      h += '<h2 class="display">Fans</h2>' + caseFans();
+      for (var n = 0; n < FAN.length; n++) {
+        var trial = state.fans.concat([{ id: FAN[n].id, qty: 1 }]);
+        var merged = JSON.parse(JSON.stringify(state.fans));
+        var hit = false;
+        for (var z = 0; z < merged.length; z++) if (merged[z].id === FAN[n].id) { merged[z].qty++; hit = true; }
+        if (!hit) merged.push({ id: FAN[n].id, qty: 1 });
+        var msg = fansFit(box4, merged);
+        h += partBtn("fan", FAN[n].name, FAN[n].size + "mm · " + FAN[n].rpm + " RPM · " + FAN[n].cfm + " CFM · " + FAN[n].noise, fitText(!msg, "Mounts", msg || ""), FAN[n].price, "addfan", FAN[n].id, FAN[n].plain + " Static pressure " + FAN[n].sp + ". " + FAN[n].rgb + ". " + FAN[n].conn + ".");
+      }
+    }
+    return '<div class="block">' + h + '</div>';
+  }
+
+  function draw() {
+    var y = 0;
+    var mainEl = document.querySelector(".main");
+    if (mainEl) y = mainEl.scrollTop || window.scrollY;
+    var html = '<header class="nav"><button type="button" class="mark" data-act="home">DREW.WTF</button><div class="seg" role="group" aria-label="Appearance"><button type="button" data-act="theme" data-id="light" class="' + (appearance === "light" ? "on" : "") + '">Light</button><button type="button" data-act="theme" data-id="dark" class="' + (appearance === "dark" ? "on" : "") + '">Dark</button><button type="button" data-act="theme" data-id="system" class="' + (appearance === "system" ? "on" : "") + '">System</button></div><button type="button" class="bagbtn" data-act="bag">Bag' + (cart.length ? " " + cart.length : "") + '</button></header>';
+    if (boot) {
+      html += '<div class="boot"><p class="kicker">' + boot.name + '</p><h1 class="display">Building it.</h1><ul>';
+      for (var i = 0; i < boot.steps.length; i++) html += '<li class="' + (i <= boot.at ? "on" : "") + '">' + (i < boot.at ? "✓ " : i === boot.at ? "● " : "○ ") + boot.steps[i] + '</li>';
+      html += '</ul></div>';
+    } else if (section === "home") html += viewHome();
+    else {
+      html += '<div class="workspace">' + meter() + '<div class="layout">' + cats() + '<div class="main">' + (section === "build" ? viewBuild() : viewPick()) + '</div>' + summary() + '</div>';
+      var list = issues();
+      html += '<div class="mobbar"><div><b>' + money(total()) + '</b><div class="fine">' + doneCount() + '/6 · ' + watts() + 'W' + (list.length ? ' · Check' : ' · OK') + '</div></div><button type="button" class="texty primary" data-act="save">Add to Bag</button></div></div>';
     }
     if (bag) {
-      html += '<div class="drop" id="drop"><h2>Bag</h2>';
-      if (!cart.length) html += '<p class="empty">Your Bag is empty.</p>';
-      var sum = 0;
-      for (var n = 0; n < cart.length; n++) {
-        sum += cart[n].price;
-        html += '<div class="row"><div><b>' + cart[n].name + '</b><span>' + cart[n].blurb + '</span></div><div><b>' + money(cart[n].price) + '</b><button type="button" data-del="' + n + '">Remove</button></div></div>';
-      }
-      if (cart.length) html += '<div class="sum"><span>Total</span><span>' + money(sum) + '</span></div><p class="fine">A list on this page. Nothing is charged.</p>';
-      html += '</div>';
+      html += '<div class="drop"><h2 class="display">Bag</h2>';
+      if (!cart.length) html += '<p class="fine">Your bag is empty. A finished build can sit here as a list.</p>';
+      for (var c = 0; c < cart.length; c++) html += '<div class="chosen"><div><b>' + cart[c].name + '</b><small>' + cart[c].blurb + '</small></div><div><em>' + money(cart[c].price) + '</em><button type="button" class="texty" data-act="openbag" data-id="' + c + '">Open</button><button type="button" class="texty" data-act="delbag" data-id="' + c + '">Remove</button></div></div>';
+      html += '<button type="button" class="texty" data-act="bag">Close</button></div>';
     }
     app.innerHTML = html;
-    document.getElementById("home").onclick = function () { view = "lineup"; bag = false; draw(); };
-    document.getElementById("bagbtn").onclick = function () { bag = !bag; draw(); };
-    var back = document.getElementById("back");
-    if (back) back.onclick = function () { view = "lineup"; draw(); };
-    var add = document.getElementById("add");
-    if (add) add.onclick = function () {
-      var p = product(openId);
-      cart.push({ name: p.name, price: priceOf(p), blurb: blurb(p) });
-      bag = true;
-      draw();
-    };
-    var opens = document.querySelectorAll("[data-open]");
-    for (var o = 0; o < opens.length; o++) opens[o].onclick = function () { openId = this.getAttribute("data-open"); view = "buy"; bag = false; draw(); window.scrollTo(0, 0); };
-    var opts = document.querySelectorAll("[data-pick]");
-    for (var k = 0; k < opts.length; k++) opts[k].onclick = function () { picks[openId][this.getAttribute("data-pick")] = Number(this.getAttribute("data-i")); draw(); };
-    var dels = document.querySelectorAll("[data-del]");
-    for (var d = 0; d < dels.length; d++) dels[d].onclick = function (e) { e.stopPropagation(); cart.splice(Number(this.getAttribute("data-del")), 1); draw(); };
+    if (y) window.scrollTo(0, y);
   }
+
+  function limitRam(next) {
+    var mb = find(MB, state.mb);
+    if (!mb) return "Choose a board first. Memory has to match its slots.";
+    var n = 0;
+    for (var i = 0; i < next.length; i++) {
+      n += next[i].qty;
+      if (find(RAM, next[i].id).ddr !== mb.ddr) return "This board takes DDR" + mb.ddr + ".";
+    }
+    if (n > mb.dimm) return "Your motherboard has " + mb.dimm + " memory slots.";
+    return "";
+  }
+  function limitDrive(next) {
+    var mb = find(MB, state.mb);
+    if (!mb) return "Choose a board first.";
+    var nv = 0, sa = 0;
+    for (var i = 0; i < next.length; i++) {
+      var d = find(DRIVE, next[i].id);
+      if (d.kind === "nvme") nv += next[i].qty; else sa += next[i].qty;
+    }
+    if (nv > mb.m2.length) return "This board has " + mb.m2.length + " M.2 slots.";
+    if (sa > mb.sata) return "This board has " + mb.sata + " SATA ports.";
+    return "";
+  }
+  function limitFan(next) { return fansFit(find(CASE, state.box), next); }
+
+  function blurb() {
+    var bits = [];
+    var cpu = find(CPU, state.cpu);
+    if (cpu) bits.push(cpu.name);
+    if (qtySum(state.ram)) bits.push(qtySum(state.ram) + " memory");
+    var gpu = find(GPU, state.gpu);
+    if (gpu) bits.push(gpu.name);
+    if (qtySum(state.drives)) bits.push(qtySum(state.drives) + " drives");
+    return bits.join(" · ") || "Empty";
+  }
+
+  app.addEventListener("click", function (e) {
+    var t = e.target.closest("[data-act]");
+    if (!t || !app.contains(t)) return;
+    var act = t.getAttribute("data-act");
+    var id = t.getAttribute("data-id");
+    if (act === "theme") { appearance = id; applyTheme(); draw(); return; }
+    if (act === "home") { section = "home"; bag = false; note = ""; draw(); window.scrollTo(0, 0); return; }
+    if (act === "bag") { bag = !bag; draw(); return; }
+    if (act === "goto") { section = id; note = ""; draw(); window.scrollTo(0, 0); return; }
+    if (act === "recipe") { bag = false; startBoot(RECIPES[id]); return; }
+    if (act === "empty") { state = blank(); section = "build"; note = ""; draw(); return; }
+    if (act === "setcpu") { state.cpu = id; section = "build"; draw(); return; }
+    if (act === "setmb") { state.mb = id; section = "build"; draw(); return; }
+    if (act === "setgpu") { state.gpu = id; section = "build"; draw(); return; }
+    if (act === "setcool") { state.cool = id; section = "build"; draw(); return; }
+    if (act === "setpsu") { state.psu = id; section = "build"; draw(); return; }
+    if (act === "setbox") { state.box = id; section = "build"; draw(); return; }
+    if (act === "addram") { state.ram = bump(state.ram, id, 1, limitRam); draw(); return; }
+    if (act === "adddrive") { state.drives = bump(state.drives, id, 1, limitDrive); draw(); return; }
+    if (act === "addfan") { state.fans = bump(state.fans, id, 1, limitFan); draw(); return; }
+    if (act === "inc" || act === "dec") {
+      var group = t.getAttribute("data-group");
+      var lim = group === "ram" ? limitRam : group === "drives" ? limitDrive : limitFan;
+      state[group] = bump(state[group], id, act === "inc" ? 1 : -1, lim);
+      draw();
+      return;
+    }
+    if (act === "save") {
+      cart.push({ name: state.name, price: total(), blurb: blurb(), build: copyBuild(state) });
+      bag = true; draw(); return;
+    }
+    if (act === "openbag") { state = copyBuild(cart[Number(id)].build); section = "build"; bag = false; draw(); return; }
+    if (act === "delbag") { cart.splice(Number(id), 1); draw(); }
+  });
 
   var canvas = document.getElementById("dino");
   var ctx = canvas.getContext("2d");
@@ -259,7 +730,7 @@
   document.getElementById("n1").onclick = hitN;
   document.getElementById("n2").onclick = hitN;
   document.getElementById("n3").onclick = hitN;
-  if (window.innerWidth > 900) mode = "desk";
+  if (window.innerWidth > 980) mode = "desk";
 })();
 </script>
 </body>
