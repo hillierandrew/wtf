@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
 <style>
   * { box-sizing: border-box; }
-  html, body { margin: 0; height: 100%; background: #07080c; overflow: hidden; }
+  html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; }
   body { font-family: "IBM Plex Sans", "Segoe UI", sans-serif; color: #f6f3ea; }
   .fit { width: 1920px; height: 1080px; transform-origin: 0 0; }
   .stage {
@@ -17,12 +17,9 @@
     height: 1080px;
     position: relative;
     overflow: hidden;
-    background:
-      radial-gradient(900px 520px at 12% 0%, #ff2d7b44, transparent 60%),
-      radial-gradient(800px 480px at 90% 100%, #c6ff4a28, transparent 55%),
-      #07080c;
+    background: transparent;
   }
-  canvas.fx { position: absolute; inset: 0; width: 1920px; height: 1080px; pointer-events: none; }
+  canvas.fx, .aurora, .grid { display: none; }
   .aurora, .grid { position: absolute; inset: -12%; pointer-events: none; }
   .aurora {
     background:
@@ -118,12 +115,13 @@
   .dot { width: 12px; height: 12px; border-radius: 50%; background: #667; }
   .pill.on { color: #ffd0e0; }
   .pill.on .dot { background: #ff2d7b; animation: ping 1.1s ease-out infinite; }
-  .hole {
-    background: repeating-linear-gradient(-45deg, #0b0d12, #0b0d12 14px, #171b24 14px, #171b24 28px);
-    display: grid;
-    place-items: center;
-    overflow: hidden;
+  .game, .cam {
+    background:
+      linear-gradient(transparent, transparent) padding-box,
+      linear-gradient(120deg, #c6ff4a, #7ee7ff, #ff2d7b, #ffe27a, #c6ff4a) border-box;
   }
+  .hole { background: transparent; }
+  .label, .scan { display: none; }
   .hole video {
     position: absolute;
     inset: 0;
