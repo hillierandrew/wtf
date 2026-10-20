@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Build a computer</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #0c0c0e; color: #f6f1e8; font: 18px/1.35 system-ui, sans-serif; }
+  a { color: #d6ff4a; }
+  button, input { font: inherit; }
+  header, main { padding: 16px; }
+  header { display: flex; justify-content: space-between; gap: 16px; align-items: flex-end; border-bottom: 1px solid #2a2a2e; }
+  h1 { margin: 6px 0 0; font-size: 40px; line-height: 1; }
+  .muted { color: #b7b1a6; }
+  .total { text-align: right; }
+  .total b { display: block; font-size: 32px; }
+  .layout { display: grid; gap: 16px; }
+  @media (min-width: 980px) { .layout { grid-template-columns: 340px 280px 1fr; align-items: start; } }
+  .panel { background: #16161a; border: 1px solid #2a2a2e; border-radius: 16px; padding: 14px; }
+  pre { margin: 10px 0 0; font: 15px/1.15 ui-monospace, Menlo, Consolas, monospace; white-space: pre; overflow-x: auto; }
+  .slots { display: flex; gap: 8px; overflow-x: auto; }
+  @media (min-width: 980px) { .slots { flex-direction: column; overflow: visible; } }
+  .slots button, .card, .more, .toggle { border-radius: 12px; border: 1px solid #2a2a2e; background: #101014; color: inherit; text-align: left; padding: 12px; cursor: pointer; }
+  .slots button { min-width: 160px; }
+  .slots button.on, .toggle.on { border-color: #d6ff4a; background: #1c220f; }
+  .slots small, .card small { display: block; color: #b7b1a6; }
+  .tools { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+  input[type="search"] { flex: 1; min-width: 180px; background: #101014; color: inherit; border: 1px solid #2a2a2e; border-radius: 12px; padding: 12px; }
+  .list { display: grid; gap: 8px; }
+  .card { width: 100%; display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+  .price { color: #d6ff4a; white-space: nowrap; }
+  .warn { color: #ffb4c4; }
+  #gate { position: fixed; inset: 0; display: grid; place-items: center; background: #0c0c0e; padding: 16px; }
+  #gate form { width: min(420px, 100%); background: #16161a; border: 1px solid #3a3a40; border-radius: 18px; padding: 18px; }
+  #gate input { width: 100%; margin-top: 8px; padding: 12px; border-radius: 12px; border: 1px solid #3a3a40; background: #000; color: #fff; }
+  #gate button { margin-top: 12px; padding: 12px 16px; border: 0; border-radius: 12px; background: #d6ff4a; color: #111; font-weight: 700; }
+  #app[hidden], #gate[hidden] { display: none; }
+</style>
+</head>
+<body>
+<div id="gate">
+  <form id="gateForm">
+    <p>Build a computer</p>
+    <label>Password<br /><input id="pass" type="password" autocomplete="current-password" /></label>
+    <p id="bad" class="warn"></p>
+    <button type="submit">Open</button>
+  </form>
+</div>
+<div id="app" hidden>
+  <header>
+    <div>
+      <a href="../">Back</a>
+      <h1>Build a computer</h1>
+      <p class="muted">Pick one part at a time. The picture fills in.</p>
+    </div>
+    <div class="total">
+      <span class="muted">Total</span>
+      <b id="total">$0.00</b>
+      <span id="watts" class="muted"></span>
+    </div>
+  </header>
+  <main class="layout">
+    <section class="panel">
+      <h2>The computer</h2>
+      <p id="story" class="muted">The brain of the computer.</p>
+      <pre id="tower"></pre>
+      <p id="note" class="warn"></p>
+    </section>
+    <div id="slots" class="slots"></div>
+    <section>
+      <div class="tools">
+        <input id="q" type="search" placeholder="Search this list" />
+        <button id="fits" class="toggle on" type="button">Fits only</button>
+      </div>
+      <div id="list" class="list"></div>
+      <button id="more" class="more" type="button" hidden>Show more</button>
+    </section>
+  </main>
+</div>
+<script>
+const CATS = [
+  ["cpu", "Processor", "The brain of the computer."],
+  ["motherboard", "Motherboard", "The board the processor plugs into."],
+  ["memory", "Memory", "Memory sticks click into the board."],
+  ["gpu", "Graphics card", "The graphics card slides into the case."],
+  ["storage", "Storage", "Storage is where files and games live."],
+  ["case", "Case", "The case is the box everything sits in."],
+  ["cooler", "Cooler", "The cooler sits on the processor and spins."],
+  ["psu", "Power", "The power supply has to be strong enough."]
+];
+const CASE_FIT = { itx: 1, matx: 2, atx: 3, full: 4 };
+const BOARD_SIZE = { itx: 1, matx: 2, atx: 3, eatx: 4 };
+const SIZE_LABEL = { itx: "Mini-ITX", matx: "Micro-ATX", atx: "ATX", eatx: "E-ATX", full: "a full tower" };
+const SOCKET_RAM = { AM4: "DDR4", AM5: "DDR5", LGA1851: "DDR5", SP5: "DDR5" };
+const money = new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" });
+let PARTS = [];
+let build = {};
+let active = "cpu";
+let shown = 40;
+let fits = true;
+
+function loadBuild() {
+  try { build = JSON.parse(localStorage.getItem("bench-build") || "{}") || {}; }
+  catch (err) { build = {}; }
+}
+function saveBuild() { localStorage.setItem("bench-build", JSON.stringify(build)); }
+function chosen() {
+  const map = {};
+  for (const row of CATS) {
+    const id = row[0];
+    const part = PARTS.find((item) => item.id === build[id] && item.cat === id);
+    if (part) map[id] = part;
+  }
+  return map;
+}
+function gpuDraw(name) {
+  const n = name.toUpperCase();
+  if (/5090|4090/.test(n)) return 450;
+  if (/5080|4080|7900 XTX/.test(n)) return 320;
+  if (/5070 TI|4070 TI|7900 XT/.test(n)) return 285;
+  if (/5070|4070|7800 XT/.test(n)) return 220;
+  if (/5060|4060|7600|7700/.test(n)) return 150;
+  return 180;
+}
+function drawOf(parts) {
+  const cpu = parts.cpu ? (parts.cpu.watt || 105) : 0;
+  const gpu = parts.gpu ? gpuDraw(parts.gpu.name) : 0;
+  const rest = (parts.cpu ? 40 : 0) + (parts.motherboard ? 40 : 0) + (parts.storage ? 10 : 0);
+  return cpu + gpu + rest;
+}
+function ramClash(memory, cpu, board) {
+  if (!memory || !memory.ram) return false;
+  if (board && board.ram) return memory.ram !== board.ram;
+  const expect = cpu && cpu.socket ? SOCKET_RAM[cpu.socket] : "";
+  return Boolean(expect && memory.ram !== expect);
+}
+function caseTooSmall(box, board) {
+  if (!box || !board || !box.form || !board.form) return false;
+  return (BOARD_SIZE[board.form] || 0) > (CASE_FIT[box.form] || 0);
+}
+function problems(parts) {
+  const notes = [];
+  if (parts.cpu && parts.motherboard && parts.cpu.socket && parts.motherboard.socket && parts.cpu.socket !== parts.motherboard.socket) {
+    notes.push("Processor is " + parts.cpu.socket + ". Board is " + parts.motherboard.socket + ".");
+  }
+  if (ramClash(parts.memory, parts.cpu, parts.motherboard)) {
+    notes.push("Memory is " + parts.memory.ram + ". That does not match the board or processor.");
+  }
+  if (caseTooSmall(parts.case, parts.motherboard)) {
+    notes.push("That case is " + SIZE_LABEL[parts.case.form] + ". This board is " + SIZE_LABEL[parts.motherboard.form] + ".");
+  }
+  const draw = drawOf(parts);
+  if (parts.psu && parts.psu.watt && draw > parts.psu.watt) notes.push("Rough draw is " + draw + "W. This supply is " + parts.psu.watt + "W.");
+  return notes;
+}
+function clashes(part, parts) {
+  const next = Object.assign({}, parts);
+  next[part.cat] = part;
+  if (next.cpu && next.motherboard && next.cpu.socket && next.motherboard.socket && next.cpu.socket !== next.motherboard.socket) return true;
+  if (ramClash(next.memory, next.cpu, next.motherboard)) return true;
+  if (caseTooSmall(next.case, next.motherboard)) return true;
+  return false;
+}
+function pad(text, width) { return (text + " ".repeat(width)).slice(0, width); }
+function row(body) { return "|" + pad(body, 32) + "|"; }
+function tower(parts) {
+  const hard = parts.storage && /hdd|hard drive|\brpm\b|7200|5400/i.test(parts.storage.name);
+  const lines = [
+    "+--------------------------------+",
+    row(parts.case ? "CASE ON" : "CASE"),
+    row("  +------------------------+"),
+    row("  |CPU   " + (parts.cpu ? "[####]" : "[    ]") + "             |"),
+    row("  |BOARD " + (parts.motherboard ? "[##########]" : "[          ]") + "        |"),
+    row("  |FAN   " + (parts.cooler ? "( ( ) )" : "(      )") + "            |"),
+    row("  |RAM   " + (parts.memory ? "[##] [##]" : "[  ] [  ]") + "          |"),
+    row("  |GPU   " + (parts.gpu ? "[=======>]" : "[         ]") + "         |"),
+    row("  |SSD   " + (parts.storage && !hard ? "[====]" : "[    ]") + "             |"),
+    row("  |HDD   " + (hard ? "(oooo)" : "(    )") + "             |"),
+    row("  |POWER " + (parts.psu ? "[====]" : "[    ]") + "             |"),
+    row("  +------------------------+"),
+    "+--------------------------------+"
+  ];
+  return lines.join("\n");
+}
+function labelButton(label, name, on) {
+  const button = document.createElement("button");
+  button.type = "button";
+  if (on) button.className = "on";
+  const small = document.createElement("small");
+  small.textContent = label;
+  button.appendChild(small);
+  button.appendChild(document.createTextNode(name));
+  return button;
+}
+function render() {
+  const parts = chosen();
+  const total = CATS.reduce((sum, row) => sum + (parts[row[0]] ? parts[row[0]].price : 0), 0);
+  document.getElementById("total").textContent = money.format(total);
+  const draw = drawOf(parts);
+  document.getElementById("watts").textContent = draw ? "About " + draw + "W" : "";
+  const next = CATS.find((row) => !parts[row[0]]);
+  document.getElementById("story").textContent = next ? next[2] : "Every part is chosen.";
+  document.getElementById("tower").textContent = tower(parts);
+  document.getElementById("note").textContent = problems(parts).join(" ");
+  const slots = document.getElementById("slots");
+  slots.replaceChildren();
+  for (const row of CATS) {
+    const id = row[0];
+    const name = parts[id] ? parts[id].name : "Choose";
+    const button = labelButton(row[1], name, id === active);
+    button.onclick = () => { active = id; shown = 40; document.getElementById("q").value = ""; render(); };
+    slots.appendChild(button);
+  }
+  const q = document.getElementById("q").value.trim().toLowerCase();
+  const list = PARTS.filter((part) => part.cat === active)
+    .filter((part) => !q || part.name.toLowerCase().includes(q) || (part.brand || "").toLowerCase().includes(q))
+    .filter((part) => !fits || !clashes(part, parts))
+    .sort((a, b) => a.price - b.price);
+  const box = document.getElementById("list");
+  box.replaceChildren();
+  list.slice(0, shown).forEach((part) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "card";
+    const span = document.createElement("span");
+    span.appendChild(document.createTextNode(part.name));
+    const small = document.createElement("small");
+    small.textContent = part.brand || "";
+    span.appendChild(small);
+    const price = document.createElement("span");
+    price.className = "price";
+    price.textContent = money.format(part.price);
+    button.append(span, price);
+    button.onclick = () => { build[part.cat] = part.id; saveBuild(); render(); };
+    box.appendChild(button);
+  });
+  const more = document.getElementById("more");
+  more.hidden = list.length <= shown;
+  more.textContent = "Show more (" + list.length + ")";
+}
+function openApp() {
+  document.getElementById("gate").hidden = true;
+  document.getElementById("app").hidden = false;
+  loadBuild();
+  fetch("parts.json").then((res) => res.json()).then((data) => { PARTS = data; render(); });
+}
+if (sessionStorage.getItem("drew-bench") === "1") openApp();
+document.getElementById("gateForm").onsubmit = (event) => {
+  event.preventDefault();
+  if (document.getElementById("pass").value === "Password1") {
+    sessionStorage.setItem("drew-bench", "1");
+    openApp();
+  } else {
+    document.getElementById("bad").textContent = "Wrong password.";
+  }
+};
+document.getElementById("fits").onclick = () => {
+  fits = !fits;
+  document.getElementById("fits").classList.toggle("on", fits);
+  shown = 40;
+  render();
+};
+document.getElementById("q").oninput = () => { shown = 40; render(); };
+document.getElementById("more").onclick = () => { shown += 40; render(); };
+</script>
+</body>
+</html>

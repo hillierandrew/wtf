@@ -936,7 +936,8 @@
     e.preventDefault();
     if (gatePass.value === "Password1") {
       gate.classList.remove("open");
-      window.open("https://github.com/hillierandrew/buildmypc", "_blank", "noopener");
+      try { sessionStorage.setItem("drew-bench", "1"); } catch (err) {}
+      location.href = "bench/";
     } else {
       gateMsg.textContent = "Wrong password";
       gatePass.select();
