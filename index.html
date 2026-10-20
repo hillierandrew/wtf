@@ -25,35 +25,77 @@
   #ink { display: block; width: 100%; height: 100%; }
   h1 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   #dock {
-    position: fixed; left: 12px; bottom: 12px; z-index: 5;
-    display: flex; align-items: center; gap: 4px;
-    max-width: calc(100vw - 24px);
-    padding: 6px 10px 6px 6px;
+    position: fixed;
+    left: max(8px, env(safe-area-inset-left));
+    bottom: max(8px, env(safe-area-inset-bottom));
+    z-index: 5;
+    display: flex; align-items: center; flex-wrap: wrap; gap: 2px;
+    max-width: calc(100vw - 16px - env(safe-area-inset-left) - env(safe-area-inset-right));
+    padding: 4px 8px 4px 4px;
     background: #000c;
     border: 1px solid #ffffff2e;
-    border-radius: 999px;
+    border-radius: 18px;
     color: #f6f3ea;
     font: 600 13px/1 ui-monospace, Menlo, Consolas, monospace;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.03em;
+    touch-action: manipulation;
   }
   #dock button {
     appearance: none; background: transparent; color: inherit;
     border: 0; border-radius: 999px; cursor: pointer;
     min-width: 40px; min-height: 40px;
     display: grid; place-items: center;
-    font: inherit; padding: 0;
+    font: inherit; font-size: 18px; padding: 0;
+    touch-action: manipulation;
   }
   #dock button.on { background: #ffffff18; color: #c6ff4a; }
   #dock button.playing { color: #7ee7ff; }
   #play svg { display: block; }
   #name {
-    padding-right: 8px;
+    padding: 0 8px 0 2px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 46vw;
+    max-width: min(46vw, 220px);
+    font-size: 12px;
   }
   #name b { font-weight: 600; color: #fff; margin-left: 6px; }
+  #gate {
+    position: fixed; inset: 0; z-index: 8;
+    display: none; place-items: center;
+    background: #000a;
+    padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+    touch-action: auto;
+  }
+  #gate.open { display: grid; }
+  #gate form {
+    width: min(360px, 100%);
+    background: #070707;
+    border: 1px solid #ffffff33;
+    border-radius: 16px;
+    padding: 18px 16px 16px;
+    color: #fff;
+    font: 600 14px/1.3 ui-monospace, Menlo, Consolas, monospace;
+  }
+  #gate p { margin: 0 0 10px; letter-spacing: 0.08em; }
+  #gate input {
+    width: 100%; box-sizing: border-box;
+    background: #000; color: #fff;
+    border: 1px solid #ffffff44; border-radius: 10px;
+    font: 16px/1 ui-monospace, Menlo, Consolas, monospace;
+    padding: 12px;
+  }
+  #gate .row { display: flex; gap: 8px; margin-top: 12px; }
+  #gate .row button {
+    flex: 1; min-height: 44px; border-radius: 10px;
+    border: 1px solid #ffffff33; background: #161616; color: #fff;
+    font: inherit; cursor: pointer;
+  }
+  #gateMsg { min-height: 1.2em; margin-top: 10px; color: #ff5a8a; font-size: 12px; }
+  @media (max-width: 720px) {
+    #dock button { min-width: 36px; min-height: 36px; }
+    #name { max-width: 34vw; }
+  }
 </style>
 </head>
 <body>
@@ -67,7 +109,20 @@
   </button>
   <button id="homeBtn" type="button" aria-label="Default animations">🏠</button>
   <button id="earthBtn" type="button" aria-label="Mother animations">🌍</button>
+  <button id="pigBtn" type="button" aria-label="Webcore animations">🐷</button>
+  <button id="pcBtn" type="button" aria-label="PC builder">💻</button>
   <span id="name"><span id="mark">🏠</span><b id="title">Diamond Drift</b></span>
+</div>
+<div id="gate">
+  <form id="gateForm">
+    <p>PC BUILDER</p>
+    <input id="gatePass" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Password" aria-label="Password" />
+    <div class="row">
+      <button type="button" id="gateCancel">Cancel</button>
+      <button type="submit">Enter</button>
+    </div>
+    <p id="gateMsg"></p>
+  </form>
 </div>
 <script>
 (function () {
@@ -82,6 +137,13 @@
   var playShape = document.getElementById("playShape");
   var homeBtn = document.getElementById("homeBtn");
   var earthBtn = document.getElementById("earthBtn");
+  var pigBtn = document.getElementById("pigBtn");
+  var pcBtn = document.getElementById("pcBtn");
+  var gate = document.getElementById("gate");
+  var gateForm = document.getElementById("gateForm");
+  var gatePass = document.getElementById("gatePass");
+  var gateMsg = document.getElementById("gateMsg");
+  var gateCancel = document.getElementById("gateCancel");
 
   var W = 0, H = 0, cols = 0, rows = 0, cellW = 0, cellH = 0, scale = 2, buf, data;
   var pack = "home";
@@ -357,10 +419,156 @@
       var p = warp(x, y, t * 1.4);
       var d = Math.sin(p[0] * 6 + t * 2) * Math.cos(p[1] * 5 - t);
       return d > 0.3 ? 1 : d > 0 ? 0.5 : 0.08;
+    }],
+    ["Skin Veins", " ~-/|%", function (x, y, t) {
+      var v = Math.sin(x * 7 + Math.sin(y * 5 + t) * 2.2);
+      var v2 = Math.sin(y * 10 + x * 1.6 - t * 0.7);
+      return (Math.abs(v) > 0.82 || Math.abs(v2) > 0.9) ? 1 : 0.1;
+    }],
+    ["Bark Grain", " |/\\#=", function (x, y, t) {
+      var ridge = Math.sin(x * 14 + Math.sin(y * 3 + t) * 1.4);
+      var knot = Math.hypot((x * 2) % 1 - 0.5, (y * 3 + t * 0.2) % 1 - 0.5);
+      return ridge > 0.55 ? 1 : knot < 0.16 ? 0.7 : 0.08;
+    }],
+    ["Ground Tile", " .+x#O", function (x, y, t) {
+      var gx = Math.abs((x * 4 + t * 0.15) % 1 - 0.5);
+      var gy = Math.abs((y * 4) % 1 - 0.5);
+      var edge = gx < 0.06 || gy < 0.06;
+      var spot = Math.hypot(gx - 0.22, gy - 0.18) < 0.08;
+      return edge ? 1 : spot ? 0.75 : 0.12;
+    }],
+    ["Cap Spots", " oO@*.", function (x, y, t) {
+      var s = 0.62, tx = (x + 2) / s, ty = (y + 2 + t * 0.08) / s;
+      var fx = tx - Math.floor(tx) - 0.5, fy = ty - Math.floor(ty) - 0.5;
+      var d = Math.hypot(fx * 1.2, fy);
+      var n = hsh(Math.floor(tx) * 9 + Math.floor(ty) * 3);
+      return d < 0.12 + n * 0.12 ? 1 : d < 0.28 ? 0.22 : 0.05;
+    }],
+    ["Gill Lines", " |/\\~", function (x, y, t) {
+      var a = Math.atan2(y + 0.2, x) + Math.sin(t) * 0.15;
+      var spoke = Math.abs(Math.sin(a * 14));
+      return spoke > 0.82 ? 1 : 0.07;
+    }],
+    ["Tree Rings", " oO0.", function (x, y, t) {
+      var r = Math.hypot(x * 1.05, y) + Math.sin(Math.atan2(y, x) * 3 + t) * 0.08;
+      var band = Math.abs(Math.sin(r * 18 - t));
+      return band > 0.72 ? 1 : 0.1;
+    }],
+    ["Spore LCD", " #+*.", function (x, y, t) {
+      var cx = Math.floor(x * 5), cy = Math.floor(y * 5 + t);
+      var n = hsh(cx * 13 + cy * 29);
+      var sub = ((Math.floor(x * 20) + Math.floor(y * 20)) & 1);
+      return n > 0.72 ? (sub ? 1 : 0.45) : 0.04;
+    }],
+    ["Flesh Mosaic", " %@#O", function (x, y, t) {
+      var cx = Math.floor(x * 3.2 + Math.sin(t) * 0.2), cy = Math.floor(y * 3.2);
+      var n = hsh(cx * 17 + cy * 11);
+      var fx = x * 3.2 - cx, fy = y * 3.2 - cy;
+      var edge = fx < 0.08 || fy < 0.08 || fx > 0.92 || fy > 0.92;
+      return edge ? 0.15 : n > 0.55 ? 1 : 0.35;
+    }],
+    ["Root Web", " ~/\\x", function (x, y, t) {
+      var a = Math.abs(Math.sin(x * 5 + Math.sin(y * 6 + t)));
+      var b = Math.abs(Math.sin(y * 5 + Math.sin(x * 4 - t * 0.8)));
+      return (a > 0.9 || b > 0.9) ? 1 : 0.06;
+    }],
+    ["Dirt Chevron", " <>^#", function (x, y, t) {
+      var row = Math.floor((y + 2) * 4);
+      var z = Math.abs(((x * 3 + row * 0.35 + t * 0.4) % 2 + 2) % 2 - 1);
+      return z > 0.82 ? 1 : 0.08;
+    }],
+    ["Scale Hide", " oO#.", function (x, y, t) {
+      var row = Math.floor(y * 6);
+      var ox = (row & 1) ? 0.5 : 0;
+      var d = Math.hypot(((x * 6 + ox) % 1) - 0.5, (y * 6 % 1) - 0.45);
+      return d < 0.28 ? (d > 0.2 ? 1 : 0.25) : 0.05;
+    }],
+    ["Magicant", " *+xO#", function (x, y, t) {
+      var a = Math.atan2(y, x) + t * 0.6, r = Math.hypot(x, y);
+      var k = Math.floor((Math.sin(a * 4 + r * 6) * 0.5 + 0.5) * 4);
+      return k / 3;
     }]
   ];
 
-  function list() { return pack === "earth" ? EARTH : HOME; }
+  var PIG = [
+    ["Terminal Tear", " |#%@/", function (x, y, t) {
+      var slice = Math.floor(x * 8 + Math.sin(t * 6) * 0.4);
+      var shift = (hsh(slice + Math.floor(t * 8)) - 0.5) * 0.6;
+      var col = Math.abs(Math.sin((y + shift) * 22));
+      return col > 0.55 ? 1 : 0.05;
+    }],
+    ["Scanline", " -=#", function (x, y, t) {
+      var line = Math.abs(Math.sin((y + t * 0.4) * 26));
+      var tear = hsh(Math.floor(y * 12) + Math.floor(t * 5) * 3) > 0.82;
+      return tear ? 1 : line > 0.8 ? 0.7 : 0.04;
+    }],
+    ["Metal Heart", " *+x#", function (x, y, t) {
+      var s = 1.15, px = ((x + 2) % s) / s * 2 - 1, py = ((y + 2) % s) / s * 2 - 1;
+      px *= 1.15; py = -py * 1.05 + 0.15;
+      var a = px * px + py * py - 1;
+      var h = a * a * a - px * px * py * py * py;
+      var edge = Math.abs(h) < 0.35;
+      return edge ? 1 : h < 0 ? 0.35 : 0.04;
+    }],
+    ["Glitch Blocks", " #%@", function (x, y, t) {
+      var jump = Math.floor(t * 7);
+      var bx = Math.floor(x * 6 + (jump & 1));
+      var by = Math.floor(y * 5);
+      var n = hsh(bx * 19 + by * 7 + jump);
+      return n > 0.62 ? 1 : n > 0.45 ? 0.3 : 0.02;
+    }],
+    ["Cross Grid", " +xX#", function (x, y, t) {
+      var fx = Math.abs((x * 5) % 1 - 0.5);
+      var fy = Math.abs((y * 5 + t * 0.1) % 1 - 0.5);
+      return (fx < 0.06 || fy < 0.06) ? 1 : 0.05;
+    }],
+    ["Error Blink", " #%@*", function (x, y, t) {
+      var blink = Math.sin(t * 8) > 0 ? 1 : 0.15;
+      var bar = Math.abs(y) < 0.12 || Math.abs(x) < 0.04;
+      return bar ? blink : 0.04;
+    }],
+    ["Window Chrome", " -|=#", function (x, y, t) {
+      var top = y < -0.55 && y > -0.8;
+      var box = Math.abs(x) < 0.85 && Math.abs(y) < 0.7;
+      var edge = Math.abs(Math.abs(x) - 0.85) < 0.04 || Math.abs(Math.abs(y) - 0.7) < 0.04;
+      return top ? 1 : edge ? 0.8 : box ? 0.12 : 0.02;
+    }],
+    ["Data Bleed", " %#/\\|", function (x, y, t) {
+      var smear = hsh(Math.floor(y * 18) * 31 + Math.floor(t * 10));
+      var run = (x + 2 + smear) % 1.4;
+      return run < smear * 0.7 ? 1 : 0.05;
+    }],
+    ["Static Bars", " .:%#", function (x, y, t) {
+      var n = hsh(Math.floor(x * 24) + Math.floor(y * 10) * 13 + Math.floor(t * 12) * 9);
+      var row = (Math.floor(y * 10) & 1);
+      return n > (row ? 0.55 : 0.78) ? 1 : 0.03;
+    }],
+    ["Hex Dump", " 0#%*.", function (x, y, t) {
+      var cx = Math.floor((x + t * 0.35) * 10), cy = Math.floor(y * 8);
+      var n = hsh(cx * 3 + cy * 17);
+      var glyph = n > 0.4;
+      var cursor = Math.floor(t * 6) % 12 === (cx & 11) && Math.abs(y) < 0.15;
+      return cursor ? 1 : glyph ? 0.7 : 0.05;
+    }],
+    ["Broken UI", " |#+", function (x, y, t) {
+      var ox = Math.sin(t * 3 + Math.floor(y * 4)) * 0.25;
+      var left = Math.abs(x - ox + 0.4) < 0.08;
+      var right = Math.abs(x - ox - 0.35) < 0.05 && y > -0.2;
+      var mid = Math.abs(y) < 0.04 && x > -0.5 && x < 0.2;
+      return (left || right || mid) ? 1 : 0.05;
+    }],
+    ["Hard Trance", " =-+*", function (x, y, t) {
+      var beat = Math.sin(t * 8) > 0.2 ? 1 : 0.35;
+      var z = Math.abs(Math.sin(x * 10 + y * Math.sin(t * 2) * 4));
+      return z > 0.75 ? beat : 0.04;
+    }]
+  ];
+
+  function list() {
+    if (pack === "earth") return EARTH;
+    if (pack === "pig") return PIG;
+    return HOME;
+  }
 
   function sample(col, row, t) {
     var nx = (col / cols) * 2 - 1;
@@ -406,6 +614,8 @@
     return [(f(0) * 255) | 0, (f(8) * 255) | 0, (f(4) * 255) | 0];
   }
   var EARTH_PAL = [[226,61,61],[61,110,226],[242,210,58],[61,191,74],[242,122,192],[255,244,214]];
+  var PIG_PAL = [[255,43,130],[57,255,70],[255,255,255],[255,20,50],[190,0,255]];
+  var MARK = { home: "🏠", earth: "🌍", pig: "🐷" };
 
   function paintASCII(t) {
     data.fill(0);
@@ -434,8 +644,9 @@
         var glyph = FONT[ch] || FONT[" "];
         if (!(glyph[0] | glyph[1] | glyph[2] | glyph[3] | glyph[4] | glyph[5] | glyph[6])) continue;
         var rr, gg, bb, alpha;
-        if (pack === "earth") {
-          var pal = EARTH_PAL[(Math.floor(hue0 / 30) + Math.floor(v * 4) + (col >> 3)) % EARTH_PAL.length];
+        if (pack === "earth" || pack === "pig") {
+          var pals = pack === "pig" ? PIG_PAL : EARTH_PAL;
+          var pal = pals[(Math.floor(hue0 / 30) + Math.floor(v * 4) + (col >> 3)) % pals.length];
           rr = pal[0]; gg = pal[1]; bb = pal[2];
           alpha = (120 + v * 135) | 0;
         } else {
@@ -476,7 +687,7 @@
     canvas.style.transform = "scale(" + zoom.toFixed(4) + ")";
     canvas.style.opacity = String(0.8 + Math.sin(t * 0.85) * 0.16);
     if (nameTitle.textContent !== shown) nameTitle.textContent = shown;
-    nameMark.textContent = pack === "earth" ? "🌍" : "🏠";
+    nameMark.textContent = MARK[pack] || "🏠";
   }
 
   function strokeWord(c) {
@@ -539,7 +750,7 @@
 
   function fitLogo() {
     var vw = window.innerWidth, vh = window.innerHeight;
-    baseW = Math.min(vw * 0.74, 820);
+    baseW = Math.min(vw * (vw < 700 ? 0.94 : 0.74), 820);
     baseH = baseW * (VH / VW);
     if (baseH > vh * 0.3) { baseH = vh * 0.3; baseW = baseH * (VW / VH); }
     if (baseW > vw - 8) { baseW = vw - 8; baseH = baseW * (VH / VW); }
@@ -635,20 +846,22 @@
 
   var HOME_LEAD = [69,0,72,76,0,74,0,71,72,0,67,0,64,69,0,0,76,0,79,0,77,74,0,72,71,0,69,67,0,64,62,0,69,72,0,76,74,0,72,71,67,0,69,0,65,64,62,60,64,0,67,0,69,72,71,0,69,67,64,0,62,0];
   var HOME_BASS = [45,0,0,0,0,0,0,0,41,0,0,0,0,0,0,0,43,0,0,0,0,0,0,0,40,0,0,0,0,0,0,0,45,0,0,0,48,0,0,0,43,0,0,0,40,0,0,0,45,0,0,0,41,0,0,0,40,0,0,0,38,0,0,0];
-  var EARTH_LEAD = [72,76,79,84,79,76,74,72,77,74,72,70,72,0,67,0,79,77,76,74,72,74,76,79,72,0,76,0,72,67,64,0,76,76,79,77,74,72,74,76,81,79,77,74,72,70,72,0,67,64,67,72,76,74,72,71,72,0,0,0,0,0];
-  var EARTH_BASS = [48,0,0,0,48,0,0,0,45,0,0,0,43,0,0,0,41,0,0,0,43,0,0,0,45,0,0,0,48,0,0,0,46,0,0,0,46,0,0,0,43,0,0,0,41,0,0,0,39,0,0,0,41,0,0,0,43,0,0,0,36,0,0,0];
+  var EARTH_LEAD = [72,76,79,84,79,76,74,72,77,74,72,70,72,0,67,0,79,77,76,74,72,74,76,79,72,0,76,0,72,67,64,0,76,76,79,77,74,72,74,76,81,79,77,74,72,70,72,0,67,64,67,72,76,74,72,71,72,0,0,0,0,0,74,74,77,81,77,74,72,69,76,72,69,67,69,0,65,0,81,79,77,74,72,69,72,76,74,0,70,0,67,64,60,0,72,76,79,76,72,74,77,74,69,72,76,74,72,69,67,65,64,67,69,72,74,72,69,67,65,0,62,0,60,0,0,0];
+  var EARTH_BASS = [48,0,0,0,48,0,0,0,45,0,0,0,43,0,0,0,41,0,0,0,43,0,0,0,45,0,0,0,48,0,0,0,46,0,0,0,46,0,0,0,43,0,0,0,41,0,0,0,39,0,0,0,41,0,0,0,43,0,0,0,36,0,0,0,50,0,0,0,47,0,0,0,45,0,0,0,43,0,0,0,41,0,0,0,38,0,0,0,45,0,0,0,48,0,0,0,46,0,0,0,43,0,0,0,41,0,0,0,39,0,0,0,36,0,0,0,38,0,0,0];
+  var PIG_LEAD = [57,0,64,0,68,69,0,64,60,0,57,61,64,0,68,0,57,64,0,69,68,0,61,0,64,57,0,60,61,64,68,69,56,0,63,0,68,70,0,63,58,0,56,61,63,0,66,0,68,63,0,70,68,0,61,0,63,56,0,58,61,63,66,68];
+  var PIG_BASS = [45,45,45,0,45,45,40,0,41,41,41,0,43,43,36,0,45,45,45,0,40,40,41,0,43,43,36,0,33,33,36,0,45,0,45,45,40,0,40,40,41,41,0,43,0,36,36,0,45,45,0,40,0,41,41,43,0,36,0,33,33,0,36];
 
   function startTrack() {
     ensureAudio();
     stopVoices();
     var id = runId;
-    var earth = pack === "earth";
-    var bpm = earth ? 156 : 86;
+    var mode = pack;
+    var bpm = mode === "pig" ? 174 : mode === "earth" ? 156 : 86;
     var stepDur = 60 / bpm / 4;
-    filter.frequency.value = earth ? 4200 : 1400;
-    filter.Q.value = earth ? 0.4 : 0.7;
-    master.gain.value = earth ? 0.16 : 0.2;
-    if (!earth) {
+    filter.frequency.value = mode === "pig" ? 5600 : mode === "earth" ? 4200 : 1400;
+    filter.Q.value = mode === "pig" ? 0.6 : 0.5;
+    master.gain.value = mode === "pig" ? 0.13 : mode === "earth" ? 0.16 : 0.2;
+    if (mode === "home") {
       [110, 164.81, 220].forEach(function (freq) {
         var o = ac.createOscillator();
         o.type = "sine";
@@ -662,17 +875,25 @@
     }
     var step = 0;
     var time = ac.currentTime + 0.06;
-    var lead = earth ? EARTH_LEAD : HOME_LEAD;
-    var bass = earth ? EARTH_BASS : HOME_BASS;
+    var lead = mode === "pig" ? PIG_LEAD : mode === "earth" ? EARTH_LEAD : HOME_LEAD;
+    var bass = mode === "pig" ? PIG_BASS : mode === "earth" ? EARTH_BASS : HOME_BASS;
+    var wave = mode === "home" ? "sine" : "square";
+    var bassWave = mode === "earth" ? "triangle" : mode === "pig" ? "square" : "sine";
+    var dest = mode === "home" ? filter : master;
     function tick() {
       if (id !== runId) return;
       while (time < ac.currentTime + 0.25) {
         var i = step % lead.length;
-        if (lead[i]) blip(earth ? "square" : "sine", midi(lead[i]), time, stepDur * (earth ? 0.85 : 1.4), earth ? 0.07 : 0.06, earth ? master : filter);
-        if (bass[i]) blip(earth ? "triangle" : "sine", midi(bass[i]), time, stepDur * 3.2, earth ? 0.09 : 0.07, earth ? master : filter);
-        if (earth && step % 2 === 0) hat(time, 0.045, true);
-        if (earth && step % 8 === 0) hat(time, 0.09, false);
-        if (!earth && step % 16 === 0) hat(time, 0.03, true);
+        var dur = stepDur * (mode === "pig" ? 0.42 : mode === "earth" ? 0.85 : 1.4);
+        if (lead[i]) blip(wave, midi(lead[i]), time, dur, mode === "pig" ? 0.055 : 0.06, dest);
+        if (mode === "pig" && lead[i] && step % 4 === 0) blip("square", midi(lead[i] + 12), time, stepDur * 0.2, 0.03, master);
+        var bi = step % bass.length;
+        if (bass[bi]) blip(bassWave, midi(bass[bi] - (mode === "pig" ? 12 : 0)), time, stepDur * (mode === "pig" ? 0.7 : 3.2), mode === "pig" ? 0.05 : 0.08, dest);
+        if (mode === "pig" && step % 2 === 1) hat(time, 0.05, true);
+        if (mode === "pig" && step % 4 === 2) hat(time, 0.08, false);
+        if (mode === "earth" && step % 2 === 0) hat(time, 0.045, true);
+        if (mode === "earth" && step % 8 === 0) hat(time, 0.09, false);
+        if (mode === "home" && step % 16 === 0) hat(time, 0.03, true);
         step++;
         time += stepDur;
       }
@@ -695,12 +916,32 @@
     pack = next;
     homeBtn.classList.toggle("on", pack === "home");
     earthBtn.classList.toggle("on", pack === "earth");
+    pigBtn.classList.toggle("on", pack === "pig");
     if (playing) startTrack();
   }
 
   playBtn.addEventListener("click", function () { setPlaying(!playing); });
   homeBtn.addEventListener("click", function () { setPack("home"); });
   earthBtn.addEventListener("click", function () { setPack("earth"); });
+  pigBtn.addEventListener("click", function () { setPack("pig"); });
+  pcBtn.addEventListener("click", function () {
+    gateMsg.textContent = "";
+    gatePass.value = "";
+    gate.classList.add("open");
+    gatePass.focus();
+  });
+  gateCancel.addEventListener("click", function () { gate.classList.remove("open"); });
+  gate.addEventListener("click", function (e) { if (e.target === gate) gate.classList.remove("open"); });
+  gateForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (gatePass.value === "Password1") {
+      gate.classList.remove("open");
+      window.open("https://github.com/hillierandrew/buildmypc", "_blank", "noopener");
+    } else {
+      gateMsg.textContent = "Wrong password";
+      gatePass.select();
+    }
+  });
   homeBtn.classList.add("on");
 
   resize();
