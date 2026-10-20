@@ -1436,50 +1436,70 @@ const E=[
     c.moveTo(1620, 118); c.lineTo(1716, 118);
   }
 
+  var critters = [
+    ["🐘", "ELEPHANT"], ["🍄", "SHROOM"], ["🐷", "PIG"], ["🐸", "FROG"],
+    ["🐙", "OCTOPUS"], ["🦋", "MOTH"], ["🐍", "SNAKE"], ["🦎", "LIZARD"],
+    ["🦄", "UNICORN"], ["🐉", "DRAGON"], ["🦊", "FOX"], ["🦉", "OWL"],
+    ["🦀", "CRAB"], ["🐠", "FISH"], ["🐝", "BEE"], ["🐢", "TURTLE"],
+    ["🦜", "PARROT"], ["🦕", "DINO"], ["🦑", "SQUID"], ["🦚", "PEACOCK"],
+    ["🦒", "GIRAFFE"], ["🐇", "RABBIT"], ["🐈", "CAT"], ["🐊", "CROC"],
+    ["🦈", "SHARK"], ["🦥", "SLOTH"], ["🐓", "ROOSTER"], ["🐪", "CAMEL"],
+    ["🦞", "LOBSTER"], ["🦔", "HEDGEHOG"], ["🐧", "PENGUIN"], ["🦩", "FLAMINGO"]
+  ];
+  var form = null;
+  var formHue = Math.random() * 360;
+  var bounceAt = -10;
+
+  function nextForm() {
+    var pick = critters[(Math.random() * critters.length) | 0];
+    if (form && pick[0] === form[0]) pick = critters[(Math.random() * critters.length) | 0];
+    form = pick;
+    formHue = Math.random() * 360;
+  }
+
+  function paintGlyph(ch, cx, cy, size, t, i, hue) {
+    var spins = [0, 48, 120, 190, 250, 310];
+    ictx.save();
+    ictx.translate(cx, cy);
+    ictx.rotate(Math.sin(t * 2.2 + i) * 0.18);
+    ictx.scale(1 + Math.sin(t * 2.6 + i) * 0.16, 1 + Math.cos(t * 1.9 + i) * 0.2);
+    ictx.font = "900 " + size + "px Impact, 'Arial Black', sans-serif";
+    ictx.textAlign = "center";
+    ictx.textBaseline = "middle";
+    for (var g = 0; g < spins.length; g++) {
+      var ox = Math.cos(t * 3 + g + i) * size * 0.08;
+      var oy = Math.sin(t * 2.4 + g) * size * 0.08;
+      ictx.fillStyle = "hsl(" + ((hue + spins[g] + t * 80) % 360) + " 100% " + (52 + g * 4) + "%)";
+      ictx.fillText(ch, ox, oy);
+    }
+    ictx.fillStyle = "#fff";
+    ictx.fillText(ch, 0, 0);
+    ictx.restore();
+  }
+
   function drawInk(t) {
     var w = ink.width, h = ink.height;
     if (!w || !h) return;
     ictx.setTransform(1, 0, 0, 1, 0, 0);
     ictx.clearRect(0, 0, w, h);
-    var word = "DREW.WTF";
-    var look = Math.floor(t / 1.5) % 4;
-    var size = h * (look === 3 ? 0.46 : 0.62);
-    var faces = [
-      "900 " + size + "px Impact, 'Arial Black', sans-serif",
-      "900 " + size + "px 'Arial Black', Impact, sans-serif",
-      "700 " + (size * 0.92) + "px Georgia, 'Times New Roman', serif",
-      "800 " + (size * 0.78) + "px 'Courier New', monospace"
-    ];
-    ictx.font = faces[look];
-    ictx.textAlign = "center";
-    ictx.textBaseline = "middle";
-    ictx.lineJoin = "round";
-    var gap = w / (word.length + 0.2);
-    for (var i = 0; i < word.length; i++) {
-      var ch = word.charAt(i);
-      var cx = gap * (i + 0.6);
-      var wave = Math.sin(t * 3.2 + i * 0.9) * h * (look === 1 ? 0.16 : 0.07);
-      var cy = h * 0.46 + wave;
-      var rot = Math.sin(t * 2.1 + i) * (look === 2 ? 0.22 : 0.05);
-      ictx.save();
-      ictx.translate(cx, cy);
-      ictx.rotate(rot);
-      ictx.scale(1 + Math.sin(t * 2.4 + i) * 0.14, 1 + Math.cos(t * 1.7 + i) * (look === 0 ? 0.22 : 0.08));
-      ictx.fillStyle = "hsl(" + ((t * 90 + i * 32) % 360) + " 100% 58%)";
-      ictx.fillText(ch, h * 0.035, h * 0.02);
-      ictx.fillStyle = "hsl(" + ((t * 90 + i * 32 + 150) % 360) + " 100% 62%)";
-      ictx.fillText(ch, -h * 0.035, -h * 0.01);
-      ictx.fillStyle = "#fff";
-      ictx.fillText(ch, 0, 0);
-      if (look === 0) {
-        ictx.fillStyle = "hsl(" + ((t * 50 + i * 24) % 360) + " 100% 55%)";
-        ictx.beginPath();
-        ictx.arc(0, h * 0.28, Math.max(2, h * 0.055 + Math.sin(t * 5 + i) * h * 0.02), 0, Math.PI * 2);
-        ictx.fill();
+    if (!form) {
+      var word = "DREW.WTF";
+      var gap = w / (word.length + 0.15);
+      var size = h * 0.62;
+      for (var i = 0; i < word.length; i++) {
+        var wave = Math.sin(t * 3.4 + i * 0.85) * h * 0.1;
+        paintGlyph(word.charAt(i), gap * (i + 0.58), h * 0.46 + wave, size, t, i, i * 36);
       }
-      ictx.restore();
+    } else {
+      paintGlyph(form[0], w * 0.34, h * 0.48, h * 0.86, t, 0, formHue);
+      var name = form[1];
+      var gap2 = (w * 0.5) / name.length;
+      var size2 = Math.min(h * 0.34, gap2 * 1.35);
+      for (var n = 0; n < name.length; n++) {
+        paintGlyph(name.charAt(n), w * 0.52 + gap2 * n, h * 0.5 + Math.sin(t * 4 + n) * h * 0.06, size2, t, n + 2, formHue + n * 28);
+      }
     }
-    ink.style.filter = "drop-shadow(0 0 10px hsl(" + ((t * 70) % 360) + " 100% 60%))";
+    ink.style.filter = "drop-shadow(0 0 12px hsl(" + ((t * 90 + formHue) % 360) + " 100% 60%)) drop-shadow(0 0 18px hsl(" + ((t * 90 + formHue + 140) % 360) + " 100% 50%))";
   }
 
   var baseW = 640, baseH = 90, x = 40, y = 40, vx = 150, vy = 110;
@@ -1522,9 +1542,15 @@ const E=[
     if (y + h >= vh) { y = Math.max(0, vh - h); if (vy > 0) hitY = true; }
     if (hitX) vx = -vx;
     if (hitY) vy = -vy;
-    if (hitX || hitY) varyVelocity();
+    if (hitX || hitY) {
+      varyVelocity();
+      nextForm();
+      bounceAt = t;
+    }
+    var punch = Math.max(0, 1 - (t - bounceAt) * 2.4);
+    var breathe = 1 + Math.sin(t * 1.7) * 0.06 + punch * 0.28;
     logo.style.transform = "translate3d(" + x.toFixed(2) + "px," + y.toFixed(2) + "px,0) scale(" + breathe.toFixed(4) + ")";
-    logo.style.opacity = String(0.88 + Math.sin(t * 1.3) * 0.12);
+    logo.style.opacity = String(0.86 + Math.sin(t * 1.3) * 0.14);
     drawInk(t);
   }
 
