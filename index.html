@@ -109,7 +109,8 @@
     min-height: 44px; padding: 0 14px; border-radius: 10px;
     border: 0; background: #d6ff4a; color: #111; font: inherit; cursor: pointer;
   }
-  #shopFrame { flex: 1; width: 100%; border: 0; background: #0c0c0e; }
+
+  #benchHost { flex: 1; min-height: 0; }
   @media (max-width: 720px) {
     #dock button { min-width: 36px; min-height: 36px; }
     #name { max-width: 34vw; }
@@ -147,7 +148,7 @@
     <button id="shopClose" type="button">Close</button>
     <span>Build a computer</span>
   </div>
-  <iframe id="shopFrame" title="Build a computer"></iframe>
+  <div id="benchHost"></div>
 </div>
 <script>
 (function () {
@@ -170,13 +171,12 @@
   var gateMsg = document.getElementById("gateMsg");
   var gateCancel = document.getElementById("gateCancel");
   var shop = document.getElementById("shop");
-  var shopFrame = document.getElementById("shopFrame");
   var shopClose = document.getElementById("shopClose");
 
   function openShop() {
     try { sessionStorage.setItem("drew-bench", "1"); } catch (err) {}
-    if (!shopFrame.getAttribute("src")) shopFrame.src = "bench/";
     shop.classList.add("open");
+    if (window.startBench) window.startBench();
   }
 
   var W = 0, H = 0, cols = 0, rows = 0, cellW = 0, cellH = 0, scale = 2, buf, data;
@@ -1012,5 +1012,201 @@
   raf = requestAnimationFrame(frame);
 })();
 </script>
+
+<script>
+(function () {
+  var host = document.getElementById("benchHost");
+  var root = host.attachShadow({ mode: "open" });
+  var style = document.createElement("style");
+  style.textContent = '\n  :root { color-scheme: dark; }\n  * { box-sizing: border-box; }\n  html, body { margin: 0; background: #0c0c0e; color: #f6f1e8; font: 18px/1.35 system-ui, sans-serif; }\n  a { color: #d6ff4a; }\n  button, input { font: inherit; }\n  header, main { padding: 16px; }\n  header { display: flex; justify-content: space-between; gap: 16px; align-items: flex-end; border-bottom: 1px solid #2a2a2e; }\n  h1 { margin: 6px 0 0; font-size: 40px; line-height: 1; }\n  .muted { color: #b7b1a6; }\n  .total { text-align: right; }\n  .total b { display: block; font-size: 32px; }\n  .layout { display: grid; gap: 16px; }\n  @media (min-width: 980px) { .layout { grid-template-columns: 340px 280px 1fr; align-items: start; } }\n  .panel { background: #16161a; border: 1px solid #2a2a2e; border-radius: 16px; padding: 14px; }\n  pre { margin: 10px 0 0; font: 15px/1.15 ui-monospace, Menlo, Consolas, monospace; white-space: pre; overflow-x: auto; }\n  .slots { display: flex; gap: 8px; overflow-x: auto; }\n  @media (min-width: 980px) { .slots { flex-direction: column; overflow: visible; } }\n  .slots button, .card, .more, .toggle { border-radius: 12px; border: 1px solid #2a2a2e; background: #101014; color: inherit; text-align: left; padding: 12px; cursor: pointer; }\n  .slots button { min-width: 160px; }\n  .slots button.on, .toggle.on { border-color: #d6ff4a; background: #1c220f; }\n  .slots small, .card small { display: block; color: #b7b1a6; }\n  .tools { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }\n  input[type="search"] { flex: 1; min-width: 180px; background: #101014; color: inherit; border: 1px solid #2a2a2e; border-radius: 12px; padding: 12px; }\n  .list { display: grid; gap: 8px; }\n  .card { width: 100%; display: flex; justify-content: space-between; gap: 12px; align-items: center; }\n  .price { color: #d6ff4a; white-space: nowrap; }\n  .warn { color: #ffb4c4; }\n  #gate { position: fixed; inset: 0; display: grid; place-items: center; background: #0c0c0e; padding: 16px; }\n  #gate form { width: min(420px, 100%); background: #16161a; border: 1px solid #3a3a40; border-radius: 18px; padding: 18px; }\n  #gate input { width: 100%; margin-top: 8px; padding: 12px; border-radius: 12px; border: 1px solid #3a3a40; background: #000; color: #fff; }\n  #gate button { margin-top: 12px; padding: 12px 16px; border: 0; border-radius: 12px; background: #d6ff4a; color: #111; font-weight: 700; }\n  #app[hidden], #gate[hidden] { display: none; }\n\n:host { display: block; height: 100%; }\n#app { height: 100%; overflow: auto; background: #0c0c0e; }\n';
+  root.appendChild(style);
+  var wrap = document.createElement("div");
+  wrap.innerHTML = '<div id="app" hidden>\n  <header>\n    <div>\n      <a href="../">Back</a>\n      <h1>Build a computer</h1>\n      <p class="muted">Pick one part at a time. The picture fills in.</p>\n    </div>\n    <div class="total">\n      <span class="muted">Total</span>\n      <b id="total">$0.00</b>\n      <span id="watts" class="muted"></span>\n    </div>\n  </header>\n  <main class="layout">\n    <section class="panel">\n      <h2>The computer</h2>\n      <p id="story" class="muted">The brain of the computer.</p>\n      <pre id="tower"></pre>\n      <p id="note" class="warn"></p>\n    </section>\n    <div id="slots" class="slots"></div>\n    <section>\n      <div class="tools">\n        <input id="q" type="search" placeholder="Search this list" />\n        <button id="fits" class="toggle on" type="button">Fits only</button>\n      </div>\n      <div id="list" class="list"></div>\n      <button id="more" class="more" type="button" hidden>Show more</button>\n    </section>\n  </main>\n</div>';
+  while (wrap.firstChild) root.appendChild(wrap.firstChild);
+  
+const CATS = [
+  ["cpu", "Processor", "The brain of the computer."],
+  ["motherboard", "Motherboard", "The board the processor plugs into."],
+  ["memory", "Memory", "Memory sticks click into the board."],
+  ["gpu", "Graphics card", "The graphics card slides into the case."],
+  ["storage", "Storage", "Storage is where files and games live."],
+  ["case", "Case", "The case is the box everything sits in."],
+  ["cooler", "Cooler", "The cooler sits on the processor and spins."],
+  ["psu", "Power", "The power supply has to be strong enough."]
+];
+const CASE_FIT = { itx: 1, matx: 2, atx: 3, full: 4 };
+const BOARD_SIZE = { itx: 1, matx: 2, atx: 3, eatx: 4 };
+const SIZE_LABEL = { itx: "Mini-ITX", matx: "Micro-ATX", atx: "ATX", eatx: "E-ATX", full: "a full tower" };
+const SOCKET_RAM = { AM4: "DDR4", AM5: "DDR5", LGA1851: "DDR5", SP5: "DDR5" };
+const money = new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" });
+let PARTS = [];
+let build = {};
+let active = "cpu";
+let shown = 40;
+let fits = true;
+
+function loadBuild() {
+  try { build = JSON.parse(localStorage.getItem("bench-build") || "{}") || {}; }
+  catch (err) { build = {}; }
+}
+function saveBuild() { localStorage.setItem("bench-build", JSON.stringify(build)); }
+function chosen() {
+  const map = {};
+  for (const row of CATS) {
+    const id = row[0];
+    const part = PARTS.find((item) => item.id === build[id] && item.cat === id);
+    if (part) map[id] = part;
+  }
+  return map;
+}
+function gpuDraw(name) {
+  const n = name.toUpperCase();
+  if (/5090|4090/.test(n)) return 450;
+  if (/5080|4080|7900 XTX/.test(n)) return 320;
+  if (/5070 TI|4070 TI|7900 XT/.test(n)) return 285;
+  if (/5070|4070|7800 XT/.test(n)) return 220;
+  if (/5060|4060|7600|7700/.test(n)) return 150;
+  return 180;
+}
+function drawOf(parts) {
+  const cpu = parts.cpu ? (parts.cpu.watt || 105) : 0;
+  const gpu = parts.gpu ? gpuDraw(parts.gpu.name) : 0;
+  const rest = (parts.cpu ? 40 : 0) + (parts.motherboard ? 40 : 0) + (parts.storage ? 10 : 0);
+  return cpu + gpu + rest;
+}
+function ramClash(memory, cpu, board) {
+  if (!memory || !memory.ram) return false;
+  if (board && board.ram) return memory.ram !== board.ram;
+  const expect = cpu && cpu.socket ? SOCKET_RAM[cpu.socket] : "";
+  return Boolean(expect && memory.ram !== expect);
+}
+function caseTooSmall(box, board) {
+  if (!box || !board || !box.form || !board.form) return false;
+  return (BOARD_SIZE[board.form] || 0) > (CASE_FIT[box.form] || 0);
+}
+function problems(parts) {
+  const notes = [];
+  if (parts.cpu && parts.motherboard && parts.cpu.socket && parts.motherboard.socket && parts.cpu.socket !== parts.motherboard.socket) {
+    notes.push("Processor is " + parts.cpu.socket + ". Board is " + parts.motherboard.socket + ".");
+  }
+  if (ramClash(parts.memory, parts.cpu, parts.motherboard)) {
+    notes.push("Memory is " + parts.memory.ram + ". That does not match the board or processor.");
+  }
+  if (caseTooSmall(parts.case, parts.motherboard)) {
+    notes.push("That case is " + SIZE_LABEL[parts.case.form] + ". This board is " + SIZE_LABEL[parts.motherboard.form] + ".");
+  }
+  const draw = drawOf(parts);
+  if (parts.psu && parts.psu.watt && draw > parts.psu.watt) notes.push("Rough draw is " + draw + "W. This supply is " + parts.psu.watt + "W.");
+  return notes;
+}
+function clashes(part, parts) {
+  const next = Object.assign({}, parts);
+  next[part.cat] = part;
+  if (next.cpu && next.motherboard && next.cpu.socket && next.motherboard.socket && next.cpu.socket !== next.motherboard.socket) return true;
+  if (ramClash(next.memory, next.cpu, next.motherboard)) return true;
+  if (caseTooSmall(next.case, next.motherboard)) return true;
+  return false;
+}
+function pad(text, width) { return (text + " ".repeat(width)).slice(0, width); }
+function row(body) { return "|" + pad(body, 32) + "|"; }
+function tower(parts) {
+  const hard = parts.storage && /hdd|hard drive|\brpm\b|7200|5400/i.test(parts.storage.name);
+  const lines = [
+    "+--------------------------------+",
+    row(parts.case ? "CASE ON" : "CASE"),
+    row("  +------------------------+"),
+    row("  |CPU   " + (parts.cpu ? "[####]" : "[    ]") + "             |"),
+    row("  |BOARD " + (parts.motherboard ? "[##########]" : "[          ]") + "        |"),
+    row("  |FAN   " + (parts.cooler ? "( ( ) )" : "(      )") + "            |"),
+    row("  |RAM   " + (parts.memory ? "[##] [##]" : "[  ] [  ]") + "          |"),
+    row("  |GPU   " + (parts.gpu ? "[=======>]" : "[         ]") + "         |"),
+    row("  |SSD   " + (parts.storage && !hard ? "[====]" : "[    ]") + "             |"),
+    row("  |HDD   " + (hard ? "(oooo)" : "(    )") + "             |"),
+    row("  |POWER " + (parts.psu ? "[====]" : "[    ]") + "             |"),
+    row("  +------------------------+"),
+    "+--------------------------------+"
+  ];
+  return lines.join("\n");
+}
+function labelButton(label, name, on) {
+  const button = document.createElement("button");
+  button.type = "button";
+  if (on) button.className = "on";
+  const small = document.createElement("small");
+  small.textContent = label;
+  button.appendChild(small);
+  button.appendChild(document.createTextNode(name));
+  return button;
+}
+function render() {
+  const parts = chosen();
+  const total = CATS.reduce((sum, row) => sum + (parts[row[0]] ? parts[row[0]].price : 0), 0);
+  root.getElementById("total").textContent = money.format(total);
+  const draw = drawOf(parts);
+  root.getElementById("watts").textContent = draw ? "About " + draw + "W" : "";
+  const next = CATS.find((row) => !parts[row[0]]);
+  root.getElementById("story").textContent = next ? next[2] : "Every part is chosen.";
+  root.getElementById("tower").textContent = tower(parts);
+  root.getElementById("note").textContent = problems(parts).join(" ");
+  const slots = root.getElementById("slots");
+  wipe(slots);
+  for (const row of CATS) {
+    const id = row[0];
+    const name = parts[id] ? parts[id].name : "Choose";
+    const button = labelButton(row[1], name, id === active);
+    button.onclick = () => { active = id; shown = 40; root.getElementById("q").value = ""; render(); };
+    slots.appendChild(button);
+  }
+  const q = root.getElementById("q").value.trim().toLowerCase();
+  const list = PARTS.filter((part) => part.cat === active)
+    .filter((part) => !q || part.name.toLowerCase().includes(q) || (part.brand || "").toLowerCase().includes(q))
+    .filter((part) => !fits || !clashes(part, parts))
+    .sort((a, b) => a.price - b.price);
+  const box = root.getElementById("list");
+  wipe(box);
+  list.slice(0, shown).forEach((part) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "card";
+    const span = document.createElement("span");
+    span.appendChild(document.createTextNode(part.name));
+    const small = document.createElement("small");
+    small.textContent = part.brand || "";
+    span.appendChild(small);
+    const price = document.createElement("span");
+    price.className = "price";
+    price.textContent = money.format(part.price);
+    button.append(span, price);
+    button.onclick = () => { build[part.cat] = part.id; saveBuild(); render(); };
+    box.appendChild(button);
+  });
+  const more = root.getElementById("more");
+  more.hidden = list.length <= shown;
+  more.textContent = "Show more (" + list.length + ")";
+}
+function wipe(node) {
+  while (node.firstChild) node.removeChild(node.firstChild);
+}
+function openApp() {
+  var app = root.getElementById("app");
+  app.hidden = false;
+  loadBuild();
+  fetch("bench/parts.json").then(function (res) { return res.json(); }).then(function (data) {
+    PARTS = data;
+    render();
+  }).catch(function () {
+    root.getElementById("story").textContent = "The parts list did not load. Close this and try again.";
+  });
+}
+
+window.startBench = function () {
+  if (window.__benchOn) return;
+  window.__benchOn = true;
+  openApp();
+};
+
+})();
+</script>
+
 </body>
 </html>
