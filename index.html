@@ -6,8 +6,8 @@
 <meta name="theme-color" content="#000000" />
 <title>DREW.WTF</title>
 <style>
-  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; touch-action: none; }
-  #field { position: fixed; inset: -6%; width: 112%; height: 112%; display: block; background: #000; z-index: 0; touch-action: none; }
+  html, body { margin: 0; height: 100%; height: 100dvh; background: #000; overflow: hidden; touch-action: none; }
+  #field { position: fixed; inset: 0; width: 100%; height: 100%; height: 100dvh; display: block; background: #000; z-index: 0; touch-action: none; }
   #veil {
     position: fixed; inset: 0; z-index: 1; pointer-events: none;
     background:
@@ -110,7 +110,7 @@
     border: 0; background: #d6ff4a; color: #111; font: inherit; cursor: pointer;
   }
 
-  #benchHost { flex: 1; min-height: 0; }
+  #shopFrame { flex: 1; width: 100%; border: 0; background: #111; min-height: 0; }
   #blockBtn {
     min-width: 44px; min-height: 44px; border: 0; border-radius: 999px;
     background: #ffffff18; color: #fff; font-size: 20px; cursor: pointer;
@@ -130,7 +130,7 @@
     }
   }
   @media (max-width: 720px) {
-    #dock button { min-width: 36px; min-height: 36px; }
+    #dock button { min-width: 48px; min-height: 48px; font-size: 22px; }
     #name { max-width: 34vw; }
   }
 </style>
@@ -168,7 +168,7 @@
     <button id="shopClose" type="button">Close</button>
     <span>Build a computer</span>
   </div>
-  <div id="benchHost"></div>
+  <iframe id="shopFrame" title="Build a computer"></iframe>
 </div>
 <script>
 (function () {
@@ -199,7 +199,8 @@
   function openShop() {
     try { sessionStorage.setItem("drew-bench", "1"); } catch (err) {}
     shop.classList.add("open");
-    if (window.startBench) window.startBench();
+    var frame = document.getElementById("shopFrame");
+    if (!frame.getAttribute("src")) frame.src = "bench/";
   }
 
   var W = 0, H = 0, cols = 0, rows = 0, cellW = 0, cellH = 0, scale = 2, buf, data;
@@ -1181,12 +1182,82 @@ mk('Spore Elephant',' .:;+x*#%@',(x,y,t)=>{const e=el(P23,x,y,t);if(e>=0)return 
 
 ];
 
+
+  var mx = 0, my = 0, tx = 0, ty = 0, tr = [], pointerOn = 0;
+  var TRIP = (function () {
+const S=Math.sin,C=Math.cos,A=Math.atan2,F=Math.floor,P=Math.PI,ab=Math.abs,Mx=Math.max,Mn=Math.min,
+H=(a,b)=>Math.sqrt(a*a+b*b),o=a=>.5+.5*S(a),hs=n=>{n=S(n*127.1)*43758.5453;return n-F(n)};
+let mx=0,my=0,tx=0,ty=0,tr=[],cols=0,rows=0;
+const R=[" .:-=+*#%@"," .·oO0Q@"," ░▒▓█"," ,;!|/\\xX&@"," ·01"," .~=≈S§&"];
+// [name, ramp, speed, fn(x,y,t,col,row) -> 0..1]   🖱 = follows cursor  ⚡ fast  🐌 slow
+const E=[
+["Tunnel of Whoa",0,1,(x,y,t)=>o(3/(H(x,y)+.05)+A(y,x)*3-t*4)],
+["Breathing Rings",1,1,(x,y,t)=>o(H(x,y)*14-t*3+3*S(t))],
+["Spiral Galaxy Soup",0,1,(x,y,t)=>o(A(y,x)*3+H(x,y)*12-t*4)],
+["Plasma Gravy",2,1,(x,y,t)=>(S(x*6+t)+S(y*6+t*1.2)+S((x+y)*5-t)+S(H(x,y)*8-t*2))/8+.5],
+["Black Hole Buddy 🖱",0,1,(x,y,t)=>{let d=x-mx,e=y-my,r=H(d,e);return o(4/(r+.1)+A(e,d)*2-t*5)*Mn(1,r*3)}],
+["Cursor Ripples 🖱",1,1,(x,y,t)=>{let r=H(x-mx,y-my);return o(r*20-t*6)/(1+r*2.5)}],
+["The Eye Watches 🖱",1,1,(x,y,t)=>{let r=H(x,y),a=A(y,x),L=H(mx,my),k=L>.35?.35/L:1,p=x-mx*k,q=y-my*k,d=H(p,q);if(r>.8)return r<1.25?.25*o(a*20+r*10-t*3):0;if(d<.09+.03*S(t))return 0;if(d<.34)return .55+.4*o(A(q,p)*12+t*2);return .25*o(x*9+S(y*7+t)*2)}],
+["Mushroom Mind 🍄",0,1,(x,y,t)=>{x+=S(y*5+t*2)*.03;let r=H(x,y);if(y<.12&&x*x/.5+(y-.12)**2/.32<1)return o(x*14)*o(y*14+t)>.8?1:.45+.2*o(r*18-t*3);if(ab(x)<.13+.04*S(y*7-t*2)&&y>=.12&&y<.75)return .3+.3*o(y*20-t*4);return .2*o(r*12-t*2)}],
+["Wormholes",3,1,(x,y,t)=>o(y*12+S(x*3+t)*3+t)],
+["Drunk Checkerboard",2,1,(x,y,t)=>((F(x*5+2*S(y*3+t))+F(y*5+2*C(x*3-t)))&1)?.9:.15],
+["Kaleido-Scope",5,1,(x,y,t)=>{let k=ab((A(y,x)+P)%(P/3)-P/6);return o(H(x,y)*10+S(k*8+t)*3-t*2)}],
+["Glacier Trip 🐌",1,.35,(x,y,t)=>o(S(x*2+t*.8)*2+S(y*2-t*.6)*2+S(x*y*3+t*.4))],
+["Hyper Strobe ⚡",0,1,(x,y,t)=>o(H(x,y)*30-t*40)*o(A(y,x)*8)],
+["DNA Soup",0,1,(x,y,t)=>{let u=(x%1.2+1.2)%1.2-.6,p=y*8-t*3,s=S(p)*.4,v=Mx(1-ab(u-s)*14,1-ab(u+s)*14,0);if(ab(u)<ab(s)&&ab(S(p*2.5))>.97)v=.6;return v}],
+["Julia Set 🖱",0,1,(x,y)=>{let a=x*1.4,b=y*1.4,i=0,u;for(;i<28&&a*a+b*b<4;i++){u=a*a-b*b+mx*.7;b=2*a*b+my*.7;a=u}return i<28?i/28:0}],
+["Rainbow Matrix",0,1,(x,y,t,i,j)=>{let h=hs(i),d=(t*(3+h*9)+h*99)%(rows+16)-j;return d>0&&d<16?1-d/16:0}],
+["TV Static ⚡",0,1,(x,y,t,i,j)=>hs(i*7.3+j*13.1+F(t*20))],
+["Heartbeat",1,1,(x,y,t)=>o(H(x,y)*12-t*2+4*S(t*3))],
+["Octopus Tendrils 🖱",3,1,(x,y,t)=>{let d=x-mx,e=y-my,r=H(d,e);return o(A(e,d)*7+S(r*10-t*3)*2+t)*Mx(0,1-r*.8)}],
+["Eyes Everywhere 🖱",1,1,(x,y)=>{let g=.34,cx=(F(x/g)+.5)*g,cy=(F(y/g)+.5)*g,d=H(x-cx,y-cy);if(d>.15)return 0;let a=A(my-cy,mx-cx),pd=H(x-cx-C(a)*.05,y-cy-S(a)*.05);return pd<.05?1:pd<.09?.7:.25}],
+["Seasick Horizon",3,1,(x,y,t)=>{let c=C(t*.3),s=S(t*.3),X=x*c-y*s,Y=x*s+y*c;return o(Y*9+S(X*4+t*2)*2-t*3)}],
+["Lava Cells",2,1,(x,y,t)=>{let m=9,d,k=0;for(;k<7;k++){d=H(x-S(t*.4+k*k)*1.2,y-C(t*.5+k*3.1)*.8);if(d<m)m=d}return o(m*14-t*3)}],
+["Metaballs + You 🖱",1,1,(x,y,t)=>{let s=.04/(H(x-mx,y-my)**2+.01);for(let k=0;k<5;k++)s+=.04/(H(x-S(t*.5+k*2)*.9,y-C(t*.4+k*3)*.7)**2+.01);return 1-1/(1+s*.4)}],
+["Infinite Zoom Checker",2,1,(x,y,t)=>((F(Math.log(H(x,y)+.001)*2.5-t*1.5)+F(A(y,x)*4/P))&1)?.9:.2],
+["Wobbly Graph Paper",3,1,(x,y,t)=>{let u=x+S(y*3+t)*.15,v=y+C(x*3+t*1.3)*.15;return ab(S(u*9))>.93||ab(S(v*9))>.93?1:.12}],
+["Highway To Nowhere ⚡",0,1,(x,y,t)=>y<.02?(H(x,y+.3)<.3&&S(y*70)>-.2?.9:hs(F(x*30)*7.7+F(y*20))>.985?.8:0):(ab(S(x/(y+.02)*3))>.96||ab(S(1/(y+.02)*2-t*8))>.96?.9/(1+.15/(y+.02)):.03)],
+["Ouroboros",1,1,(x,y,t)=>{let r=H(x,y),d=((A(y,x)-t*2)%(2*P)+2*P)%(2*P);return(1-d/6.283)*Mx(0,1-ab(r-.6)*10)}],
+["Hyperspace ⚡",0,2,(x,y,t)=>{let r=H(x,y),ai=F(A(y,x)*30/P),v=0;for(let k=0;k<3;k++){let h=hs(ai+k*37.7),p=(t*(.2+h*.5)+h*5)%1;if(ab(r-p*1.5)<.03+p*.07)v=Mx(v,p)}return v}],
+["Spores Rising 🍄",1,1,(x,y,t)=>{let s=0;for(let k=0;k<16;k++){let X=S(k*7.1)*1.4+S(t*.5+k)*.12,Y=1.2-((t*.08*(1+k%3)+k*.37)%1)*2.4;s+=.0025*(1+k%3)/(H(x-X,y-Y)**2+.0006)}return Mn(1,s)}],
+["Ghost Comet Trail 🖱",1,1,(x,y)=>{let s=0,n=tr.length;for(let k=0;k<n;k++)s+=.004*(k/n)/(H(x-tr[k][0],y-tr[k][1])**2+.002);return Mn(1,s)}],
+["Quad-Mirror Ripples 🖱",0,1,(x,y,t)=>o(H(ab(x)-ab(mx),ab(y)-ab(my))*18-t*4)],
+["Bubble Lattice",1,1,(x,y,t)=>{let u=(x*5%1+1)%1-.5,w=(y*5%1+1)%1-.5;return Mx(0,1-H(u,w)*(2.2-.8*S(F(x*5)+F(y*5)*1.7+t*2)))}],
+["Swirl Melt",5,1,(x,y,t)=>{let r=H(x,y);return o((A(y,x)+4*r*S(t*.5))*5+r*6-t)}],
+["Confetti Blocks",2,1,(x,y,t,i,j)=>hs(F(i/4)*3.1+F(j/2)*17.3+F(t*4))],
+["Diamond Drift ◆",0,1,(x,y,t)=>o((ab(x-S(t*.5)*.4)+ab(y-C(t*.4)*.3))*12-t*3)],
+["Mood Swing Smiley 🙂",0,1,(x,y,t)=>{x+=S(y*6+t*2)*.04*(y+1);let r=H(x,y),ym=.38-x*x*1.8*S(t*.8);return ab(r-.7)<.04||H(x-.25,y+.2)<.08||H(x+.25,y+.2)<.08||(ab(x)<.35&&ab(y-ym)<.04)?1:.15*o(r*10-t*2)}],
+["Radar For Aliens 👽",0,1,(x,y,t)=>{let r=H(x,y),f=1-(((A(y,x)-t*2)%(2*P)+2*P)%(2*P))/6.283;return r<.9?f*f+.05*(ab(S(r*20))>.95)+(hs(F(x*9)*5.3+F(y*9))>.96?.7*Math.sqrt(f):0):.04}],
+["Double Slit Disco",1,1,(x,y,t)=>(o(H(x-.5-S(t*.3)*.3,y)*20-t*3)+o(H(x+.5+S(t*.3)*.3,y)*20-t*3))/2],
+["Square Tunnel",2,1,(x,y,t)=>{let c=C(t*.3),s=S(t*.3);return o(2/Mx(ab(x*c-y*s),ab(x*s+y*c))-t*3)}],
+["Glitch Slices ⚡",3,1,(x,y,t)=>{let b=F(y*8);return o((x+(hs(b+F(t*4))-.5)*4)*10)*(hs(b*3+F(t*2))>.2?1:0)}],
+["Mandala Bloom 🐌",1,.5,(x,y,t)=>{let r=H(x,y),a=A(y,x),Rd=.45+.25*S(a*7+t*.6)+.1*S(a*3-t*.4);return r<Rd?.3+.7*o(r*25-t*2):.06*o(r*10)}],
+["Hyperbola Dance 🖱",5,1,(x,y,t)=>o((H(x-mx-.3,y-my)-H(x+mx+.3,y+my))*14+t*2)],
+["The Shy Dot (flees you) 🖱",1,1,(x,y,t)=>{let d=H(x+mx*.9,y+my*.9);return Mn(1,.015/(d*d+.002))+.3*o(d*30-t*6)/(1+d*4)}],
+["Flashlight In The Void 🖱",0,1,(x,y,t)=>{let d=H(x-mx,y-my),n=(S(x*8+t)+S(y*9-t)+S((x+y)*12+t*2))/6+.5;return n*Mx(0,1-d*1.6)}],
+["Lissajous Worm",1,1,(x,y,t)=>{let s=0;for(let k=0;k<50;k++){let q=k*.13+t;s+=.0014/(H(x-S(3*q+t*.2)*.8,y-C(2*q)*.8)**2+.0006)}return Mn(1,s)}],
+["XOR Tapestry",5,1,(x,y,t)=>((F(x*40+t*10)^F(y*40+t*6))&31)/31],
+["Moire Drift",0,1,(x,y,t)=>o(H(x-S(t*.4)*.5,y)*60)*o(H(x+S(t*.3)*.5,y-C(t*.2)*.3)*60)],
+["Drip Drop Top",4,1,(x,y,t,i,j)=>{let h=hs(i*.7),d=j-(((t*.25*(.5+h)+h*3)%1)*(rows+8)-4);return d<0?.35+.25*hs(i+j*.31):d<2?1-d*.4:0}],
+["Loading… 99% (never)",2,1,(x,y,t)=>{let p=.99*(1-Math.exp(-(t%14)*.4));if(ab(y)<.1&&ab(x)<.84&&(ab(y)>.075||ab(x)>.81))return 1;if(ab(y)<.075&&ab(x)<.81)return x<-.81+1.62*p?.85:.18;return .3*o(x*8+S(y*6+t)*2)*o(y*9-t)}],
+["Gravity Unplugged ↑",3,1,(x,y,t,i,j)=>{let h=hs(i*1.3),d=(t*(2+h*6)+h*99)%(rows+12)-(rows-j);return d>0&&d<12?1-d/12:0}]
+];
+    var SAFE = [" .:-=+*#%@", " .oO0#@%", " .:+#*X%", " |/\\xX#@", " .~=oO#"];
+    return E.map(function (scene) {
+      var ramp = SAFE[scene[1] % SAFE.length];
+      var speed = scene[2] || 1;
+      var fn = scene[3];
+      var name = String(scene[0]).replace(/[^\x20-\x7E]+/g, " ").replace(/\s+/g, " ").trim();
+      return [name, ramp, function (x, y, t, i, j) { return fn(x, y, t * speed, i, j); }];
+    });
+  })();
+
   var ALL = null;
   function list() {
     if (pack === "earth") return EARTH;
     if (pack === "pig") return PIG;
     if (pack === "elephant") return ELEPHANT;
-    if (!ALL) ALL = HOME.concat(EARTH, PIG, ELEPHANT);
+    if (!ALL) ALL = HOME.concat(EARTH, PIG, ELEPHANT, TRIP);
     return ALL;
   }
 
@@ -1219,13 +1290,16 @@ mk('Spore Elephant',' .:;+x*#%@',(x,y,t)=>{const e=el(P23,x,y,t);if(e>=0)return 
     var x = ((col + 0.5) / cols * 2 - 1) * aspect;
     var y = ((row + 0.5) / rows) * 2 - 1;
     var tt = frameT;
-    var a = frameA[2](x, y, tt);
-    var b = frameS ? frameB[2](x, y, tt) : a;
+    var ix = arguments[3] || 0;
+    var a = frameA[2](x, y, tt, ix, row);
+    var b = frameS ? frameB[2](x, y, tt, ix, row) : a;
     return { a: a, b: b, s: frameS, ramp: frameA[1], rampB: frameB[1], name: frameName };
   }
 
   function resize() {
-    W = window.innerWidth; H = window.innerHeight;
+    var vv = window.visualViewport;
+    W = Math.floor(vv ? vv.width : window.innerWidth);
+    H = Math.floor(vv ? vv.height : window.innerHeight);
     canvas.width = W; canvas.height = H;
     scale = W > 1800 ? 2 : (W < 700 ? 2 : 3);
     cellW = 5 * scale + scale;
@@ -1250,6 +1324,11 @@ mk('Spore Elephant',' .:;+x*#%@',(x,y,t)=>{const e=el(P23,x,y,t);if(e>=0)return 
   var MARK = { home: "🏠", earth: "🌍", pig: "🐷", elephant: "🐘" };
 
   function paintASCII(t) {
+    if (!pointerOn) { tx = Math.sin(t * 0.35) * 0.75; ty = Math.cos(t * 0.28) * 0.55; }
+    mx += (tx - mx) * 0.12;
+    my += (ty - my) * 0.12;
+    tr.push([mx, my]);
+    if (tr.length > 28) tr.shift();
     data.fill(0);
     var breathe = 0.92 + Math.sin(t * 0.8) * 0.08;
     var hue0 = (t * 28) % 360;
@@ -1259,7 +1338,7 @@ mk('Spore Elephant',' .:;+x*#%@',(x,y,t)=>{const e=el(P23,x,y,t);if(e>=0)return 
     for (var row = 0; row < rows; row++) {
       cr = row;
       for (var col = 0; col < cols; col++) {
-        var s = sample(col + Math.sin(t * 0.2) * 1.2, row, t);
+        var s = sample(col + Math.sin(t * 0.2) * 1.2, row, t, col);
         shown = s.name;
         var v, ramp, ch;
         if (s.s > 0) {
@@ -1323,6 +1402,9 @@ mk('Spore Elephant',' .:;+x*#%@',(x,y,t)=>{const e=el(P23,x,y,t);if(e>=0)return 
     if (pack === "elephant") {
       canvas.style.transform = "none";
       canvas.style.opacity = "1";
+    } else if (W < 900) {
+      canvas.style.transform = "none";
+      canvas.style.opacity = "1";
     } else {
       var zoom = 1 + Math.sin(t * 0.65) * 0.04 + Math.sin(t * 1.5) * 0.012;
       canvas.style.transform = "scale(" + zoom.toFixed(4) + ")";
@@ -1359,42 +1441,54 @@ mk('Spore Elephant',' .:;+x*#%@',(x,y,t)=>{const e=el(P23,x,y,t);if(e>=0)return 
     if (!w || !h) return;
     ictx.setTransform(1, 0, 0, 1, 0, 0);
     ictx.clearRect(0, 0, w, h);
-    var cx = w * 0.5, cy = h * 0.5;
-    var maxR = Math.hypot(cx, cy);
-    ictx.lineWidth = Math.max(8, w * 0.055);
-    for (var i = 0; i < 8; i++) {
-      var u = (i / 8 + t * 0.12) % 1;
-      var r = maxR * (1 - u);
-      var hue = (t * 50 + i * 36) % 360;
-      ictx.strokeStyle = "hsl(" + hue + " 100% 62%)";
-      ictx.beginPath();
-      ictx.arc(cx, cy, Math.max(1, r), 0, Math.PI * 2);
-      ictx.stroke();
-    }
-    ictx.setTransform(w / VW, 0, 0, h / VH, 0, 0);
-    ictx.globalCompositeOperation = "destination-in";
-    ictx.lineCap = "round";
+    var word = "DREW.WTF";
+    var look = Math.floor(t / 1.5) % 4;
+    var size = h * (look === 3 ? 0.46 : 0.62);
+    var faces = [
+      "900 " + size + "px Impact, 'Arial Black', sans-serif",
+      "900 " + size + "px 'Arial Black', Impact, sans-serif",
+      "700 " + (size * 0.92) + "px Georgia, 'Times New Roman', serif",
+      "800 " + (size * 0.78) + "px 'Courier New', monospace"
+    ];
+    ictx.font = faces[look];
+    ictx.textAlign = "center";
+    ictx.textBaseline = "middle";
     ictx.lineJoin = "round";
-    ictx.strokeStyle = "#fff";
-    ictx.lineWidth = 46;
-    strokeWord(ictx);
-    ictx.stroke();
-    ictx.globalCompositeOperation = "destination-out";
-    ictx.lineWidth = 16;
-    strokeWord(ictx);
-    ictx.stroke();
-    ictx.globalCompositeOperation = "source-over";
-    var hueGlow = (t * 50) % 360;
-    ink.style.filter = "drop-shadow(0 0 5px hsl(" + hueGlow + " 100% 62%))";
+    var gap = w / (word.length + 0.2);
+    for (var i = 0; i < word.length; i++) {
+      var ch = word.charAt(i);
+      var cx = gap * (i + 0.6);
+      var wave = Math.sin(t * 3.2 + i * 0.9) * h * (look === 1 ? 0.16 : 0.07);
+      var cy = h * 0.46 + wave;
+      var rot = Math.sin(t * 2.1 + i) * (look === 2 ? 0.22 : 0.05);
+      ictx.save();
+      ictx.translate(cx, cy);
+      ictx.rotate(rot);
+      ictx.scale(1 + Math.sin(t * 2.4 + i) * 0.14, 1 + Math.cos(t * 1.7 + i) * (look === 0 ? 0.22 : 0.08));
+      ictx.fillStyle = "hsl(" + ((t * 90 + i * 32) % 360) + " 100% 58%)";
+      ictx.fillText(ch, h * 0.035, h * 0.02);
+      ictx.fillStyle = "hsl(" + ((t * 90 + i * 32 + 150) % 360) + " 100% 62%)";
+      ictx.fillText(ch, -h * 0.035, -h * 0.01);
+      ictx.fillStyle = "#fff";
+      ictx.fillText(ch, 0, 0);
+      if (look === 0) {
+        ictx.fillStyle = "hsl(" + ((t * 50 + i * 24) % 360) + " 100% 55%)";
+        ictx.beginPath();
+        ictx.arc(0, h * 0.28, Math.max(2, h * 0.055 + Math.sin(t * 5 + i) * h * 0.02), 0, Math.PI * 2);
+        ictx.fill();
+      }
+      ictx.restore();
+    }
+    ink.style.filter = "drop-shadow(0 0 10px hsl(" + ((t * 70) % 360) + " 100% 60%))";
   }
 
   var baseW = 640, baseH = 90, x = 40, y = 40, vx = 150, vy = 110;
 
   function fitLogo() {
     var vw = window.innerWidth, vh = window.innerHeight;
-    baseW = Math.min(vw * (vw < 700 ? 0.94 : 0.74), 820);
-    baseH = baseW * (VH / VW);
-    if (baseH > vh * 0.3) { baseH = vh * 0.3; baseW = baseH * (VW / VH); }
+    baseW = Math.min(vw * (vw < 700 ? 0.92 : 0.62), 920);
+    baseH = Math.max(78, baseW * 0.34);
+    if (baseH > vh * 0.34) { baseH = vh * 0.34; baseW = baseH / 0.34; }
     if (baseW > vw - 8) { baseW = vw - 8; baseH = baseW * (VH / VW); }
     logo.style.width = baseW + "px";
     logo.style.height = baseH + "px";
@@ -1544,13 +1638,18 @@ mk('Spore Elephant',' .:;+x*#%@',(x,y,t)=>{const e=el(P23,x,y,t);if(e>=0)return 
     tick();
   }
 
+  var song = new Audio("dreams.mp3");
+  song.loop = true;
+  song.preload = "none";
   function setPlaying(on) {
     playing = on;
     playBtn.classList.toggle("playing", on);
     playBtn.setAttribute("aria-label", on ? "Pause music" : "Play music");
     playShape.setAttribute("d", on ? "M6 5h4v14H6zM14 5h4v14h-4z" : "M8 5v14l12-7z");
-    if (on) startTrack();
-    else stopVoices();
+    if (on) {
+      var pending = song.play();
+      if (pending && pending.catch) pending.catch(function () { playing = false; playBtn.classList.remove("playing"); });
+    } else song.pause();
   }
 
   function setPack(next) {
@@ -1561,7 +1660,6 @@ mk('Spore Elephant',' .:;+x*#%@',(x,y,t)=>{const e=el(P23,x,y,t);if(e>=0)return 
     pigBtn.classList.toggle("on", pack === "pig");
     elephantBtn.classList.toggle("on", pack === "elephant");
     timeOff = -clock;
-    if (playing) startTrack();
   }
 
   blockBtn.addEventListener("click", function () {
@@ -1619,6 +1717,7 @@ mk('Spore Elephant',' .:;+x*#%@',(x,y,t)=>{const e=el(P23,x,y,t);if(e>=0)return 
     stepLogo(dt, t);
     raf = requestAnimationFrame(frame);
   }
+  if (window.visualViewport) window.visualViewport.addEventListener("resize", function () { resize(); });
   window.addEventListener("resize", function () {
     resize();
     if (x + baseW > window.innerWidth) x = Math.max(0, window.innerWidth - baseW);
@@ -1671,6 +1770,11 @@ mk('Spore Elephant',' .:;+x*#%@',(x,y,t)=>{const e=el(P23,x,y,t);if(e>=0)return 
   });
   window.addEventListener("keyup", stopHold);
   window.addEventListener("blur", stopHold);
+  document.addEventListener("pointermove", function (e) {
+    pointerOn = 1;
+    tx = (e.clientX / Math.max(1, W) - 0.5) * 2;
+    ty = (e.clientY / Math.max(1, H) - 0.5) * 2;
+  });
   document.addEventListener("pointerdown", function (e) {
     if (e.button !== 0 || uiHit(e.target) || shop.classList.contains("open")) return;
     armHold(e.clientX < window.innerWidth / 2 ? -1 : 1);
@@ -1681,201 +1785,6 @@ mk('Spore Elephant',' .:;+x*#%@',(x,y,t)=>{const e=el(P23,x,y,t);if(e>=0)return 
     if (!uiHit(e.target)) e.preventDefault();
   });
   raf = requestAnimationFrame(frame);
-})();
-</script>
-
-<script>
-(function () {
-  var host = document.getElementById("benchHost");
-  var root = host.attachShadow({ mode: "open" });
-  var style = document.createElement("style");
-  style.textContent = '\n  :root { color-scheme: dark; }\n  * { box-sizing: border-box; }\n  html, body { margin: 0; background: #0c0c0e; color: #f6f1e8; font: 18px/1.35 system-ui, sans-serif; }\n  a { color: #d6ff4a; }\n  button, input { font: inherit; }\n  header, main { padding: 16px; }\n  header { display: flex; justify-content: space-between; gap: 16px; align-items: flex-end; border-bottom: 1px solid #2a2a2e; }\n  h1 { margin: 6px 0 0; font-size: 40px; line-height: 1; }\n  .muted { color: #b7b1a6; }\n  .total { text-align: right; }\n  .total b { display: block; font-size: 32px; }\n  .layout { display: grid; gap: 16px; }\n  @media (min-width: 980px) { .layout { grid-template-columns: 340px 280px 1fr; align-items: start; } }\n  .panel { background: #16161a; border: 1px solid #2a2a2e; border-radius: 16px; padding: 14px; }\n  pre { margin: 10px 0 0; font: 15px/1.15 ui-monospace, Menlo, Consolas, monospace; white-space: pre; overflow-x: auto; }\n  .slots { display: flex; gap: 8px; overflow-x: auto; }\n  @media (min-width: 980px) { .slots { flex-direction: column; overflow: visible; } }\n  .slots button, .card, .more, .toggle { border-radius: 12px; border: 1px solid #2a2a2e; background: #101014; color: inherit; text-align: left; padding: 12px; cursor: pointer; }\n  .slots button { min-width: 160px; }\n  .slots button.on, .toggle.on { border-color: #d6ff4a; background: #1c220f; }\n  .slots small, .card small { display: block; color: #b7b1a6; }\n  .tools { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }\n  input[type="search"] { flex: 1; min-width: 180px; background: #101014; color: inherit; border: 1px solid #2a2a2e; border-radius: 12px; padding: 12px; }\n  .list { display: grid; gap: 8px; }\n  .card { width: 100%; display: flex; justify-content: space-between; gap: 12px; align-items: center; }\n  .price { color: #d6ff4a; white-space: nowrap; }\n  .warn { color: #ffb4c4; }\n  #gate { position: fixed; inset: 0; display: grid; place-items: center; background: #0c0c0e; padding: 16px; }\n  #gate form { width: min(420px, 100%); background: #16161a; border: 1px solid #3a3a40; border-radius: 18px; padding: 18px; }\n  #gate input { width: 100%; margin-top: 8px; padding: 12px; border-radius: 12px; border: 1px solid #3a3a40; background: #000; color: #fff; }\n  #gate button { margin-top: 12px; padding: 12px 16px; border: 0; border-radius: 12px; background: #d6ff4a; color: #111; font-weight: 700; }\n  #app[hidden], #gate[hidden] { display: none; }\n\n:host { display: block; height: 100%; }\n#app { height: 100%; overflow: auto; background: #0c0c0e; }\n';
-  root.appendChild(style);
-  var wrap = document.createElement("div");
-  wrap.innerHTML = '<div id="app" hidden>\n  <header>\n    <div>\n      <a href="../">Back</a>\n      <h1>Build a computer</h1>\n      <p class="muted">Pick one part at a time. The picture fills in.</p>\n    </div>\n    <div class="total">\n      <span class="muted">Total</span>\n      <b id="total">$0.00</b>\n      <span id="watts" class="muted"></span>\n    </div>\n  </header>\n  <main class="layout">\n    <section class="panel">\n      <h2>The computer</h2>\n      <p id="story" class="muted">The brain of the computer.</p>\n      <pre id="tower"></pre>\n      <p id="note" class="warn"></p>\n    </section>\n    <div id="slots" class="slots"></div>\n    <section>\n      <div class="tools">\n        <input id="q" type="search" placeholder="Search this list" />\n        <button id="fits" class="toggle on" type="button">Fits only</button>\n      </div>\n      <div id="list" class="list"></div>\n      <button id="more" class="more" type="button" hidden>Show more</button>\n    </section>\n  </main>\n</div>';
-  while (wrap.firstChild) root.appendChild(wrap.firstChild);
-  
-const CATS = [
-  ["cpu", "Processor", "The brain of the computer."],
-  ["motherboard", "Motherboard", "The board the processor plugs into."],
-  ["memory", "Memory", "Memory sticks click into the board."],
-  ["gpu", "Graphics card", "The graphics card slides into the case."],
-  ["storage", "Storage", "Storage is where files and games live."],
-  ["case", "Case", "The case is the box everything sits in."],
-  ["cooler", "Cooler", "The cooler sits on the processor and spins."],
-  ["psu", "Power", "The power supply has to be strong enough."]
-];
-const CASE_FIT = { itx: 1, matx: 2, atx: 3, full: 4 };
-const BOARD_SIZE = { itx: 1, matx: 2, atx: 3, eatx: 4 };
-const SIZE_LABEL = { itx: "Mini-ITX", matx: "Micro-ATX", atx: "ATX", eatx: "E-ATX", full: "a full tower" };
-const SOCKET_RAM = { AM4: "DDR4", AM5: "DDR5", LGA1851: "DDR5", SP5: "DDR5" };
-const money = new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" });
-let PARTS = [];
-let build = {};
-let active = "cpu";
-let shown = 40;
-let fits = true;
-
-function loadBuild() {
-  try { build = JSON.parse(localStorage.getItem("bench-build") || "{}") || {}; }
-  catch (err) { build = {}; }
-}
-function saveBuild() { localStorage.setItem("bench-build", JSON.stringify(build)); }
-function chosen() {
-  const map = {};
-  for (const row of CATS) {
-    const id = row[0];
-    const part = PARTS.find((item) => item.id === build[id] && item.cat === id);
-    if (part) map[id] = part;
-  }
-  return map;
-}
-function gpuDraw(name) {
-  const n = name.toUpperCase();
-  if (/5090|4090/.test(n)) return 450;
-  if (/5080|4080|7900 XTX/.test(n)) return 320;
-  if (/5070 TI|4070 TI|7900 XT/.test(n)) return 285;
-  if (/5070|4070|7800 XT/.test(n)) return 220;
-  if (/5060|4060|7600|7700/.test(n)) return 150;
-  return 180;
-}
-function drawOf(parts) {
-  const cpu = parts.cpu ? (parts.cpu.watt || 105) : 0;
-  const gpu = parts.gpu ? gpuDraw(parts.gpu.name) : 0;
-  const rest = (parts.cpu ? 40 : 0) + (parts.motherboard ? 40 : 0) + (parts.storage ? 10 : 0);
-  return cpu + gpu + rest;
-}
-function ramClash(memory, cpu, board) {
-  if (!memory || !memory.ram) return false;
-  if (board && board.ram) return memory.ram !== board.ram;
-  const expect = cpu && cpu.socket ? SOCKET_RAM[cpu.socket] : "";
-  return Boolean(expect && memory.ram !== expect);
-}
-function caseTooSmall(box, board) {
-  if (!box || !board || !box.form || !board.form) return false;
-  return (BOARD_SIZE[board.form] || 0) > (CASE_FIT[box.form] || 0);
-}
-function problems(parts) {
-  const notes = [];
-  if (parts.cpu && parts.motherboard && parts.cpu.socket && parts.motherboard.socket && parts.cpu.socket !== parts.motherboard.socket) {
-    notes.push("Processor is " + parts.cpu.socket + ". Board is " + parts.motherboard.socket + ".");
-  }
-  if (ramClash(parts.memory, parts.cpu, parts.motherboard)) {
-    notes.push("Memory is " + parts.memory.ram + ". That does not match the board or processor.");
-  }
-  if (caseTooSmall(parts.case, parts.motherboard)) {
-    notes.push("That case is " + SIZE_LABEL[parts.case.form] + ". This board is " + SIZE_LABEL[parts.motherboard.form] + ".");
-  }
-  const draw = drawOf(parts);
-  if (parts.psu && parts.psu.watt && draw > parts.psu.watt) notes.push("Rough draw is " + draw + "W. This supply is " + parts.psu.watt + "W.");
-  return notes;
-}
-function clashes(part, parts) {
-  const next = Object.assign({}, parts);
-  next[part.cat] = part;
-  if (next.cpu && next.motherboard && next.cpu.socket && next.motherboard.socket && next.cpu.socket !== next.motherboard.socket) return true;
-  if (ramClash(next.memory, next.cpu, next.motherboard)) return true;
-  if (caseTooSmall(next.case, next.motherboard)) return true;
-  return false;
-}
-function pad(text, width) { return (text + " ".repeat(width)).slice(0, width); }
-function row(body) { return "|" + pad(body, 32) + "|"; }
-function tower(parts) {
-  const hard = parts.storage && /hdd|hard drive|\brpm\b|7200|5400/i.test(parts.storage.name);
-  const lines = [
-    "+--------------------------------+",
-    row(parts.case ? "CASE ON" : "CASE"),
-    row("  +------------------------+"),
-    row("  |CPU   " + (parts.cpu ? "[####]" : "[    ]") + "             |"),
-    row("  |BOARD " + (parts.motherboard ? "[##########]" : "[          ]") + "        |"),
-    row("  |FAN   " + (parts.cooler ? "( ( ) )" : "(      )") + "            |"),
-    row("  |RAM   " + (parts.memory ? "[##] [##]" : "[  ] [  ]") + "          |"),
-    row("  |GPU   " + (parts.gpu ? "[=======>]" : "[         ]") + "         |"),
-    row("  |SSD   " + (parts.storage && !hard ? "[====]" : "[    ]") + "             |"),
-    row("  |HDD   " + (hard ? "(oooo)" : "(    )") + "             |"),
-    row("  |POWER " + (parts.psu ? "[====]" : "[    ]") + "             |"),
-    row("  +------------------------+"),
-    "+--------------------------------+"
-  ];
-  return lines.join("\n");
-}
-function labelButton(label, name, on) {
-  const button = document.createElement("button");
-  button.type = "button";
-  if (on) button.className = "on";
-  const small = document.createElement("small");
-  small.textContent = label;
-  button.appendChild(small);
-  button.appendChild(document.createTextNode(name));
-  return button;
-}
-function render() {
-  const parts = chosen();
-  const total = CATS.reduce((sum, row) => sum + (parts[row[0]] ? parts[row[0]].price : 0), 0);
-  root.getElementById("total").textContent = money.format(total);
-  const draw = drawOf(parts);
-  root.getElementById("watts").textContent = draw ? "About " + draw + "W" : "";
-  const next = CATS.find((row) => !parts[row[0]]);
-  root.getElementById("story").textContent = next ? next[2] : "Every part is chosen.";
-  root.getElementById("tower").textContent = tower(parts);
-  root.getElementById("note").textContent = problems(parts).join(" ");
-  const slots = root.getElementById("slots");
-  wipe(slots);
-  for (const row of CATS) {
-    const id = row[0];
-    const name = parts[id] ? parts[id].name : "Choose";
-    const button = labelButton(row[1], name, id === active);
-    button.onclick = () => { active = id; shown = 40; root.getElementById("q").value = ""; render(); };
-    slots.appendChild(button);
-  }
-  const q = root.getElementById("q").value.trim().toLowerCase();
-  const list = PARTS.filter((part) => part.cat === active)
-    .filter((part) => !q || part.name.toLowerCase().includes(q) || (part.brand || "").toLowerCase().includes(q))
-    .filter((part) => !fits || !clashes(part, parts))
-    .sort((a, b) => a.price - b.price);
-  const box = root.getElementById("list");
-  wipe(box);
-  list.slice(0, shown).forEach((part) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "card";
-    const span = document.createElement("span");
-    span.appendChild(document.createTextNode(part.name));
-    const small = document.createElement("small");
-    small.textContent = part.brand || "";
-    span.appendChild(small);
-    const price = document.createElement("span");
-    price.className = "price";
-    price.textContent = money.format(part.price);
-    button.append(span, price);
-    button.onclick = () => { build[part.cat] = part.id; saveBuild(); render(); };
-    box.appendChild(button);
-  });
-  const more = root.getElementById("more");
-  more.hidden = list.length <= shown;
-  more.textContent = "Show more (" + list.length + ")";
-}
-function wipe(node) {
-  while (node.firstChild) node.removeChild(node.firstChild);
-}
-function openApp() {
-  var app = root.getElementById("app");
-  app.hidden = false;
-  loadBuild();
-  fetch("bench/parts.json").then(function (res) { return res.json(); }).then(function (data) {
-    PARTS = data;
-    render();
-  }).catch(function () {
-    root.getElementById("story").textContent = "The parts list did not load. Close this and try again.";
-  });
-}
-
-window.startBench = function () {
-  if (window.__benchOn) return;
-  window.__benchOn = true;
-  openApp();
-};
-
 })();
 </script>
 
