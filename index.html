@@ -95,13 +95,13 @@
   #shop {
     position: fixed; inset: 0; z-index: 12;
     display: none; flex-direction: column;
-    background: #0c0c0e;
+    background: rgba(0, 0, 0, 0.28);
   }
   #shop.open { display: flex; }
   #shopBar {
     display: flex; align-items: center; gap: 12px;
     padding: 8px 10px;
-    background: #111;
+    background: rgba(0, 0, 0, 0.45);
     color: #f6f1e8;
     font: 600 16px/1 system-ui, sans-serif;
   }
@@ -110,7 +110,7 @@
     border: 0; background: #d6ff4a; color: #111; font: inherit; cursor: pointer;
   }
 
-  #shopFrame { flex: 1; width: 100%; border: 0; background: #111; min-height: 0; }
+  #shopFrame { flex: 1; width: 100%; border: 0; background: transparent; min-height: 0; }
   #blockBtn {
     min-width: 44px; min-height: 44px; border: 0; border-radius: 999px;
     background: #ffffff18; color: #fff; font-size: 20px; cursor: pointer;

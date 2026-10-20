@@ -3,59 +3,62 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="theme-color" content="#111111" />
 <title>Build a computer</title>
 <style>
   :root { color-scheme: dark; }
   * { box-sizing: border-box; }
-  html, body { margin: 0; background: #111; color: #fff; font: 22px/1.35 system-ui, sans-serif; }
-  button, input { font: inherit; }
-  body { min-height: 100dvh; padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom)); }
-  header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
-  header h1 { font-size: 28px; line-height: 1.1; margin: 0; flex: 1; }
+  html, body { margin: 0; background: transparent !important; color: #fff; font: 20px/1.35 system-ui, sans-serif; }
+  button, input { font: inherit; color: inherit; }
+  body { min-height: 100dvh; padding: 10px 12px max(12px, env(safe-area-inset-bottom)); }
+  header { display: flex; align-items: center; gap: 8px; }
+  h1 { font-size: 28px; margin: 0; flex: 1; text-shadow: 0 2px 8px #000; }
   .icon, .back {
-    min-width: 64px; min-height: 64px; border-radius: 16px; border: 3px solid #fff;
-    background: #1c1c1c; color: #fff; font-size: 28px;
+    min-width: 56px; min-height: 56px; border-radius: 16px; border: 2px solid #fff;
+    background: rgba(0,0,0,.55); font-size: 26px;
   }
-  .total { font-size: 28px; font-weight: 800; color: #ffe14a; }
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .choice, .tier, .row, .card, .langbtn {
-    min-height: 76px; border-radius: 18px; border: 3px solid #fff; background: #1c1c1c;
-    color: #fff; text-align: left; padding: 12px 14px; width: 100%;
+  .pitch {
+    margin: 8px 0; padding: 12px 14px; border-radius: 16px;
+    background: rgba(0,0,0,.55); border: 2px solid #ffe14a;
+    font-size: 22px; font-weight: 700;
   }
-  .choice b, .tier b { display: block; font-size: 26px; }
-  .choice small, .tier small, .muted { color: #ddd; font-size: 18px; }
-  .tier { margin-bottom: 10px; }
-  .row { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 10px; }
-  .row span { display: block; }
+  .budget {
+    margin: 8px 0; padding: 10px 12px; border-radius: 16px; background: rgba(0,0,0,.5);
+  }
+  .budget b { font-size: 32px; color: #ffe14a; }
+  input[type="range"] { width: 100%; accent-color: #ffe14a; height: 36px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .choice, .row, .card, .langbtn {
+    min-height: 64px; border-radius: 16px; border: 2px solid #ffffffcc;
+    background: rgba(0,0,0,.55); text-align: left; padding: 10px 12px; width: 100%;
+  }
+  .choice.on { border-color: #ffe14a; background: rgba(40, 40, 0, .72); }
+  .choice b { display: block; font-size: 22px; }
+  .row { display: flex; justify-content: space-between; gap: 10px; align-items: center; margin-top: 8px; }
   .price { color: #ffe14a; font-weight: 800; white-space: nowrap; }
-  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-  .tag, .chip {
-    display: inline-block; background: #333; color: #ffe14a; border-radius: 999px;
-    padding: 4px 10px; font-size: 16px; font-weight: 700;
-  }
-  .chip { border: 2px solid #fff; background: #111; color: #fff; min-height: 44px; }
-  .chip.on { background: #ffe14a; color: #111; }
-  .tools { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+  .tag { display: inline-block; margin: 4px 4px 0 0; background: rgba(0,0,0,.65); color: #ffe14a; border-radius: 999px; padding: 2px 8px; font-size: 14px; }
+  .muted { color: #f3f3f3; text-shadow: 0 1px 4px #000; }
+  .warn { color: #ffd0dc; }
   input[type="search"], input[type="password"] {
-    width: 100%; font-size: 22px; padding: 16px; border-radius: 16px; border: 3px solid #fff;
-    background: #000; color: #fff;
+    width: 100%; font-size: 20px; padding: 14px; border-radius: 14px; border: 2px solid #fff;
+    background: rgba(0,0,0,.7); color: #fff;
   }
-  .go {
-    min-height: 72px; width: 100%; border: 0; border-radius: 18px; background: #ffe14a; color: #111;
-    font-weight: 800; font-size: 24px; margin-top: 8px;
-  }
-  .warn { color: #ffb4c4; font-size: 20px; }
-  #langs {
-    position: fixed; inset: 0; background: rgba(0,0,0,.82); display: none; z-index: 5;
-    padding: max(16px, env(safe-area-inset-top)) 12px 16px; overflow: auto;
-  }
+  .go { min-height: 64px; width: 100%; border: 0; border-radius: 16px; background: #ffe14a; color: #111; font-weight: 800; font-size: 22px; margin-top: 8px; }
+  .layout { display: grid; gap: 10px; margin-top: 10px; }
+  @media (min-width: 900px) { .layout { grid-template-columns: 340px 1fr; align-items: start; } }
+  .stage { background: rgba(0,0,0,.62); border-radius: 16px; padding: 10px; border: 2px solid #ffffff55; }
+  .machine { font: 15px/1.25 ui-monospace, Menlo, Consolas, monospace; white-space: pre; }
+  .bay { display: block; min-height: 1.25em; }
+  .bay.go { animation: slide .65s ease; }
+  .bay.drop.go { animation: drop .7s ease; }
+  @keyframes slide { from { transform: translateX(-28px); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes drop { from { transform: translateY(-20px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .art { margin: 0 0 8px; color: #d6ffb0; font: 14px/1.15 ui-monospace, Menlo, monospace; white-space: pre; }
+  #langs { position: fixed; inset: 0; background: rgba(0,0,0,.78); display: none; z-index: 5; padding: 16px; overflow: auto; }
   #langs.open { display: block; }
-  #gate { position: fixed; inset: 0; background: #111; display: grid; place-items: center; padding: 16px; z-index: 6; }
-  #gate form { width: min(440px, 100%); }
-  #gate[hidden], .hide { display: none !important; }
-  pre { font: 16px/1.15 ui-monospace, Menlo, monospace; white-space: pre; overflow-x: auto; background: #000; padding: 8px; border-radius: 12px; }
-  @media (max-width: 420px) { .grid { grid-template-columns: 1fr; } header h1 { font-size: 22px; } }
+  #gate { position: fixed; inset: 0; background: rgba(0,0,0,.72); display: grid; place-items: center; padding: 16px; z-index: 6; }
+  #gate form { width: min(440px, 100%); background: rgba(0,0,0,.78); padding: 16px; border-radius: 18px; }
+  #gate[hidden] { display: none !important; }
+  @media (max-width: 420px) { .grid { grid-template-columns: 1fr; } h1 { font-size: 22px; } }
 </style>
 </head>
 <body>
@@ -65,7 +68,7 @@
     <p id="gateLabel">Password</p>
     <input id="pass" type="password" autocomplete="current-password" />
     <p id="bad" class="warn"></p>
-    <button class="go" type="submit" id="gateOpen">Open</button>
+    <button class="go" id="gateOpen" type="submit">Open</button>
   </form>
 </div>
 <header>
@@ -73,306 +76,362 @@
   <h1 id="title">Build a computer</h1>
   <button class="icon" id="langBtn" type="button" aria-label="Language">🔤</button>
 </header>
-<p class="total" id="total">$0.00</p>
-<p class="muted" id="watts"></p>
-<main id="app"></main>
+<p class="pitch" id="pitch"></p>
+<div class="budget">
+  <div><span id="budgetWord">Budget</span> <b id="budgetLabel">$700</b></div>
+  <input id="budget" type="range" min="0" max="20000" step="50" value="700" />
+  <div class="muted">$0 <span style="float:right">$20,000</span></div>
+</div>
+<div id="jobs" class="grid"></div>
+<p class="muted" id="sell"></p>
+<div class="layout">
+  <section class="stage">
+    <pre class="art" id="art"></pre>
+    <div class="machine" id="machine"></div>
+    <p class="muted" id="story"></p>
+  </section>
+  <section id="parts"></section>
+</div>
 <div id="langs"></div>
 <script>
-const BUILDS = [{"use": "school", "tier": "low", "parts": {"cpu": "ae65baf2c4", "motherboard": "318bb08df9", "memory": "e06fc91f29", "storage": "9cb0ce4e81", "case": "6ac47d294c", "psu": "5d5b11a54a"}, "total": 779.72}, {"use": "school", "tier": "med", "parts": {"cpu": "4ddc8d2924", "motherboard": "a5de9ab0cc", "memory": "e06fc91f29", "gpu": "7abfe8da82", "storage": "9cb0ce4e81", "case": "6ac47d294c", "psu": "5d5b11a54a"}, "total": 1218.83}, {"use": "school", "tier": "high", "parts": {"cpu": "60f5c1e878", "motherboard": "5f5a90664b", "memory": "d95a523fa2", "gpu": "0b368adbd0", "storage": "9cb0ce4e81", "case": "6ac47d294c", "cooler": "28fa577480", "psu": "0ea1dd592d"}, "total": 1993.7}, {"use": "cad", "tier": "low", "parts": {"cpu": "ebfe91bdf2", "motherboard": "318bb08df9", "memory": "c21bc234e5", "gpu": "7abfe8da82", "storage": "9cb0ce4e81", "case": "6ac47d294c", "psu": "5d5b11a54a"}, "total": 1344.82}, {"use": "cad", "tier": "med", "parts": {"cpu": "158a35e078", "motherboard": "262c6f81fd", "memory": "d95a523fa2", "gpu": "18b805ee4b", "storage": "7ac9b8153a", "case": "0cb735786c", "cooler": "28fa577480", "psu": "ae8346de9c"}, "total": 2294.81}, {"use": "cad", "tier": "high", "parts": {"cpu": "ee3bc4df84", "motherboard": "0dadc78431", "memory": "d95a523fa2", "gpu": "9965ef6736", "storage": "7ac9b8153a", "case": "0cb735786c", "cooler": "af40ca81d0", "psu": "a079d1f92f"}, "total": 2988.82}, {"use": "dj", "tier": "low", "parts": {"cpu": "ae65baf2c4", "motherboard": "318bb08df9", "memory": "e06fc91f29", "gpu": "a02c106c9a", "storage": "9cb0ce4e81", "case": "6ac47d294c", "psu": "5d5b11a54a"}, "total": 1159.71}, {"use": "dj", "tier": "med", "parts": {"cpu": "60f5c1e878", "motherboard": "5f5a90664b", "memory": "d95a523fa2", "gpu": "18b805ee4b", "storage": "7ac9b8153a", "case": "6ac47d294c", "cooler": "28fa577480", "psu": "0ea1dd592d"}, "total": 2108.7}, {"use": "dj", "tier": "high", "parts": {"cpu": "feaf3b87f1", "motherboard": "b38e9a56ad", "memory": "d95a523fa2", "gpu": "3726ddc09b", "storage": "7ac9b8153a", "case": "0cb735786c", "cooler": "af40ca81d0", "psu": "a079d1f92f"}, "total": 3018.71}, {"use": "video", "tier": "low", "parts": {"cpu": "4ddc8d2924", "motherboard": "a5de9ab0cc", "memory": "c21bc234e5", "gpu": "50eca7bbd7", "storage": "9cb0ce4e81", "case": "6ac47d294c", "psu": "0ea1dd592d"}, "total": 1378.94}, {"use": "video", "tier": "med", "parts": {"cpu": "feaf3b87f1", "motherboard": "b38e9a56ad", "memory": "d95a523fa2", "gpu": "18b805ee4b", "storage": "7ac9b8153a", "case": "0cb735786c", "cooler": "28fa577480", "psu": "ae8346de9c"}, "total": 2424.81}, {"use": "video", "tier": "high", "parts": {"cpu": "7dfffacaa5", "motherboard": "c465aaad43", "memory": "d95a523fa2", "gpu": "16288e9112", "storage": "7ac9b8153a", "case": "0cb735786c", "cooler": "af40ca81d0", "psu": "a079d1f92f"}, "total": 3158.82}, {"use": "fortnite", "tier": "low", "parts": {"cpu": "ae65baf2c4", "motherboard": "318bb08df9", "memory": "e06fc91f29", "gpu": "7abfe8da82", "storage": "9cb0ce4e81", "case": "6ac47d294c", "psu": "5d5b11a54a"}, "total": 1184.71}, {"use": "fortnite", "tier": "med", "parts": {"cpu": "60f5c1e878", "motherboard": "0666473ee7", "memory": "d95a523fa2", "gpu": "18b805ee4b", "storage": "9cb0ce4e81", "case": "6ac47d294c", "cooler": "28fa577480", "psu": "0ea1dd592d"}, "total": 2133.81}, {"use": "fortnite", "tier": "high", "parts": {"cpu": "feaf3b87f1", "motherboard": "65246d4ecc", "memory": "d95a523fa2", "gpu": "3726ddc09b", "storage": "7ac9b8153a", "case": "0cb735786c", "cooler": "af40ca81d0", "psu": "a079d1f92f"}, "total": 3028.71}, {"use": "warzone", "tier": "low", "parts": {"cpu": "60f5c1e878", "motherboard": "0666473ee7", "memory": "d95a523fa2", "gpu": "18b805ee4b", "storage": "9cb0ce4e81", "case": "6ac47d294c", "cooler": "28fa577480", "psu": "0ea1dd592d"}, "total": 2133.81}, {"use": "warzone", "tier": "med", "parts": {"cpu": "feaf3b87f1", "motherboard": "65246d4ecc", "memory": "d95a523fa2", "gpu": "3726ddc09b", "storage": "7ac9b8153a", "case": "0cb735786c", "cooler": "af40ca81d0", "psu": "a079d1f92f"}, "total": 3028.71}, {"use": "warzone", "tier": "high", "parts": {"cpu": "ee3bc4df84", "motherboard": "3959a35d89", "memory": "d95a523fa2", "gpu": "8fcf54d185", "storage": "7ac9b8153a", "case": "0cb735786c", "cooler": "af40ca81d0", "psu": "a079d1f92f"}, "total": 3298.82}, {"use": "roblox", "tier": "low", "parts": {"cpu": "ae65baf2c4", "motherboard": "318bb08df9", "memory": "e06fc91f29", "storage": "9cb0ce4e81", "case": "6ac47d294c", "psu": "5d5b11a54a"}, "total": 779.72}, {"use": "roblox", "tier": "med", "parts": {"cpu": "4ddc8d2924", "motherboard": "a5de9ab0cc", "memory": "e06fc91f29", "gpu": "7abfe8da82", "storage": "9cb0ce4e81", "case": "6ac47d294c", "psu": "5d5b11a54a"}, "total": 1218.83}, {"use": "roblox", "tier": "high", "parts": {"cpu": "60f5c1e878", "motherboard": "0666473ee7", "memory": "d95a523fa2", "gpu": "18b805ee4b", "storage": "9cb0ce4e81", "case": "6ac47d294c", "cooler": "28fa577480", "psu": "0ea1dd592d"}, "total": 2133.81}, {"use": "minecraft", "tier": "low", "parts": {"cpu": "ae65baf2c4", "motherboard": "318bb08df9", "memory": "e06fc91f29", "storage": "9cb0ce4e81", "case": "6ac47d294c", "psu": "5d5b11a54a"}, "total": 779.72}, {"use": "minecraft", "tier": "med", "parts": {"cpu": "ebfe91bdf2", "motherboard": "318bb08df9", "memory": "e06fc91f29", "gpu": "7abfe8da82", "storage": "9cb0ce4e81", "case": "6ac47d294c", "psu": "5d5b11a54a"}, "total": 1204.71}, {"use": "minecraft", "tier": "high", "parts": {"cpu": "60f5c1e878", "motherboard": "0666473ee7", "memory": "d95a523fa2", "gpu": "18b805ee4b", "storage": "7ac9b8153a", "case": "6ac47d294c", "cooler": "28fa577480", "psu": "0ea1dd592d"}, "total": 2148.81}, {"use": "apex", "tier": "low", "parts": {"cpu": "60f5c1e878", "motherboard": "0666473ee7", "memory": "d95a523fa2", "gpu": "18b805ee4b", "storage": "9cb0ce4e81", "case": "6ac47d294c", "cooler": "28fa577480", "psu": "0ea1dd592d"}, "total": 2133.81}, {"use": "apex", "tier": "med", "parts": {"cpu": "feaf3b87f1", "motherboard": "65246d4ecc", "memory": "d95a523fa2", "gpu": "3726ddc09b", "storage": "7ac9b8153a", "case": "0cb735786c", "cooler": "af40ca81d0", "psu": "a079d1f92f"}, "total": 3028.71}, {"use": "apex", "tier": "high", "parts": {"cpu": "ee3bc4df84", "motherboard": "3959a35d89", "memory": "d95a523fa2", "gpu": "4c148a4fc3", "storage": "7ac9b8153a", "case": "0cb735786c", "cooler": "af40ca81d0", "psu": "a079d1f92f"}, "total": 3348.82}, {"use": "tarkov", "tier": "low", "parts": {"cpu": "60f5c1e878", "motherboard": "0666473ee7", "memory": "d95a523fa2", "gpu": "18b805ee4b", "storage": "9cb0ce4e81", "case": "6ac47d294c", "cooler": "28fa577480", "psu": "0ea1dd592d"}, "total": 2133.81}, {"use": "tarkov", "tier": "med", "parts": {"cpu": "feaf3b87f1", "motherboard": "b514f531a7", "memory": "d95a523fa2", "gpu": "a8c121e4d2", "storage": "7ac9b8153a", "case": "0cb735786c", "cooler": "af40ca81d0", "psu": "a079d1f92f"}, "total": 3079.7}, {"use": "tarkov", "tier": "high", "parts": {"cpu": "ee3bc4df84", "motherboard": "7646105f47", "memory": "d95a523fa2", "gpu": "ca48e0056f", "storage": "7ac9b8153a", "case": "0cb735786c", "cooler": "af40ca81d0", "psu": "a079d1f92f"}, "total": 3408.82}];
-const CATS = ["cpu","motherboard","memory","gpu","storage","case","cooler","psu"];
-const CASE_FIT = { itx: 1, matx: 2, atx: 3, full: 4 };
-const BOARD_SIZE = { itx: 1, matx: 2, atx: 3, eatx: 4 };
-const SIZE = { itx: "Mini-ITX", matx: "Micro-ATX", atx: "ATX", eatx: "E-ATX", full: "Full tower" };
-const SOCKET_RAM = { AM4: "DDR4", AM5: "DDR5", LGA1700: "DDR4", LGA1851: "DDR5", SP5: "DDR5" };
-const USES = ["school","cad","dj","video","fortnite","warzone","roblox","minecraft","apex","tarkov"];
-const TIERS = ["low","med","high"];
-const LANG = {
-  en: { name:"English", title:"Build a computer", back:"Back", askUse:"What is this computer for?", askTier:"How strong should it be?", low:"Light", med:"Medium", high:"Strong", change:"Change a part", search:"Search", fits:"Only parts that fit", more:"Show more", pass:"Password", open:"Open", bad:"Wrong password.", lang:"Language", ready:"This computer is ready.", about:"About", watts:"watts", builtin:"Pictures are inside the processor.", start:"Start over",
-    school:"School", cad:"Drawings", dj:"Music", video:"Video editing", fortnite:"Fortnite", warzone:"Warzone", roblox:"Roblox", minecraft:"Minecraft", apex:"Apex", tarkov:"Tarkov",
-    cpu:"Processor", motherboard:"Motherboard", memory:"Memory", gpu:"Graphics card", storage:"Storage", case:"Case", cooler:"Cooler", psu:"Power supply" },
-  fr: { name:"Français", title:"Monter un ordinateur", back:"Retour", askUse:"Cet ordinateur sert à quoi?", askTier:"Quelle puissance?", low:"Léger", med:"Moyen", high:"Fort", change:"Changer une pièce", search:"Chercher", fits:"Seulement ce qui va", more:"Voir plus", pass:"Mot de passe", open:"Ouvrir", bad:"Mauvais mot de passe.", lang:"Langue", ready:"Cet ordinateur est prêt.", about:"Environ", watts:"watts", builtin:"L'image est dans le processeur.", start:"Recommencer",
-    school:"École", cad:"Dessin", dj:"Musique", video:"Montage vidéo", fortnite:"Fortnite", warzone:"Warzone", roblox:"Roblox", minecraft:"Minecraft", apex:"Apex", tarkov:"Tarkov",
-    cpu:"Processeur", motherboard:"Carte mère", memory:"Mémoire", gpu:"Carte graphique", storage:"Disque", case:"Boîtier", cooler:"Ventilateur", psu:"Alimentation" },
-  zh: { name:"普通话", title:"组装电脑", back:"返回", askUse:"这台电脑用来做什么？", askTier:"要多强？", low:"入门", med:"中等", high:"高配", change:"换一个零件", search:"搜索", fits:"只看合适的", more:"更多", pass:"密码", open:"打开", bad:"密码不对。", lang:"语言", ready:"这台电脑配好了。", about:"大约", watts:"瓦", builtin:"画面由处理器负责。", start:"重新开始",
-    school:"上学", cad:"画图", dj:"音乐", video:"剪视频", fortnite:"堡垒之夜", warzone:"战区", roblox:"罗布乐思", minecraft:"我的世界", apex:"Apex", tarkov:"塔科夫",
-    cpu:"处理器", motherboard:"主板", memory:"内存", gpu:"显卡", storage:"硬盘", case:"机箱", cooler:"散热器", psu:"电源" },
-  yue: { name:"廣東話", title:"砌電腦", back:"返去", askUse:"呢部電腦用嚟做咩？", askTier:"要幾勁？", low:"入門", med:"中等", high:"高配", change:"換一件零件", search:"搜尋", fits:"只睇啱用嘅", more:"更多", pass:"密碼", open:"打開", bad:"密碼唔啱。", lang:"語言", ready:"呢部電腦砌好啦。", about:"大約", watts:"瓦", builtin:"畫面由處理器負責。", start:"重新開始",
-    school:"返學", cad:"畫圖", dj:"音樂", video:"剪片", fortnite:"Fortnite", warzone:"Warzone", roblox:"Roblox", minecraft:"Minecraft", apex:"Apex", tarkov:"Tarkov",
-    cpu:"處理器", motherboard:"主機板", memory:"記憶體", gpu:"顯示卡", storage:"硬碟", case:"機箱", cooler:"散熱器", psu:"火牛" },
-  hi: { name:"हिन्दी", title:"कंप्यूटर बनाएँ", back:"वापस", askUse:"यह कंप्यूटर किस काम का है?", askTier:"कितना तेज़ चाहिए?", low:"हल्का", med:"मध्यम", high:"तेज़", change:"एक हिस्सा बदलें", search:"खोजें", fits:"सिर्फ़ जो फिट हो", more:"और दिखाएँ", pass:"पासवर्ड", open:"खोलें", bad:"गलत पासवर्ड।", lang:"भाषा", ready:"यह कंप्यूटर तैयार है।", about:"लगभग", watts:"वाट", builtin:"तस्वीर प्रोसेसर में बनती है।", start:"फिर से शुरू",
-    school:"पढ़ाई", cad:"ड्राइंग", dj:"संगीत", video:"वीडियो", fortnite:"Fortnite", warzone:"Warzone", roblox:"Roblox", minecraft:"Minecraft", apex:"Apex", tarkov:"Tarkov",
-    cpu:"प्रोसेसर", motherboard:"मदरबोर्ड", memory:"मेमोरी", gpu:"ग्राफ़िक्स कार्ड", storage:"स्टोरेज", case:"केस", cooler:"कूलर", psu:"पावर" },
-  ur: { name:"اردو", title:"کمپیوٹر بنائیں", back:"واپس", askUse:"یہ کمپیوٹر کس کام کا ہے؟", askTier:"کتنا طاقتور؟", low:"ہلکا", med:"درمیانہ", high:"طاقتور", change:"ایک پرزہ بدلیں", search:"تلاش", fits:"صرف جو فٹ ہو", more:"مزید", pass:"پاس ورڈ", open:"کھولیں", bad:"غلط پاس ورڈ۔", lang:"زبان", ready:"یہ کمپیوٹر تیار ہے۔", about:"تقریباً", watts:"واٹ", builtin:"تصویر پروسیسر بناتا ہے۔", start:"دوبارہ شروع",
-    school:"سکول", cad:"ڈرائنگ", dj:"موسیقی", video:"ویڈیو", fortnite:"Fortnite", warzone:"Warzone", roblox:"Roblox", minecraft:"Minecraft", apex:"Apex", tarkov:"Tarkov",
-    cpu:"پروسیسر", motherboard:"مدر بورڈ", memory:"میموری", gpu:"گرافکس کارڈ", storage:"سٹوریج", case:"کیس", cooler:"کولر", psu:"پاور" },
-  kn: { name:"ಕನ್ನಡ", title:"ಕಂಪ್ಯೂಟರ್ ಮಾಡಿ", back:"ಹಿಂದೆ", askUse:"ಈ ಕಂಪ್ಯೂಟರ್ ಯಾವ ಕೆಲಸಕ್ಕೆ?", askTier:"ಎಷ್ಟು ಬಲವಾಗಿರಬೇಕು?", low:"ಸಣ್ಣ", med:"ಮಧ್ಯಮ", high:"ಬಲವಾದ", change:"ಒಂದು ಭಾಗ ಬದಲಿಸಿ", search:"ಹುಡುಕಿ", fits:"ಹೊಂದುವುದು ಮಾತ್ರ", more:"ಇನ್ನಷ್ಟು", pass:"ಪಾಸ್‌ವರ್ಡ್", open:"ತೆರೆಯಿರಿ", bad:"ತಪ್ಪು ಪಾಸ್‌ವರ್ಡ್.", lang:"ಭಾಷೆ", ready:"ಈ ಕಂಪ್ಯೂಟರ್ ಸಿದ್ಧ.", about:"ಸುಮಾರು", watts:"ವ್ಯಾಟ್", builtin:"ಚಿತ್ರ ಪ್ರೊಸೆಸರ್‌ನಲ್ಲೇ ಆಗುತ್ತದೆ.", start:"ಮತ್ತೆ ಶುರು",
-    school:"ಶಾಲೆ", cad:"ಚಿತ್ರ", dj:"ಸಂಗೀತ", video:"ವೀಡಿಯೊ", fortnite:"Fortnite", warzone:"Warzone", roblox:"Roblox", minecraft:"Minecraft", apex:"Apex", tarkov:"Tarkov",
-    cpu:"ಪ್ರೊಸೆಸರ್", motherboard:"ಮದರ್‌ಬೋರ್ಡ್", memory:"ಮೆಮೊರಿ", gpu:"ಗ್ರಾಫಿಕ್ಸ್", storage:"ಸ್ಟೋರೇಜ್", case:"ಕೇಸ್", cooler:"ಕೂಲರ್", psu:"ಪವರ್" },
-  pa: { name:"ਪੰਜਾਬੀ", title:"ਕੰਪਿਊਟਰ ਬਣਾਓ", back:"ਵਾਪਸ", askUse:"ਇਹ ਕੰਪਿਊਟਰ ਕਿਸ ਕੰਮ ਲਈ ਹੈ?", askTier:"ਕਿੰਨਾ ਤੇਜ਼?", low:"ਹੌਲਾ", med:"ਮੱਧਮ", high:"ਤੇਜ਼", change:"ਇੱਕ ਹਿੱਸਾ ਬਦਲੋ", search:"ਖੋਜੋ", fits:"ਸਿਰਫ਼ ਜੋ ਫਿੱਟ ਹੋਵੇ", more:"ਹੋਰ", pass:"ਪਾਸਵਰਡ", open:"ਖੋਲ੍ਹੋ", bad:"ਗਲਤ ਪਾਸਵਰਡ।", lang:"ਭਾਸ਼ਾ", ready:"ਇਹ ਕੰਪਿਊਟਰ ਤਿਆਰ ਹੈ।", about:"ਲਗਭਗ", watts:"ਵਾਟ", builtin:"ਤਸਵੀਰ ਪ੍ਰੋਸੈਸਰ ਵਿੱਚ ਬਣਦੀ ਹੈ।", start:"ਮੁੜ ਸ਼ੁਰੂ",
-    school:"ਸਕੂਲ", cad:"ਡਰਾਇੰਗ", dj:"ਸੰਗੀਤ", video:"ਵੀਡੀਓ", fortnite:"Fortnite", warzone:"Warzone", roblox:"Roblox", minecraft:"Minecraft", apex:"Apex", tarkov:"Tarkov",
-    cpu:"ਪ੍ਰੋਸੈਸਰ", motherboard:"ਮਦਰਬੋਰਡ", memory:"ਮੈਮੋਰੀ", gpu:"ਗ੍ਰਾਫਿਕਸ", storage:"ਸਟੋਰੇਜ", case:"ਕੇਸ", cooler:"ਕੂਲਰ", psu:"ਪਾਵਰ" },
-  es: { name:"Español", title:"Armar una computadora", back:"Volver", askUse:"¿Para qué es esta computadora?", askTier:"¿Qué tan fuerte?", low:"Básica", med:"Media", high:"Fuerte", change:"Cambiar una pieza", search:"Buscar", fits:"Solo lo que sirve", more:"Ver más", pass:"Contraseña", open:"Abrir", bad:"Contraseña incorrecta.", lang:"Idioma", ready:"Esta computadora está lista.", about:"Unos", watts:"vatios", builtin:"La imagen sale del procesador.", start:"Empezar de nuevo",
-    school:"Escuela", cad:"Dibujo", dj:"Música", video:"Video", fortnite:"Fortnite", warzone:"Warzone", roblox:"Roblox", minecraft:"Minecraft", apex:"Apex", tarkov:"Tarkov",
-    cpu:"Procesador", motherboard:"Placa", memory:"Memoria", gpu:"Tarjeta de video", storage:"Disco", case:"Caja", cooler:"Ventilador", psu:"Fuente" },
-  ar: { name:"العربية", title:"ركّب كمبيوتر", back:"رجوع", askUse:"هذا الكمبيوتر لأي عمل؟", askTier:"كم القوة؟", low:"خفيف", med:"وسط", high:"قوي", change:"غيّر قطعة", search:"بحث", fits:"فقط ما يناسب", more:"المزيد", pass:"كلمة السر", open:"افتح", bad:"كلمة السر خطأ.", lang:"اللغة", ready:"هذا الكمبيوتر جاهز.", about:"حوالي", watts:"واط", builtin:"الصورة من المعالج.", start:"ابدأ من جديد",
-    school:"دراسة", cad:"رسم", dj:"موسيقى", video:"فيديو", fortnite:"Fortnite", warzone:"Warzone", roblox:"Roblox", minecraft:"Minecraft", apex:"Apex", tarkov:"Tarkov",
-    cpu:"المعالج", motherboard:"اللوحة", memory:"الذاكرة", gpu:"كرت الشاشة", storage:"التخزين", case:"الصندوق", cooler:"المبرد", psu:"مزود الطاقة" }
+const JOBS = ["elementary","highschool","college","office","cad","video","dj","stream","fortnite","roblox","minecraft","warzone","apex","tarkov"];
+const NEED = {
+  elementary: { gpu: 0, ram: 8, disk: "512GB" },
+  office: { gpu: 0, ram: 16, disk: "1TB" },
+  highschool: { gpu: 1, ram: 16, disk: "1TB" },
+  college: { gpu: 2, ram: 16, disk: "1TB" },
+  roblox: { gpu: 1, ram: 16, disk: "1TB" },
+  minecraft: { gpu: 1, ram: 16, disk: "1TB" },
+  fortnite: { gpu: 2, ram: 16, disk: "1TB" },
+  apex: { gpu: 3, ram: 16, disk: "1TB" },
+  warzone: { gpu: 3, ram: 32, disk: "1TB" },
+  tarkov: { gpu: 3, ram: 32, disk: "1TB" },
+  cad: { gpu: 3, ram: 32, disk: "2TB" },
+  video: { gpu: 3, ram: 32, disk: "2TB" },
+  dj: { gpu: 1, ram: 32, disk: "2TB" },
+  stream: { gpu: 2, ram: 16, disk: "2TB" }
 };
+const LANG = {
+  en: { name:"English", title:"Build a computer", pitch:"I sell the computer that fits the job and the money. Not the biggest one on the wall. Move the budget. Pick the work. I put the parts in the box.", budget:"Budget", pass:"Password", open:"Open", bad:"Wrong password.", under:"This job does not need all of that money. I will sell this one.", over:"The cheapest honest computer for this job costs more than the slider. Here it is.", story:"Pick a job. I will fill the box.", elem:"Elementary school", high:"High school", col:"College", off:"Office", cad:"Drawings", vid:"Video", dj:"Music", stream:"Streaming",
+    cpu:"Processor", motherboard:"Motherboard", memory:"Memory", gpu:"Graphics card", storage:"Storage", case:"Case", cooler:"Cooler", psu:"Power",
+    cpuLine:"The processor drops into the board.", ramLine:"The memory clicks down into the slots.", gpuLine:"The graphics card slides into the slot.", nvmeLine:"The NVMe drive slides into the board.", ssdLine:"The drive goes in the bay.", caseLine:"The case is the box.", psuLine:"The power supply sits at the bottom.", coolLine:"The cooler sits on the processor.", boardLine:"The motherboard goes in first." },
+  fr: { name:"Français", title:"Monter un ordinateur", pitch:"Je vends l'ordinateur qui va au travail et au budget. Pas le plus cher. Bougez l'argent. Choisissez le travail.", budget:"Budget", pass:"Mot de passe", open:"Ouvrir", bad:"Mauvais mot de passe.", under:"Ce travail n'a pas besoin de tout cet argent.", over:"Le moins cher honnête coûte plus que le curseur.", story:"Choisissez un travail.", elem:"École primaire", high:"Secondaire", col:"Cégep / université", off:"Bureau", cad:"Dessin", vid:"Vidéo", dj:"Musique", stream:"Streaming" },
+  zh: { name:"普通话", title:"组装电脑", pitch:"我按工作和预算卖电脑，不卖墙上最贵的。拖动预算，选用途，我来装零件。", budget:"预算", pass:"密码", open:"打开", bad:"密码不对。", under:"这个用途不需要花这么多。", over:"诚实的最低价比滑条高。", story:"选一个用途。", elem:"小学", high:"中学", col:"大学", off:"办公", cad:"画图", vid:"视频", dj:"音乐", stream:"直播" },
+  yue: { name:"廣東話", title:"砌電腦", pitch:"我跟工作同預算賣電腦，唔賣最貴嗰部。拉個預算，揀用途，我裝零件。", budget:"預算", pass:"密碼", open:"打開", bad:"密碼唔啱。", under:"呢個用途唔使花咁多。", over:"最平誠實價高過個滑條。", story:"揀個用途。", elem:"小學", high:"中學", col:"大學", off:"辦公室", cad:"畫圖", vid:"片", dj:"音樂", stream:"直播" },
+  hi: { name:"हिन्दी", title:"कंप्यूटर बनाएँ", pitch:"मैं काम और बजट के हिसाब से कंप्यूटर बेचता हूँ। सबसे महँगा नहीं। बजट हिलाएँ। काम चुनें।", budget:"बजट", pass:"पासवर्ड", open:"खोलें", bad:"गलत पासवर्ड।", under:"इस काम के लिए इतने पैसे नहीं चाहिए।", over:"सच्ची सबसे कम कीमत स्लाइडर से ज़्यादा है।", story:"काम चुनें।", elem:"प्राथमिक स्कूल", high:"हाई स्कूल", col:"कॉलेज", off:"दफ़्तर", cad:"ड्राइंग", vid:"वीडियो", dj:"संगीत", stream:"स्ट्रीम" },
+  ur: { name:"اردو", title:"کمپیوٹر بنائیں", pitch:"میں کام اور بجٹ کے مطابق کمپیوٹر بیچتا ہوں، سب سے مہنگا نہیں۔ بجٹ ہلائیں، کام چنیں۔", budget:"بجٹ", pass:"پاس ورڈ", open:"کھولیں", bad:"غلط پاس ورڈ۔", under:"اس کام کے لیے اتنے پیسے نہیں چاہئیں۔", over:"سچی کم قیمت سلائیڈر سے زیادہ ہے۔", story:"کام چنیں۔", elem:"پرائمری", high:"ہائی سکول", col:"کالج", off:"دفتر", cad:"ڈرائنگ", vid:"ویڈیو", dj:"موسیقی", stream:"سٹریم" },
+  kn: { name:"ಕನ್ನಡ", title:"ಕಂಪ್ಯೂಟರ್ ಮಾಡಿ", pitch:"ಕೆಲಸ ಮತ್ತು ಬಜೆಟ್‌ಗೆ ಸರಿಯಾದ ಕಂಪ್ಯೂಟರ್. ದುಬಾರಿ ಒಂದಲ್ಲ. ಬಜೆಟ್ ಜರುಗಿಸಿ. ಕೆಲಸ ಆಯ್ಕೆಮಾಡಿ.", budget:"ಬಜೆಟ್", pass:"ಪಾಸ್‌ವರ್ಡ್", open:"ತೆರೆಯಿರಿ", bad:"ತಪ್ಪು ಪಾಸ್‌ವರ್ಡ್.", under:"ಈ ಕೆಲಸಕ್ಕೆ ಇಷ್ಟು ಹಣ ಬೇಡ.", over:"ನಿಜವಾದ ಕಡಿಮೆ ಬೆಲೆ ಸ್ಲೈಡರ್‌ಗಿಂತ ಹೆಚ್ಚು.", story:"ಕೆಲಸ ಆಯ್ಕೆಮಾಡಿ.", elem:"ಪ್ರಾಥಮಿಕ", high:"ಹೈಸ್ಕೂಲ್", col:"ಕಾಲೇಜು", off:"ಕಚೇರಿ", cad:"ಚಿತ್ರ", vid:"ವೀಡಿಯೊ", dj:"ಸಂಗೀತ", stream:"ಸ್ಟ್ರೀಮ್" },
+  pa: { name:"ਪੰਜਾਬੀ", title:"ਕੰਪਿਊਟਰ ਬਣਾਓ", pitch:"ਮੈਂ ਕੰਮ ਅਤੇ ਬਜਟ ਮੁਤਾਬਕ ਕੰਪਿਊਟਰ ਵੇਚਦਾ ਹਾਂ। ਸਭ ਤੋਂ ਮਹਿੰਗਾ ਨਹੀਂ। ਬਜਟ ਹਿਲਾਓ। ਕੰਮ ਚੁਣੋ।", budget:"ਬਜਟ", pass:"ਪਾਸਵਰਡ", open:"ਖੋਲ੍ਹੋ", bad:"ਗਲਤ ਪਾਸਵਰਡ।", under:"ਇਸ ਕੰਮ ਲਈ ਇੰਨੇ ਪੈਸੇ ਨਹੀਂ ਚਾਹੀਦੇ।", over:"ਸੱਚੀ ਘੱਟ ਕੀਮਤ ਸਲਾਈਡਰ ਤੋਂ ਵੱਧ ਹੈ।", story:"ਕੰਮ ਚੁਣੋ।", elem:"ਐਲੀਮੈਂਟਰੀ", high:"ਹਾਈ ਸਕੂਲ", col:"ਕਾਲਜ", off:"ਦਫ਼ਤਰ", cad:"ਡਰਾਇੰਗ", vid:"ਵੀਡੀਓ", dj:"ਸੰਗੀਤ", stream:"ਸਟ੍ਰੀਮ" },
+  es: { name:"Español", title:"Armar una computadora", pitch:"Vendo la computadora que sirve para el trabajo y el dinero. No la más cara. Mueve el presupuesto. Elige el trabajo.", budget:"Presupuesto", pass:"Contraseña", open:"Abrir", bad:"Contraseña incorrecta.", under:"Este trabajo no necesita todo ese dinero.", over:"La más barata de verdad cuesta más que la barra.", story:"Elige un trabajo.", elem:"Primaria", high:"Secundaria", col:"Universidad", off:"Oficina", cad:"Dibujo", vid:"Video", dj:"Música", stream:"Streaming" },
+  ar: { name:"العربية", title:"ركّب كمبيوتر", pitch:"أبيع الكمبيوتر الذي يناسب العمل والميزانية. ليس الأغلى. حرّك الميزانية. اختر العمل.", budget:"الميزانية", pass:"كلمة السر", open:"افتح", bad:"كلمة السر خطأ.", under:"هذا العمل لا يحتاج كل هذا المال.", over:"أرخص سعر صادق أعلى من الشريط.", story:"اختر العمل.", elem:"ابتدائي", high:"ثانوي", col:"جامعة", off:"مكتب", cad:"رسم", vid:"فيديو", dj:"موسيقى", stream:"بث" }
+};
+const CATS = ["case","motherboard","cpu","cooler","memory","storage","gpu","psu"];
 const money = new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" });
 let lang = localStorage.getItem("bench-lang") || "en";
 let PARTS = [];
 let byId = {};
 let build = {};
-let screen = "use";
-let use = "school";
-let shown = 12;
-let fits = true;
-let active = "cpu";
-let tag = "";
-const app = document.getElementById("app");
-const langs = document.getElementById("langs");
+let job = "elementary";
+let budget = 700;
+let lock = false;
+let swap = "";
+let seen = {};
+let artTick = 0;
+const ARTS = [
+"   \\\\   //\n  (\\\\_//)\n  ( o.o )   mushrooms\n  (> < )",
+"  .----.\n  |RAM ||\n  | || ||  click\n  '----'",
+"  [NVME]\n  ======>  slide\n  |||||",
+"  [GPU========>]\n  sliding in",
+"   (((o)))\n    fan on\n   the cpu",
+"  +--------+\n  | BOARD  |\n  | first  |\n  +--------+"
+];
 function t(key) { return (LANG[lang] && LANG[lang][key]) || LANG.en[key] || key; }
-function applyLang() {
-  document.documentElement.lang = lang === "zh" ? "zh-Hans" : lang === "yue" ? "zh-Hant" : lang;
-  document.documentElement.dir = (lang === "ar" || lang === "ur") ? "rtl" : "ltr";
-  document.getElementById("title").textContent = t("title");
-  document.getElementById("back").setAttribute("aria-label", t("back"));
-  document.getElementById("gateTitle").textContent = t("title");
-  document.getElementById("gateLabel").textContent = t("pass");
-  document.getElementById("gateOpen").textContent = t("open");
-  localStorage.setItem("bench-lang", lang);
-  if (!document.getElementById("gate").hidden) return;
-  render();
+function jobName(id) {
+  const map = { elementary:"elem", highschool:"high", college:"col", office:"off", cad:"cad", video:"vid", dj:"dj", stream:"stream" };
+  if (map[id]) return t(map[id]);
+  return id.charAt(0).toUpperCase() + id.slice(1);
+}
+function junk(p) { return /open box|renewed|recertified|sodimm|surveillance|purple|laptop|\becc\b/i.test(p.name) || p.price < 12; }
+function cheapest(cat, pred) {
+  let best = null;
+  for (const p of PARTS) {
+    if (p.cat !== cat || junk(p)) continue;
+    if (pred && !pred(p)) continue;
+    if (!best || p.price < best.price) best = p;
+  }
+  return best;
+}
+function formOf(p) {
+  if (!p) return "";
+  if (p.form) return p.form;
+  const n = p.name.toUpperCase();
+  if (/MICRO|MATX|M-ATX/.test(n)) return "matx";
+  if (/MINI-?ITX|\bITX\b/.test(n)) return "itx";
+  if (/\bATX\b/.test(n)) return "atx";
+  return "";
+}
+function fitsCase(box, board) {
+  const rank = { itx: 1, matx: 2, atx: 3, eatx: 4, full: 4 };
+  return (rank[formOf(box)] || 3) >= (rank[formOf(board)] || 2);
+}
+function gbOf(p) { const m = p.name.toUpperCase().match(/\b(4|8|16|32|64)GB\b/); return m ? +m[1] : 0; }
+function wattOf(p) { if (!p) return 0; if (p.watt) return p.watt; const m = p.name.toUpperCase().match(/(\d{3,4})\s?W/); return m ? +m[1] : 0; }
+function gpuTier(p) {
+  const n = p.name.toUpperCase();
+  if (/5090|4090/.test(n)) return 6;
+  if (/5080|4080|5070\s?TI|9070\s?XT/.test(n)) return 5;
+  if (/\b5070\b|\b9070\b|4070/.test(n)) return 4;
+  if (/5060|7600|4060/.test(n)) return 3;
+  if (/3050|1650|6500/.test(n)) return 2;
+  if (/1030/.test(n)) return 1;
+  return 0;
+}
+function bestGpu(cap, maxTier) {
+  let best = null;
+  for (const p of PARTS) {
+    if (p.cat !== "gpu" || junk(p) || p.price > cap + 0.001) continue;
+    const tier = gpuTier(p);
+    if (tier < 1 || tier > maxTier) continue;
+    if (!best || tier > gpuTier(best) || (tier === gpuTier(best) && p.price < best.price)) best = p;
+  }
+  return best;
+}
+function spendOf(out) { return Object.values(out).reduce((sum, p) => sum + (p ? p.price : 0), 0); }
+function assemble(jobId, moneyCap) {
+  const need = NEED[jobId];
+  const out = {};
+  const am5 = moneyCap >= 2400 && need.gpu >= 3;
+  if (need.gpu === 0 || moneyCap < 850) out.cpu = cheapest("cpu", (p) => /5500GT/.test(p.name));
+  else if (!am5) out.cpu = cheapest("cpu", (p) => /Ryzen 5 5500 /.test(p.name)) || cheapest("cpu", (p) => /5500GT/.test(p.name));
+  else if (moneyCap < 4000) out.cpu = cheapest("cpu", (p) => /Ryzen 5 7600/.test(p.name));
+  else out.cpu = cheapest("cpu", (p) => /9700X/.test(p.name)) || cheapest("cpu", (p) => /7700X/.test(p.name));
+  if (!out.cpu) return {};
+  const socket = out.cpu.socket || "AM4";
+  const ramKind = socket === "AM5" ? "DDR5" : "DDR4";
+  out.motherboard = cheapest("motherboard", (p) => p.socket === socket && (!p.ram || p.ram === ramKind));
+  let want = need.ram;
+  if (moneyCap < 700) want = Math.min(want, 8);
+  else if (moneyCap < 1200) want = Math.min(want, 16);
+  const mem = (gb) => (p) => p.ram === ramKind && gbOf(p) === gb;
+  out.memory = cheapest("memory", (p) => mem(want)(p) && /2x/i.test(p.name)) || cheapest("memory", mem(want)) || cheapest("memory", (p) => p.ram === ramKind && gbOf(p) >= 8);
+  const ssd = (p) => /SSD|NVME|M\.2/.test(p.name.toUpperCase()) && !/HARD DRIVE|\bHDD\b/i.test(p.name);
+  const disk = moneyCap < 700 ? "512GB" : need.disk;
+  out.storage = cheapest("storage", (p) => ssd(p) && p.name.toUpperCase().includes(disk) && (moneyCap >= 800 ? /NVME|M\.2/.test(p.name.toUpperCase()) : true)) || cheapest("storage", ssd);
+  out.case = cheapest("case", (p) => fitsCase(p, out.motherboard)) || cheapest("case");
+  let maxTier = need.gpu;
+  if (moneyCap >= 1100 && need.gpu >= 1) maxTier = Math.max(maxTier, 2);
+  if (moneyCap >= 1500 && need.gpu >= 2) maxTier = Math.max(maxTier, 3);
+  if (moneyCap >= 2200 && need.gpu >= 3) maxTier = Math.max(maxTier, 4);
+  if (moneyCap >= 5000 && need.gpu >= 3) maxTier = 5;
+  const apu = /graphics|5500GT|5600GT|8500G|8600G/i.test(out.cpu.name);
+  function sizePsu() {
+    const tier = out.gpu ? gpuTier(out.gpu) : 0;
+    const needW = tier >= 4 ? 750 : tier >= 3 ? 650 : tier >= 2 ? 550 : tier >= 1 ? 450 : 400;
+    out.psu = cheapest("psu", (p) => wattOf(p) >= needW && wattOf(p) <= needW + 250) || cheapest("psu", (p) => wattOf(p) >= needW);
+  }
+  sizePsu();
+  if (maxTier >= 2 || (maxTier >= 1 && !apu)) {
+    const g = bestGpu(Math.max(0, moneyCap - spendOf(out)), maxTier);
+    if (g) out.gpu = g;
+    sizePsu();
+  }
+  if (!/cooler/i.test(out.cpu.name) || (need.gpu >= 3 && moneyCap > 2200)) {
+    out.cooler = need.gpu >= 3 && moneyCap > 2200 ? cheapest("cooler", (p) => /\b240\s?MM\b/i.test(p.name)) : cheapest("cooler");
+    if (out.cooler && spendOf(out) > moneyCap) delete out.cooler;
+  }
+  function tryMem(gb) {
+    const found = cheapest("memory", (p) => mem(gb)(p) && /2x/i.test(p.name)) || cheapest("memory", mem(gb));
+    if (found && spendOf(out) - out.memory.price + found.price <= moneyCap) out.memory = found;
+  }
+  function tryDisk(size) {
+    const found = cheapest("storage", (p) => ssd(p) && /NVME|M\.2/.test(p.name.toUpperCase()) && p.name.toUpperCase().includes(size));
+    if (found && spendOf(out) - out.storage.price + found.price <= moneyCap) out.storage = found;
+  }
+  if (gbOf(out.memory) < 16) tryMem(16);
+  if (need.ram >= 32 && gbOf(out.memory) < 32) tryMem(32);
+  if (!/1TB|2TB/.test(out.storage.name)) tryDisk("1TB");
+  if (/2TB/.test(need.disk)) tryDisk("2TB");
+  let guard = 0;
+  while (spendOf(out) > moneyCap + 1 && guard++ < 8) {
+    if (out.cooler) { delete out.cooler; continue; }
+    if (out.gpu && gpuTier(out.gpu) > 1) {
+      const lower = bestGpu(out.gpu.price - 1, gpuTier(out.gpu) - 1);
+      if (lower) { out.gpu = lower; sizePsu(); continue; }
+      delete out.gpu; sizePsu(); continue;
+    }
+    if (out.gpu) { delete out.gpu; sizePsu(); continue; }
+    if (out.memory && gbOf(out.memory) > 8) { out.memory = cheapest("memory", mem(8)) || out.memory; continue; }
+    break;
+  }
+  return out;
 }
 function tagsOf(part) {
-  const n = part.name.toUpperCase();
   const tags = [];
-  if (part.form && SIZE[part.form]) tags.push(SIZE[part.form]);
+  const n = part.name.toUpperCase();
+  if (part.form) tags.push(part.form.toUpperCase());
   if (part.socket) tags.push(part.socket);
   if (part.ram) tags.push(part.ram);
-  if (/MINI-?ITX|\bITX\b/.test(n) && tags.indexOf("Mini-ITX") < 0) tags.push("Mini-ITX");
-  if (/MICRO-?ATX|M-ATX|\bMATX\b/.test(n) && tags.indexOf("Micro-ATX") < 0) tags.push("Micro-ATX");
-  if (/\bATX\b/.test(n) && tags.indexOf("ATX") < 0 && tags.indexOf("Micro-ATX") < 0 && tags.indexOf("Mini-ITX") < 0) tags.push("ATX");
   const rad = n.match(/\b(120|140|240|280|360|420)\s?MM\b/);
   if (rad) tags.push(rad[1] + "mm");
-  if (/NVME|M\.2/.test(n)) tags.push("M.2");
+  if (/NVME|M\.2/.test(n)) tags.push("NVMe");
   if (/SSD/.test(n)) tags.push("SSD");
-  if (/HDD|HARD DRIVE|\bRPM\b|7200|5400/.test(n)) tags.push("HDD");
-  if (/WIFI|WI-FI/.test(n)) tags.push("Wi-Fi");
-  if (/DDR5/.test(n)) tags.push("DDR5");
-  if (/DDR4/.test(n)) tags.push("DDR4");
-  let watt = part.watt;
-  if (!watt) { const m = n.match(/(\d{3,4})\s?W\b/); if (m) watt = +m[1]; }
-  if (watt) tags.push(watt + "W");
-  if (/SFX/.test(n)) tags.push("SFX");
-  return [...new Set(tags)].slice(0, 6);
+  if (part.watt) tags.push(part.watt + "W");
+  return tags.slice(0, 5);
 }
-function chosen() {
+function catLabel(id) { return t(id) || id; }
+function lineFor(id) {
+  const map = { cpu:"cpuLine", memory:"ramLine", gpu:"gpuLine", storage:"nvmeLine", case:"caseLine", psu:"psuLine", cooler:"coolLine", motherboard:"boardLine" };
+  return t(map[id] || "story");
+}
+function paintArt() {
+  document.getElementById("art").textContent = ARTS[artTick % ARTS.length];
+}
+function paintMachine(parts) {
+  const box = document.getElementById("machine");
+  box.replaceChildren();
+  const rows = [
+    ["case", "  .------------------------------."],
+    ["case", " / " + ((parts.case && parts.case.name) || "empty case").slice(0, 28)],
+    ["motherboard", "|  BOARD " + (parts.motherboard ? "[##########]" : "[          ]")],
+    ["cpu", "|  CPU   " + (parts.cpu ? "[####]  drops in" : "[    ]")],
+    ["cooler", "|  FAN   " + (parts.cooler || (parts.cpu && /cooler/i.test(parts.cpu.name)) ? "((( o )))" : "(       )")],
+    ["memory", "|  RAM   " + (parts.memory ? "||  ||   click" : "|   |   |")],
+    ["storage", "|  NVME  " + (parts.storage && /NVME|M\.2/i.test(parts.storage.name) ? "[====] slide" : "[    ]")],
+    ["gpu", "|  GPU   " + (parts.gpu ? "[==========>]" : "[           ]")],
+    ["storage", "|  SSD   " + (parts.storage ? "[====]" : "[    ]")],
+    ["psu", "|  PSU   " + (parts.psu ? "[####] " + wattOf(parts.psu) + "W" : "[    ]")],
+    ["case", "  '------------------------------'"]
+  ];
+  let told = "";
+  rows.forEach((row) => {
+    const div = document.createElement("div");
+    const id = row[0];
+    const now = parts[id] && parts[id].id;
+    const fresh = now && seen[id] !== now;
+    div.className = "bay" + (id === "memory" || id === "cpu" ? " drop" : "") + (fresh ? " go" : "");
+    div.textContent = row[1];
+    box.appendChild(div);
+    if (fresh) told = lineFor(id);
+  });
+  CATS.forEach((id) => { if (parts[id]) seen[id] = parts[id].id; });
+  document.getElementById("story").textContent = told || t("story");
+}
+function currentParts() {
   const map = {};
   CATS.forEach((id) => { if (byId[build[id]]) map[id] = byId[build[id]]; });
   return map;
 }
-function gpuDraw(name) {
-  const n = name.toUpperCase();
-  if (/5090|4090/.test(n)) return 450;
-  if (/5080|4080|5070 TI|9070/.test(n)) return 300;
-  if (/5070|4070/.test(n)) return 220;
-  if (/5060|4060|7600/.test(n)) return 150;
-  if (/3050|1030/.test(n)) return 80;
-  return 150;
-}
-function drawOf(parts) {
-  return (parts.cpu ? (parts.cpu.watt || 105) : 0) + (parts.gpu ? gpuDraw(parts.gpu.name) : 0) + (parts.cpu ? 80 : 0);
-}
-function problems(parts) {
-  const notes = [];
-  if (parts.cpu && parts.motherboard && parts.cpu.socket && parts.motherboard.socket && parts.cpu.socket !== parts.motherboard.socket) notes.push(parts.cpu.socket + " / " + parts.motherboard.socket);
-  const expect = (parts.motherboard && parts.motherboard.ram) || (parts.cpu && SOCKET_RAM[parts.cpu.socket]);
-  if (parts.memory && parts.memory.ram && expect && parts.memory.ram !== expect) notes.push(parts.memory.ram);
-  if (parts.case && parts.motherboard && parts.case.form && parts.motherboard.form && (BOARD_SIZE[parts.motherboard.form] || 0) > (CASE_FIT[parts.case.form] || 0)) notes.push(SIZE[parts.case.form] || "");
-  const draw = drawOf(parts);
-  const watt = parts.psu && (parts.psu.watt || ((parts.psu.name.match(/(\d{3,4})\s?W/i) || [])[1] | 0));
-  if (watt && draw > watt) notes.push(draw + "W / " + watt + "W");
-  return notes;
-}
-function save() { localStorage.setItem("bench-build", JSON.stringify(build)); }
-function el(tag, cls, text) {
-  const node = document.createElement(tag);
-  if (cls) node.className = cls;
-  if (text != null) node.textContent = text;
-  return node;
-}
-function paintTotal(parts) {
-  const total = CATS.reduce((sum, id) => sum + (parts[id] ? parts[id].price : 0), 0);
-  document.getElementById("total").textContent = money.format(total);
-  const draw = drawOf(parts);
-  document.getElementById("watts").textContent = draw ? t("about") + " " + draw + " " + t("watts") : "";
+function applySuggestion() {
+  const suggestion = assemble(job, budget);
+  const next = {};
+  Object.keys(suggestion).forEach((id) => { if (suggestion[id]) next[id] = suggestion[id].id; });
+  build = next;
 }
 function render() {
-  const parts = chosen();
-  paintTotal(parts);
-  app.replaceChildren();
-  if (screen === "use") {
-    app.appendChild(el("p", "muted", t("askUse")));
-    const grid = el("div", "grid");
-    USES.forEach((id) => {
-      const button = el("button", "choice");
-      button.type = "button";
-      button.appendChild(el("b", "", t(id)));
-      button.onclick = () => { use = id; screen = "tier"; render(); };
-      grid.appendChild(button);
-    });
-    app.appendChild(grid);
-    return;
-  }
-  if (screen === "tier") {
-    app.appendChild(el("p", "muted", t(use) + " — " + t("askTier")));
-    TIERS.forEach((tier) => {
-      const found = BUILDS.find((item) => item.use === use && item.tier === tier);
-      const button = el("button", "tier");
-      button.type = "button";
-      button.appendChild(el("b", "", t(tier)));
-      button.appendChild(el("small", "", found ? money.format(found.total) : ""));
-      button.onclick = () => {
-        build = Object.assign({}, found ? found.parts : {});
-        save();
-        screen = "done";
-        render();
-      };
-      app.appendChild(button);
-    });
-    return;
-  }
-  if (screen === "swap") {
+  document.documentElement.lang = lang === "zh" ? "zh-Hans" : lang === "yue" ? "zh-Hant" : lang;
+  document.documentElement.dir = (lang === "ar" || lang === "ur") ? "rtl" : "ltr";
+  document.getElementById("title").textContent = t("title");
+  document.getElementById("pitch").textContent = t("pitch");
+  document.getElementById("budgetWord").textContent = t("budget");
+  document.getElementById("budgetLabel").textContent = money.format(budget);
+  document.getElementById("gateTitle").textContent = t("title");
+  document.getElementById("gateLabel").textContent = t("pass");
+  document.getElementById("gateOpen").textContent = t("open");
+  const jobs = document.getElementById("jobs");
+  jobs.replaceChildren();
+  JOBS.forEach((id) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "choice" + (id === job ? " on" : "");
+    const b = document.createElement("b");
+    b.textContent = jobName(id);
+    button.appendChild(b);
+    button.onclick = () => { job = id; swap = ""; lock = false; seen = {}; applySuggestion(); render(); };
+    jobs.appendChild(button);
+  });
+  if (PARTS.length && !lock) applySuggestion();
+  const parts = currentParts();
+  const total = CATS.reduce((sum, id) => sum + (parts[id] ? parts[id].price : 0), 0);
+  const sell = document.getElementById("sell");
+  if (total > budget + 1) sell.textContent = t("over") + " " + money.format(total);
+  else if (budget - total > 250) sell.textContent = t("under") + " " + money.format(total);
+  else sell.textContent = money.format(total);
+  paintArt();
+  paintMachine(parts);
+  const list = document.getElementById("parts");
+  list.replaceChildren();
+  if (swap) {
     const input = document.createElement("input");
     input.type = "search";
-    input.placeholder = t("search");
-    input.id = "q";
-    app.appendChild(input);
-    const tools = el("div", "tools");
-    const fit = el("button", "chip" + (fits ? " on" : ""), t("fits"));
-    fit.type = "button";
-    fit.onclick = () => { fits = !fits; render(); };
-    tools.appendChild(fit);
-    const pool = PARTS.filter((part) => part.cat === active);
-    const tagset = [];
-    pool.forEach((part) => tagsOf(part).forEach((name) => { if (tagset.indexOf(name) < 0 && tagset.length < 8) tagset.push(name); }));
-    tagset.forEach((name) => {
-      const chip = el("button", "chip" + (tag === name ? " on" : ""), name);
-      chip.type = "button";
-      chip.onclick = () => { tag = tag === name ? "" : name; shown = 12; render(); };
-      tools.appendChild(chip);
-    });
-    app.appendChild(tools);
-    const q = (document.getElementById("q") ? document.getElementById("q").value : "").trim().toLowerCase();
-    const list = pool.filter((part) => !q || part.name.toLowerCase().includes(q) || (part.brand || "").toLowerCase().includes(q))
-      .filter((part) => !tag || tagsOf(part).indexOf(tag) >= 0)
-      .filter((part) => !fits || !clash(part, parts))
-      .sort((a, b) => a.price - b.price);
-    list.slice(0, shown).forEach((part) => app.appendChild(card(part, () => { build[part.cat] = part.id; save(); screen = "done"; render(); })));
-    if (list.length > shown) {
-      const more = el("button", "go", t("more"));
-      more.type = "button";
-      more.onclick = () => { shown += 12; render(); };
-      app.appendChild(more);
-    }
-    input.addEventListener("input", () => { shown = 12; renderKeep(); });
+    input.placeholder = catLabel(swap);
+    list.appendChild(input);
+    const pool = PARTS.filter((p) => p.cat === swap && !junk(p)).sort((a, b) => a.price - b.price).slice(0, 40);
+    pool.forEach((part) => list.appendChild(card(part, () => { build[part.cat] = part.id; lock = true; swap = ""; render(); })));
+    input.oninput = () => {
+      const q = input.value.toLowerCase();
+      [...list.querySelectorAll(".card")].forEach((node) => { node.hidden = q && !node.dataset.name.includes(q); });
+    };
     return;
   }
-  app.appendChild(el("p", "muted", t("ready")));
-  app.appendChild(el("pre", "", tower(parts)));
-  const note = el("p", "warn", problems(parts).join("  "));
-  app.appendChild(note);
   CATS.forEach((id) => {
     const part = parts[id];
-    const button = el("button", "row");
+    const button = document.createElement("button");
     button.type = "button";
-    const text = el("span");
-    text.appendChild(el("b", "", t(id)));
-    text.appendChild(document.createTextNode(part ? part.name : (id === "gpu" ? t("builtin") : t("change"))));
+    button.className = "row";
+    const text = document.createElement("span");
+    const name = document.createElement("b");
+    name.textContent = catLabel(id);
+    text.appendChild(name);
+    text.appendChild(document.createTextNode(part ? " " + part.name : ""));
     if (part) {
-      const tags = el("span", "tags");
-      tagsOf(part).forEach((name) => tags.appendChild(el("span", "tag", name)));
+      const tags = document.createElement("span");
+      tagsOf(part).forEach((tag) => { const s = document.createElement("span"); s.className = "tag"; s.textContent = tag; tags.appendChild(s); });
       text.appendChild(tags);
     }
     button.appendChild(text);
-    button.appendChild(el("span", "price", part ? money.format(part.price) : ""));
-    button.onclick = () => { active = id; tag = ""; shown = 12; screen = "swap"; render(); };
-    app.appendChild(button);
+    const price = document.createElement("span");
+    price.className = "price";
+    price.textContent = part ? money.format(part.price) : "";
+    button.appendChild(price);
+    button.onclick = () => { swap = id; render(); };
+    list.appendChild(button);
   });
-  const again = el("button", "go", t("start"));
-  again.type = "button";
-  again.onclick = () => { screen = "use"; render(); };
-  app.appendChild(again);
-}
-function renderKeep() {
-  const q = document.getElementById("q");
-  const value = q ? q.value : "";
-  render();
-  const next = document.getElementById("q");
-  if (next) { next.value = value; next.focus(); }
 }
 function card(part, onclick) {
-  const button = el("button", "card");
+  const button = document.createElement("button");
   button.type = "button";
-  const text = el("span");
-  text.appendChild(document.createTextNode(part.name));
-  const tags = el("span", "tags");
-  tagsOf(part).forEach((name) => tags.appendChild(el("span", "tag", name)));
-  text.appendChild(tags);
+  button.className = "card";
+  button.dataset.name = part.name.toLowerCase();
+  const text = document.createElement("span");
+  text.textContent = part.name;
+  tagsOf(part).forEach((tag) => { const s = document.createElement("span"); s.className = "tag"; s.textContent = tag; text.appendChild(s); });
   button.appendChild(text);
-  button.appendChild(el("span", "price", money.format(part.price)));
+  const price = document.createElement("span");
+  price.className = "price";
+  price.textContent = money.format(part.price);
+  button.appendChild(price);
   button.onclick = onclick;
   return button;
 }
-function clash(part, parts) {
-  const next = Object.assign({}, parts);
-  next[part.cat] = part;
-  if (next.cpu && next.motherboard && next.cpu.socket && next.motherboard.socket && next.cpu.socket !== next.motherboard.socket) return true;
-  const expect = (next.motherboard && next.motherboard.ram) || (next.cpu && SOCKET_RAM[next.cpu.socket]);
-  if (next.memory && next.memory.ram && expect && next.memory.ram !== expect) return true;
-  if (next.case && next.motherboard && next.case.form && next.motherboard.form && (BOARD_SIZE[next.motherboard.form] || 0) > (CASE_FIT[next.case.form] || 0)) return true;
-  return false;
-}
-function tower(parts) {
-  const line = (s) => "|" + (s + "                                ").slice(0, 32) + "|";
-  return [
-    "+--------------------------------+",
-    line(parts.case ? "CASE" : "case"),
-    line("  +------------------------+"),
-    line("  |CPU  " + (parts.cpu ? "[####]" : "[    ]")),
-    line("  |BOARD" + (parts.motherboard ? "[########]" : "[        ]")),
-    line("  |FAN  " + (parts.cooler ? "(())" : "(  )")),
-    line("  |RAM  " + (parts.memory ? "[##][##]" : "[  ][  ]")),
-    line("  |GPU  " + (parts.gpu ? "[======>]" : "[      ]")),
-    line("  |SSD  " + (parts.storage ? "[====]" : "[    ]")),
-    line("  |PWR  " + (parts.psu ? "[====]" : "[    ]")),
-    line("  +------------------------+"),
-    "+--------------------------------+"
-  ].join("\n");
-}
-function openLangs() {
-  langs.classList.add("open");
-  langs.replaceChildren();
-  const close = el("button", "go", t("back"));
-  close.type = "button";
-  close.onclick = () => langs.classList.remove("open");
-  langs.appendChild(el("p", "", t("lang")));
-  Object.keys(LANG).forEach((id) => {
-    const button = el("button", "langbtn", LANG[id].name);
-    button.type = "button";
-    button.onclick = () => { lang = id; langs.classList.remove("open"); applyLang(); };
-    langs.appendChild(button);
-  });
-  langs.appendChild(close);
-}
-document.getElementById("langBtn").onclick = openLangs;
-document.getElementById("back").onclick = () => {
-  if (screen === "swap") screen = "done";
-  else if (screen === "done") screen = "tier";
-  else if (screen === "tier") screen = "use";
-  else return;
+document.getElementById("budget").oninput = (event) => {
+  budget = +event.target.value;
+  lock = false;
+  swap = "";
   render();
+};
+document.getElementById("back").onclick = () => { if (swap) { swap = ""; render(); } };
+document.getElementById("langBtn").onclick = () => {
+  const box = document.getElementById("langs");
+  box.classList.add("open");
+  box.replaceChildren();
+  Object.keys(LANG).forEach((id) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "langbtn";
+    button.textContent = LANG[id].name;
+    button.onclick = () => { lang = id; localStorage.setItem("bench-lang", lang); box.classList.remove("open"); render(); };
+    box.appendChild(button);
+  });
 };
 document.getElementById("gateForm").onsubmit = (event) => {
   event.preventDefault();
@@ -383,16 +442,10 @@ document.getElementById("gateForm").onsubmit = (event) => {
 };
 function boot() {
   document.getElementById("gate").hidden = true;
-  fetch("parts.json").then((res) => res.json()).then((data) => {
-    PARTS = data;
-    byId = {};
-    PARTS.forEach((part) => { byId[part.id] = part; });
-    try { build = JSON.parse(localStorage.getItem("bench-build") || "{}") || {}; } catch (err) { build = {}; }
-    if (build.cpu) screen = "done";
-    render();
-  });
+  fetch("parts.json").then((res) => res.json()).then((data) => { PARTS = data; byId = {}; PARTS.forEach((p) => { byId[p.id] = p; }); render(); });
 }
-applyLang();
+setInterval(() => { artTick++; paintArt(); }, 1600);
+render();
 if (sessionStorage.getItem("drew-bench") === "1") boot();
 </script>
 </body>
