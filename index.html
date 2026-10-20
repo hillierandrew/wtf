@@ -92,6 +92,24 @@
     font: inherit; cursor: pointer;
   }
   #gateMsg { min-height: 1.2em; margin-top: 10px; color: #ff5a8a; font-size: 12px; }
+  #shop {
+    position: fixed; inset: 0; z-index: 12;
+    display: none; flex-direction: column;
+    background: #0c0c0e;
+  }
+  #shop.open { display: flex; }
+  #shopBar {
+    display: flex; align-items: center; gap: 12px;
+    padding: 8px 10px;
+    background: #111;
+    color: #f6f1e8;
+    font: 600 16px/1 system-ui, sans-serif;
+  }
+  #shopClose {
+    min-height: 44px; padding: 0 14px; border-radius: 10px;
+    border: 0; background: #d6ff4a; color: #111; font: inherit; cursor: pointer;
+  }
+  #shopFrame { flex: 1; width: 100%; border: 0; background: #0c0c0e; }
   @media (max-width: 720px) {
     #dock button { min-width: 36px; min-height: 36px; }
     #name { max-width: 34vw; }
@@ -124,6 +142,13 @@
     <p id="gateMsg"></p>
   </form>
 </div>
+<div id="shop">
+  <div id="shopBar">
+    <button id="shopClose" type="button">Close</button>
+    <span>Build a computer</span>
+  </div>
+  <iframe id="shopFrame" title="Build a computer"></iframe>
+</div>
 <script>
 (function () {
   var canvas = document.getElementById("field");
@@ -144,6 +169,15 @@
   var gatePass = document.getElementById("gatePass");
   var gateMsg = document.getElementById("gateMsg");
   var gateCancel = document.getElementById("gateCancel");
+  var shop = document.getElementById("shop");
+  var shopFrame = document.getElementById("shopFrame");
+  var shopClose = document.getElementById("shopClose");
+
+  function openShop() {
+    try { sessionStorage.setItem("drew-bench", "1"); } catch (err) {}
+    if (!shopFrame.getAttribute("src")) shopFrame.src = "bench/";
+    shop.classList.add("open");
+  }
 
   var W = 0, H = 0, cols = 0, rows = 0, cellW = 0, cellH = 0, scale = 2, buf, data;
   var pack = "home";
@@ -925,6 +959,9 @@
   earthBtn.addEventListener("click", function () { setPack("earth"); });
   pigBtn.addEventListener("click", function () { setPack("pig"); });
   pcBtn.addEventListener("click", function () {
+    try {
+      if (sessionStorage.getItem("drew-bench") === "1") { openShop(); return; }
+    } catch (err) {}
     gateMsg.textContent = "";
     gatePass.value = "";
     gate.classList.add("open");
@@ -932,12 +969,12 @@
   });
   gateCancel.addEventListener("click", function () { gate.classList.remove("open"); });
   gate.addEventListener("click", function (e) { if (e.target === gate) gate.classList.remove("open"); });
+  shopClose.addEventListener("click", function () { shop.classList.remove("open"); });
   gateForm.addEventListener("submit", function (e) {
     e.preventDefault();
     if (gatePass.value === "Password1") {
       gate.classList.remove("open");
-      try { sessionStorage.setItem("drew-bench", "1"); } catch (err) {}
-      location.href = "bench/";
+      openShop();
     } else {
       gateMsg.textContent = "Wrong password";
       gatePass.select();
