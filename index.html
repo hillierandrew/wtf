@@ -2,498 +2,433 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>pwndemonium</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#000000" />
+<title>DREW.WTF</title>
 <style>
-  * { box-sizing: border-box; }
-  html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; }
-  body { font-family: "IBM Plex Sans", "Segoe UI", sans-serif; color: #f6f3ea; }
-  .fit { width: 1920px; height: 1080px; transform-origin: 0 0; }
-  .stage {
-    width: 1920px;
-    height: 1080px;
-    position: relative;
-    overflow: hidden;
-    background: transparent;
-  }
-  canvas.fx, .aurora, .grid { display: none; }
-  .aurora, .grid { position: absolute; inset: -12%; pointer-events: none; }
-  .aurora {
-    background:
-      radial-gradient(circle at 20% 30%, #ff2d7b66, transparent 26%),
-      radial-gradient(circle at 75% 70%, #7ee7ff40, transparent 24%);
-    filter: blur(10px);
-    animation: drift 9s ease-in-out infinite alternate;
-  }
-  .grid {
-    background-image:
-      linear-gradient(#ffffff14 1px, transparent 1px),
-      linear-gradient(90deg, #ffffff14 1px, transparent 1px);
-    background-size: 72px 72px;
-    animation: pan 8s linear infinite;
-    opacity: 0.4;
-  }
-  .layout {
-    position: absolute;
-    inset: 16px;
-    display: grid;
-    grid-template-columns: 1fr 400px;
-    grid-template-rows: 1fr 240px;
-    gap: 14px;
-    z-index: 1;
-  }
-  .panel {
-    position: relative;
-    border-radius: 22px;
-    background:
-      linear-gradient(#10131b, #10131b) padding-box,
-      linear-gradient(120deg, #c6ff4a, #7ee7ff, #ff2d7b, #ffe27a, #c6ff4a) border-box;
-    background-size: 100% 100%, 280% 280%;
-    border: 3px solid transparent;
-    animation: border 3.2s linear infinite;
-    overflow: hidden;
-  }
-  .game { grid-column: 1; grid-row: 1; }
-  .game .hole { position: absolute; inset: 0; margin: 0; border-radius: 19px; cursor: pointer; }
-  .badge {
-    position: absolute;
-    z-index: 3;
-    left: 22px;
-    top: 16px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    pointer-events: none;
-    max-width: calc(100% - 44px);
-  }
-  .badge img {
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
-    object-fit: cover;
-    box-shadow: 0 0 0 4px #c6ff4a, 0 0 24px #ff2d7b;
-    animation: pulse 1.6s ease-in-out infinite;
-  }
-  .badge b {
-    display: block;
-    font-family: Syne, sans-serif;
-    font-size: 68px;
-    line-height: 0.85;
-    letter-spacing: -0.05em;
-    background: linear-gradient(90deg, #fff, #c6ff4a 30%, #7ee7ff 60%, #ff2d7b 85%, #fff);
-    background-size: 220% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    animation: sheen 2.2s linear infinite, bump 1.8s ease-in-out infinite;
-    filter: drop-shadow(0 6px 0 #000) drop-shadow(0 0 16px #c6ff4a);
-  }
-  .badge em {
-    display: block;
-    margin-top: 6px;
-    font-style: normal;
-    font-size: 18px;
-    color: #fff;
-    text-shadow: 0 2px 0 #000, 0 0 10px #000;
-  }
-  .pill {
-    margin-left: 8px;
-    align-self: flex-start;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    border-radius: 999px;
-    padding: 8px 12px;
-    background: #000c;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    font-size: 14px;
-  }
-  .dot { width: 12px; height: 12px; border-radius: 50%; background: #667; }
-  .pill.on { color: #ffd0e0; }
-  .pill.on .dot { background: #ff2d7b; animation: ping 1.1s ease-out infinite; }
-  .game, .cam {
-    background:
-      linear-gradient(transparent, transparent) padding-box,
-      linear-gradient(120deg, #c6ff4a, #7ee7ff, #ff2d7b, #ffe27a, #c6ff4a) border-box;
-  }
-  .hole { background: transparent; }
-  .label, .scan { display: none; }
-  .hole video {
-    position: absolute;
-    inset: 0;
-    width: 100%;
+  html, body {
+    margin: 0;
     height: 100%;
-    object-fit: cover;
-    display: none;
     background: #000;
+    overflow: hidden;
+    touch-action: none;
   }
-  .hole.live video { display: block; }
-  .hole.live .scan, .hole.live .label { display: none; }
-  .label {
-    position: relative;
+  #field {
+    position: fixed;
+    inset: -6%;
+    width: 112%;
+    height: 112%;
+    display: block;
+    background: #000;
+    z-index: 0;
+  }
+  #veil {
+    position: fixed;
+    inset: 0;
     z-index: 1;
-    text-align: center;
-    font-family: Syne, sans-serif;
-    letter-spacing: 0.14em;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse at 50% 50%, transparent 40%, #000 78%),
+      radial-gradient(circle at 20% 80%, #ff2d7b14, transparent 32%),
+      radial-gradient(circle at 80% 20%, #7ee7ff12, transparent 28%);
   }
-  .label strong {
+  #logo {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 2;
+    transform-origin: 0 0;
+    will-change: transform, filter, opacity;
+    pointer-events: none;
+    user-select: none;
+  }
+  #logo svg {
     display: block;
-    font-size: 64px;
-    animation: bump 1.1s ease-in-out infinite;
-    text-shadow: 0 0 18px #c6ff4a;
+    width: 100%;
+    height: auto;
+    overflow: visible;
   }
-  .label small { display: block; margin-top: 6px; color: #ffffffaa; letter-spacing: 0.18em; font-size: 16px; }
-  .scan {
+  h1 {
     position: absolute;
-    left: 0; right: 0;
-    height: 28%;
-    background: linear-gradient(transparent, #c6ff4a33, transparent);
-    animation: scan 2.4s linear infinite;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
   }
-  .bottom { grid-column: 1; grid-row: 2; display: grid; grid-template-columns: 420px 1fr; gap: 14px; }
-  .cam .hole { position: absolute; inset: 0; margin: 0; cursor: pointer; border-radius: 19px; }
-  .cam .label strong { font-size: 36px; }
-  .alerts { padding: 16px 20px; display: flex; flex-direction: column; justify-content: center; }
-  .idle b {
-    font-family: Syne, sans-serif;
-    font-size: 46px;
-    letter-spacing: -0.05em;
-    display: block;
-    background: linear-gradient(90deg, #f6f3ea, #c6ff4a, #7ee7ff, #ff2d7b);
-    background-size: 220% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    animation: sheen 2.4s linear infinite;
-  }
-  .idle span { color: #f6f3ea99; letter-spacing: 0.14em; font-size: 14px; }
-  .card { display: none; }
-  .card.show { display: block; animation: slam 0.4s cubic-bezier(.2,1.4,.4,1) both; }
-  .kicker { font-family: Syne, sans-serif; font-size: 16px; letter-spacing: 0.22em; }
-  .card strong { display: block; font-family: Syne, sans-serif; font-size: 44px; line-height: 0.95; }
-  .card p { margin: 6px 0 0; font-size: 18px; }
-  .card.raid .kicker { color: #ff2d7b; }
-  .card.follow .kicker { color: #c6ff4a; }
-  .card.sub .kicker { color: #ffe27a; }
-  .card.bits .kicker { color: #7ee7ff; }
-  .chat {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    display: flex;
-    flex-direction: column;
-    background: #0d1016;
-  }
-  .chat-head {
-    height: 58px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 16px;
-    font-family: Syne, sans-serif;
-    letter-spacing: 0.16em;
-    border-bottom: 2px solid #ffffff14;
-  }
-  .log { flex: 1; overflow: hidden; padding: 10px 12px 8px; display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; }
-  .msg { animation: pop 0.35s ease both; line-height: 1.35; font-size: 18px; word-wrap: break-word; }
-  .msg b { margin-right: 6px; }
-  .emote { height: 28px; vertical-align: middle; }
-  .quiet { color: #f6f3ea66; }
-  @keyframes drift { to { transform: translate3d(4%, -3%, 0) scale(1.08); } }
-  @keyframes pan { to { background-position: 72px 72px; } }
-  @keyframes scan { from { top: -30%; } to { top: 110%; } }
-  @keyframes sheen { to { background-position: 220% 0; } }
-  @keyframes bump { 50% { transform: scale(1.045) rotate(-0.4deg); } }
-  @keyframes ping { 70% { box-shadow: 0 0 0 12px #ff2d7b00; } }
-  @keyframes border { to { background-position: 0 0, 280% 0; } }
-  @keyframes slam { from { transform: translateY(20px) scale(0.94); opacity: 0; } }
-  @keyframes pop { from { transform: translateX(14px); opacity: 0; } }
-  @keyframes pulse { 50% { transform: scale(1.06); } }
 </style>
 </head>
 <body>
-  <div class="fit" id="fit">
-    <div class="stage">
-      <div class="aurora"></div>
-      <div class="grid"></div>
-      <canvas class="fx" id="fx" width="1920" height="1080"></canvas>
-      <div class="layout">
-        <section class="panel game">
-          <div class="hole" id="gameHole">
-            <video id="gameVideo" autoplay playsinline muted></video>
-            <i class="scan"></i>
-            <div class="label"><strong>GAME</strong><small>CLICK TO CAPTURE</small></div>
-          </div>
-          <div class="badge">
-            <img alt="" src="https://static-cdn.jtvnw.net/jtv_user_pictures/1e95469a-febb-4347-a2c5-20aa07be3f61-profile_image-300x300.png" />
-            <div>
-              <b>pwndemonium</b>
-              <em id="title">loading title</em>
-            </div>
-            <div class="pill" id="live"><i class="dot"></i><span id="liveLabel">OFFLINE</span></div>
-          </div>
-        </section>
-        <div class="bottom">
-          <section class="panel cam">
-            <div class="hole" id="camHole">
-              <video id="camVideo" autoplay playsinline muted></video>
-              <i class="scan"></i>
-              <div class="label"><strong>CAM</strong><small>CLICK FOR WEBCAM</small></div>
-            </div>
-          </section>
-          <section class="panel alerts">
-            <div class="idle" id="idle">
-              <b>pwndemonium</b>
-              <span id="meta">RAIDS · FOLLOWS · SUBS</span>
-            </div>
-            <div class="card" id="card">
-              <div class="kicker" id="kicker">RAID</div>
-              <strong id="ahead">NAME</strong>
-              <p id="asub"></p>
-            </div>
-          </section>
-        </div>
-        <aside class="panel chat">
-          <div class="chat-head">CHAT <span id="chatDot">···</span></div>
-          <div class="log" id="log"><div class="quiet">chat will show up here</div></div>
-        </aside>
-      </div>
-    </div>
-  </div>
+<h1>DREW.WTF</h1>
+<canvas id="field"></canvas>
+<div id="veil"></div>
+<div id="logo" aria-hidden="true">
+  <svg viewBox="-8 0 1540 196" role="img">
+    <title>DREW.WTF</title>
+    <defs>
+      <g id="glyphs" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <!-- D -->
+        <path d="M48 164 V32 A66 66 0 0 1 48 164" />
+        <!-- R -->
+        <path d="M186 164 V32 H262 C318 32 318 96 258 96 H186" />
+        <path d="M236 92 L318 164" />
+        <!-- E -->
+        <path d="M430 32 H360 V164 H430" />
+        <path d="M360 98 H414" />
+        <!-- W -->
+        <path d="M478 32 L536 164 L598 86 L660 164 L718 32" />
+        <!-- . -->
+        <circle cx="778" cy="148" r="16" />
+        <!-- W -->
+        <path d="M836 32 L894 164 L956 86 L1018 164 L1076 32" />
+        <!-- T -->
+        <path d="M1124 32 H1264" />
+        <path d="M1194 32 V164" />
+        <!-- F -->
+        <path d="M1324 164 V32 H1444" />
+        <path d="M1324 98 H1416" />
+      </g>
+      <mask id="cut" maskUnits="userSpaceOnUse" x="-40" y="-20" width="1620" height="240">
+        <rect x="-40" y="-20" width="1620" height="240" fill="#000" />
+        <use href="#glyphs" stroke="#fff" stroke-width="36" />
+        <use href="#glyphs" stroke="#000" stroke-width="13" />
+      </mask>
+    </defs>
+    <rect x="-40" y="-20" width="1620" height="240" fill="#ff2d7b" mask="url(#cut)" />
+  </svg>
+</div>
 <script>
-const CHANNEL = "pwndemonium";
-const fit = document.getElementById("fit");
-function scale() {
-  const s = Math.min(innerWidth / 1920, innerHeight / 1080);
-  fit.style.transform = "scale(" + s + ")";
-}
-addEventListener("resize", scale);
-scale();
+(function () {
+  var canvas = document.getElementById("field");
+  var logo = document.getElementById("logo");
+  var ctx = canvas.getContext("2d", { alpha: true });
+  var W = 0, H = 0, cols = 0, rows = 0, cellW = 0, cellH = 0, scale = 2;
+  var buf, data;
 
-const paint = document.getElementById("fx").getContext("2d");
-const dots = Array.from({ length: 48 }, () => ({
-  x: Math.random() * 1920,
-  y: Math.random() * 1080,
-  r: 1 + Math.random() * 2.4,
-  s: 0.4 + Math.random() * 1.3,
-  c: Math.random() > 0.5 ? "#c6ff4a" : "#ff2d7b"
-}));
-(function tick() {
-  paint.clearRect(0, 0, 1920, 1080);
-  dots.forEach((d) => {
-    d.y -= d.s;
-    if (d.y < -8) d.y = 1088;
-    paint.fillStyle = d.c;
-    paint.globalAlpha = 0.55;
-    paint.beginPath();
-    paint.arc(d.x, d.y, d.r, 0, 6.3);
-    paint.fill();
-  });
-  requestAnimationFrame(tick);
-})();
+  /* 5x7 glyphs, bit 4 is the leftmost pixel */
+  var FONT = {
+    " ": [0,0,0,0,0,0,0],
+    ".": [0,0,0,0,0,4,0],
+    ":": [0,4,0,0,4,0,0],
+    "-": [0,0,0,31,0,0,0],
+    "=": [0,0,31,0,31,0,0],
+    "+": [0,4,4,31,4,4,0],
+    "*": [0,21,14,31,14,21,0],
+    "#": [10,10,31,10,31,10,10],
+    "%": [25,26,4,8,11,19,0],
+    "@": [14,17,23,21,23,16,14],
+    ",": [0,0,0,0,4,4,8],
+    "~": [0,0,8,21,2,0,0],
+    "^": [4,10,17,0,0,0,0],
+    "/": [1,2,4,8,16,0,0],
+    "\\": [16,8,4,2,1,0,0],
+    "|": [0,4,4,4,4,4,0],
+    ";": [0,4,0,4,4,8,0],
+    "o": [0,14,17,17,17,14,0],
+    "x": [0,17,10,4,10,17,0],
+    "O": [14,17,17,17,17,17,14],
+    "Q": [14,17,17,17,21,18,13],
+    "<": [2,4,8,16,8,4,2],
+    ">": [8,4,2,1,2,4,8],
+    "0": [14,17,19,21,25,17,14],
+    "(": [2,4,4,4,4,4,2],
+    ")": [8,4,4,4,4,4,8]
+  };
 
-async function arm(hole, video, grab) {
-  const hint = hole.querySelector("small");
-  hole.addEventListener("click", async () => {
-    try {
-      if (video.srcObject) video.srcObject.getTracks().forEach((t) => t.stop());
-      const stream = await grab();
-      video.srcObject = stream;
-      video.muted = true;
-      await video.play();
-      hole.classList.add("live");
-      const track = stream.getVideoTracks()[0];
-      if (track) track.addEventListener("ended", () => hole.classList.remove("live"));
-    } catch (err) {
-      if (hint) hint.textContent = "BLOCKED — CLICK AGAIN";
-    }
-  });
-}
-arm(document.getElementById("gameHole"), document.getElementById("gameVideo"), () =>
-  navigator.mediaDevices.getDisplayMedia({ video: { frameRate: 60 }, audio: false })
-);
-arm(document.getElementById("camHole"), document.getElementById("camVideo"), () =>
-  navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 }, audio: false })
-);
+  var RAMPS = [
+    " .:-=+*#%@",
+    " .~^/\\|*x",
+    " .,:;oOQ#@",
+    " .-+*#%@0",
+    " .,oO()*#%@",
+    " .+xX#*=<>",
+    " ~:;|/\\+*^."
+  ];
+  var ORDER = [0, 1, 2, 3, 4, 5, 6, 1];
+  var HOLD = 5.8;
+  var FADE = 2.3;
+  var CYCLE = HOLD + FADE;
 
-const titleEl = document.getElementById("title");
-const live = document.getElementById("live");
-const liveLabel = document.getElementById("liveLabel");
-const meta = document.getElementById("meta");
-let lastFollowers = null;
-
-async function poll() {
-  try {
-    const res = await fetch("https://api.ivr.fi/v2/twitch/user?login=" + CHANNEL);
-    const user = (await res.json())[0];
-    const stream = user.stream;
-    const on = !!(stream && (stream.title || stream.viewers || stream.viewerCount || stream.startedAt));
-    live.classList.toggle("on", on);
-    const viewers = stream && (stream.viewers ?? stream.viewerCount);
-    liveLabel.textContent = on ? ("LIVE" + (viewers != null ? " " + viewers : "")) : "OFFLINE";
-    titleEl.textContent = (stream && stream.title) || (user.lastBroadcast && user.lastBroadcast.title) || CHANNEL;
-    if (typeof user.followers === "number") {
-      meta.textContent = user.followers + " FOLLOWERS · RAIDS · SUBS";
-      if (lastFollowers != null && user.followers > lastFollowers) {
-        const n = user.followers - lastFollowers;
-        enqueue("follow", n === 1 ? "NEW FOLLOWER" : "+" + n + " FOLLOWERS", n === 1 ? "someone just followed" : "new people just followed");
+  function field(id, x, y, t) {
+    var wx = x + Math.sin(y * 2.6 + t * 0.65) * 0.22 + Math.sin(t * 0.31 + y * 0.4) * 0.08;
+    var wy = y + Math.cos(x * 2.3 - t * 0.5) * 0.22 + Math.cos(t * 0.27 + x) * 0.06;
+    var v = 0;
+    if (id === 0) {
+      var rot = t * 0.35;
+      var cs = Math.cos(rot), sn = Math.sin(rot);
+      var rx = wx * cs - wy * sn;
+      var ry = wx * sn + wy * cs;
+      var diamond = Math.abs(rx) + Math.abs(ry);
+      var ring = Math.sin(diamond * 8.5 - t * 2.1) * 0.5 + 0.5;
+      var grid = Math.max(Math.abs(Math.sin(rx * 6.2)), Math.abs(Math.sin(ry * 6.2)));
+      v = ring * 0.72 + (grid > 0.92 ? 1 : 0) * 0.28;
+    } else if (id === 1) {
+      var r = Math.hypot(wx, wy) + 0.001;
+      var a = Math.atan2(wy, wx);
+      v = Math.sin(a * 6 + r * 9 - t * 2.2) * 0.5 + 0.5;
+      v = v * 0.85 + (Math.sin(r * 18 - t * 3) * 0.5 + 0.5) * 0.15;
+    } else if (id === 2) {
+      var b = Math.sin(wx * 2.4 + t * 0.9) + Math.sin(wy * 2.1 - t * 0.7) + Math.sin((wx + wy) * 1.7 + t * 0.45) + Math.sin(Math.hypot(wx * 1.15, wy) * 4.2 - t);
+      var nrm = (b + 4) / 8;
+      v = nrm > 0.68 ? 1 : nrm > 0.52 ? 0.62 : nrm > 0.38 ? 0.28 : 0.05;
+    } else if (id === 3) {
+      var zx = wx * 1.25, zy = wy * 1.25;
+      var cx = Math.sin(t * 0.23) * 0.7;
+      var cy = Math.cos(t * 0.19) * 0.55;
+      var n = 0, max = 9;
+      for (; n < max; n++) {
+        var xx = zx * zx - zy * zy + cx;
+        zy = 2 * zx * zy + cy;
+        zx = xx;
+        if (zx * zx + zy * zy > 4) break;
       }
-      lastFollowers = user.followers;
+      var dust = (Math.sin(wx * 10 + wy * 6 + t) * 0.5 + 0.5) * 0.22;
+      v = Math.max(n / max, dust);
+    } else if (id === 4) {
+      var s = 0.9;
+      var tx = (wx + 2.4 + t * 0.18) / s;
+      var ty = (wy + 2.4 + Math.sin(t * 0.35) * 0.2) / s;
+      var fx = tx - Math.floor(tx);
+      var fy = ty - Math.floor(ty);
+      var cap = Math.hypot(fx - 0.5, (fy - 0.32) * 1.25);
+      var stem = Math.abs(fx - 0.5) < 0.09 && fy > 0.4 && fy < 0.9;
+      v = 0.04;
+      if (cap < 0.36 && fy < 0.52) v = 0.7;
+      if (Math.abs(cap - 0.32) < 0.07) v = 1;
+      if (fy > 0.34 && fy < 0.44 && cap < 0.34) v = 0.4;
+      if (stem) v = 0.95;
+      if (Math.hypot(fx - 0.36, fy - 0.26) < 0.06 || Math.hypot(fx - 0.64, fy - 0.28) < 0.05) v = 0.12;
+      v = Math.min(1, v + (Math.sin(wx * 3 + t) * 0.5 + 0.5) * 0.08);
+    } else if (id === 5) {
+      var k = 5.5;
+      var px = wx * k + t * 0.45;
+      var py = wy * k * 0.92;
+      var tri = Math.abs((px % 2 + 2) % 2 - 1) + Math.abs((py % 2 + 2) % 2 - 1);
+      var edge = Math.min(Math.abs(Math.sin(px * Math.PI)), Math.abs(Math.sin(py * Math.PI)));
+      v = (tri < 0.55 ? 0.15 : 0.7) * 0.45 + (edge < 0.18 ? 1 : 0.2) * 0.55;
+    } else {
+      var u = Math.sin(wx * 4 + t) * Math.cos(wy * 3.2 - t * 0.7);
+      var flow = Math.sin((wx * wx - wy * wy) * 1.4 + t * 0.8);
+      v = (u + flow + 2) / 4;
     }
-  } catch (e) {}
-}
-poll();
-setInterval(poll, 20000);
-
-const idle = document.getElementById("idle");
-const card = document.getElementById("card");
-const kicker = document.getElementById("kicker");
-const ahead = document.getElementById("ahead");
-const asub = document.getElementById("asub");
-const queue = [];
-let showing = false;
-
-function enqueue(kind, head, sub) {
-  queue.push({ kind, head, sub });
-  pump();
-}
-function pump() {
-  if (showing || !queue.length) return;
-  showing = true;
-  const item = queue.shift();
-  card.className = "card show " + item.kind;
-  kicker.textContent = item.kind.toUpperCase();
-  ahead.textContent = item.head;
-  asub.textContent = item.sub || "";
-  idle.style.display = "none";
-  setTimeout(() => {
-    card.className = "card";
-    idle.style.display = "";
-    showing = false;
-    pump();
-  }, 7000);
-}
-
-const log = document.getElementById("log");
-const chatDot = document.getElementById("chatDot");
-
-function addLine(id, name, color, text, emotes) {
-  const quiet = log.querySelector(".quiet");
-  if (quiet) quiet.remove();
-  const row = document.createElement("div");
-  row.className = "msg";
-  const who = document.createElement("b");
-  who.textContent = name;
-  who.style.color = color || "#c6ff4a";
-  row.append(who);
-  row.append(renderText(text, emotes));
-  log.append(row);
-  while (log.children.length > 40) log.removeChild(log.firstElementChild);
-  log.scrollTop = log.scrollHeight;
-}
-
-function renderText(text, emotes) {
-  const frag = document.createDocumentFragment();
-  const ranges = [];
-  if (emotes) {
-    emotes.split("/").forEach((part) => {
-      const cut = part.split(":");
-      if (!cut[1]) return;
-      cut[1].split(",").forEach((place) => {
-        const pair = place.split("-").map(Number);
-        if (Number.isFinite(pair[0])) ranges.push({ a: pair[0], b: pair[1], id: cut[0] });
-      });
-    });
-    ranges.sort((a, b) => a.a - b.a);
+    if (v < 0) v = 0;
+    if (v > 1) v = 1;
+    return v;
   }
-  let i = 0;
-  ranges.forEach((range) => {
-    if (range.a < i || range.a > text.length) return;
-    if (range.a > i) frag.append(document.createTextNode(text.slice(i, range.a)));
-    const img = document.createElement("img");
-    img.className = "emote";
-    img.alt = "";
-    img.src = "https://static-cdn.jtvnw.net/emoticons/v2/" + range.id + "/default/dark/2.0";
-    frag.append(img);
-    i = range.b + 1;
+
+  function sample(col, row, t) {
+    var nx = (col / cols) * 2 - 1;
+    var ny = (row / rows) * 2 - 1;
+    var aspect = (cols / rows) * (cellW / cellH);
+    var x = nx * aspect;
+    var y = ny;
+    var cyc = t / CYCLE;
+    var idx = Math.floor(cyc) % ORDER.length;
+    if (idx < 0) idx += ORDER.length;
+    var nxt = (idx + 1) % ORDER.length;
+    var local = (cyc - Math.floor(cyc)) * CYCLE;
+    var u = local < HOLD ? 0 : (local - HOLD) / FADE;
+    var s = u * u * (3 - 2 * u);
+    var a = field(ORDER[idx], x, y, t);
+    if (s === 0) return { v: a, ramp: RAMPS[ORDER[idx] % RAMPS.length], rampB: null, s: 0, b: 0 };
+    var b = field(ORDER[nxt], x, y, t);
+    return {
+      v: a * (1 - s) + b * s,
+      ramp: RAMPS[ORDER[idx] % RAMPS.length],
+      rampB: RAMPS[ORDER[nxt] % RAMPS.length],
+      s: s,
+      b: b,
+      a: a
+    };
+  }
+
+  function hash(n) {
+    var x = Math.imul(n ^ 0x9e3779b9, 0x85ebca6b);
+    return (x ^ (x >>> 13)) >>> 0;
+  }
+
+  function resize() {
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = W;
+    canvas.height = H;
+    scale = W < 640 ? 2 : (W > 1600 ? 3 : 2);
+    cellW = 5 * scale + scale;
+    cellH = 7 * scale + Math.max(1, scale - 1);
+    cols = Math.max(16, Math.floor(W / cellW));
+    rows = Math.max(10, Math.floor(H / cellH));
+    buf = ctx.createImageData(W, H);
+    data = buf.data;
+  }
+
+  function paintASCII(t) {
+    data.fill(0);
+    var breathe = 0.92 + Math.sin(t * 0.8) * 0.08;
+    var hue0 = (t * 28) % 360;
+    var originX = ((W - cols * cellW) * 0.5) | 0;
+    var originY = ((H - rows * cellH) * 0.5) | 0;
+    for (var row = 0; row < rows; row++) {
+      for (var col = 0; col < cols; col++) {
+        var s = sample(col + Math.sin(t * 0.2) * 1.4, row + t * 0.55, t);
+        var v = s.v;
+        var ramp = s.ramp;
+        var ch;
+        if (s.s > 0) {
+          var ia = Math.max(0, Math.min(s.ramp.length - 1, (s.a * (s.ramp.length - 1)) | 0));
+          var ib = Math.max(0, Math.min(s.rampB.length - 1, (s.b * (s.rampB.length - 1)) | 0));
+          var flip = (hash(col * 131 + row * 17) % 1000) / 1000;
+          ch = flip < s.s ? s.rampB.charAt(ib) : s.ramp.charAt(ia);
+          v = flip < s.s ? s.b : s.a;
+        } else {
+          var ii = Math.max(0, Math.min(ramp.length - 1, (v * (ramp.length - 1)) | 0));
+          ch = ramp.charAt(ii);
+        }
+        var glyph = FONT[ch] || FONT[" "];
+        if (glyph[0] + glyph[1] + glyph[2] + glyph[3] + glyph[4] + glyph[5] + glyph[6] === 0) continue;
+        var hue = (hue0 + v * 70 + col * 1.7 + row * 0.6) % 360;
+        var light = (0.42 + v * 0.4) * breathe;
+        var sat = 1;
+        var aC = sat * Math.min(light, 1 - light);
+        var rr, gg, bb;
+        var fk = function (n) {
+          var k = (n + hue / 30) % 12;
+          var c = light - aC * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+          return (c * 255) | 0;
+        };
+        rr = fk(0); gg = fk(8); bb = fk(4);
+        var alpha = (150 + v * 105) | 0;
+        var x0 = originX + col * cellW;
+        var y0 = originY + row * cellH;
+        for (var gy = 0; gy < 7; gy++) {
+          var bits = glyph[gy];
+          if (!bits) continue;
+          var py = y0 + gy * scale;
+          if (py < 0 || py >= H) continue;
+          for (var gx = 0; gx < 5; gx++) {
+            if ((bits & (16 >> gx)) === 0) continue;
+            var px = x0 + gx * scale;
+            if (px < 0 || px >= W) continue;
+            for (var sy = 0; sy < scale; sy++) {
+              var yy = py + sy;
+              if (yy >= H) break;
+              var rowI = yy * W;
+              for (var sx = 0; sx < scale; sx++) {
+                var xx = px + sx;
+                if (xx >= W) break;
+                var p = (rowI + xx) * 4;
+                data[p] = rr;
+                data[p + 1] = gg;
+                data[p + 2] = bb;
+                data[p + 3] = alpha;
+              }
+            }
+          }
+        }
+      }
+    }
+    ctx.putImageData(buf, 0, 0);
+
+    var zoom = 1 + Math.sin(t * 0.65) * 0.045 + Math.sin(t * 1.7) * 0.012;
+    canvas.style.transform = "scale(" + zoom.toFixed(4) + ")";
+    canvas.style.opacity = String(0.78 + Math.sin(t * 0.85) * 0.18);
+  }
+
+  var baseW = 640, baseH = 80;
+  var x = 40, y = 40, vx = 150, vy = 115;
+  var hueLogo = 0;
+
+  function fitLogo() {
+    var vw = window.innerWidth, vh = window.innerHeight;
+    baseW = Math.min(vw * 0.72, 760);
+    baseH = baseW * (196 / 1540);
+    if (baseH > vh * 0.28) {
+      baseH = vh * 0.28;
+      baseW = baseH * (1540 / 196);
+    }
+    if (baseW > vw - 8) {
+      baseW = vw - 8;
+      baseH = baseW * (196 / 1540);
+    }
+    logo.style.width = baseW + "px";
+  }
+
+  function varyVelocity() {
+    var sx = vx < 0 ? -1 : 1;
+    var sy = vy < 0 ? -1 : 1;
+    var ang = Math.atan2(Math.abs(vy), Math.abs(vx));
+    ang += (Math.random() - 0.5) * 0.32;
+    if (ang < 0.38) ang = 0.38;
+    if (ang > 1.2) ang = 1.2;
+    var mag = Math.hypot(vx, vy) * (0.93 + Math.random() * 0.14);
+    if (mag < 120) mag = 120;
+    if (mag > 230) mag = 230;
+    vx = Math.cos(ang) * mag * sx;
+    vy = Math.sin(ang) * mag * sy;
+  }
+
+  function stepLogo(dt, t) {
+    var breathe = 1 + Math.sin(t * 2.05) * 0.055 + Math.sin(t * 0.7) * 0.028;
+    var w = baseW * breathe;
+    var h = baseH * breathe;
+    var vw = window.innerWidth;
+    var vh = window.innerHeight;
+    x += vx * dt;
+    y += vy * dt;
+    var hitX = false, hitY = false;
+    if (x <= 0) { x = 0; if (vx < 0) hitX = true; }
+    if (y <= 0) { y = 0; if (vy < 0) hitY = true; }
+    if (x + w >= vw) { x = Math.max(0, vw - w); if (vx > 0) hitX = true; }
+    if (y + h >= vh) { y = Math.max(0, vh - h); if (vy > 0) hitY = true; }
+    if (hitX) vx = -vx;
+    if (hitY) vy = -vy;
+    if (hitX || hitY) varyVelocity();
+    var skx = Math.sin(t * 1.25) * 5.5;
+    var sky = Math.cos(t * 0.85) * 3.2;
+    hueLogo = (t * 48) % 360;
+    var op = 0.8 + Math.sin(t * 1.45) * 0.16 + Math.sin(t * 0.4) * 0.04;
+    logo.style.transform = "translate3d(" + x.toFixed(2) + "px," + y.toFixed(2) + "px,0) scale(" + breathe.toFixed(4) + ") skew(" + skx.toFixed(2) + "deg," + sky.toFixed(2) + "deg)";
+    logo.style.opacity = String(Math.max(0.62, Math.min(1, op)));
+    logo.style.filter = "drop-shadow(0 0 8px #ff2d7b) drop-shadow(0 0 22px #7ee7ff) hue-rotate(" + hueLogo.toFixed(1) + "deg) saturate(1.45)";
+  }
+
+  resize();
+  fitLogo();
+  x = Math.random() * Math.max(1, window.innerWidth - baseW);
+  y = Math.random() * Math.max(1, window.innerHeight - baseH);
+  var dir = Math.random() * Math.PI * 2;
+  vx = Math.cos(dir) * 160;
+  vy = Math.sin(dir) * 130;
+  if (Math.abs(vx) < 70) vx = vx < 0 ? -90 : 90;
+  if (Math.abs(vy) < 60) vy = vy < 0 ? -80 : 80;
+
+  var last = performance.now();
+  var raf = 0;
+  var started = performance.now();
+
+  function frame(now) {
+    if (document.hidden) { raf = 0; return; }
+    var dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    var t = (now - started) / 1000;
+    paintASCII(t);
+    stepLogo(dt, t);
+    raf = requestAnimationFrame(frame);
+  }
+
+  window.addEventListener("resize", function () {
+    resize();
+    fitLogo();
+    var w = baseW, h = baseH;
+    if (x + w > window.innerWidth) x = Math.max(0, window.innerWidth - w);
+    if (y + h > window.innerHeight) y = Math.max(0, window.innerHeight - h);
   });
-  if (i < text.length) frag.append(document.createTextNode(text.slice(i)));
-  return frag;
-}
-
-function unescapeTag(value) {
-  return value.replace(/\\s/g, " ").replace(/\\:/g, ";").replace(/\\r/g, "").replace(/\\n/g, " ").replace(/\\\\/g, "\\");
-}
-function parseLine(line) {
-  let rest = line;
-  const tags = {};
-  if (rest.startsWith("@")) {
-    const space = rest.indexOf(" ");
-    rest.slice(1, space).split(";").forEach((pair) => {
-      const eq = pair.indexOf("=");
-      if (eq > 0) tags[pair.slice(0, eq)] = unescapeTag(pair.slice(eq + 1));
-    });
-    rest = rest.slice(space + 1);
-  }
-  if (rest.startsWith(":")) rest = rest.slice(rest.indexOf(" ") + 1);
-  const trailAt = rest.indexOf(" :");
-  const main = trailAt === -1 ? rest : rest.slice(0, trailAt);
-  const trailing = trailAt === -1 ? "" : rest.slice(trailAt + 2);
-  const parts = main.split(" ");
-  return { tags, cmd: parts[0], trailing };
-}
-
-function onIrc(line) {
-  if (!line) return;
-  if (line.startsWith("PING")) {
-    socket.send(line.replace("PING", "PONG"));
-    return;
-  }
-  const msg = parseLine(line);
-  if (msg.cmd === "PRIVMSG") {
-    const name = msg.tags["display-name"] || "chat";
-    addLine(msg.tags.id, name, msg.tags.color, msg.trailing, msg.tags.emotes);
-    if (msg.tags.bits) enqueue("bits", name, "cheered " + msg.tags.bits);
-  } else if (msg.cmd === "USERNOTICE") {
-    const id = msg.tags["msg-id"] || "";
-    const name = msg.tags["display-name"] || msg.tags["msg-param-displayName"] || "someone";
-    if (id === "raid") enqueue("raid", name, "raiding with " + (msg.tags["msg-param-viewerCount"] || "?") + " viewers");
-    else if (id === "sub" || id === "resub") enqueue("sub", name, msg.tags["system-msg"] || "subscribed");
-    else if (id.indexOf("subgift") !== -1 || id === "submysterygift") enqueue("sub", name, msg.tags["system-msg"] || "gifted a sub");
-    if (msg.trailing) addLine(msg.tags.id, name, msg.tags.color, msg.trailing, msg.tags.emotes);
-  } else if (msg.cmd === "CLEARCHAT") {
-    const who = (msg.trailing || "").toLowerCase();
-    Array.from(log.children).forEach((row) => {
-      const b = row.querySelector("b");
-      if (!who || (b && b.textContent.toLowerCase() === who)) row.remove();
-    });
-  }
-}
-
-let socket;
-let retry = 1000;
-function connect() {
-  chatDot.textContent = "···";
-  socket = new WebSocket("wss://irc-ws.chat.twitch.tv:443");
-  socket.onopen = () => {
-    retry = 1000;
-    chatDot.textContent = "LIVE";
-    socket.send("CAP REQ :twitch.tv/tags twitch.tv/commands");
-    socket.send("PASS SCHMOEPILOT");
-    socket.send("NICK justinfan" + Math.floor(Math.random() * 100000));
-    socket.send("JOIN #" + CHANNEL);
-  };
-  socket.onmessage = (ev) => String(ev.data).split(/\r?\n/).forEach(onIrc);
-  socket.onclose = () => {
-    chatDot.textContent = "RETRY";
-    setTimeout(connect, retry);
-    retry = Math.min(retry * 2, 15000);
-  };
-}
-connect();
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden && !raf) {
+      last = performance.now();
+      raf = requestAnimationFrame(frame);
+    }
+  });
+  raf = requestAnimationFrame(frame);
+})();
 </script>
 </body>
 </html>

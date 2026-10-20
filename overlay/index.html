@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>pwndemonium</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; }
+  body { font-family: "IBM Plex Sans", "Segoe UI", sans-serif; color: #f6f3ea; }
+  .fit { width: 1920px; height: 1080px; transform-origin: 0 0; }
+  .stage {
+    width: 1920px;
+    height: 1080px;
+    position: relative;
+    overflow: hidden;
+    background: transparent;
+  }
+  canvas.fx, .aurora, .grid { display: none; }
+  .aurora, .grid { position: absolute; inset: -12%; pointer-events: none; }
+  .aurora {
+    background:
+      radial-gradient(circle at 20% 30%, #ff2d7b66, transparent 26%),
+      radial-gradient(circle at 75% 70%, #7ee7ff40, transparent 24%);
+    filter: blur(10px);
+    animation: drift 9s ease-in-out infinite alternate;
+  }
+  .grid {
+    background-image:
+      linear-gradient(#ffffff14 1px, transparent 1px),
+      linear-gradient(90deg, #ffffff14 1px, transparent 1px);
+    background-size: 72px 72px;
+    animation: pan 8s linear infinite;
+    opacity: 0.4;
+  }
+  .layout {
+    position: absolute;
+    inset: 16px;
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    grid-template-rows: 1fr 240px;
+    gap: 14px;
+    z-index: 1;
+  }
+  .panel {
+    position: relative;
+    border-radius: 22px;
+    background:
+      linear-gradient(#10131b, #10131b) padding-box,
+      linear-gradient(120deg, #c6ff4a, #7ee7ff, #ff2d7b, #ffe27a, #c6ff4a) border-box;
+    background-size: 100% 100%, 280% 280%;
+    border: 3px solid transparent;
+    animation: border 3.2s linear infinite;
+    overflow: hidden;
+  }
+  .game { grid-column: 1; grid-row: 1; }
+  .game .hole { position: absolute; inset: 0; margin: 0; border-radius: 19px; cursor: pointer; }
+  .badge {
+    position: absolute;
+    z-index: 3;
+    left: 22px;
+    top: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    pointer-events: none;
+    max-width: calc(100% - 44px);
+  }
+  .badge img {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 0 0 4px #c6ff4a, 0 0 24px #ff2d7b;
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  .badge b {
+    display: block;
+    font-family: Syne, sans-serif;
+    font-size: 68px;
+    line-height: 0.85;
+    letter-spacing: -0.05em;
+    background: linear-gradient(90deg, #fff, #c6ff4a 30%, #7ee7ff 60%, #ff2d7b 85%, #fff);
+    background-size: 220% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: sheen 2.2s linear infinite, bump 1.8s ease-in-out infinite;
+    filter: drop-shadow(0 6px 0 #000) drop-shadow(0 0 16px #c6ff4a);
+  }
+  .badge em {
+    display: block;
+    margin-top: 6px;
+    font-style: normal;
+    font-size: 18px;
+    color: #fff;
+    text-shadow: 0 2px 0 #000, 0 0 10px #000;
+  }
+  .pill {
+    margin-left: 8px;
+    align-self: flex-start;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 999px;
+    padding: 8px 12px;
+    background: #000c;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    font-size: 14px;
+  }
+  .dot { width: 12px; height: 12px; border-radius: 50%; background: #667; }
+  .pill.on { color: #ffd0e0; }
+  .pill.on .dot { background: #ff2d7b; animation: ping 1.1s ease-out infinite; }
+  .game, .cam {
+    background:
+      linear-gradient(transparent, transparent) padding-box,
+      linear-gradient(120deg, #c6ff4a, #7ee7ff, #ff2d7b, #ffe27a, #c6ff4a) border-box;
+  }
+  .hole { background: transparent; }
+  .label, .scan { display: none; }
+  .hole video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+    background: #000;
+  }
+  .hole.live video { display: block; }
+  .hole.live .scan, .hole.live .label { display: none; }
+  .label {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    font-family: Syne, sans-serif;
+    letter-spacing: 0.14em;
+  }
+  .label strong {
+    display: block;
+    font-size: 64px;
+    animation: bump 1.1s ease-in-out infinite;
+    text-shadow: 0 0 18px #c6ff4a;
+  }
+  .label small { display: block; margin-top: 6px; color: #ffffffaa; letter-spacing: 0.18em; font-size: 16px; }
+  .scan {
+    position: absolute;
+    left: 0; right: 0;
+    height: 28%;
+    background: linear-gradient(transparent, #c6ff4a33, transparent);
+    animation: scan 2.4s linear infinite;
+  }
+  .bottom { grid-column: 1; grid-row: 2; display: grid; grid-template-columns: 420px 1fr; gap: 14px; }
+  .cam .hole { position: absolute; inset: 0; margin: 0; cursor: pointer; border-radius: 19px; }
+  .cam .label strong { font-size: 36px; }
+  .alerts { padding: 16px 20px; display: flex; flex-direction: column; justify-content: center; }
+  .idle b {
+    font-family: Syne, sans-serif;
+    font-size: 46px;
+    letter-spacing: -0.05em;
+    display: block;
+    background: linear-gradient(90deg, #f6f3ea, #c6ff4a, #7ee7ff, #ff2d7b);
+    background-size: 220% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: sheen 2.4s linear infinite;
+  }
+  .idle span { color: #f6f3ea99; letter-spacing: 0.14em; font-size: 14px; }
+  .card { display: none; }
+  .card.show { display: block; animation: slam 0.4s cubic-bezier(.2,1.4,.4,1) both; }
+  .kicker { font-family: Syne, sans-serif; font-size: 16px; letter-spacing: 0.22em; }
+  .card strong { display: block; font-family: Syne, sans-serif; font-size: 44px; line-height: 0.95; }
+  .card p { margin: 6px 0 0; font-size: 18px; }
+  .card.raid .kicker { color: #ff2d7b; }
+  .card.follow .kicker { color: #c6ff4a; }
+  .card.sub .kicker { color: #ffe27a; }
+  .card.bits .kicker { color: #7ee7ff; }
+  .chat {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    display: flex;
+    flex-direction: column;
+    background: #0d1016;
+  }
+  .chat-head {
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    font-family: Syne, sans-serif;
+    letter-spacing: 0.16em;
+    border-bottom: 2px solid #ffffff14;
+  }
+  .log { flex: 1; overflow: hidden; padding: 10px 12px 8px; display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; }
+  .msg { animation: pop 0.35s ease both; line-height: 1.35; font-size: 18px; word-wrap: break-word; }
+  .msg b { margin-right: 6px; }
+  .emote { height: 28px; vertical-align: middle; }
+  .quiet { color: #f6f3ea66; }
+  @keyframes drift { to { transform: translate3d(4%, -3%, 0) scale(1.08); } }
+  @keyframes pan { to { background-position: 72px 72px; } }
+  @keyframes scan { from { top: -30%; } to { top: 110%; } }
+  @keyframes sheen { to { background-position: 220% 0; } }
+  @keyframes bump { 50% { transform: scale(1.045) rotate(-0.4deg); } }
+  @keyframes ping { 70% { box-shadow: 0 0 0 12px #ff2d7b00; } }
+  @keyframes border { to { background-position: 0 0, 280% 0; } }
+  @keyframes slam { from { transform: translateY(20px) scale(0.94); opacity: 0; } }
+  @keyframes pop { from { transform: translateX(14px); opacity: 0; } }
+  @keyframes pulse { 50% { transform: scale(1.06); } }
+</style>
+</head>
+<body>
+  <div class="fit" id="fit">
+    <div class="stage">
+      <div class="aurora"></div>
+      <div class="grid"></div>
+      <canvas class="fx" id="fx" width="1920" height="1080"></canvas>
+      <div class="layout">
+        <section class="panel game">
+          <div class="hole" id="gameHole">
+            <video id="gameVideo" autoplay playsinline muted></video>
+            <i class="scan"></i>
+            <div class="label"><strong>GAME</strong><small>CLICK TO CAPTURE</small></div>
+          </div>
+          <div class="badge">
+            <img alt="" src="https://static-cdn.jtvnw.net/jtv_user_pictures/1e95469a-febb-4347-a2c5-20aa07be3f61-profile_image-300x300.png" />
+            <div>
+              <b>pwndemonium</b>
+              <em id="title">loading title</em>
+            </div>
+            <div class="pill" id="live"><i class="dot"></i><span id="liveLabel">OFFLINE</span></div>
+          </div>
+        </section>
+        <div class="bottom">
+          <section class="panel cam">
+            <div class="hole" id="camHole">
+              <video id="camVideo" autoplay playsinline muted></video>
+              <i class="scan"></i>
+              <div class="label"><strong>CAM</strong><small>CLICK FOR WEBCAM</small></div>
+            </div>
+          </section>
+          <section class="panel alerts">
+            <div class="idle" id="idle">
+              <b>pwndemonium</b>
+              <span id="meta">RAIDS · FOLLOWS · SUBS</span>
+            </div>
+            <div class="card" id="card">
+              <div class="kicker" id="kicker">RAID</div>
+              <strong id="ahead">NAME</strong>
+              <p id="asub"></p>
+            </div>
+          </section>
+        </div>
+        <aside class="panel chat">
+          <div class="chat-head">CHAT <span id="chatDot">···</span></div>
+          <div class="log" id="log"><div class="quiet">chat will show up here</div></div>
+        </aside>
+      </div>
+    </div>
+  </div>
+<script>
+const CHANNEL = "pwndemonium";
+const fit = document.getElementById("fit");
+function scale() {
+  const s = Math.min(innerWidth / 1920, innerHeight / 1080);
+  fit.style.transform = "scale(" + s + ")";
+}
+addEventListener("resize", scale);
+scale();
+
+const paint = document.getElementById("fx").getContext("2d");
+const dots = Array.from({ length: 48 }, () => ({
+  x: Math.random() * 1920,
+  y: Math.random() * 1080,
+  r: 1 + Math.random() * 2.4,
+  s: 0.4 + Math.random() * 1.3,
+  c: Math.random() > 0.5 ? "#c6ff4a" : "#ff2d7b"
+}));
+(function tick() {
+  paint.clearRect(0, 0, 1920, 1080);
+  dots.forEach((d) => {
+    d.y -= d.s;
+    if (d.y < -8) d.y = 1088;
+    paint.fillStyle = d.c;
+    paint.globalAlpha = 0.55;
+    paint.beginPath();
+    paint.arc(d.x, d.y, d.r, 0, 6.3);
+    paint.fill();
+  });
+  requestAnimationFrame(tick);
+})();
+
+async function arm(hole, video, grab) {
+  const hint = hole.querySelector("small");
+  hole.addEventListener("click", async () => {
+    try {
+      if (video.srcObject) video.srcObject.getTracks().forEach((t) => t.stop());
+      const stream = await grab();
+      video.srcObject = stream;
+      video.muted = true;
+      await video.play();
+      hole.classList.add("live");
+      const track = stream.getVideoTracks()[0];
+      if (track) track.addEventListener("ended", () => hole.classList.remove("live"));
+    } catch (err) {
+      if (hint) hint.textContent = "BLOCKED — CLICK AGAIN";
+    }
+  });
+}
+arm(document.getElementById("gameHole"), document.getElementById("gameVideo"), () =>
+  navigator.mediaDevices.getDisplayMedia({ video: { frameRate: 60 }, audio: false })
+);
+arm(document.getElementById("camHole"), document.getElementById("camVideo"), () =>
+  navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 }, audio: false })
+);
+
+const titleEl = document.getElementById("title");
+const live = document.getElementById("live");
+const liveLabel = document.getElementById("liveLabel");
+const meta = document.getElementById("meta");
+let lastFollowers = null;
+
+async function poll() {
+  try {
+    const res = await fetch("https://api.ivr.fi/v2/twitch/user?login=" + CHANNEL);
+    const user = (await res.json())[0];
+    const stream = user.stream;
+    const on = !!(stream && (stream.title || stream.viewers || stream.viewerCount || stream.startedAt));
+    live.classList.toggle("on", on);
+    const viewers = stream && (stream.viewers ?? stream.viewerCount);
+    liveLabel.textContent = on ? ("LIVE" + (viewers != null ? " " + viewers : "")) : "OFFLINE";
+    titleEl.textContent = (stream && stream.title) || (user.lastBroadcast && user.lastBroadcast.title) || CHANNEL;
+    if (typeof user.followers === "number") {
+      meta.textContent = user.followers + " FOLLOWERS · RAIDS · SUBS";
+      if (lastFollowers != null && user.followers > lastFollowers) {
+        const n = user.followers - lastFollowers;
+        enqueue("follow", n === 1 ? "NEW FOLLOWER" : "+" + n + " FOLLOWERS", n === 1 ? "someone just followed" : "new people just followed");
+      }
+      lastFollowers = user.followers;
+    }
+  } catch (e) {}
+}
+poll();
+setInterval(poll, 20000);
+
+const idle = document.getElementById("idle");
+const card = document.getElementById("card");
+const kicker = document.getElementById("kicker");
+const ahead = document.getElementById("ahead");
+const asub = document.getElementById("asub");
+const queue = [];
+let showing = false;
+
+function enqueue(kind, head, sub) {
+  queue.push({ kind, head, sub });
+  pump();
+}
+function pump() {
+  if (showing || !queue.length) return;
+  showing = true;
+  const item = queue.shift();
+  card.className = "card show " + item.kind;
+  kicker.textContent = item.kind.toUpperCase();
+  ahead.textContent = item.head;
+  asub.textContent = item.sub || "";
+  idle.style.display = "none";
+  setTimeout(() => {
+    card.className = "card";
+    idle.style.display = "";
+    showing = false;
+    pump();
+  }, 7000);
+}
+
+const log = document.getElementById("log");
+const chatDot = document.getElementById("chatDot");
+
+function addLine(id, name, color, text, emotes) {
+  const quiet = log.querySelector(".quiet");
+  if (quiet) quiet.remove();
+  const row = document.createElement("div");
+  row.className = "msg";
+  const who = document.createElement("b");
+  who.textContent = name;
+  who.style.color = color || "#c6ff4a";
+  row.append(who);
+  row.append(renderText(text, emotes));
+  log.append(row);
+  while (log.children.length > 40) log.removeChild(log.firstElementChild);
+  log.scrollTop = log.scrollHeight;
+}
+
+function renderText(text, emotes) {
+  const frag = document.createDocumentFragment();
+  const ranges = [];
+  if (emotes) {
+    emotes.split("/").forEach((part) => {
+      const cut = part.split(":");
+      if (!cut[1]) return;
+      cut[1].split(",").forEach((place) => {
+        const pair = place.split("-").map(Number);
+        if (Number.isFinite(pair[0])) ranges.push({ a: pair[0], b: pair[1], id: cut[0] });
+      });
+    });
+    ranges.sort((a, b) => a.a - b.a);
+  }
+  let i = 0;
+  ranges.forEach((range) => {
+    if (range.a < i || range.a > text.length) return;
+    if (range.a > i) frag.append(document.createTextNode(text.slice(i, range.a)));
+    const img = document.createElement("img");
+    img.className = "emote";
+    img.alt = "";
+    img.src = "https://static-cdn.jtvnw.net/emoticons/v2/" + range.id + "/default/dark/2.0";
+    frag.append(img);
+    i = range.b + 1;
+  });
+  if (i < text.length) frag.append(document.createTextNode(text.slice(i)));
+  return frag;
+}
+
+function unescapeTag(value) {
+  return value.replace(/\\s/g, " ").replace(/\\:/g, ";").replace(/\\r/g, "").replace(/\\n/g, " ").replace(/\\\\/g, "\\");
+}
+function parseLine(line) {
+  let rest = line;
+  const tags = {};
+  if (rest.startsWith("@")) {
+    const space = rest.indexOf(" ");
+    rest.slice(1, space).split(";").forEach((pair) => {
+      const eq = pair.indexOf("=");
+      if (eq > 0) tags[pair.slice(0, eq)] = unescapeTag(pair.slice(eq + 1));
+    });
+    rest = rest.slice(space + 1);
+  }
+  if (rest.startsWith(":")) rest = rest.slice(rest.indexOf(" ") + 1);
+  const trailAt = rest.indexOf(" :");
+  const main = trailAt === -1 ? rest : rest.slice(0, trailAt);
+  const trailing = trailAt === -1 ? "" : rest.slice(trailAt + 2);
+  const parts = main.split(" ");
+  return { tags, cmd: parts[0], trailing };
+}
+
+function onIrc(line) {
+  if (!line) return;
+  if (line.startsWith("PING")) {
+    socket.send(line.replace("PING", "PONG"));
+    return;
+  }
+  const msg = parseLine(line);
+  if (msg.cmd === "PRIVMSG") {
+    const name = msg.tags["display-name"] || "chat";
+    addLine(msg.tags.id, name, msg.tags.color, msg.trailing, msg.tags.emotes);
+    if (msg.tags.bits) enqueue("bits", name, "cheered " + msg.tags.bits);
+  } else if (msg.cmd === "USERNOTICE") {
+    const id = msg.tags["msg-id"] || "";
+    const name = msg.tags["display-name"] || msg.tags["msg-param-displayName"] || "someone";
+    if (id === "raid") enqueue("raid", name, "raiding with " + (msg.tags["msg-param-viewerCount"] || "?") + " viewers");
+    else if (id === "sub" || id === "resub") enqueue("sub", name, msg.tags["system-msg"] || "subscribed");
+    else if (id.indexOf("subgift") !== -1 || id === "submysterygift") enqueue("sub", name, msg.tags["system-msg"] || "gifted a sub");
+    if (msg.trailing) addLine(msg.tags.id, name, msg.tags.color, msg.trailing, msg.tags.emotes);
+  } else if (msg.cmd === "CLEARCHAT") {
+    const who = (msg.trailing || "").toLowerCase();
+    Array.from(log.children).forEach((row) => {
+      const b = row.querySelector("b");
+      if (!who || (b && b.textContent.toLowerCase() === who)) row.remove();
+    });
+  }
+}
+
+let socket;
+let retry = 1000;
+function connect() {
+  chatDot.textContent = "···";
+  socket = new WebSocket("wss://irc-ws.chat.twitch.tv:443");
+  socket.onopen = () => {
+    retry = 1000;
+    chatDot.textContent = "LIVE";
+    socket.send("CAP REQ :twitch.tv/tags twitch.tv/commands");
+    socket.send("PASS SCHMOEPILOT");
+    socket.send("NICK justinfan" + Math.floor(Math.random() * 100000));
+    socket.send("JOIN #" + CHANNEL);
+  };
+  socket.onmessage = (ev) => String(ev.data).split(/\r?\n/).forEach(onIrc);
+  socket.onclose = () => {
+    chatDot.textContent = "RETRY";
+    setTimeout(connect, retry);
+    retry = Math.min(retry * 2, 15000);
+  };
+}
+connect();
+</script>
+</body>
+</html>
