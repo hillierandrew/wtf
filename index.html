@@ -59,6 +59,7 @@
     max-width: min(72vw, 460px);
     font-size: 12px;
   }
+  #name.wide { max-width: min(92vw, 560px); }
   #name b { font-weight: 600; color: #fff; margin-left: 6px; }
   #gate {
     position: fixed; inset: 0; z-index: 8;
@@ -122,16 +123,12 @@
     background: #ffffff18; color: #fff; font-size: 20px; cursor: pointer;
   }
   body.intro #logo { visibility: hidden; }
+  body.logo-off #logo { visibility: hidden !important; }
   body.intro #field { transform: none !important; }
   body.building #field,
   body.building #logo,
   body.building #veil,
   body.building #dock { visibility: hidden; }
-  body.clean #dock {
-    background: transparent; border-color: transparent; padding: 0;
-    box-shadow: none;
-  }
-  body.clean #dock > :not(#blockBtn) { display: none; }
   @media (min-aspect-ratio: 2/1) {
     #veil {
       background:
@@ -152,7 +149,9 @@
 <div id="veil"></div>
 <div id="logo" aria-hidden="true"><canvas id="ink"></canvas></div>
 <div id="dock">
-  <button id="blockBtn" type="button" aria-label="Hide the name and buttons">&#128683;</button>
+  <button id="blockBtn" type="button" aria-label="Hide DREW.WTF">&#128683;</button>
+  <button id="clockBtn" type="button" aria-label="Show the time">&#128336;</button>
+  <button id="sunBtn" type="button" aria-label="Mississauga weather">&#9728;&#65039;</button>
   <button id="play" type="button" aria-label="Play music">
     <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path id="playShape" fill="currentColor" d="M8 5v14l12-7z"/></svg>
   </button>
@@ -198,7 +197,14 @@
   var pigBtn = document.getElementById("pigBtn");
   var elephantBtn = document.getElementById("elephantBtn");
   var blockBtn = document.getElementById("blockBtn");
-  var clean = false;
+  var clockBtn = document.getElementById("clockBtn");
+  var sunBtn = document.getElementById("sunBtn");
+  var nameEl = document.getElementById("name");
+  var logoOff = false;
+  var faceMode = 0;
+  var skyOn = false;
+  var skyText = "";
+  var skyBusy = false;
   var pcBtn = document.getElementById("pcBtn");
   var gate = document.getElementById("gate");
   var gateForm = document.getElementById("gateForm");
@@ -1496,8 +1502,7 @@ const E=[
       canvas.style.opacity = String(0.8 + Math.sin(t * 0.85) * 0.16);
     }
     var label = shown + " · " + ((s && s.n) + 1) + " of " + (s && s.total);
-    if (nameTitle.textContent !== label) nameTitle.textContent = label;
-    nameMark.textContent = MARK[pack] || "🏠";
+    setSceneLabel(label, MARK[pack] || "🏠");
   }
 
   function strokeWord(c) {
@@ -1550,7 +1555,7 @@ const E=[
     if (!w || !h) return;
     ictx.setTransform(1, 0, 0, 1, 0, 0);
     ictx.clearRect(0, 0, w, h);
-    var word = "DREW.WTF";
+    var word = faceText();
     var gap = w / (word.length + 0.15);
     var size = h * 0.62;
     for (var i = 0; i < word.length; i++) {
@@ -1745,11 +1750,81 @@ const E=[
     timeOff = -clock;
   }
 
+  function faceText() {
+    if (!faceMode) return "DREW.WTF";
+    var d = new Date();
+    var h = d.getHours();
+    var m = d.getMinutes();
+    var mm = (m < 10 ? "0" : "") + m;
+    if (faceMode === 2) return (h < 10 ? "0" : "") + h + ":" + mm;
+    var h12 = h % 12 || 12;
+    return h12 + ":" + mm + (h < 12 ? " AM" : " PM");
+  }
+  function setSceneLabel(label, mark) {
+    if (skyOn) return;
+    if (nameTitle.textContent !== label) nameTitle.textContent = label;
+    if (mark && nameMark.textContent !== mark) nameMark.textContent = mark;
+  }
+  function skyWord(code) {
+    if (code === 0) return "Clear";
+    if (code === 1) return "Mainly clear";
+    if (code === 2) return "Partly cloudy";
+    if (code === 3) return "Cloudy";
+    if (code === 45 || code === 48) return "Fog";
+    if (code >= 51 && code <= 57) return "Drizzle";
+    if (code >= 61 && code <= 67) return "Rain";
+    if (code >= 71 && code <= 77) return "Snow";
+    if (code >= 80 && code <= 82) return "Showers";
+    if (code === 85 || code === 86) return "Snow showers";
+    if (code >= 95) return "Thunderstorm";
+    return "Weather";
+  }
+  function paintSky(text) {
+    skyOn = true;
+    nameMark.textContent = "\u2600\uFE0F";
+    nameTitle.textContent = text;
+    nameEl.classList.add("wide");
+    sunBtn.classList.add("on");
+    sunBtn.setAttribute("aria-label", "Hide the weather");
+  }
+  function hideSky() {
+    skyOn = false;
+    nameEl.classList.remove("wide");
+    sunBtn.classList.remove("on");
+    sunBtn.setAttribute("aria-label", "Mississauga weather");
+  }
+
   blockBtn.addEventListener("click", function () {
-    clean = !clean;
-    document.body.classList.toggle("clean", clean);
-    blockBtn.setAttribute("aria-label", clean ? "Show the name and buttons" : "Hide the name and buttons");
-    if (clean) { gate.classList.remove("open"); shop.classList.remove("open"); document.body.classList.remove("building"); }
+    logoOff = !logoOff;
+    document.body.classList.toggle("logo-off", logoOff);
+    blockBtn.classList.toggle("on", logoOff);
+    blockBtn.setAttribute("aria-label", logoOff ? "Show DREW.WTF" : "Hide DREW.WTF");
+  });
+  clockBtn.addEventListener("click", function () {
+    faceMode = (faceMode + 1) % 3;
+    clockBtn.classList.toggle("on", faceMode > 0);
+    clockBtn.setAttribute("aria-label", faceMode === 1 ? "Show military time" : faceMode === 2 ? "Show DREW.WTF" : "Show the time");
+  });
+  sunBtn.addEventListener("click", function () {
+    if (skyOn) { hideSky(); return; }
+    if (skyText) { paintSky(skyText); return; }
+    if (skyBusy) return;
+    skyBusy = true;
+    paintSky("Mississauga\u2026");
+    fetch("https://api.open-meteo.com/v1/forecast?latitude=43.589&longitude=-79.644&current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=America%2FToronto&forecast_days=1")
+      .then(function (r) { if (!r.ok) throw new Error("bad"); return r.json(); })
+      .then(function (data) {
+        var now = Math.round(data.current.temperature_2m);
+        var hi = Math.round(data.daily.temperature_2m_max[0]);
+        var lo = Math.round(data.daily.temperature_2m_min[0]);
+        skyText = "Mississauga " + now + "\u00B0C \u00B7 " + skyWord(data.daily.weather_code[0]) + " \u00B7 high " + hi + "\u00B0 low " + lo + "\u00B0";
+        if (skyOn) paintSky(skyText);
+      })
+      .catch(function () {
+        skyText = "";
+        if (skyOn) nameTitle.textContent = "Weather didn't load";
+      })
+      .then(function () { skyBusy = false; });
   });
   playBtn.addEventListener("click", function () { setPlaying(!playing); });
   homeBtn.addEventListener("click", function () { setPack("home"); });
@@ -1991,8 +2066,7 @@ const E=[
     canvas.style.transform = "none";
     canvas.style.opacity = "1";
     if (veilEl) veilEl.style.opacity = String(dim);
-    if (nameTitle.textContent !== label) nameTitle.textContent = label;
-    nameMark.textContent = "🏠";
+    if (nameTitle.textContent !== label) setSceneLabel(label, "🏠");
   }
   function spawnDvd() {
     document.body.classList.remove("intro");
