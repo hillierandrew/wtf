@@ -100,6 +100,21 @@ let PARTS = [];
 
 const GROUPS = [
   { name:"Games", items:[
+    { id:"roblox", name:"Roblox", sub:"A computer for a kid", tiers:{
+      starts: spec("apu", 0, 16, "512GB", "Roblox opens on a current processor with its own graphics and 16 GB. A 5090 is the wrong product."),
+      comfortable: spec("six", 1, 16, "512GB", "Comfortable adds a small graphics card. Still not a gaming flagship."),
+      high: spec("new6", 2, 16, "1TB", "The top of what Roblox can use here. The card stays small on purpose.")
+    }},
+    { id:"dota", name:"Dota 2", sub:"Does not need a flagship", tiers:{
+      starts: spec("six", 1, 16, "512GB", "Dota 2 runs on a small card and 16 GB."),
+      comfortable: spec("new6", 2, 16, "512GB", "Comfortable is a modest current card. Extra money does not buy a better game."),
+      high: spec("new6", 3, 16, "1TB", "The high row stays mid-range. A 90-class card is wasted here.")
+    }},
+    { id:"fortnite", name:"Fortnite", sub:"Smooth play, not a flagship", tiers:{
+      starts: spec("six", 2, 16, "512GB", "Starts is an entry card and 16 GB."),
+      comfortable: spec("new6", 3, 16, "1TB", "Comfortable is a mid card. That is what people actually buy for Fortnite."),
+      high: spec("new6", 4, 16, "1TB", "High stays at a current mid card. A flagship does not belong in this budget.")
+    }},
     { id:"cod", name:"Call of Duty", sub:"Current game and Warzone", tiers:{
       starts: spec("six", 2, 16, "1TB", "Starts means the game can open. Activision's minimum is an old RX 470 or GTX 970 and 8 GB of memory. Those cards are not on this list. This is a current entry card and 16 GB, the smallest kit sold here."),
       comfortable: spec("new6", 4, 16, "1TB", "Comfortable is the computer people buy so the game feels settled. The publisher's recommended row is still an RTX 3060 or RX 6600 XT and 12 GB. This list has one leftover 3060 and no 6600 XT. A current 5060-class card and 16 GB is the stand-in. An i7-8700K is a 2018 chip and is not sold here. No frame rate is promised."),

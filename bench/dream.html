@@ -104,12 +104,22 @@
     <button class="dark" id="setBudget" type="button">Set</button>
     <button class="ghost" id="clearBudget" type="button">Clear Budget</button>
     <select id="use" aria-label="What is this computer for">
-      <option>Gaming</option>
-      <option>Home Server</option>
-      <option>Office</option>
+      <option>Roblox</option>
+      <option>Minecraft</option>
+      <option>Fortnite</option>
+      <option>Dota 2</option>
+      <option>League of Legends</option>
+      <option>Valorant</option>
+      <option>Counter-Strike 2</option>
+      <option>Call of Duty</option>
+      <option>Diablo IV</option>
+      <option>Escape from Tarkov</option>
+      <option>Apex Legends</option>
       <option>School</option>
+      <option>Office</option>
+      <option>Photo editing</option>
       <option>Video Editing</option>
-      <option>Streaming</option>
+      <option>CAD</option>
     </select>
     <select id="brand" aria-label="Processor brand">
       <option value="any">AMD or Intel</option>
@@ -161,12 +171,22 @@
 const CATS = ["cpu","motherboard","memory","gpu","storage","case","cooler","psu"];
 const NAMES = { cpu:"CPU", motherboard:"Motherboard", memory:"Memory", gpu:"Video card", storage:"Storage", case:"Case", cooler:"Cooler", psu:"Power supply" };
 const USES = {
-  Gaming: { gpu: 3, ram: 16, disk: "1TB" },
-  "Home Server": { gpu: 0, ram: 16, disk: "2TB" },
-  Office: { gpu: 0, ram: 16, disk: "1TB" },
-  School: { gpu: 0, ram: 16, disk: "1TB" },
-  "Video Editing": { gpu: 3, ram: 32, disk: "2TB" },
-  Streaming: { gpu: 2, ram: 16, disk: "2TB" }
+  Roblox: { gpu: 1, gpuMax: 2, ram: 16, disk: "512GB" },
+  Minecraft: { gpu: 1, gpuMax: 2, ram: 16, disk: "512GB" },
+  Fortnite: { gpu: 2, gpuMax: 4, ram: 16, disk: "512GB" },
+  "Dota 2": { gpu: 1, gpuMax: 3, ram: 16, disk: "512GB" },
+  "League of Legends": { gpu: 1, gpuMax: 2, ram: 16, disk: "512GB" },
+  Valorant: { gpu: 1, gpuMax: 3, ram: 16, disk: "512GB" },
+  "Counter-Strike 2": { gpu: 2, gpuMax: 4, ram: 16, disk: "512GB" },
+  "Call of Duty": { gpu: 3, gpuMax: 5, ram: 16, disk: "1TB" },
+  "Diablo IV": { gpu: 2, gpuMax: 4, ram: 16, disk: "1TB" },
+  "Escape from Tarkov": { gpu: 3, gpuMax: 5, ram: 32, disk: "1TB" },
+  "Apex Legends": { gpu: 2, gpuMax: 4, ram: 16, disk: "1TB" },
+  School: { gpu: 0, gpuMax: 0, ram: 16, disk: "512GB" },
+  Office: { gpu: 0, gpuMax: 0, ram: 16, disk: "512GB" },
+  "Photo editing": { gpu: 2, gpuMax: 3, ram: 32, disk: "1TB" },
+  "Video Editing": { gpu: 3, gpuMax: 5, ram: 32, disk: "2TB" },
+  CAD: { gpu: 3, gpuMax: 5, ram: 32, disk: "1TB" }
 };
 const TOUR = [
   "Gaming? Home Server? Or slowly realizing you just built a $1,000 Facebook machine.",
@@ -344,7 +364,8 @@ function suggest() {
     || choose(pool("storage", (p) => /SSD|NVME/i.test(p.name)), cap * 0.12, gen);
   out.case = choose(pool("case", (p) => fitsCase(p, out.motherboard)), cap * 0.1, gen) || choose(pool("case"), cap, gen);
   if (wantGpu > 0 && graphics !== "integrated") {
-    const maxTier = cap >= 2200 && wantGpu >= 3 ? 4 : cap >= 1500 ? Math.max(wantGpu, 3) : cap >= 1000 ? 2 : 1;
+    const ceiling = use.gpuMax != null ? use.gpuMax : (use.gpu || 4);
+    const maxTier = Math.min(ceiling, cap >= 2200 && wantGpu >= 3 ? 4 : cap >= 1500 ? Math.max(wantGpu, 3) : cap >= 1000 ? 2 : 1);
     out.gpu = choose(pool("gpu", (p) => { const t = gpuTier(p); return t >= 1 && t <= maxTier; }).sort((a, b) => gpuTier(b) - gpuTier(a) || a.price - b.price), cap * 0.42, gen);
   }
   const tier = out.gpu ? gpuTier(out.gpu) : 0;
