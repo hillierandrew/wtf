@@ -16,7 +16,7 @@
       radial-gradient(circle at 84% 16%, #7ee7ff14, transparent 28%);
   }
   #logo {
-    position: fixed; left: 0; top: 0; z-index: 2;
+    position: fixed; left: 0; top: 0; z-index: 4;
     transform-origin: 0 0;
     will-change: transform;
     pointer-events: none;
@@ -1580,9 +1580,10 @@ const E=[
           rr = pal[0]; gg = pal[1]; bb = pal[2];
           alpha = (120 + v * 135) | 0;
         } else if (s.rain) {
-          var silver = (12 + v * 238) | 0;
-          rr = silver; gg = silver; bb = (silver * 0.9) | 0;
-          alpha = (30 + v * 225) | 0;
+          var hue = (t * 40 + col * 8 + v * 120) % 360;
+          var rgb = hsl(hue, 1, Math.min(0.78, 0.45 + v * 0.45));
+          rr = rgb[0]; gg = rgb[1]; bb = rgb[2];
+          alpha = 255;
         } else if (s.purple) {
           var phue = 268 + v * 42 + Math.sin(t * 0.5 + row * 0.08) * 6;
           var plight = (0.16 + v * 0.5) * breathe;
@@ -1590,11 +1591,11 @@ const E=[
           rr = prgb[0]; gg = prgb[1]; bb = prgb[2];
           alpha = (170 + v * 85) | 0;
         } else {
-          var hue = (hue0 + v * 70 + col * 1.6 + row * 0.5) % 360;
-          var light = (0.42 + v * 0.4) * breathe * Math.min(1.35, beat);
+          var hue = (hue0 * 1.7 + v * 180 + col * 6 + row * 3) % 360;
+          var light = Math.min(0.78, (0.58 + v * 0.34) * Math.min(1.25, beat));
           var rgb = hsl(hue, 1, light);
           rr = rgb[0]; gg = rgb[1]; bb = rgb[2];
-          alpha = (150 + v * 105) | 0;
+          alpha = 255;
         }
         var x0 = originX + col * cellW;
         var y0 = originY + row * cellH;
@@ -1687,33 +1688,59 @@ const E=[
     ictx.restore();
   }
 
+  var faceAt = 0;
+  var FACES = [
+    ["900", "Impact, 'Arial Black', 'Helvetica Neue', sans-serif"],
+    ["700", "'Courier New', ui-monospace, Menlo, monospace"],
+    ["700", "'Marker Felt', 'Comic Sans MS', cursive"],
+    ["500", "Zapfino, 'Snell Roundhand', 'Segoe Script', cursive"],
+    ["700", "Copperplate, 'American Typewriter', 'Times New Roman', serif"],
+    ["700", "Chalkduster, 'Bradley Hand', 'Marker Felt', cursive"],
+    ["700", "Papyrus, fantasy"],
+    ["italic 800", "'Gill Sans', 'Avenir Next', 'Trebuchet MS', sans-serif"],
+    ["italic 800", "Georgia, 'Times New Roman', serif"],
+    ["900", "'Arial Black', 'Helvetica Neue', sans-serif"]
+  ];
   function drawInk(t) {
     var w = ink.width, h = ink.height;
     if (!w || !h) return;
     ictx.setTransform(1, 0, 0, 1, 0, 0);
     ictx.clearRect(0, 0, w, h);
-    var word = faceText();
-    var cells = Math.max(1, word.length * 6 - 1);
-    var cell = Math.min(w * 0.9 / cells, h * 0.62 / 7);
-    var gw = cells * cell, gh = 7 * cell;
-    var x0 = (w - gw) / 2;
-    var y0 = (h - gh) / 2 + Math.sin(t * 2.2) * cell * 0.15;
-    var hue = (t * 70 + (danceOn ? dreamKick * 120 : 0)) % 360;
-    ictx.fillStyle = "hsl(" + hue + " 100% " + (danceOn ? 62 + dreamBass * 24 : 78) + "%)";
+    var word = faceText() || "DREW.WTF";
+    var face = FACES[faceAt % FACES.length];
+    var size = h * 0.72;
+    function setFont(px) { ictx.font = face[0] + " " + px + "px " + face[1]; }
+    setFont(size);
+    if (ictx.measureText(word).width > w * 0.94) {
+      size *= (w * 0.94) / ictx.measureText(word).width;
+      setFont(size);
+    }
+    var widths = [];
+    var total = 0;
     for (var i = 0; i < word.length; i++) {
-      var glyph = FONT[word.charAt(i)] || FONT[" "];
-      var ox = x0 + i * 6 * cell;
-      for (var gy = 0; gy < 7; gy++) {
-        var bits = glyph[gy];
-        if (!bits) continue;
-        for (var gx = 0; gx < 5; gx++) {
-          if ((bits & (16 >> gx)) === 0) continue;
-          ictx.fillRect(ox + gx * cell, y0 + gy * cell, Math.ceil(cell * 0.86), Math.ceil(cell * 0.86));
-        }
+      var cw = Math.max(size * 0.2, ictx.measureText(word.charAt(i)).width);
+      widths.push(cw);
+      total += cw;
+    }
+    var x0 = (w - total) / 2;
+    var copies = [[-size * 0.045, 0, "rgba(255,0,90,.95)"], [size * 0.05, size * 0.02, "rgba(0,230,255,.95)"]];
+    ictx.textAlign = "left";
+    ictx.textBaseline = "middle";
+    for (var c = 0; c < copies.length; c++) {
+      var pen = x0 + copies[c][0];
+      ictx.fillStyle = copies[c][2];
+      for (var n = 0; n < word.length; n++) {
+        ictx.fillText(word.charAt(n), pen, h * 0.52 + Math.sin(t * 3 + n * 0.7) * size * 0.08 + copies[c][1]);
+        pen += widths[n];
       }
     }
-    if (!isPhone()) ink.style.filter = "drop-shadow(0 0 8px hsl(" + hue + " 100% 55%))";
-    else ink.style.filter = "none";
+    var pen2 = x0;
+    for (var k = 0; k < word.length; k++) {
+      ictx.fillStyle = "hsl(" + ((t * 90 + k * 34) % 360) + " 100% 64%)";
+      ictx.fillText(word.charAt(k), pen2, h * 0.52 + Math.sin(t * 3 + k * 0.7) * size * 0.08);
+      pen2 += widths[k];
+    }
+    ink.style.filter = "drop-shadow(0 0 12px hsl(" + ((t * 90) % 360) + " 100% 60%))";
   }
 
   var baseW = 640, baseH = 90, x = 40, y = 40, vx = 150, vy = 110;
@@ -2260,6 +2287,7 @@ const E=[
     if (Math.abs(vx) < 70) vx = vx < 0 ? -90 : 90;
     if (Math.abs(vy) < 60) vy = vy < 0 ? -80 : 80;
     logo.style.visibility = "visible";
+    logo.style.opacity = "1";
     if (veilEl) veilEl.style.opacity = "";
   }
   function frame(now) {
@@ -2370,6 +2398,7 @@ const E=[
     var quick = performance.now() - tapAt < 320;
     stopHold();
     if (quick && tapAt && !uiHit(e.target) && !shop.classList.contains("open") && spawned) stepScene(tapSide);
+    if (!uiHit(e.target) && !shop.classList.contains("open")) faceAt = (faceAt + 1) % FACES.length;
     tapAt = 0;
   });
   document.addEventListener("pointercancel", stopHold);
