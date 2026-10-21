@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Let's Build Your Perfect PC</title>
+<style>
+  :root { color-scheme: light; --bg:#f4efe6; --ink:#1c1915; --card:#fffdf8; --line:#d9d0c3; --ok:#0e6b4f; --warn:#8a5a00; --bad:#8f1d33; --accent:#0e6b4f; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; background:var(--bg); color:var(--ink); font:20px/1.45 "Iowan Old Style", Palatino, Georgia, serif; }
+  button, input, select { font:18px/1.3 system-ui, sans-serif; color:inherit; }
+  button { min-height:56px; border-radius:14px; border:2px solid var(--ink); background:var(--card); padding:10px 14px; cursor:pointer; }
+  button.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
+  button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline:3px solid #0b57d0; outline-offset:3px; }
+  a { color:var(--accent); }
+  .top { position:sticky; top:0; z-index:2; background:#fffdf8ee; border-bottom:1px solid var(--line); display:flex; gap:8px; align-items:center; padding:8px 12px; overflow:auto; }
+  .top button { min-height:48px; white-space:nowrap; }
+  .wrap { width:min(1080px, 100%); margin:0 auto; padding:18px 14px 72px; }
+  h1 { font-size:clamp(34px, 6vw, 58px); line-height:1.05; margin:8px 0; font-weight:650; }
+  h2 { font-size:28px; margin:0 0 8px; }
+  .sub { font-size:22px; margin-top:0; }
+  .note { background:#fff6d8; border:1px solid #e2c56a; border-radius:14px; padding:12px 14px; font:16px/1.4 system-ui, sans-serif; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px; }
+  .card { background:var(--card); border:2px solid var(--line); border-radius:18px; padding:14px; text-align:left; }
+  .card.on { border-color:var(--accent); background:#e7f6f0; }
+  .card b { display:block; font-size:22px; }
+  .card span, .muted { font:16px/1.35 system-ui, sans-serif; color:#3d3832; }
+  .row { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0; }
+  .status { display:inline-block; border-radius:999px; padding:2px 8px; font:14px/1.3 system-ui, sans-serif; font-weight:700; }
+  .ok { background:#d8f3e8; color:#08543c; }
+  .warn { background:#fff1cc; color:#6d4700; }
+  .bad { background:#ffd9df; color:#7a1024; }
+  .pc { display:grid; grid-template-columns:1.1fr .9fr; gap:12px; align-items:center; }
+  .tower { border:3px solid var(--ink); border-radius:18px; padding:12px; background:#1c1915; color:#f4efe6; display:grid; gap:8px; }
+  .tower button { background:#2a2622; color:#f4efe6; border-color:#f4efe6; text-align:left; }
+  input[type="range"] { width:100%; height:36px; }
+  input[type="number"], input[type="search"], input[type="text"], select { width:100%; min-height:52px; border-radius:12px; border:2px solid var(--ink); padding:8px 12px; background:#fff; }
+  .price { font-variant-numeric:tabular-nums; font-weight:750; }
+  ul.clean { padding-left:1.1em; }
+  #lock { position:fixed; inset:0; background:var(--bg); display:grid; place-items:center; z-index:5; padding:16px; }
+  #lock[hidden] { display:none !important; }
+  #lock form { width:min(420px,100%); }
+  @media (max-width:720px) { .pc { grid-template-columns:1fr; } h1 { font-size:36px; } }
+  @media (prefers-reduced-motion: reduce) { * { animation:none !important; transition:none !important; } }
+  body.simple { font-size:24px; }
+  body.simple button { min-height:68px; font-size:22px; }
+</style>
+</head>
+<body>
+<div id="lock">
+  <form id="lockForm">
+    <h1>Easy builder</h1>
+    <p>Password</p>
+    <input id="lockPass" type="password" autocomplete="current-password" />
+    <p id="lockBad" class="bad"></p>
+    <button class="primary" type="submit">Open</button>
+  </form>
+</div>
+<nav class="top" aria-label="Main">
+  <button type="button" data-go="home">Home</button>
+  <button type="button" data-go="guide">Help me</button>
+  <button type="button" data-go="dash">My computer</button>
+  <button type="button" data-go="explore">Parts</button>
+  <button type="button" data-go="compare">Compare</button>
+  <button type="button" data-go="build">Put it together</button>
+  <button type="button" data-go="settings">Settings</button>
+</nav>
+<main class="wrap" id="app"></main>
+<script>
+const CATS = ["cpu","motherboard","memory","gpu","storage","case","cooler","psu"];
+const LABEL = { cpu:"Processor", motherboard:"Motherboard", memory:"Memory", gpu:"Graphics card", storage:"Storage", case:"Case", cooler:"Cooler", psu:"Power supply" };
+const USES = [
+  ["gaming","Gaming","Play games like Minecraft, Fortnite, and Roblox."],
+  ["school","School","Homework, browsing, video calls, and projects."],
+  ["work","Work","Documents, spreadsheets, email, and office apps."],
+  ["video","Video editing","Edit videos and make content."],
+  ["stream","Streaming","Play and broadcast at the same time."],
+  ["art","Art and design","Drawing, photos, and design."],
+  ["code","Programming","Write code and build apps."],
+  ["ai","Artificial intelligence","Try AI tools. This catalog cannot promise a specific model will run."],
+  ["everyday","Everyday","Internet, videos, and staying in touch."],
+  ["everything","Everything","A little of everything."]
+];
+const FACTS = {
+  cpu:["Processor (CPU)","This is the part that thinks. It follows the instructions in your programs.","Every computer needs one. A weak one makes everything feel slow. It must match the motherboard."],
+  motherboard:["Motherboard","This is the main board the other parts plug into. It lets them talk to each other.","Every computer needs one. It must match the processor and the memory."],
+  memory:["Memory (RAM)","This is the desk where the computer keeps what it is working on right now.","Every computer needs some. Too little makes many programs feel stuck. It must be the kind the motherboard accepts."],
+  gpu:["Graphics card (GPU)","This draws the pictures in games and some creative programs.","Not every computer needs a separate one. Some processors already draw the pictures. A big one may not fit the case, and the catalog often does not list the length, so I will say when I cannot check."],
+  storage:["Storage (SSD)","This is the filing cabinet. Your files stay here when the computer is off.","Every computer needs some. A slow drive makes starting up and opening files feel long. An SSD is the kind to start with."],
+  case:["Case","This is the box that holds the parts and keeps hands off the electronics.","You need one unless you already have a box that fits. The motherboard size must fit the box."],
+  cooler:["Cooler","This keeps the processor from getting too hot.","Some processors include one. If not, you need a separate cooler that fits the processor."],
+  psu:["Power supply","This takes wall power and feeds the parts.","Every computer needs one. Too small and the computer can shut off. I estimate the need. I do not have a lab measurement."]
+};
+const money = new Intl.NumberFormat("en-CA", { style:"currency", currency:"CAD" });
+let PARTS = [], byId = {};
+const state = load();
+function load() {
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem("drew-easy-build") || "{}"); } catch (e) {}
+  return Object.assign({
+    view:"home", step:0, five:false, simple:false, mode:"beginner",
+    answers:{ uses:["school"], budget:800, accessories:false, power:"works", owned:{}, ownedId:{}, priorities:["value"] },
+    build:{}, why:{}, unknown:{}, note:"", past:[], future:[], asm:0, sort:"fit", ask:""
+  }, saved);
+}
+function save() {
+  const copy = JSON.parse(JSON.stringify(state));
+  delete copy.past; delete copy.future;
+  try { localStorage.setItem("drew-easy-build", JSON.stringify(copy)); } catch (e) {}
+}
+function junk(p){ return /open box|renewed|recertified|sodimm|surveillance|purple|laptop|\becc\b/i.test(p.name) || p.price < 12; }
+function gbOf(p){ const m=p.name.toUpperCase().match(/\b(4|8|16|32|64)GB\b/); return m?+m[1]:0; }
+function wattOf(p){ if(!p) return 0; if(p.watt) return p.watt; const m=p.name.toUpperCase().match(/(\d{3,4})\s?W/); return m?+m[1]:0; }
+function gpuTier(p){ const n=p.name.toUpperCase(); if(/5090|4090/.test(n)) return 6; if(/5080|4080|5070\s?TI|9070\s?XT/.test(n)) return 5; if(/\b5070\b|\b9070\b|4070/.test(n)) return 4; if(/5060|7600|4060/.test(n)) return 3; if(/3050|1650|6500/.test(n)) return 2; if(/1030/.test(n)) return 1; return 0; }
+function formOf(p){ if(!p) return ""; if(p.form) return p.form; const n=p.name.toUpperCase(); if(/MICRO|MATX|M-ATX/.test(n)) return "matx"; if(/ITX/.test(n)) return "itx"; if(/ATX/.test(n)) return "atx"; return ""; }
+function fitsCase(box, board){ const r={itx:1,matx:2,atx:3,eatx:4,full:4}; return (r[formOf(box)]||3) >= (r[formOf(board)]||2); }
+function pool(cat, pred){ return PARTS.filter(p=>p.cat===cat && !junk(p) && (!pred || pred(p))).sort((a,b)=>a.price-b.price); }
+function choose(list, cap){ if(!list.length) return null; const under=list.filter(p=>p.price<=cap+0.001); const bag=(under.length?under:[list[0]]).slice(0,6); return bag[Math.min(bag.length-1, state.answers.priorities.includes("cheap")?0:Math.floor(bag.length/2))]; }
+function boxBudget(variant){
+  let n = Number(state.answers.budget)||0;
+  if (state.answers.accessories) n = Math.max(0, n-250);
+  if (variant<0) n *= 0.8;
+  return n;
+}
+function gpuTarget(){
+  const u = new Set(state.answers.uses);
+  if (u.has("everything")) u.add("gaming");
+  const power = state.answers.power;
+  let t = 0;
+  if (u.has("art")) t = 2;
+  if (u.has("gaming") || u.has("stream")) t = Math.max(t, {works:1,smooth:2,demanding:3,extreme:4,best:4}[power]||2);
+  if (u.has("video") || u.has("ai")) t = Math.max(t, power==="works"?2:3);
+  if (!u.has("gaming") && !u.has("stream") && !u.has("video") && !u.has("ai") && !u.has("art")) t = 0;
+  if (state.answers.priorities.includes("power")) t = 0;
+  return t;
+}
+function plan(variant){
+  const cap = boxBudget(variant);
+  const want = gpuTarget();
+  const small = state.answers.priorities.includes("small");
+  const out = {}, why = {};
+  const owned = state.answers.ownedId || {};
+  function take(cat, part, reason){ if(part){ out[cat]=part; why[cat]=reason; } }
+  if (owned.cpu && byId[owned.cpu]) take("cpu", byId[owned.cpu], "You already have this processor, so the rest of the computer is built around it.");
+  else {
+    const apu = pool("cpu", p=>/5500GT|5600GT|8500G|8600G|Graphics/i.test(p.name));
+    const plain = pool("cpu", p=>/Ryzen 5 5500 /.test(p.name));
+    const strong = pool("cpu", p=>/Ryzen 5 7600/.test(p.name));
+    let pick = want===0 || cap<850 ? apu[0] : (cap>=2400 && want>=3 ? strong[0] : plain[0]||apu[0]);
+    if (variant>0 && cap>=1600 && plain[0]) pick = plain[0];
+    take("cpu", pick, want===0 ? "The pictures can come from the processor, so you do not have to pay for a separate graphics card." : "This processor is fast enough for the job and leaves money for the other parts.");
+  }
+  if (!out.cpu) return { parts:{}, why:{}, note:"The parts list has no processor I can recommend." };
+  const socket = out.cpu.socket;
+  const ramKind = socket==="AM5" ? "DDR5" : "DDR4";
+  if (owned.motherboard && byId[owned.motherboard]) take("motherboard", byId[owned.motherboard], "You said this motherboard is already yours.");
+  else take("motherboard", pool("motherboard", p=>p.socket===socket && (!p.ram||p.ram===ramKind) && (!small || formOf(p)==="matx" || formOf(p)==="itx"))[0] || pool("motherboard", p=>p.socket===socket)[0], "This board fits that processor and the matching memory. I will still warn you if a detail is missing.");
+  const kind = (out.motherboard && out.motherboard.ram) || ramKind;
+  let gb = (state.answers.uses.includes("video")||state.answers.uses.includes("ai")) ? 32 : 16;
+  if (cap<700) gb = 8;
+  if (variant<0) gb = Math.min(gb, 16);
+  if (owned.memory && byId[owned.memory]) take("memory", byId[owned.memory], "You said this memory is already yours. I will check that it matches the board.");
+  else take("memory", pool("memory", p=>p.ram===kind && gbOf(p)===gb)[0] || pool("memory", p=>p.ram===kind && gbOf(p)>=8)[0], gb+" GB is enough room on the desk for this kind of work. More does not automatically make games smoother.");
+  const disk = cap<700 ? "512GB" : (state.answers.uses.includes("video")||state.answers.uses.includes("stream")) ? "2TB" : "1TB";
+  if (owned.storage && byId[owned.storage]) take("storage", byId[owned.storage], "You said this drive is already yours.");
+  else take("storage", pool("storage", p=>/SSD|NVME|M\.2/i.test(p.name) && !/HDD|HARD DRIVE/i.test(p.name) && p.name.toUpperCase().includes(disk))[0] || pool("storage", p=>/SSD|NVME/i.test(p.name))[0], "An SSD opens files and starts the computer much faster than an old hard drive.");
+  if (owned.case && byId[owned.case]) take("case", byId[owned.case], "You said this case is already yours. I will check the motherboard size against it.");
+  else take("case", pool("case", p=>fitsCase(p, out.motherboard) && (!small || formOf(p)!=="atx"))[0] || pool("case", p=>fitsCase(p, out.motherboard))[0], "This box fits the motherboard. I cannot see fan mounts or radiator room in the catalog.");
+  if (want>0 && !(owned.gpu && byId[owned.gpu])) {
+    const maxTier = Math.max(1, want + (variant>0?1:0));
+    const cards = pool("gpu", p=>{ const t=gpuTier(p); return t>=1 && t<=maxTier; }).sort((a,b)=>gpuTier(b)-gpuTier(a)||a.price-b.price);
+    const room = Math.max(80, cap - Object.values(out).reduce((s,p)=>s+p.price,0) - 80);
+    take("gpu", cards.find(p=>p.price<=room) || (cap>=900?cards[cards.length-1]:null), "This graphics card matches the games or creative work you picked, without spending the whole budget on it.");
+  } else if (owned.gpu && byId[owned.gpu]) take("gpu", byId[owned.gpu], "You said this graphics card is already yours. Length and power plugs are not in the catalog, so those still need a look.");
+  const tier = out.gpu ? gpuTier(out.gpu) : 0;
+  const needW = tier>=4?750:tier>=3?650:tier>=2?550:tier?450:400;
+  if (owned.psu && byId[owned.psu]) take("psu", byId[owned.psu], "You said this power supply is already yours. I will compare its listed watts with an estimate.");
+  else take("psu", pool("psu", p=>wattOf(p)>=needW && wattOf(p)<=needW+250)[0] || pool("psu", p=>wattOf(p)>=needW)[0], "This power supply is bigger than my estimated need, with some spare room. The estimate is not a lab test.");
+  if (owned.cooler && byId[owned.cooler]) take("cooler", byId[owned.cooler], "You said this cooler is already yours. The catalog does not list its height, so case fit is not verified.");
+  else if (!/cooler/i.test(out.cpu.name)) take("cooler", pool("cooler")[0], "This processor does not say it includes a cooler, so I added a separate one.");
+  else why.cooler = "This processor includes a cooler, so I did not add another one.";
+  let note = "";
+  const total = Object.values(out).reduce((s,p)=>s+p.price,0);
+  if (cap>0 && total>cap+1) note = "The closest honest computer costs "+money.format(total)+", which is over the "+money.format(cap)+" I could use. I will not pretend a lower budget hits the same goal.";
+  else if (want>=3 && (!out.gpu || gpuTier(out.gpu)<3)) note = "This budget cannot buy the stronger graphics card those harder jobs usually want. This is the closest computer I can build from the list.";
+  else note = "I picked parts that fit the job and the money, not the most expensive parts in the list.";
+  if (state.answers.accessories) note += " About $250 is only set aside for a screen, keyboard, and mouse. Those items are not in this parts list.";
+  return { parts:out, why, note };
+}
+function applyPlan(p){
+  pushHist();
+  state.build = {}; state.why = p.why; state.note = p.note;
+  Object.keys(p.parts).forEach(k=>{ state.build[k]=p.parts[k].id; });
+  save();
+}
+function selected(){ const m={}; CATS.forEach(id=>{ if(byId[state.build[id]]) m[id]=byId[state.build[id]]; }); return m; }
+function totalOf(parts){ return Object.values(parts).reduce((s,p)=>s+(p?p.price:0),0); }
+function checks(parts){
+  const list = [];
+  function add(level, text){ list.push({level, text}); }
+  CATS.forEach(id=>{
+    if (id==="gpu" && gpuTarget()===0) return;
+    if (id==="cooler" && parts.cpu && /cooler/i.test(parts.cpu.name)) return;
+    if (!parts[id]) {
+      if (state.unknown && state.unknown[id]) add("warn", LABEL[id]+": you already own one, but the model is unknown, so I cannot check it.");
+      else add("bad", LABEL[id]+" is still needed.");
+    }
+  });
+  if (parts.cpu && parts.motherboard) {
+    if (parts.cpu.socket && parts.motherboard.socket && parts.cpu.socket!==parts.motherboard.socket) add("bad", "This processor does not fit this motherboard.");
+    else if (!parts.cpu.socket || !parts.motherboard.socket) add("warn", "A socket is missing from the catalog, so processor fit is not verified.");
+    else add("ok", "The processor fits this motherboard's socket ("+parts.cpu.socket+").");
+    add("warn", "The catalog does not list BIOS versions. I cannot confirm the motherboard already supports this processor.");
+  }
+  if (parts.memory && parts.motherboard) {
+    if (parts.memory.ram && parts.motherboard.ram && parts.memory.ram!==parts.motherboard.ram) add("bad", "This memory is "+parts.memory.ram+" and the motherboard wants "+parts.motherboard.ram+".");
+    else if (!parts.memory.ram || !parts.motherboard.ram) add("warn", "Memory type is missing for one of these parts, so I cannot confirm the match.");
+    else add("ok", "The memory type matches the motherboard ("+parts.memory.ram+"). Speed limits are not in the catalog.");
+  }
+  if (parts.case && parts.motherboard) {
+    if (formOf(parts.case) && formOf(parts.motherboard) && !fitsCase(parts.case, parts.motherboard)) add("bad", "This case is smaller than the motherboard.");
+    else if (!formOf(parts.case) || !formOf(parts.motherboard)) add("warn", "A case or board size is missing, so physical fit is not verified.");
+    else add("ok", "The motherboard size fits this case. Cable room is not listed.");
+  }
+  if (parts.gpu) add("warn", "Graphics-card length and power plugs are not in the catalog, so case fit and cables are not verified.");
+  if (parts.storage && /NVME|M\.2/i.test(parts.storage.name)) add("warn", "This is an NVMe drive. The catalog does not list the motherboard's M.2 slots, so that still needs a look.");
+  if (parts.psu) {
+    const tier = parts.gpu?gpuTier(parts.gpu):0;
+    const need = (parts.cpu && (parts.cpu.watt||95) || 65) + (tier>=4?260:tier>=3?180:tier>=2?130:tier?40:0) + 70;
+    const w = wattOf(parts.psu);
+    if (!w) add("warn", "This power supply has no watt number in the catalog.");
+    else if (w < need) add("bad", "This power supply looks too small for the estimate ("+w+"W listed, about "+need+"W estimated).");
+    else add("ok", "Listed power supply watts ("+w+"W) are above the estimate (about "+need+"W). This is an estimate, not a measurement.");
+  }
+  if (parts.cooler) add("warn", "Cooler height and socket support are not fully listed, so fit is not verified.");
+  return list;
+}
+function spendCap(){ return state.answers.accessories ? Math.max(0,(Number(state.answers.budget)||0)-250) : (Number(state.answers.budget)||0); }
+function el(tag, attrs, kids){
+  const node = document.createElement(tag);
+  Object.entries(attrs||{}).forEach(([k,v])=>{
+    if (k==="class") node.className=v;
+    else if (k==="text") node.textContent=v;
+    else if (k.startsWith("on")) node.addEventListener(k.slice(2), v);
+    else if (v===true) node.setAttribute(k,"");
+    else if (v!==false && v!=null) node.setAttribute(k,v);
+  });
+  (kids||[]).forEach(k=>{ if(k) node.appendChild(typeof k==="string"?document.createTextNode(k):k); });
+  return node;
+}
+function pushHist(){ state.past.push(JSON.stringify(state.build)); state.future=[]; if(state.past.length>30) state.past.shift(); }
+function say(long, short){ return state.five ? short : long; }
+function render(){
+  document.body.classList.toggle("simple", state.simple);
+  const app = document.getElementById("app");
+  app.replaceChildren();
+  const view = { home:viewHome, guide:viewGuide, dash:viewDash, explore:viewExplore, compare:viewCompare, build:viewAsm, settings:viewSettings }[state.view] || viewHome;
+  view(app);
+  save();
+}
+function banner(parent){
+  parent.appendChild(el("p",{class:"note", text:"Prices are Canadian dollars from the saved parts list. They are not live store prices, and they do not include shipping or tax. If a fit detail is missing, I say so instead of guessing."}));
+}
+function viewHome(app){
+  app.append(el("h1",{text:"Let's Build Your Perfect PC."}), el("p",{class:"sub", text:"You don't need to know computers. Tell me what you want to do, and I will figure out the rest."}));
+  banner(app);
+  const row = el("div",{class:"row"});
+  row.append(
+    el("button",{class:"primary", type:"button", text:"Help Me Build a PC", onclick:()=>{ state.view="guide"; state.step=0; render(); }}),
+    el("button",{type:"button", text:"I Already Know What I Want", onclick:()=>{ state.mode="expert"; state.view="dash"; render(); }}),
+    el("button",{type:"button", text:"Show Me Ready-Made PCs", onclick:()=>{ state.view="compare"; render(); }}),
+    el("button",{type:"button", text:"Help Me Upgrade My Current PC", onclick:()=>{ state.view="guide"; state.step=3; render(); }})
+  );
+  app.appendChild(row);
+  const pc = el("div",{class:"pc"});
+  const tower = el("div",{class:"tower", role:"group", "aria-label":"Computer parts"});
+  ["case","motherboard","cpu","memory","gpu","storage","cooler","psu"].forEach(id=>{
+    tower.appendChild(el("button",{type:"button", text:LABEL[id], onclick:()=>{ state.focus=id; state.view="explore"; render(); }}));
+  });
+  const copy = el("div");
+  const id = state.focus || "gpu";
+  const f = FACTS[id];
+  copy.append(el("h2",{text:f[0]}), el("p",{text:state.five?"Think of it this way: "+f[1]:f[1]}), el("p",{class:"muted", text:f[2]}));
+  pc.append(tower, copy);
+  app.appendChild(pc);
+}
+function viewGuide(app){
+  const steps = ["What will you use it for?","What's your budget?","How powerful should it be?","Do you already own any parts?","What matters most?","Your computer"];
+  app.append(el("p",{class:"muted", text:"Step "+(state.step+1)+" of "+steps.length}), el("h1",{text:steps[state.step]}));
+  banner(app);
+  if (state.step===0) {
+    const grid = el("div",{class:"grid"});
+    USES.forEach(([id,name,blurb])=>{
+      const on = state.answers.uses.includes(id);
+      grid.appendChild(el("button",{class:"card"+(on?" on":""), type:"button", onclick:()=>{
+        const set = new Set(state.answers.uses);
+        if (set.has(id)) set.delete(id); else set.add(id);
+        state.answers.uses = [...set];
+        render();
+      }}, [el("b",{text:name}), el("span",{text:blurb})]));
+    });
+    app.appendChild(grid);
+  }
+  if (state.step===1) {
+    const presets = [450,700,1000,1500,2000,3000,4000];
+    const row = el("div",{class:"row"});
+    [["Under $500",450],["$500–$800",700],["$800–$1,200",1000],["$1,200–$1,800",1500],["$1,800–$2,500",2000],["$2,500–$3,500",3000],["$3,500+",4000],["I'm not sure",800]].forEach(([label,value])=>{
+      row.appendChild(el("button",{type:"button", class:state.answers.budget===value?"primary":"", text:label, onclick:()=>{ state.answers.budget=value; if(label.includes("not sure")) state.answers.unsure=true; render(); }}));
+    });
+    app.appendChild(row);
+    const num = el("input",{type:"number", min:"0", max:"20000", value:String(state.answers.budget), "aria-label":"Your own budget"});
+    num.addEventListener("change", ()=>{ state.answers.budget=Math.max(0, Math.min(20000, Number(num.value)||0)); render(); });
+    app.append(el("p",{text:"Or type your own budget in Canadian dollars."}), num);
+    const acc = el("button",{type:"button", class:state.answers.accessories?"primary":"", text:state.answers.accessories?"Budget includes screen and keyboard":"Budget is only the computer box", onclick:()=>{ state.answers.accessories=!state.answers.accessories; render(); }});
+    app.append(el("p",{class:"muted", text:"The parts list has no monitors or keyboards. If you include them, I set aside $250 as a placeholder, not a real price."}), acc);
+  }
+  if (state.step===2) {
+    const opts = [["works","I just want things to work."],["smooth","I want games to look good and run smoothly."],["demanding","I want demanding games at high quality."],["extreme","I want an extremely powerful computer."],["best","I want the best this budget can honestly do."]];
+    const grid = el("div",{class:"grid"});
+    opts.forEach(([id,text])=> grid.appendChild(el("button",{class:"card"+(state.answers.power===id?" on":""), type:"button", text, onclick:()=>{ state.answers.power=id; render(); }})));
+    app.appendChild(grid);
+    app.appendChild(el("p",{class:"muted", text:"I will not invent a frames-per-second number. The catalog has no game benchmarks."}));
+  }
+  if (state.step===3) {
+    CATS.forEach(id=>{
+      const own = state.answers.owned[id] || "no";
+      const row = el("div",{class:"card"});
+      row.appendChild(el("b",{text:LABEL[id]}));
+      const buttons = el("div",{class:"row"});
+      [["no","I need to buy it"],["yes","I already own it"],["unsure","I don't know"]].forEach(([k,label])=>{
+        buttons.appendChild(el("button",{type:"button", class:own===k?"primary":"", text:label, onclick:()=>{ state.answers.owned[id]=k; if(k!=="yes") delete state.answers.ownedId[id]; state.unknown[id]=k==="unsure"; render(); }}));
+      });
+      row.appendChild(buttons);
+      if (own==="yes") {
+        const search = el("input",{type:"search", placeholder:"Type the model, if you know it", value:""});
+        const list = el("div");
+        search.addEventListener("input", ()=>{
+          list.replaceChildren();
+          const q = search.value.toLowerCase();
+          if (q.length<2) return;
+          pool(id, p=>p.name.toLowerCase().includes(q)).slice(0,6).forEach(p=>{
+            list.appendChild(el("button",{type:"button", text:p.name+" — "+money.format(p.price), onclick:()=>{ state.answers.ownedId[id]=p.id; state.unknown[id]=false; render(); }}));
+          });
+        });
+        row.append(search, list);
+        if (state.answers.ownedId[id] && byId[state.answers.ownedId[id]]) row.appendChild(el("p",{text:"Using "+byId[state.answers.ownedId[id]].name}));
+      }
+      app.appendChild(row);
+    });
+  }
+  if (state.step===4) {
+    const opts = [["cheap","Cheapest possible"],["value","Best value"],["quiet","Quiet"],["small","Small case"],["upgrade","Easy to upgrade later"],["gaming","Maximum gaming"],["reliable","Known brands when the price is close"],["power","Low electricity use"]];
+    const grid = el("div",{class:"grid"});
+    opts.forEach(([id,name])=>{
+      const on = state.answers.priorities.includes(id);
+      grid.appendChild(el("button",{class:"card"+(on?" on":""), type:"button", onclick:()=>{
+        const set = new Set(state.answers.priorities);
+        if (set.has(id)) set.delete(id); else set.add(id);
+        state.answers.priorities=[...set]; render();
+      }}, [el("b",{text:name})]));
+    });
+    app.appendChild(grid);
+    app.appendChild(el("p",{class:"muted", text:"Quiet, RGB, and warranty are not measured in this catalog. I will not pretend they are."}));
+  }
+  if (state.step===5) {
+    app.append(el("p",{text:"I used your answers. Nothing here is a live price."}), el("button",{class:"primary", type:"button", text:"Show my computer", onclick:()=>{ applyPlan(plan(0)); state.view="dash"; render(); }}));
+  }
+  const nav = el("div",{class:"row"});
+  if (state.step>0) nav.appendChild(el("button",{type:"button", text:"Back", onclick:()=>{ state.step--; render(); }}));
+  if (state.step<5) nav.appendChild(el("button",{class:"primary", type:"button", text:state.step===4?"Build my PC":"Next", onclick:()=>{ state.step++; render(); }}));
+  app.appendChild(nav);
+}
+function viewDash(app){
+  const parts = selected();
+  app.append(el("h1",{text:"Your computer"}), el("p",{text:state.note || "No build yet. I can make one from your answers."}));
+  banner(app);
+  const left = spendCap() - totalOf(parts);
+  app.append(el("p",{class:"price", text:"Total "+money.format(totalOf(parts))+" · Budget left "+money.format(left)}), el("p",{class:"muted", text:"Mode: "+state.mode+". Switching mode keeps this build."}));
+  const modes = el("div",{class:"row"});
+  [["beginner","Beginner"],["guided","Guided"],["expert","Expert"]].forEach(([id,name])=> modes.appendChild(el("button",{type:"button", class:state.mode===id?"primary":"", text:name, onclick:()=>{ state.mode=id; render(); }})));
+  app.appendChild(modes);
+  if (!Object.keys(parts).length) app.appendChild(el("button",{class:"primary", type:"button", text:"Make a recommendation", onclick:()=>{ applyPlan(plan(0)); render(); }}));
+  CATS.forEach(id=>{
+    const part = parts[id];
+    const card = el("article",{class:"card"});
+    card.append(el("b",{text:LABEL[id]}), el("p",{text:part?part.name:"Not chosen yet"}), el("p",{class:"muted", text:state.why[id] || FACTS[id][1]}));
+    if (part) card.append(el("p",{class:"price", text:money.format(part.price)+" · catalog price"}), el("p",{class:"muted", text:"No store link is stored. Search this exact name yourself."}));
+    const row = el("div",{class:"row"});
+    row.append(
+      el("button",{type:"button", text:"Keep this", onclick:()=>{}}),
+      el("button",{type:"button", text:"Find something else", onclick:()=>{ state.focus=id; state.view="explore"; render(); }}),
+      el("button",{type:"button", text:"Explain this part", onclick:()=>{ state.focus=id; state.view="explore"; render(); }})
+    );
+    card.appendChild(row);
+    if (state.mode!=="beginner") card.appendChild(optionList(id));
+    app.appendChild(card);
+  });
+  const flags = checks(parts);
+  const box = el("div",{class:"card"});
+  box.appendChild(el("h2",{text:"Compatibility"}));
+  const ul = el("ul",{class:"clean"});
+  (flags.length?flags:[{level:"ok", text:"Nothing to check yet."}]).forEach(item=>{
+    const li = el("li");
+    li.append(el("span",{class:"status "+item.level, text:item.level==="ok"?"Fits":item.level==="warn"?"Check":"Does not fit"}), document.createTextNode(" "+item.text));
+    ul.appendChild(li);
+  });
+  box.appendChild(ul);
+  app.appendChild(box);
+  const tools = el("div",{class:"row"});
+  tools.append(
+    el("button",{type:"button", text:"Undo", onclick:()=>{ if(!state.past.length) return; state.future.push(JSON.stringify(state.build)); state.build=JSON.parse(state.past.pop()); render(); }}),
+    el("button",{type:"button", text:"Redo", onclick:()=>{ if(!state.future.length) return; state.past.push(JSON.stringify(state.build)); state.build=JSON.parse(state.future.pop()); render(); }}),
+    el("button",{type:"button", text:"Start over", onclick:()=>{ pushHist(); state.build={}; state.why={}; state.note=""; render(); }}),
+    el("button",{type:"button", text:"Copy share link", onclick:()=>{ const link=location.href.split("#")[0]+"#"+CATS.map(id=>state.build[id]).filter(Boolean).join(","); if(navigator.clipboard) navigator.clipboard.writeText(link); }}),
+    el("button",{type:"button", text:"Cheaper build", onclick:()=>{ applyPlan(plan(-1)); render(); }}),
+    el("button",{type:"button", text:"Stronger build", onclick:()=>{ applyPlan(plan(1)); render(); }})
+  );
+  app.appendChild(tools);
+  const q = el("input",{type:"text", placeholder:"Ask a plain question", value:state.ask||""});
+  const ans = el("p",{text:assist(state.ask||"")});
+  q.addEventListener("change", ()=>{ state.ask=q.value; render(); });
+  app.append(el("h2",{text:"Ask"}), q, ans);
+}
+function optionList(id){
+  const wrap = el("div");
+  let list = pool(id).slice(0, state.mode==="expert"?12:4);
+  if (state.sort==="cheap") list = pool(id).slice(0,8);
+  list.forEach(p=>{
+    wrap.appendChild(el("button",{type:"button", text:p.name+" — "+money.format(p.price), onclick:()=>{ pushHist(); state.build[id]=p.id; state.why[id]="You picked this one yourself."; render(); }}));
+  });
+  return wrap;
+}
+function viewExplore(app){
+  const id = state.focus || "cpu";
+  const f = FACTS[id];
+  app.append(el("h1",{text:f[0]}), el("p",{text:state.five?f[1]:f[1]+" "+f[2]}));
+  banner(app);
+  const jump = el("div",{class:"row"});
+  CATS.forEach(k=> jump.appendChild(el("button",{type:"button", class:k===id?"primary":"", text:LABEL[k], onclick:()=>{ state.focus=k; render(); }})));
+  app.appendChild(jump);
+  const search = el("input",{type:"search", placeholder:"Search this kind of part", "aria-label":"Search"});
+  const list = el("div",{class:"grid"});
+  function fill(){
+    list.replaceChildren();
+    const q = search.value.toLowerCase();
+    pool(id, p=>!q || p.name.toLowerCase().includes(q)).slice(0,24).forEach(p=>{
+      const card = el("article",{class:"card"});
+      const partNow = selected();
+      const trial = Object.assign({}, partNow, {[id]:p});
+      const bad = checks(trial).some(x=>x.level==="bad");
+      card.append(el("b",{text:p.name}), el("p",{class:"price", text:money.format(p.price)}), el("p",{class:"muted", text:[p.socket,p.ram,p.form,p.watt&&(p.watt+"W")].filter(Boolean).join(" · ")||"Few specs are stored."}), el("span",{class:"status "+(bad?"bad":"warn"), text:bad?"Does not fit this build":"Check remaining details"}));
+      card.appendChild(el("button",{type:"button", text:"Choose this part", onclick:()=>{ pushHist(); state.build[id]=p.id; state.why[id]="You chose this from the list."; state.view="dash"; render(); }}));
+      list.appendChild(card);
+    });
+  }
+  search.addEventListener("input", fill);
+  app.append(search, list);
+  fill();
+}
+function viewCompare(app){
+  app.append(el("h1",{text:"Three ways to spend the money"}), banner(app));
+  const plans = [["Cheaper", plan(-1)],["The one I would sell you", plan(0)],["Stronger", plan(1)]];
+  const grid = el("div",{class:"grid"});
+  plans.forEach(([name, p])=>{
+    const card = el("article",{class:"card"});
+    const total = Object.values(p.parts).reduce((s,part)=>s+part.price,0);
+    card.append(el("b",{text:name}), el("p",{class:"price", text:money.format(total)}), el("p",{text:p.note}));
+    CATS.forEach(id=>{ if(p.parts[id]) card.appendChild(el("p",{class:"muted", text:LABEL[id]+": "+p.parts[id].name})); });
+    const flags = checks(p.parts);
+    card.appendChild(el("p",{text:flags.some(f=>f.level==="bad")?"Has a confirmed problem.":flags.some(f=>f.level==="warn")?"Fits what I can check. Some details are missing.":"No problem found in the stored specs."}));
+    card.appendChild(el("button",{class:"primary", type:"button", text:"Use this computer", onclick:()=>{ applyPlan(p); state.view="dash"; render(); }}));
+    grid.appendChild(card);
+  });
+  app.appendChild(grid);
+  app.appendChild(el("p",{text:"The middle one matches your answers. The cheaper one spends less and may give up graphics power. The stronger one spends more. I will not invent a performance percentage."}));
+}
+function viewAsm(app){
+  const parts = selected();
+  const steps = [
+    "Clear a table. Do not build on carpet if you can help it. Leave the power supply closed. Do not open it.",
+    "Touch the case metal before you handle parts, so a static spark is less likely. This is a precaution, not a guarantee.",
+    "Open the processor socket the way the motherboard manual shows. Set the processor in. Do not force it. Close the latch.",
+    parts.memory ? "Click the memory into the slots until both ends latch. Line up the notch. Do not force a stick that does not match." : "Add memory before the first startup.",
+    parts.storage && /NVME|M\.2/i.test(parts.storage.name) ? "Screw the NVMe drive into the M.2 slot flat. Do not bend it." : "Mount the SSD in its bay. Do not bend the connector.",
+    "Stand the motherboard on its box, then later screw it into the case on the standoffs. Do not let the board sit on loose screws.",
+    "Put the power supply in its spot with the fan facing the way the case expects. Do not open the power supply.",
+    parts.gpu ? "Seat the graphics card in its slot until the latch clicks, then screw the bracket. If it does not slide in, stop." : "This build has no separate graphics card. The processor draws the picture.",
+    "Connect the power cables the manuals show. If a plug does not match, do not bend its pins.",
+    parts.cooler ? "Mount the cooler the way its own sheet shows. Do not turn the computer on with the cooler missing." : "Use the cooler that came with the processor.",
+    "Look once more: processor latched, memory clicked, power cables seated, no loose screws.",
+    "Plug in a screen. Turn it on. If it does not start, turn it off and recheck cables. I cannot see your computer from here.",
+    "Install the operating system from a source you trust, then the drivers from the brands that made the parts."
+  ];
+  app.append(el("h1",{text:"Put it together"}), el("p",{class:"muted", text:"Step "+(state.asm+1)+" of "+steps.length+". Stop any time. Do not force a part."}));
+  app.appendChild(el("p",{text:steps[state.asm]}));
+  const row = el("div",{class:"row"});
+  if (state.asm>0) row.appendChild(el("button",{type:"button", text:"Back", onclick:()=>{ state.asm--; render(); }}));
+  if (state.asm<steps.length-1) row.appendChild(el("button",{class:"primary", type:"button", text:"Next", onclick:()=>{ state.asm++; render(); }}));
+  app.appendChild(row);
+}
+function viewSettings(app){
+  app.append(el("h1",{text:"Settings"}), el("p",{text:"The whole builder works without an account. This browser keeps the build on this device only."}));
+  app.appendChild(el("button",{type:"button", class:state.five?"primary":"", text:state.five?"Simple words are on":"Explain like I'm new", onclick:()=>{ state.five=!state.five; render(); }}));
+  app.appendChild(el("button",{type:"button", class:state.simple?"primary":"", text:state.simple?"Bigger controls are on":"Bigger controls", onclick:()=>{ state.simple=!state.simple; render(); }}));
+  app.appendChild(el("p",{class:"muted", text:"Keyboard works on every button. Status uses the words Fits, Check, and Does not fit, not color alone."}));
+}
+function assist(q){
+  const s = (q||"").toLowerCase();
+  if (!s.trim()) return "Ask about a part, Minecraft, old memory, or making it cheaper. If I do not know, I will say so.";
+  if (s.includes("cheaper")) return "Press Cheaper build. It spends less. It may drop the graphics card down or skip one. I will show the new total.";
+  if (s.includes("ssd") || s.includes("hdd") || s.includes("hard drive")) return "Storage is the filing cabinet. An SSD is the fast kind. A hard drive is the older, slower kind. Start with an SSD.";
+  if (s.includes("minecraft") || s.includes("fortnite") || s.includes("roblox")) return "I can say whether the build has a graphics card. I cannot say a frame rate, because this catalog has no game tests.";
+  if (s.includes("ram") || s.includes("memory")) return "Old memory works only if it is the same kind as the motherboard, such as DDR4 or DDR5. If you do not know the model, I cannot say it fits.";
+  if (s.includes("graphics") || s.includes("gpu")) return FACTS.gpu[1]+" "+FACTS.gpu[2];
+  if (s.includes("why")) return state.note || "I have not built a computer from your answers yet.";
+  return "I don't know that from the saved parts list, so I will not guess.";
+}
+document.querySelectorAll("[data-go]").forEach(btn=> btn.addEventListener("click", ()=>{ state.view=btn.getAttribute("data-go"); render(); }));
+document.getElementById("lockForm").onsubmit = (event)=>{
+  event.preventDefault();
+  if (document.getElementById("lockPass").value==="Password3") { sessionStorage.setItem("drew-easy","1"); boot(); }
+  else document.getElementById("lockBad").textContent = "Wrong password";
+};
+function boot(){
+  document.getElementById("lock").hidden = true;
+  fetch("parts.json").then(r=>r.json()).then(data=>{
+    PARTS = data; data.forEach(p=>{ byId[p.id]=p; });
+    const hash = location.hash.replace("#","");
+    if (hash) hash.split(",").forEach(id=>{ if(byId[id]) state.build[byId[id].cat]=id; });
+    render();
+  }).catch(()=>{ document.getElementById("app").textContent = "The parts list did not load."; });
+}
+if (sessionStorage.getItem("drew-easy")==="1") boot();
+</script>
+</body>
+</html>

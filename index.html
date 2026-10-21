@@ -199,9 +199,9 @@
   function openShop(which) {
     shop.classList.add("open");
     var frame = document.getElementById("shopFrame");
-    var src = which === "dream" ? "bench/dream.html" : "bench/";
+    var src = which === "dream" ? "bench/dream.html" : which === "easy" ? "bench/easy.html" : "bench/";
     var title = document.getElementById("shopTitle");
-    if (title) title.textContent = which === "dream" ? "Dream builder" : "Build a computer";
+    if (title) title.textContent = which === "dream" ? "Dream builder" : which === "easy" ? "Easy builder" : "Build a computer";
     if (frame.getAttribute("src") !== src) frame.src = src;
   }
 
@@ -1401,7 +1401,6 @@ const E=[
       }
     }
     ctx.putImageData(buf, 0, 0);
-    paintHerd(t);
     if (pack === "elephant") {
       canvas.style.transform = "none";
       canvas.style.opacity = "1";
@@ -1439,86 +1438,8 @@ const E=[
     c.moveTo(1620, 118); c.lineTo(1716, 118);
   }
 
-  var critters = [
-    ["🐘", "ELEPHANT"], ["🍄", "SHROOM"], ["🐷", "PIG"], ["🐸", "FROG"],
-    ["🐙", "OCTOPUS"], ["🦋", "MOTH"], ["🐍", "SNAKE"], ["🦎", "LIZARD"],
-    ["🦄", "UNICORN"], ["🐉", "DRAGON"], ["🦊", "FOX"], ["🦉", "OWL"],
-    ["🦀", "CRAB"], ["🐠", "FISH"], ["🐝", "BEE"], ["🐢", "TURTLE"],
-    ["🦜", "PARROT"], ["🦕", "DINO"], ["🦑", "SQUID"], ["🦚", "PEACOCK"],
-    ["🦒", "GIRAFFE"], ["🐇", "RABBIT"], ["🐈", "CAT"], ["🐊", "CROC"],
-    ["🦈", "SHARK"], ["🦥", "SLOTH"], ["🐓", "ROOSTER"], ["🐪", "CAMEL"],
-    ["🦞", "LOBSTER"], ["🦔", "HEDGEHOG"], ["🐧", "PENGUIN"], ["🦩", "FLAMINGO"]
-  ];
-  var form = null;
-  var formHue = Math.random() * 360;
+  var formHue = 28;
   var bounceAt = -10;
-
-  var herd = [];
-  var herdAt = -99;
-
-  function rollHerd(t) {
-    herdAt = t;
-    var count = W < 700 ? 3 : (W > 1600 ? 7 : 5);
-    var next = [];
-    for (var i = 0; i < count; i++) {
-      var pick = critters[(Math.random() * critters.length) | 0];
-      next.push({
-        emoji: pick[0],
-        name: pick[1],
-        x: 0.08 + Math.random() * 0.84,
-        y: 0.12 + Math.random() * 0.76,
-        hue: Math.random() * 360,
-        size: 0.16 + Math.random() * 0.16
-      });
-    }
-    herd = next;
-  }
-
-  function paintHerd(t) {
-    if (!herd.length || t - herdAt > 3.2) rollHerd(t);
-    else if (((t * 2) | 0) !== ((herdAt * 2) | 0) && Math.random() < 0.02) {
-      var slot = (Math.random() * herd.length) | 0;
-      var pick = critters[(Math.random() * critters.length) | 0];
-      herd[slot].emoji = pick[0];
-      herd[slot].name = pick[1];
-      herd[slot].hue = Math.random() * 360;
-    }
-    ctx.save();
-    ctx.globalCompositeOperation = "source-over";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    for (var i = 0; i < herd.length; i++) {
-      var a = herd[i];
-      var px = a.x * W + Math.sin(t * 0.65 + i * 1.7) * Math.min(48, W * 0.04);
-      var py = a.y * H + Math.cos(t * 0.5 + i) * Math.min(36, H * 0.04);
-      var size = Math.min(W, H) * a.size * (0.92 + 0.08 * Math.sin(t * 1.4 + i));
-      var shifts = [0, 55, 125, 200, 280];
-      ctx.font = size + "px 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif";
-      for (var g = 0; g < shifts.length; g++) {
-        ctx.fillStyle = "hsla(" + ((a.hue + shifts[g] + t * 50) % 360) + ",100%,62%," + (g === shifts.length - 1 ? 0.95 : 0.45) + ")";
-        ctx.fillText(a.emoji, px + (g - 2) * size * 0.06, py + Math.sin(t * 3 + g) * 3);
-      }
-      ctx.font = "900 " + Math.max(18, size * 0.28) + "px Impact, 'Arial Black', sans-serif";
-      for (var k = 0; k < a.name.length; k++) {
-        var nx = px + (k - (a.name.length - 1) / 2) * size * 0.22;
-        var ny = py + size * 0.62 + Math.sin(t * 3 + k) * 4;
-        for (var c = 0; c < 4; c++) {
-          ctx.fillStyle = "hsl(" + ((a.hue + k * 24 + c * 70 + t * 60) % 360) + " 100% 62%)";
-          ctx.fillText(a.name.charAt(k), nx + (c - 1.5) * 3, ny);
-        }
-        ctx.fillStyle = "#fff";
-        ctx.fillText(a.name.charAt(k), nx, ny);
-      }
-    }
-    ctx.restore();
-  }
-
-  function nextForm() {
-    var pick = critters[(Math.random() * critters.length) | 0];
-    if (form && pick[0] === form[0]) pick = critters[(Math.random() * critters.length) | 0];
-    form = pick;
-    formHue = Math.random() * 360;
-  }
 
   function paintGlyph(ch, cx, cy, size, t, i, hue) {
     var spins = [0, 48, 120, 190, 250, 310];
@@ -1545,22 +1466,12 @@ const E=[
     if (!w || !h) return;
     ictx.setTransform(1, 0, 0, 1, 0, 0);
     ictx.clearRect(0, 0, w, h);
-    if (!form) {
-      var word = "DREW.WTF";
-      var gap = w / (word.length + 0.15);
-      var size = h * 0.62;
-      for (var i = 0; i < word.length; i++) {
-        var wave = Math.sin(t * 3.4 + i * 0.85) * h * 0.1;
-        paintGlyph(word.charAt(i), gap * (i + 0.58), h * 0.46 + wave, size, t, i, i * 36);
-      }
-    } else {
-      paintGlyph(form[0], w * 0.34, h * 0.48, h * 0.86, t, 0, formHue);
-      var name = form[1];
-      var gap2 = (w * 0.5) / name.length;
-      var size2 = Math.min(h * 0.34, gap2 * 1.35);
-      for (var n = 0; n < name.length; n++) {
-        paintGlyph(name.charAt(n), w * 0.52 + gap2 * n, h * 0.5 + Math.sin(t * 4 + n) * h * 0.06, size2, t, n + 2, formHue + n * 28);
-      }
+    var word = "DREW.WTF";
+    var gap = w / (word.length + 0.15);
+    var size = h * 0.62;
+    for (var i = 0; i < word.length; i++) {
+      var wave = Math.sin(t * 3.4 + i * 0.85) * h * 0.1;
+      paintGlyph(word.charAt(i), gap * (i + 0.58), h * 0.46 + wave, size, t, i, i * 36);
     }
     ink.style.filter = "drop-shadow(0 0 12px hsl(" + ((t * 90 + formHue) % 360) + " 100% 60%)) drop-shadow(0 0 18px hsl(" + ((t * 90 + formHue + 140) % 360) + " 100% 50%))";
   }
@@ -1607,9 +1518,7 @@ const E=[
     if (hitY) vy = -vy;
     if (hitX || hitY) {
       varyVelocity();
-      nextForm();
       bounceAt = t;
-      rollHerd(t);
     }
     var punch = Math.max(0, 1 - (t - bounceAt) * 2.4);
     var breathe = 1 + Math.sin(t * 1.7) * 0.06 + punch * 0.28;
@@ -1782,6 +1691,10 @@ const E=[
       try { sessionStorage.setItem("drew-dream", "1"); } catch (err) {}
       gate.classList.remove("open");
       openShop("dream");
+    } else if (gatePass.value === "Password3") {
+      try { sessionStorage.setItem("drew-easy", "1"); } catch (err) {}
+      gate.classList.remove("open");
+      openShop("easy");
     } else {
       gateMsg.textContent = "Wrong password";
       gatePass.select();
