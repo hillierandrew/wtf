@@ -201,7 +201,7 @@ function findPurpose(id) {
   }
   return null;
 }
-function junk(p) { return /open box|renewed|recertified|sodimm|surveillance|purple|laptop|\becc\b/i.test(p.name) || p.price < 12; }
+function junk(p) { return /open\s?box|\[openbox\]|renewed|recertified|sodimm|surveillance|purple|laptop|\becc\b|(^|\s)ican\b/i.test((p.name||"")+" "+(p.brand||"")) || p.price < 12; }
 function sticksOf(p) {
   const n = (p && p.name) || "";
   const m = n.match(/\((\d+)\s*[x×]\s*\d+/i) || n.match(/\b(\d+)\s*[x×]\s*\d+\s*GB/i);

@@ -122,7 +122,9 @@
   <section id="parts"></section>
 </div>
 <div id="langs"></div>
-<div class="dock"><span>Paper total</span><b id="dockTotal">$0</b></div>
+<div class="dock"><span>Paper total</span><b id="dockTotal">$0</b><button class="icon" id="codeBtn" type="button">QR</button></div>
+<canvas id="code" hidden></canvas>
+<script src="qr.js"></script>
 <script src="bulb.js"></script>
 <script>
 const JOBS = ["elementary","highschool","college","office","cad","video","dj","stream","fortnite","roblox","minecraft","warzone","apex","tarkov"];
@@ -154,7 +156,14 @@ const LANG = {
   kn: { name:"ಕನ್ನಡ", title:"ಕಂಪ್ಯೂಟರ್ ಮಾಡಿ", pitch:"ಕೆಲಸ ಮತ್ತು ಬಜೆಟ್‌ಗೆ ಸರಿಯಾದ ಕಂಪ್ಯೂಟರ್. ದುಬಾರಿ ಒಂದಲ್ಲ. ಬಜೆಟ್ ಜರುಗಿಸಿ. ಕೆಲಸ ಆಯ್ಕೆಮಾಡಿ.", budget:"ಬಜೆಟ್", pass:"ಪಾಸ್‌ವರ್ಡ್", open:"ತೆರೆಯಿರಿ", bad:"ತಪ್ಪು ಪಾಸ್‌ವರ್ಡ್.", under:"ಈ ಕೆಲಸಕ್ಕೆ ಇಷ್ಟು ಹಣ ಬೇಡ.", over:"ನಿಜವಾದ ಕಡಿಮೆ ಬೆಲೆ ಸ್ಲೈಡರ್‌ಗಿಂತ ಹೆಚ್ಚು.", story:"ಕೆಲಸ ಆಯ್ಕೆಮಾಡಿ.", elem:"ಪ್ರಾಥಮಿಕ", high:"ಹೈಸ್ಕೂಲ್", col:"ಕಾಲೇಜು", off:"ಕಚೇರಿ", cad:"ಚಿತ್ರ", vid:"ವೀಡಿಯೊ", dj:"ಸಂಗೀತ", stream:"ಸ್ಟ್ರೀಮ್" },
   pa: { name:"ਪੰਜਾਬੀ", title:"ਕੰਪਿਊਟਰ ਬਣਾਓ", pitch:"ਮੈਂ ਕੰਮ ਅਤੇ ਬਜਟ ਮੁਤਾਬਕ ਕੰਪਿਊਟਰ ਵੇਚਦਾ ਹਾਂ। ਸਭ ਤੋਂ ਮਹਿੰਗਾ ਨਹੀਂ। ਬਜਟ ਹਿਲਾਓ। ਕੰਮ ਚੁਣੋ।", budget:"ਬਜਟ", pass:"ਪਾਸਵਰਡ", open:"ਖੋਲ੍ਹੋ", bad:"ਗਲਤ ਪਾਸਵਰਡ।", under:"ਇਸ ਕੰਮ ਲਈ ਇੰਨੇ ਪੈਸੇ ਨਹੀਂ ਚਾਹੀਦੇ।", over:"ਸੱਚੀ ਘੱਟ ਕੀਮਤ ਸਲਾਈਡਰ ਤੋਂ ਵੱਧ ਹੈ।", story:"ਕੰਮ ਚੁਣੋ।", elem:"ਐਲੀਮੈਂਟਰੀ", high:"ਹਾਈ ਸਕੂਲ", col:"ਕਾਲਜ", off:"ਦਫ਼ਤਰ", cad:"ਡਰਾਇੰਗ", vid:"ਵੀਡੀਓ", dj:"ਸੰਗੀਤ", stream:"ਸਟ੍ਰੀਮ" },
   es: { name:"Español", title:"Armar una computadora", pitch:"Vendo la computadora que sirve para el trabajo y el dinero. No la más cara. Mueve el presupuesto. Elige el trabajo.", budget:"Presupuesto", pass:"Contraseña", open:"Abrir", bad:"Contraseña incorrecta.", under:"Este trabajo no necesita todo ese dinero.", over:"La más barata de verdad cuesta más que la barra.", story:"Elige un trabajo.", elem:"Primaria", high:"Secundaria", col:"Universidad", off:"Oficina", cad:"Dibujo", vid:"Video", dj:"Música", stream:"Streaming" },
-  ar: { name:"العربية", title:"ركّب كمبيوتر", pitch:"أبيع الكمبيوتر الذي يناسب العمل والميزانية. ليس الأغلى. حرّك الميزانية. اختر العمل.", budget:"الميزانية", pass:"كلمة السر", open:"افتح", bad:"كلمة السر خطأ.", under:"هذا العمل لا يحتاج كل هذا المال.", over:"أرخص سعر صادق أعلى من الشريط.", story:"اختر العمل.", elem:"ابتدائي", high:"ثانوي", col:"جامعة", off:"مكتب", cad:"رسم", vid:"فيديو", dj:"موسيقى", stream:"بث" }
+  ar: { name:"العربية", title:"ركّب كمبيوتر", pitch:"أبيع الكمبيوتر الذي يناسب العمل والميزانية. ليس الأغلى. حرّك الميزانية. اختر العمل.", budget:"الميزانية", pass:"كلمة السر", open:"افتح", bad:"كلمة السر خطأ.", under:"هذا العمل لا يحتاج كل هذا المال.", over:"أرخص سعر صادق أعلى من الشريط.", story:"اختر العمل.", elem:"ابتدائي", high:"ثانوي", col:"جامعة", off:"مكتب", cad:"رسم", vid:"فيديو", dj:"موسيقى", stream:"بث" },
+  it: { name:"Italiano", title:"Monta un computer", pitch:"Vendo il computer giusto per il lavoro e i soldi. Non il più caro. Muovi il budget. Scegli il lavoro.", budget:"Budget", pass:"Password", open:"Apri", bad:"Password sbagliata.", under:"Questo lavoro non ha bisogno di tutti quei soldi.", over:"Il prezzo onesto più basso è sopra la barra.", story:"Scegli un lavoro.", elem:"Elementari", high:"Superiori", col:"Università", off:"Ufficio", cad:"Disegno", vid:"Video", dj:"Musica", stream:"Streaming" },
+  ta: { name:"தமிழ்", title:"கணினி கட்டுங்கள்", pitch:"வேலைக்கும் பணத்துக்கும் பொருந்தும் கணினி. சுவரில் பெரியது அல்ல. பட்ஜெட்டை நகர்த்துங்கள். வேலையைத் தேர்ந்தெடுங்கள்.", budget:"பட்ஜெட்", pass:"கடவுச்சொல்", open:"திற", bad:"தவறான கடவுச்சொல்.", under:"இந்த வேலைக்கு இவ்வளவு பணம் வேண்டாம்.", over:"உண்மையான குறைந்த விலை ஸ்லைடருக்கு மேல்.", story:"ஒரு வேலையைத் தேர்ந்தெடுங்கள்.", elem:"தொடக்கப் பள்ளி", high:"உயர்நிலை", col:"கல்லூரி", off:"அலுவலகம்", cad:"வரைபடம்", vid:"வீடியோ", dj:"இசை", stream:"ஸ்ட்ரீம்" },
+  te: { name:"తెలుగు", title:"కంప్యూటర్ కట్టండి", pitch:"పనికి మరియు డబ్బుకు సరిపోయే కంప్యూటర్. గోడ మీద పెద్దది కాదు. బడ్జెట్ జరపండి. పని ఎంచుకోండి.", budget:"బడ్జెట్", pass:"పాస్‌వర్డ్", open:"తెరవండి", bad:"తప్పు పాస్‌వర్డ్.", under:"ఈ పనికి అంత డబ్బు అక్కర్లేదు.", over:"నిజమైన తక్కువ ధర స్లైడర్ కంటే ఎక్కువ.", story:"ఒక పని ఎంచుకోండి.", elem:"ప్రాథమిక", high:"హైస్కూల్", col:"కాలేజీ", off:"ఆఫీస్", cad:"డ్రాయింగ్", vid:"వీడియో", dj:"సంగీతం", stream:"స్ట్రీమ్" },
+  bn: { name:"বাংলা", title:"কম্পিউটার বানান", pitch:"কাজ আর টাকার সাথে মানানসই কম্পিউটার। দেয়ালের সবচেয়ে দামিটা না। বাজেট সরান। কাজ বেছে নিন।", budget:"বাজেট", pass:"পাসওয়ার্ড", open:"খুলুন", bad:"ভুল পাসওয়ার্ড।", under:"এই কাজের জন্য এত টাকা লাগবে না।", over:"সত্যিকারের কম দাম স্লাইডারের উপরে।", story:"একটা কাজ বেছে নিন।", elem:"প্রাথমিক", high:"হাই স্কুল", col:"কলেজ", off:"অফিস", cad:"আঁকা", vid:"ভিডিও", dj:"সঙ্গীত", stream:"স্ট্রিম" },
+  mr: { name:"मराठी", title:"संगणक बनवा", pitch:"कामासाठी आणि पैशासाठी योग्य संगणक. भिंतीवरचा सर्वात महाग नाही. बजेट हलवा. काम निवडा.", budget:"बजेट", pass:"पासवर्ड", open:"उघडा", bad:"चुकीचा पासवर्ड.", under:"या कामासाठी इतके पैसे नकोत.", over:"खरी कमी किंमत स्लायडरपेक्षा जास्त आहे.", story:"एक काम निवडा.", elem:"प्राथमिक", high:"हायस्कूल", col:"कॉलेज", off:"ऑफिस", cad:"रेखाटन", vid:"व्हिडिओ", dj:"संगीत", stream:"स्ट्रीम" },
+  gu: { name:"ગુજરાતી", title:"કમ્પ્યુટર બનાવો", pitch:"કામ અને પૈસા માટે યોગ્ય કમ્પ્યુટર. દીવાલ પરનું સૌથી મોંઘું નહીં. બજેટ ખસેડો. કામ પસંદ કરો.", budget:"બજેટ", pass:"પાસવર્ડ", open:"ખોલો", bad:"ખોટો પાસવર્ડ.", under:"આ કામ માટે આટલા પૈસા જોઈએ નહીં.", over:"સાચી ઓછી કિંમત સ્લાઇડર કરતાં વધુ છે.", story:"એક કામ પસંદ કરો.", elem:"પ્રાથમિક", high:"હાઈસ્કૂલ", col:"કોલેજ", off:"ઓફિસ", cad:"ચિત્ર", vid:"વિડિયો", dj:"સંગીત", stream:"સ્ટ્રીમ" },
+  ml: { name:"മലയാളം", title:"കമ്പ്യൂട്ടർ ഉണ്ടാക്കുക", pitch:"ജോലിക്കും പണത്തിനും ചേരുന്ന കമ്പ്യൂട്ടർ. ചുവരിലെ ഏറ്റവും വലുതല്ല. ബജറ്റ് നീക്കുക. ജോലി തിരഞ്ഞെടുക്കുക.", budget:"ബജറ്റ്", pass:"പാസ്‌വേഡ്", open:"തുറക്കുക", bad:"തെറ്റായ പാസ്‌വേഡ്.", under:"ഈ ജോലിക്ക് ഇത്ര പണം വേണ്ട.", over:"യഥാർത്ഥ കുറഞ്ഞ വില സ്ലൈഡറിന് മുകളിലാണ്.", story:"ഒരു ജോലി തിരഞ്ഞെടുക്കുക.", elem:"പ്രൈമറി", high:"ഹൈസ്കൂൾ", col:"കോളേജ്", off:"ഓഫീസ്", cad:"ചിത്രം", vid:"വീഡിയോ", dj:"സംഗീതം", stream:"സ്ട്രീം" }
 };
 const CATS = ["case","motherboard","cpu","cooler","memory","storage","gpu","psu"];
 const money = new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" });
@@ -182,7 +191,7 @@ function jobName(id) {
   if (map[id]) return t(map[id]);
   return id.charAt(0).toUpperCase() + id.slice(1);
 }
-function junk(p) { return /open box|renewed|recertified|sodimm|surveillance|purple|laptop|\becc\b/i.test(p.name) || p.price < 12; }
+function junk(p) { return /open\s?box|\[openbox\]|renewed|recertified|sodimm|surveillance|purple|laptop|\becc\b|(^|\s)ican\b/i.test((p.name||"")+" "+(p.brand||"")) || p.price < 12; }
 function cheapest(cat, pred) {
   let best = null;
   for (const p of PARTS) {
@@ -585,6 +594,12 @@ document.getElementById("langBtn").onclick = () => {
     button.onclick = () => { lang = id; localStorage.setItem("bench-lang", lang); box.classList.remove("open"); render(); };
     box.appendChild(button);
   });
+};
+document.getElementById("codeBtn").onclick = () => {
+  const lines = CATS.map((id) => byId[build[id]] ? id + ": " + byId[build[id]].name : "").filter(Boolean);
+  const canvas = document.getElementById("code");
+  canvas.hidden = false;
+  if (window.drewQR) window.drewQR.draw(canvas, lines.join("\n").slice(0, 640), 3);
 };
 document.getElementById("gateForm").onsubmit = (event) => {
   event.preventDefault();

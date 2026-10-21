@@ -164,9 +164,12 @@
   <div class="orderbar">
     <div><div>Paper total</div><b id="orderTotal">$0.00</b></div>
     <button type="button" id="orderBtn">Print this list</button>
+    <button type="button" id="codeBtn">Checkout code</button>
   </div>
+  <canvas id="code" hidden></canvas>
 </div>
 <script src="bulb.js"></script>
+<script src="qr.js"></script>
 <script>
 const CATS = ["cpu","motherboard","memory","gpu","storage","case","cooler","psu"];
 const NAMES = { cpu:"CPU", motherboard:"Motherboard", memory:"Memory", gpu:"Video card", storage:"Storage", case:"Case", cooler:"Cooler", psu:"Power supply" };
@@ -201,7 +204,7 @@ let budget = 1000;
 let gen = 0;
 let tourStep = 0;
 let refused = "";
-function junk(p) { return /open box|renewed|recertified|sodimm|surveillance|purple|laptop|\becc\b/i.test(p.name) || p.price < 12; }
+function junk(p) { return /open\s?box|\[openbox\]|renewed|recertified|sodimm|surveillance|purple|laptop|\becc\b|(^|\s)ican\b/i.test((p.name||"")+" "+(p.brand||"")) || p.price < 12; }
 function brandOf(p) { return p.brand || (p.name.split(" ")[0] || ""); }
 function gbOf(p) { const m = p.name.toUpperCase().match(/\b(4|8|16|32|64)GB\b/); return m ? +m[1] : 0; }
 function wattOf(p) { if (!p) return 0; if (p.watt) return p.watt; const m = p.name.toUpperCase().match(/(\d{3,4})\s?W/); return m ? +m[1] : 0; }
@@ -535,6 +538,12 @@ function start() {
 document.getElementById("phoneBtn").onclick = () => setLayout("phone");
 document.getElementById("deskBtn").onclick = () => setLayout("desk");
 document.getElementById("orderBtn").onclick = () => window.print();
+document.getElementById("codeBtn").onclick = () => {
+  const lines = CATS.map((id) => byId[build[id]] ? NAMES[id] + ": " + byId[build[id]].name : "").filter(Boolean);
+  const canvas = document.getElementById("code");
+  canvas.hidden = false;
+  if (window.drewQR) window.drewQR.draw(canvas, lines.join("\n").slice(0, 640), 3);
+};
 document.getElementById("setBudget").onclick = () => { budget = Math.max(0, Math.min(20000, Number(document.getElementById("budget").value) || 0)); draw(); };
 document.getElementById("clearBudget").onclick = () => { budget = 0; document.getElementById("budget").value = 0; draw(); };
 document.getElementById("fine").oninput = () => { document.getElementById("fineLabel").textContent = document.getElementById("fine").value + "%"; draw(); };

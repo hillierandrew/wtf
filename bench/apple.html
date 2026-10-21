@@ -5,459 +5,231 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Build</title>
 <style>
-  :root { color-scheme: light; --bg:#f5f5f7; --ink:#1d1d1f; --muted:#6e6e73; --line:#d2d2d7; --card:#fff; --warn:#b45309; }
+  :root { color-scheme: light; --bg:#f5f5f7; --ink:#1d1d1f; --muted:#6e6e73; --line:#d2d2d7; --card:#fff; }
   * { box-sizing: border-box; }
-  html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--ink); font: 17px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--ink); font: 18px/1.35 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
   button, input { font: inherit; color: inherit; }
-  button { cursor: pointer; }
-  #lock { position: fixed; inset: 0; z-index: 8; display: grid; place-items: center; background: var(--bg); padding: 24px; }
+  button { cursor: pointer; touch-action: manipulation; }
+  #lock { position: fixed; inset: 0; z-index: 9; display: grid; place-items: center; background: var(--bg); padding: 24px; }
   #lock[hidden] { display: none !important; }
   #lock form { width: min(420px, 100%); }
-  #lock input { width: 100%; min-height: 48px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); padding: 8px 12px; }
-  .go { min-height: 44px; border: 0; border-radius: 980px; background: #1d1d1f; color: #fff; padding: 0 18px; font-weight: 600; }
-  header { padding: 28px 22px 8px; width: min(980px, 100%); margin: 0 auto; }
-  h1 { margin: 0; font-size: clamp(40px, 6vw, 64px); letter-spacing: -0.045em; font-weight: 600; line-height: .95; }
-  .lede { color: var(--muted); font-size: 19px; max-width: 36em; margin: 10px 0 0; }
-  .uses, .tiers, .pills { display: flex; flex-wrap: wrap; gap: 8px; }
-  .uses { margin-top: 18px; }
-  .uses button, .tiers button, .pills button {
-    min-height: 44px; border-radius: 980px; border: 0; background: #e8e8ed; padding: 0 14px;
+  #lock input { width: 100%; min-height: 52px; border-radius: 14px; border: 1px solid var(--line); background: var(--card); padding: 8px 14px; }
+  .go { min-height: 48px; border: 0; border-radius: 980px; background: #1d1d1f; color: #fff; padding: 0 18px; font-weight: 600; }
+  #bar { position: fixed; z-index: 6; top: 0; left: 0; height: 4px; background: #1d1d1f; width: 0; }
+  #langBtn, #back {
+    position: fixed; z-index: 7; border: 0; border-radius: 980px; background: var(--card);
+    box-shadow: 0 1px 4px rgba(0,0,0,.12);
   }
-  .uses button.on, .tiers button.on, .pills button.on { background: #1d1d1f; color: #fff; }
-  .pills button:disabled { opacity: .35; cursor: not-allowed; }
-  main { width: min(980px, 100%); margin: 0 auto; padding: 8px 22px 34vh; }
-  section { padding: 28px 0; border-top: 1px solid var(--line); content-visibility: auto; contain-intrinsic-size: 320px; }
-  h2 { margin: 0 0 6px; font-size: clamp(28px, 4vw, 40px); letter-spacing: -0.04em; font-weight: 600; }
-  .note, .meta, .hint { color: var(--muted); font-size: 14px; margin: 6px 0 12px; }
-  .warn { color: var(--warn); font-size: 14px; margin: 8px 0; }
-  .rows { display: flex; flex-direction: column; gap: 8px; }
-  .row, .row.off {
-    display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 2px 12px; align-items: start;
-    width: 100%; text-align: left; background: var(--card); border: 0; border-radius: 16px; padding: 14px 16px;
-    box-shadow: 0 1px 0 rgba(0,0,0,.04);
+  #langBtn { top: max(12px, env(safe-area-inset-top)); left: max(12px, env(safe-area-inset-left)); width: 48px; height: 48px; font-size: 22px; }
+  #back { left: max(12px, env(safe-area-inset-left)); bottom: max(12px, env(safe-area-inset-bottom)); min-height: 48px; padding: 0 18px; font-weight: 600; }
+  #app { width: min(720px, 100%); margin: 0 auto; padding: calc(36px + env(safe-area-inset-top)) 16px calc(84px + env(safe-area-inset-bottom)); }
+  .pct { margin: 8px 0 0; font-size: clamp(44px, 12vw, 80px); letter-spacing: -.05em; font-weight: 600; line-height: .9; }
+  h1 { margin: 4px 0 14px; font-size: clamp(32px, 7vw, 52px); letter-spacing: -.045em; font-weight: 600; line-height: 1; }
+  .grid { display: flex; flex-direction: column; gap: 10px; }
+  .card { width: 100%; text-align: left; background: var(--card); border: 0; border-radius: 20px; padding: 16px 16px; min-height: 68px; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+  .card.on { outline: 3px solid #1d1d1f; }
+  .card b { display: block; font-size: clamp(18px, 4vw, 22px); letter-spacing: -.02em; overflow-wrap: anywhere; }
+  .card span, .muted { color: var(--muted); font-size: 15px; }
+  .price { float: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+  .pills button { min-height: 44px; border: 0; border-radius: 980px; background: #e8e8ed; padding: 0 14px; }
+  .pills button.on { background: #1d1d1f; color: #fff; }
+  .warn { color: #b45309; }
+  #sheet { position: fixed; inset: 0; z-index: 8; background: var(--bg); overflow: auto; padding: 72px 16px 32px; }
+  #sheet[hidden] { display: none !important; }
+  #sheet .card { margin-bottom: 8px; }
+  canvas { display: block; width: min(260px, 70vw); height: auto; margin: 12px 0; background: #fff; }
+  @media (orientation: landscape) and (max-height: 520px) {
+    .pct { font-size: 32px; }
+    h1 { font-size: 28px; }
+    .card { min-height: 52px; padding: 10px 14px; }
+    #app { padding-top: 16px; }
   }
-  .row.on { outline: 2px solid #1d1d1f; }
-  .row b, .cart b { font-weight: 600; letter-spacing: -0.02em; overflow-wrap: anywhere; }
-  .row .meta { grid-column: 1 / -1; margin: 0; }
-  .price { font-variant-numeric: tabular-nums; font-weight: 600; letter-spacing: -0.03em; white-space: nowrap; }
-  .row.off { opacity: .4; cursor: not-allowed; }
-  #cart {
-    position: fixed; z-index: 6; left: 12px; bottom: max(12px, env(safe-area-inset-bottom));
-    width: min(380px, calc(100% - 24px)); max-height: 25vh; overflow: auto;
-    background: rgba(255,255,255,.9); color: #1d1d1f; backdrop-filter: blur(16px);
-    border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,.12); padding: 10px 12px 12px;
-  }
-  #cart h3 { margin: 0 0 6px; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: #6e6e73; }
-  .line { display: grid; grid-template-columns: minmax(0,1fr) auto auto; gap: 8px; align-items: center; padding: 6px 0; border-top: 1px solid #e5e5ea; animation: in .35s ease; }
-  .line .x, .line .plus { width: 32px; height: 32px; border: 0; border-radius: 999px; background: #e8e8ed; }
-  .qty { font-variant-numeric: tabular-nums; }
-  @keyframes in { from { transform: translateY(-10px); opacity: 0; } to { transform: none; opacity: 1; } }
-  html[data-theme="dark"] #cart { background: rgba(28,28,30,.92); color: #f5f5f7; }
-  html[data-theme="dark"] .uses button, html[data-theme="dark"] .pills button, html[data-theme="dark"] .tiers button { background: #2c2c2e; }
-  html[data-theme="dark"] .row.on { outline-color: #f5f5f7; }
-  @media (max-width: 800px) {
-    header, main { padding-left: 16px; padding-right: 16px; }
-    #cart { left: 0; right: 0; width: auto; border-radius: 18px 18px 0 0; }
-  }
+  html[data-theme="dark"] .pills button { background: #2c2c2e; }
+  html[data-theme="dark"] .card.on { outline-color: #f5f5f7; }
+  html[data-theme="dark"] #bar { background: #f5f5f7; }
 </style>
 </head>
 <body>
-<div id="lock"><form id="lockForm"><p class="note">Password4</p><h1>Build.</h1><input id="lockPass" type="password" autocomplete="current-password" aria-label="Password" /><p id="lockBad" class="warn"></p><button class="go" type="submit">Continue</button></form></div>
-<header>
-  <h1>What is it for?</h1>
-  <p class="lede">Tell me the job. I will show a few honest computers, then you can change any part. Nothing here is a sale.</p>
-  <div class="uses" id="uses"></div>
-  <div class="tiers" id="tiers"></div>
-  <p class="note" id="useNote"></p>
-</header>
-<main id="list"></main>
-<aside id="cart" aria-live="polite"></aside>
+<div id="bar"></div>
+<button id="langBtn" type="button" aria-label="Language">🔤</button>
+<div id="lock"><form id="lockForm"><p class="muted">Password4</p><h1>Build.</h1><input id="lockPass" type="password" autocomplete="current-password" aria-label="Password" /><p id="lockBad" class="warn"></p><button class="go" type="submit">Continue</button></form></div>
+<main id="app"></main>
+<button id="back" type="button" hidden>Back</button>
+<div id="sheet" hidden></div>
 <script src="bulb.js"></script>
+<script src="qr.js"></script>
 <script>
-const USES = [
-  { name:"Roblox", gpuMin:0, gpuMax:2, ram:16, disk:500, note:"A child's Roblox computer. The processor's own graphics are enough. A 5090 is the wrong product." },
-  { name:"Minecraft", gpuMin:0, gpuMax:2, ram:16, disk:500, note:"Minecraft, even with a few mods, is fine on a small card or none." },
-  { name:"Fortnite", gpuMin:2, gpuMax:4, ram:16, disk:500, note:"Fortnite wants a modest card for smooth play, not a flagship." },
-  { name:"Dota 2", gpuMin:1, gpuMax:3, ram:16, disk:500, note:"Dota 2 runs well on a small graphics card." },
-  { name:"League of Legends", gpuMin:0, gpuMax:2, ram:16, disk:500, note:"League does not need a gaming card." },
-  { name:"Valorant", gpuMin:1, gpuMax:3, ram:16, disk:500, note:"Valorant likes a steady frame rate from a modest card." },
-  { name:"Counter-Strike 2", gpuMin:2, gpuMax:4, ram:16, disk:500, note:"Counter-Strike likes frames. A mid card is the right spend." },
-  { name:"Apex Legends", gpuMin:2, gpuMax:4, ram:16, disk:1000, note:"Apex is comfortable on a mid-range card." },
-  { name:"Call of Duty", gpuMin:3, gpuMax:5, ram:16, disk:1000, note:"Call of Duty is large. A mid card and a fast SSD. Not a 90-class card." },
-  { name:"Diablo IV", gpuMin:2, gpuMax:4, ram:16, disk:1000, note:"Diablo is fine on a mid card. Extra money belongs in the processor and the SSD." },
-  { name:"Escape from Tarkov", gpuMin:3, gpuMax:5, ram:32, disk:1000, note:"Tarkov cares about the processor and 32 GB as much as the card." },
-  { name:"World of Warcraft", gpuMin:2, gpuMax:4, ram:16, disk:500, note:"Raids like a decent processor and 16 GB. A mid card is plenty." },
-  { name:"Halo Infinite", gpuMin:2, gpuMax:4, ram:16, disk:500, note:"Halo is comfortable on a mid card." },
-  { name:"Age of Empires IV", gpuMin:1, gpuMax:3, ram:16, disk:500, note:"Big battles like a processor. The card can stay modest." },
-  { name:"School", gpuMin:0, gpuMax:0, ram:16, disk:500, note:"Essays, class video, and a browser. No graphics card." },
-  { name:"Office", gpuMin:0, gpuMax:0, ram:16, disk:500, note:"Word, Excel, Zoom, and email. No graphics card." },
-  { name:"Photo", gpuMin:2, gpuMax:3, ram:32, disk:1000, note:"Photo work wants 32 GB and a modest card." },
-  { name:"Video editing", gpuMin:3, gpuMax:5, ram:32, disk:2000, note:"Editing wants memory, a fast SSD, and a mid card." },
-  { name:"CAD", gpuMin:3, gpuMax:5, ram:32, disk:1000, note:"3D drawings want a mid card and 32 GB. This is not a certified workstation." },
-  { name:"Spreadsheets and code", gpuMin:0, gpuMax:1, ram:32, disk:1000, note:"Big sheets and code want memory and a processor, not a graphics card." }
-];
-const HASH = {
-  "GT 1030":"not a mining card", "RTX 3050":"about 20 MH/s", "RTX 3060":"about 45 MH/s",
-  "RTX 5050":"about 25 MH/s", "RTX 5060":"about 30 MH/s", "RTX 5060 TI":"about 35 MH/s",
-  "RTX 5070":"about 50 MH/s", "RTX 5070 TI":"about 60 MH/s", "RTX 5080":"about 75 MH/s",
-  "RX 6800":"about 60 MH/s", "RX 7600":"about 30 MH/s", "RX 9060 XT":"about 40 MH/s",
-  "RX 9070":"about 55 MH/s", "RX 9070 GRE":"about 50 MH/s", "RX 9070 XT":"about 70 MH/s"
+const LANG = {
+  en:{ name:"English", for:"What is this computer for?", min:"Minimum", med:"Medium", high:"High", ultra:"Ultra", cpu:"Processor", board:"Motherboard", mem:"Memory", gpu:"Graphics", disk:"Storage", case:"Case", fan:"Fans", cool:"Cooler", paste:"Thermal paste", psu:"Power", done:"Done", back:"Back", thisone:"This one", scan:"Checkout code", print:"Print", none:"No graphics card", warn:"Power supply is too small.", pct:"complete", notsale:"Not a sale.", air:"Fan cooler", aio:"Liquid cooler", nvme:"NVMe", ssd:"SSD", hdd:"Hard drive", itx:"Mini-ITX", matx:"Micro-ATX", atx:"ATX", eatx:"E-ATX", model:"3D modelling", video:"Video editing", photo:"Photo", school:"School", office:"Office", fansay:"Two or three fans move air through the case.", pastesay:"A little paste sits between the cooler and the processor.", amd:"AMD", intel:"Intel", nvidia:"Nvidia" },
+  fr:{ name:"Français", for:"Cet ordinateur sert à quoi?", min:"Minimum", med:"Moyen", high:"Élevé", ultra:"Ultra", cpu:"Processeur", board:"Carte mère", mem:"Mémoire", gpu:"Carte graphique", disk:"Stockage", case:"Boîtier", fan:"Ventilateurs", cool:"Refroidisseur", paste:"Pâte thermique", psu:"Alimentation", done:"Terminé", back:"Retour", thisone:"Celui-ci", scan:"Code de caisse", print:"Imprimer", none:"Sans carte graphique", warn:"Alimentation trop petite.", pct:"terminé", notsale:"Ce n est pas une vente.", air:"Ventilateur", aio:"Liquide", nvme:"NVMe", ssd:"SSD", hdd:"Disque dur", itx:"Mini-ITX", matx:"Micro-ATX", atx:"ATX", eatx:"E-ATX", model:"Modélisation 3D", video:"Montage vidéo", photo:"Photo", school:"École", office:"Bureau", fansay:"Deux ou trois ventilateurs font circuler l air.", pastesay:"Un peu de pâte entre le refroidisseur et le processeur.", amd:"AMD", intel:"Intel", nvidia:"Nvidia" },
+  es:{ name:"Español", for:"¿Para qué es esta computadora?", min:"Mínimo", med:"Medio", high:"Alto", ultra:"Ultra", cpu:"Procesador", board:"Placa base", mem:"Memoria", gpu:"Gráficos", disk:"Almacenamiento", case:"Caja", fan:"Ventiladores", cool:"Disipador", paste:"Pasta térmica", psu:"Fuente", done:"Listo", back:"Atrás", thisone:"Este", scan:"Código de caja", print:"Imprimir", none:"Sin tarjeta gráfica", warn:"La fuente es demasiado pequeña.", pct:"completo", notsale:"No es una venta.", air:"Aire", aio:"Líquida", nvme:"NVMe", ssd:"SSD", hdd:"Disco duro", itx:"Mini-ITX", matx:"Micro-ATX", atx:"ATX", eatx:"E-ATX", model:"Modelado 3D", video:"Edición de video", photo:"Foto", school:"Escuela", office:"Oficina", fansay:"Dos o tres ventiladores mueven el aire de la caja.", pastesay:"Un poco de pasta va entre el disipador y el procesador.", amd:"AMD", intel:"Intel", nvidia:"Nvidia" },
+  it:{ name:"Italiano", for:"A cosa serve questo computer?", min:"Minimo", med:"Medio", high:"Alto", ultra:"Ultra", cpu:"Processore", board:"Scheda madre", mem:"Memoria", gpu:"Grafica", disk:"Archivio", case:"Case", fan:"Ventole", cool:"Dissipatore", paste:"Pasta termica", psu:"Alimentatore", done:"Fatto", back:"Indietro", thisone:"Questo", scan:"Codice cassa", print:"Stampa", none:"Senza scheda grafica", warn:"Alimentatore troppo piccolo.", pct:"completo", notsale:"Non è una vendita.", air:"Aria", aio:"Liquido", nvme:"NVMe", ssd:"SSD", hdd:"Disco", itx:"Mini-ITX", matx:"Micro-ATX", atx:"ATX", eatx:"E-ATX", model:"Modellazione 3D", video:"Montaggio video", photo:"Foto", school:"Scuola", office:"Ufficio", fansay:"Due o tre ventole muovono l aria nel case.", pastesay:"Un po di pasta tra il dissipatore e il processore.", amd:"AMD", intel:"Intel", nvidia:"Nvidia" },
+  hi:{ name:"हिन्दी", for:"यह कंप्यूटर किस काम का है?", min:"कम से कम", med:"मध्यम", high:"ऊँचा", ultra:"अल्ट्रा", cpu:"प्रोसेसर", board:"मदरबोर्ड", mem:"मेमोरी", gpu:"ग्राफ़िक्स", disk:"स्टोरेज", case:"केस", fan:"पंखा", cool:"कूलर", paste:"थर्मल पेस्ट", psu:"पावर", done:"पूरा", back:"पीछे", thisone:"यही", scan:"चेकआउट कोड", print:"प्रिंट", none:"ग्राफ़िक्स कार्ड नहीं", warn:"पावर सप्लाई छोटी है।", pct:"पूरा", notsale:"यह बिक्री नहीं है।", air:"पंखा कूलर", aio:"लिक्विड", nvme:"NVMe", ssd:"SSD", hdd:"हार्ड ड्राइव", itx:"मिनी-ITX", matx:"माइक्रो-ATX", atx:"ATX", eatx:"E-ATX", model:"3D मॉडलिंग", video:"वीडियो एडिटिंग", photo:"फ़ोटो", school:"स्कूल", office:"ऑफ़िस", fansay:"दो या तीन पंखे केस में हवा चलाते हैं।", pastesay:"थोड़ा पेस्ट कूलर और प्रोसेसर के बीच लगता है।", amd:"AMD", intel:"Intel", nvidia:"Nvidia" },
+  ur:{ name:"اردو", for:"یہ کمپیوٹر کس کام کا ہے؟", min:"کم از کم", med:"درمیانہ", high:"اعلیٰ", ultra:"الٹرا", cpu:"پروسیسر", board:"مدر بورڈ", mem:"میموری", gpu:"گرافکس", disk:"اسٹوریج", case:"کیس", fan:"پنکھے", cool:"کولر", paste:"تھرمل پیسٹ", psu:"پاور", done:"مکمل", back:"پیچھے", thisone:"یہی", scan:"چیک آؤٹ کوڈ", print:"پرنٹ", none:"گرافکس کارڈ نہیں", warn:"پاور سپلائی چھوٹی ہے۔", pct:"مکمل", notsale:"یہ فروخت نہیں ہے۔", air:"پنکھا", aio:"مائع", nvme:"NVMe", ssd:"SSD", hdd:"ہارڈ ڈرائیو", itx:"منی ITX", matx:"مائیکرو ATX", atx:"ATX", eatx:"E-ATX", model:"تھری ڈی", video:"ویڈیو", photo:"فوٹو", school:"سکول", office:"دفتر", fansay:"دو یا تین پنکھے کیس میں ہوا چلاتے ہیں۔", pastesay:"تھوڑا پیسٹ کولر اور پروسیسر کے درمیان لگتا ہے۔", amd:"AMD", intel:"Intel", nvidia:"Nvidia" },
+  kn:{ name:"ಕನ್ನಡ", for:"ಈ ಕಂಪ್ಯೂಟರ್ ಯಾವ ಕೆಲಸಕ್ಕೆ?", min:"ಕನಿಷ್ಠ", med:"ಮಧ್ಯಮ", high:"ಹೆಚ್ಚು", ultra:"ಅಲ್ಟ್ರಾ", cpu:"ಪ್ರೊಸೆಸರ್", board:"ಮದರ್‌ಬೋರ್ಡ್", mem:"ಮೆಮೊರಿ", gpu:"ಗ್ರಾಫಿಕ್ಸ್", disk:"ಸ್ಟೋರೇಜ್", case:"ಕೇಸ್", fan:"ಫ್ಯಾನ್", cool:"ಕೂಲರ್", paste:"ಥರ್ಮಲ್ ಪೇಸ್ಟ್", psu:"ಪವರ್", done:"ಆಯಿತು", back:"ಹಿಂದೆ", thisone:"ಇದು", scan:"ಚೆಕ್‌ಔಟ್ ಕೋಡ್", print:"ಪ್ರಿಂಟ್", none:"ಗ್ರಾಫಿಕ್ಸ್ ಕಾರ್ಡ್ ಇಲ್ಲ", warn:"ಪವರ್ ಸಪ್ಲೈ ಚಿಕ್ಕದು.", pct:"ಪೂರ್ಣ", notsale:"ಇದು ಮಾರಾಟವಲ್ಲ.", air:"ಫ್ಯಾನ್", aio:"ದ್ರವ", nvme:"NVMe", ssd:"SSD", hdd:"ಹಾರ್ಡ್ ಡ್ರೈವ್", itx:"ಮಿನಿ-ITX", matx:"ಮೈಕ್ರೋ-ATX", atx:"ATX", eatx:"E-ATX", model:"3D ಮಾಡೆಲಿಂಗ್", video:"ವೀಡಿಯೊ", photo:"ಫೋಟೋ", school:"ಶಾಲೆ", office:"ಕಚೇರಿ", fansay:"ಎರಡು ಅಥವಾ ಮೂರು ಫ್ಯಾನ್ ಗಾಳಿ ಚಲಿಸುತ್ತವೆ.", pastesay:"ಸ್ವಲ್ಪ ಪೇಸ್ಟ್ ಕೂಲರ್ ಮತ್ತು ಪ್ರೊಸೆಸರ್ ನಡುವೆ.", amd:"AMD", intel:"Intel", nvidia:"Nvidia" },
+  pa:{ name:"ਪੰਜਾਬੀ", for:"ਇਹ ਕੰਪਿਊਟਰ ਕਿਸ ਕੰਮ ਲਈ ਹੈ?", min:"ਘੱਟੋ ਘੱਟ", med:"ਦਰਮਿਆਨਾ", high:"ਉੱਚਾ", ultra:"ਅਲਟਰਾ", cpu:"ਪ੍ਰੋਸੈਸਰ", board:"ਮਦਰਬੋਰਡ", mem:"ਮੈਮੋਰੀ", gpu:"ਗ੍ਰਾਫਿਕਸ", disk:"ਸਟੋਰੇਜ", case:"ਕੇਸ", fan:"ਪੱਖੇ", cool:"ਕੂਲਰ", paste:"ਥਰਮਲ ਪੇਸਟ", psu:"ਪਾਵਰ", done:"ਮੁਕੰਮਲ", back:"ਪਿੱਛੇ", thisone:"ਇਹੀ", scan:"ਚੈਕਆਊਟ ਕੋਡ", print:"ਪ੍ਰਿੰਟ", none:"ਗ੍ਰਾਫਿਕਸ ਕਾਰਡ ਨਹੀਂ", warn:"ਪਾਵਰ ਸਪਲਾਈ ਛੋਟੀ ਹੈ।", pct:"ਪੂਰਾ", notsale:"ਇਹ ਵਿਕਰੀ ਨਹੀਂ।", air:"ਪੱਖਾ", aio:"ਤਰਲ", nvme:"NVMe", ssd:"SSD", hdd:"ਹਾਰਡ ਡਰਾਈਵ", itx:"ਮਿਨੀ-ITX", matx:"ਮਾਈਕਰੋ-ATX", atx:"ATX", eatx:"E-ATX", model:"3D ਮਾਡਲਿੰਗ", video:"ਵੀਡੀਓ", photo:"ਫੋਟੋ", school:"ਸਕੂਲ", office:"ਦਫ਼ਤਰ", fansay:"ਦੋ ਜਾਂ ਤਿੰਨ ਪੱਖੇ ਕੇਸ ਵਿੱਚ ਹਵਾ ਚਲਾਉਂਦੇ ਹਨ।", pastesay:"ਥੋੜਾ ਪੇਸਟ ਕੂਲਰ ਅਤੇ ਪ੍ਰੋਸੈਸਰ ਵਿਚਕਾਰ।", amd:"AMD", intel:"Intel", nvidia:"Nvidia" },
+  ta:{ name:"தமிழ்", for:"இந்த கணினி எதற்கு?", min:"குறைந்தது", med:"நடுத்தரம்", high:"உயர்வு", ultra:"அல்ட்ரா", cpu:"பிராசசர்", board:"மதர்போர்டு", mem:"மெமரி", gpu:"கிராபிக்ஸ்", disk:"சேமிப்பு", case:"கேஸ்", fan:"விசிறி", cool:"கூலர்", paste:"தெர்மல் பேஸ்ட்", psu:"பவர்", done:"முடிந்தது", back:"பின்னால்", thisone:"இது", scan:"செக்அவுட் குறியீடு", print:"அச்சு", none:"கிராபிக்ஸ் கார்டு இல்லை", warn:"பவர் சப்ளை சிறியது.", pct:"முழுமை", notsale:"இது விற்பனை அல்ல.", air:"விசிறி", aio:"திரவம்", nvme:"NVMe", ssd:"SSD", hdd:"ஹார்ட் டிரைவ்", itx:"மினி-ITX", matx:"மைக்ரோ-ATX", atx:"ATX", eatx:"E-ATX", model:"3D மாடலிங்", video:"வீடியோ", photo:"புகைப்படம்", school:"பள்ளி", office:"அலுவலகம்", fansay:"இரண்டு அல்லது மூன்று விசிறிகள் காற்றை நகர்த்தும்.", pastesay:"கொஞ்சம் பேஸ்ட் கூலருக்கும் பிராசசருக்கும் இடையில்.", amd:"AMD", intel:"Intel", nvidia:"Nvidia" },
+  te:{ name:"తెలుగు", for:"ఈ కంప్యూటర్ దేనికి?", min:"కనిష్టం", med:"మధ్యస్థం", high:"ఎక్కువ", ultra:"అల్ట్రా", cpu:"ప్రాసెసర్", board:"మదర్‌బోర్డ్", mem:"మెమరీ", gpu:"గ్రాఫిక్స్", disk:"నిల్వ", case:"కేస్", fan:"ఫ్యాన్", cool:"కూలర్", paste:"థర్మల్ పేస్ట్", psu:"పవర్", done:"అయింది", back:"వెనక్కి", thisone:"ఇదే", scan:"చెక్‌అవుట్ కోడ్", print:"ప్రింట్", none:"గ్రాఫిక్స్ కార్డ్ లేదు", warn:"పవర్ సప్లై చిన్నది.", pct:"పూర్తి", notsale:"ఇది అమ్మకం కాదు.", air:"ఫ్యాన్", aio:"ద్రవం", nvme:"NVMe", ssd:"SSD", hdd:"హార్డ్ డ్రైవ్", itx:"మినీ-ITX", matx:"మైక్రో-ATX", atx:"ATX", eatx:"E-ATX", model:"3D మోడలింగ్", video:"వీడియో", photo:"ఫోటో", school:"స్కూల్", office:"ఆఫీస్", fansay:"రెండు లేదా మూడు ఫ్యాన్లు గాలిని కదులుస్తాయి.", pastesay:"కొంచెం పేస్ట్ కూలర్ మరియు ప్రాసెసర్ మధ్య.", amd:"AMD", intel:"Intel", nvidia:"Nvidia" },
+  bn:{ name:"বাংলা", for:"এই কম্পিউটার কীসের জন্য?", min:"কমপক্ষে", med:"মাঝারি", high:"উচ্চ", ultra:"আল্ট্রা", cpu:"প্রসেসর", board:"মাদারবোর্ড", mem:"মেমরি", gpu:"গ্রাফিক্স", disk:"স্টোরেজ", case:"কেস", fan:"ফ্যান", cool:"কুলার", paste:"থার্মাল পেস্ট", psu:"পাওয়ার", done:"শেষ", back:"পিছনে", thisone:"এইটা", scan:"চেকআউট কোড", print:"প্রিন্ট", none:"গ্রাফিক্স কার্ড নেই", warn:"পাওয়ার সাপ্লাই ছোট।", pct:"সম্পূর্ণ", notsale:"এটা বিক্রি নয়।", air:"ফ্যান", aio:"লিকুইড", nvme:"NVMe", ssd:"SSD", hdd:"হার্ড ড্রাইভ", itx:"মিনি-ITX", matx:"মাইক্রো-ATX", atx:"ATX", eatx:"E-ATX", model:"3D মডেলিং", video:"ভিডিও", photo:"ছবি", school:"স্কুল", office:"অফিস", fansay:"দুই বা তিনটা ফ্যান কেসে হাওয়া চালায়।", pastesay:"একটু পেস্ট কুলার আর প্রসেসরের মাঝে।", amd:"AMD", intel:"Intel", nvidia:"Nvidia" },
+  mr:{ name:"मराठी", for:"हा संगणक कशासाठी?", min:"किमान", med:"मध्यम", high:"जास्त", ultra:"अल्ट्रा", cpu:"प्रोसेसर", board:"मदरबोर्ड", mem:"मेमरी", gpu:"ग्राफिक्स", disk:"स्टोरेज", case:"केस", fan:"पंखा", cool:"कूलर", paste:"थर्मल पेस्ट", psu:"पॉवर", done:"पूर्ण", back:"मागे", thisone:"हेच", scan:"चेकआउट कोड", print:"प्रिंट", none:"ग्राफिक्स कार्ड नाही", warn:"पॉवर सप्लाय लहान आहे.", pct:"पूर्ण", notsale:"ही विक्री नाही.", air:"पंखा", aio:"लिक्विड", nvme:"NVMe", ssd:"SSD", hdd:"हार्ड ड्राइव्ह", itx:"मिनी-ITX", matx:"मायक्रो-ATX", atx:"ATX", eatx:"E-ATX", model:"3D मॉडेलिंग", video:"व्हिडिओ", photo:"फोटो", school:"शाळा", office:"ऑफिस", fansay:"दोन किंवा तीन पंखे केसमध्ये हवा फिरवतात.", pastesay:"थोडे पेस्ट कूलर आणि प्रोसेसरमध्ये.", amd:"AMD", intel:"Intel", nvidia:"Nvidia" },
+  gu:{ name:"ગુજરાતી", for:"આ કમ્પ્યુટર શેના માટે?", min:"ઓછામાં ઓછું", med:"મધ્યમ", high:"ઊંચું", ultra:"અલ્ટ્રા", cpu:"પ્રોસેસર", board:"મધરબોર્ડ", mem:"મેમરી", gpu:"ગ્રાફિક્સ", disk:"સ્ટોરેજ", case:"કેસ", fan:"પંખા", cool:"કૂલર", paste:"થર્મલ પેસ્ટ", psu:"પાવર", done:"પૂરું", back:"પાછળ", thisone:"આ", scan:"ચેકઆઉટ કોડ", print:"પ્રિન્ટ", none:"ગ્રાફિક્સ કાર્ડ નહીં", warn:"પાવર સપ્લાય નાનો છે.", pct:"પૂર્ણ", notsale:"આ વેચાણ નથી.", air:"પંખો", aio:"પ્રવાહી", nvme:"NVMe", ssd:"SSD", hdd:"હાર્ડ ડ્રાઈવ", itx:"મિની-ITX", matx:"માઇક્રો-ATX", atx:"ATX", eatx:"E-ATX", model:"3D મોડેલિંગ", video:"વિડિયો", photo:"ફોટો", school:"શાળા", office:"ઓફિસ", fansay:"બે કે ત્રણ પંખા કેસમાં હવા ફેરવે છે.", pastesay:"થોડો પેસ્ટ કૂલર અને પ્રોસેસર વચ્ચે.", amd:"AMD", intel:"Intel", nvidia:"Nvidia" },
+  ml:{ name:"മലയാളം", for:"ഈ കമ്പ്യൂട്ടർ എന്തിന്?", min:"കുറഞ്ഞത്", med:"ഇടത്തരം", high:"ഉയർന്നത്", ultra:"അൾട്രാ", cpu:"പ്രോസസർ", board:"മദർബോർഡ്", mem:"മെമ്മറി", gpu:"ഗ്രാഫിക്സ്", disk:"സ്റ്റോറേജ്", case:"കേസ്", fan:"ഫാൻ", cool:"കൂളർ", paste:"തെർമൽ പേസ്റ്റ്", psu:"പവർ", done:"കഴിഞ്ഞു", back:"പിന്നിലേക്ക്", thisone:"ഇത്", scan:"ചെക്കൗട്ട് കോഡ്", print:"പ്രിന്റ്", none:"ഗ്രാഫിക്സ് കാർഡ് വേണ്ട", warn:"പവർ സപ്ലൈ ചെറുതാണ്.", pct:"പൂർണം", notsale:"ഇതൊരു വിൽപ്പനയല്ല.", air:"ഫാൻ", aio:"ദ്രാവകം", nvme:"NVMe", ssd:"SSD", hdd:"ഹാർഡ് ഡ്രൈവ്", itx:"മിനി-ITX", matx:"മൈക്രോ-ATX", atx:"ATX", eatx:"E-ATX", model:"3D മോഡലിംഗ്", video:"വീഡിയോ", photo:"ഫോട്ടോ", school:"സ്കൂൾ", office:"ഓഫീസ്", fansay:"രണ്ടോ മൂന്നോ ഫാൻ കേസിൽ വായു നീക്കും.", pastesay:"കുറച്ച് പേസ്റ്റ് കൂളറിനും പ്രോസസറിനും ഇടയിൽ.", amd:"AMD", intel:"Intel", nvidia:"Nvidia" }
 };
+const USES = {
+  Minecraft:{ min:[0,16,500], med:[1,16,500], high:[2,16,1000], ultra:[3,32,1000] },
+  Roblox:{ min:[0,16,500], med:[1,16,500], high:[2,16,500], ultra:[2,16,1000] },
+  Fortnite:{ min:[2,16,500], med:[3,16,1000], high:[4,16,1000], ultra:[4,16,1000] },
+  "Apex Legends":{ min:[2,16,500], med:[3,16,1000], high:[4,16,1000], ultra:[5,16,1000] },
+  "Dota 2":{ min:[1,16,500], med:[2,16,500], high:[3,16,500], ultra:[3,16,1000] },
+  Valorant:{ min:[1,16,500], med:[2,16,500], high:[3,16,500], ultra:[3,16,1000] },
+  "Counter-Strike 2":{ min:[2,16,500], med:[3,16,500], high:[4,16,1000], ultra:[4,16,1000] },
+  "League of Legends":{ min:[0,16,500], med:[1,16,500], high:[2,16,500], ultra:[2,16,1000] },
+  "Call of Duty":{ min:[3,16,1000], med:[4,16,1000], high:[4,32,1000], ultra:[5,32,2000] },
+  "Diablo IV":{ min:[2,16,1000], med:[3,16,1000], high:[4,16,1000], ultra:[4,32,1000] },
+  "Escape from Tarkov":{ min:[3,16,1000], med:[4,32,1000], high:[4,32,1000], ultra:[5,32,2000] },
+  "World of Warcraft":{ min:[1,16,500], med:[3,16,500], high:[4,16,1000], ultra:[4,32,1000] },
+  "Halo Infinite":{ min:[2,16,500], med:[3,16,1000], high:[4,16,1000], ultra:[4,32,1000] },
+  School:{ min:[0,16,500], med:[0,16,1000], high:[1,16,1000], ultra:[2,32,1000] },
+  Office:{ min:[0,16,500], med:[0,16,1000], high:[0,32,1000], ultra:[1,32,1000] },
+  Photo:{ min:[1,16,1000], med:[2,32,1000], high:[3,32,2000], ultra:[4,32,2000] },
+  "Video editing":{ min:[2,16,1000], med:[3,32,2000], high:[4,32,2000], ultra:[5,64,2000] },
+  "3D modelling":{ min:[2,16,1000], med:[3,32,1000], high:[4,32,2000], ultra:[5,64,2000] }
+};
+const TIERS = ["min","med","high","ultra"];
+const STEPS = ["use","tier","cpu","board","mem","gpu","disk","case","fan","cool","paste","psu","done"];
+const HASH = { "GT 1030":"not a mining card", "RTX 3050":"about 20 MH/s", "RTX 3060":"about 45 MH/s", "RTX 5050":"about 25 MH/s", "RTX 5060":"about 30 MH/s", "RTX 5060 TI":"about 35 MH/s", "RTX 5070":"about 50 MH/s", "RTX 5070 TI":"about 60 MH/s", "RTX 5080":"about 75 MH/s", "RX 6800":"about 60 MH/s", "RX 7600":"about 30 MH/s", "RX 9060 XT":"about 40 MH/s", "RX 9070":"about 55 MH/s", "RX 9070 GRE":"about 50 MH/s", "RX 9070 XT":"about 70 MH/s" };
 const WATT = { "GT 1030":30, "RTX 3050":130, "RTX 3060":170, "RTX 5050":130, "RTX 5060":150, "RTX 5060 TI":180, "RTX 5070":250, "RTX 5070 TI":300, "RTX 5080":360, "RX 6800":250, "RX 7600":165, "RX 9060 XT":180, "RX 9070":220, "RX 9070 GRE":220, "RX 9070 XT":304 };
-const FORMS = [["itx","Mini-ITX"],["matx","Micro-ATX"],["atx","ATX"],["eatx","E-ATX"]];
+const EXTRA = [
+  { id:"fan-p12", cat:"fan", name:"Arctic P12 PST 120mm PWM", price:14, brand:"Arctic" },
+  { id:"fan-p12-5", cat:"fan", name:"Arctic P12 PST 120mm, pack of 5", price:42, brand:"Arctic" },
+  { id:"fan-quiet", cat:"fan", name:"be quiet! Pure Wings 2 120mm PWM", price:18, brand:"be quiet!" },
+  { id:"fan-redux", cat:"fan", name:"Noctua NF-P12 redux 120mm PWM", price:28, brand:"Noctua" },
+  { id:"fan-a12", cat:"fan", name:"Noctua NF-A12x25 PWM 120mm", price:49, brand:"Noctua" },
+  { id:"paste-mx4", cat:"paste", name:"Arctic MX-4 thermal paste, 4 g", price:14, brand:"Arctic" },
+  { id:"paste-mx6", cat:"paste", name:"Arctic MX-6 thermal paste, 4 g", price:16, brand:"Arctic" },
+  { id:"paste-nth1", cat:"paste", name:"Noctua NT-H1 thermal paste, 3.5 g", price:18, brand:"Noctua" }
+];
 const money = new Intl.NumberFormat("en-CA", { style:"currency", currency:"CAD" });
 let PARTS = [], byId = {};
-let s = { use:"Roblox", tier:"", cpuBrand:"AMD", socket:"AM4", form:"matx", ramKind:"", gpuBrand:"NVIDIA", driveKind:"NVME", coolKind:"air", cpu:"", board:"", kits:[], gpu:"", drives:[], box:"", cooler:"", psu:"" };
-function junk(p){ return !p || /open\s?box|\[openbox\]|renewed|recertified|sodimm|surveillance|purple|laptop|\becc\b/i.test(p.name) || p.price < 12; }
+let lang = "en";
+try { lang = localStorage.getItem("bench-lang") || "en"; } catch (e) {}
+let step = 0;
+let s = blank();
+function blank(){ return { use:"Minecraft", tier:"med", cpuBrand:"AMD", socket:"", form:"matx", ramKind:"", gpuBrand:"NVIDIA", driveKind:"NVME", coolKind:"air", cpu:"", board:"", kit:"", gpu:"", drive:"", box:"", fan:"fan-p12", fanQty:2, cooler:"", paste:"paste-mx4", psu:"" }; }
+function t(k){ return (LANG[lang] && LANG[lang][k]) || LANG.en[k] || k; }
+function useLabel(name){ if (name==="3D modelling") return t("model"); if (name==="Video editing") return t("video"); if (name==="Photo") return t("photo"); if (name==="School") return t("school"); if (name==="Office") return t("office"); return name; }
+function junk(p){ return !p || /open\s?box|\[openbox\]|renewed|recertified|sodimm|surveillance|purple|laptop|\becc\b|(^|\s)ican\b/i.test((p.name||"")+" "+(p.brand||"")) || p.price < 12; }
 function sticksOf(p){ const m = (p.name||"").match(/\((\d+)\s*[x×]/i) || (p.name||"").match(/\b(\d+)\s*[x×]\s*\d+\s*GB/i); return m ? +m[1] : 1; }
-function ramKindOf(p){ if (!p) return ""; if (p.ram) return p.ram; const m = (p.name||"").toUpperCase().match(/DDR[345]/); if (m) return m[0]; if (p.socket === "AM5" || p.socket === "LGA1851") return "DDR5"; if (p.socket === "AM4" || p.socket === "LGA1700") return "DDR4"; return ""; }
-function formOf(p){ if (!p) return ""; if (p.form) return p.form === "full" ? "atx" : p.form; const n = (p.name||"").toUpperCase(); if (/E-?ATX|XL-ATX/.test(n)) return "eatx"; if (/MINI-?ITX|\bITX\b/.test(n)) return "itx"; if (/MICRO|MATX|M-ATX/.test(n)) return "matx"; if (/ATX/.test(n)) return "atx"; return ""; }
-function fitsCase(box, board){ const r = { itx:1, matx:2, atx:3, eatx:4 }; return (r[formOf(box)] || 3) >= (r[formOf(board)] || 2); }
-function dimmSlots(board){ if (!board) return 4; if (/2\s*DIMM/i.test(board.name||"")) return 2; if (formOf(board) === "itx") return 2; return 4; }
-function gbOf(p){ const m = (p.name||"").toUpperCase().match(/\b(4|8|16|32|64|96|128)\s?GB\b/); return m ? +m[1] : 0; }
-function diskGb(p){ const n = (p.name||"").toUpperCase(); const tb = n.match(/(\d+)\s?TB/); if (tb) return +tb[1]*1000; const gb = n.match(/(\d+)\s?GB/); return gb ? +gb[1] : 0; }
-function wattOf(p){ if (!p) return 0; if (p.watt) return p.watt; const m = (p.name||"").toUpperCase().match(/(\d{3,4})\s?W/); return m ? +m[1] : 0; }
-function cores(p){ const m = (p.name||"").match(/(\d+)\s*[- ]?Core/i); return m ? +m[1] : 4; }
-function cpuBrand(p){ if (/AMD|RYZEN|AM[45]/i.test((p.brand||"")+" "+p.name+" "+(p.socket||""))) return "AMD"; if (/INTEL|LGA|CORE/i.test((p.brand||"")+" "+p.name+" "+(p.socket||""))) return "INTEL"; return "OTHER"; }
-function gpuBrand(p){ const n = (p.name||"").toUpperCase(); if (/RTX|GTX|GEFORCE|NVIDIA/.test(n)) return "NVIDIA"; if (/RADEON|\bRX\s?\d/.test(n)) return "AMD"; if (/ARC|INTEL/.test(n)) return "INTEL"; return "OTHER"; }
-function chipOf(p){
-  const n = (p.name||"").toUpperCase().replace(/\s+/g," ");
-  const m = n.match(/RTX\s?(\d{4})\s?(TI|SUPER)?|RX\s?(\d{4})\s?(XT|GRE)?|GT\s?(\d{3,4})/);
-  if (!m) return "";
-  if (m[1]) return ("RTX " + m[1] + (m[2] ? " " + m[2] : "")).replace("TI","TI");
-  if (m[3]) return "RX " + m[3] + (m[4] ? " " + m[4] : "");
-  return "GT " + m[5];
-}
-function gpuClass(p){ const n = (p.name||"").toUpperCase(); if (/5080|5070\s?TI|9070\s?XT/.test(n)) return 6; if (/5070|9070|4070/.test(n)) return 5; if (/5060\s?TI|5060|9060/.test(n)) return 4; if (/5050|3060|6800|7600/.test(n)) return 3; if (/3050|1660|1650/.test(n)) return 2; if (/1030/.test(n)) return 1; return 0; }
-function gpuWatt(p){ return WATT[chipOf(p)] || wattOf(p) || (gpuClass(p) >= 6 ? 320 : gpuClass(p) >= 4 ? 180 : 130); }
-function driveKind(p){ const n = (p.name||"").toUpperCase(); if (/NVME|M\.2|PCIE|PCI-?E/.test(n)) return "NVME"; if (/HDD|HARD DRIVE|3\.5/.test(n)) return "HDD"; return "SSD"; }
+function ramKindOf(p){ if (!p) return ""; if (p.ram) return p.ram; const m = (p.name||"").toUpperCase().match(/DDR[345]/); if (m) return m[0]; if (p.socket==="AM5"||p.socket==="LGA1851") return "DDR5"; if (p.socket==="AM4"||p.socket==="LGA1700") return "DDR4"; return ""; }
+function formOf(p){ if (!p) return ""; if (p.form) return p.form==="full"?"atx":p.form; const n=(p.name||"").toUpperCase(); if (/E-?ATX/.test(n)) return "eatx"; if (/ITX/.test(n)) return "itx"; if (/MICRO|MATX|M-ATX/.test(n)) return "matx"; if (/ATX/.test(n)) return "atx"; return ""; }
+function fitsCase(box, board){ const r={itx:1,matx:2,atx:3,eatx:4}; return (r[formOf(box)]||3) >= (r[formOf(board)]||2); }
+function gbOf(p){ const m=(p.name||"").toUpperCase().match(/\b(4|8|16|32|64|96|128)\s?GB\b/); return m?+m[1]:0; }
+function diskGb(p){ const n=(p.name||"").toUpperCase(); const tb=n.match(/(\d+)\s?TB/); if (tb) return +tb[1]*1000; const gb=n.match(/(\d+)\s?GB/); return gb?+gb[1]:0; }
+function wattOf(p){ if (!p) return 0; if (p.watt) return p.watt; const m=(p.name||"").toUpperCase().match(/(\d{3,4})\s?W/); return m?+m[1]:0; }
+function cores(p){ const m=(p.name||"").match(/(\d+)\s*[- ]?Core/i); return m?+m[1]:4; }
+function cpuBrandOf(p){ return /AMD|RYZEN|AM[45]/i.test((p.brand||"")+" "+(p.name||"")+" "+(p.socket||"")) ? "AMD" : "INTEL"; }
+function gpuBrandOf(p){ const n=(p.name||"").toUpperCase(); if (/RTX|GTX|GEFORCE|NVIDIA/.test(n)) return "NVIDIA"; if (/RADEON|\bRX\s?\d/.test(n)) return "AMD"; if (/ARC|INTEL/.test(n)) return "INTEL"; return "OTHER"; }
+function chipOf(p){ const n=(p.name||"").toUpperCase().replace(/\s+/g," "); const m=n.match(/RTX\s?(\d{4})\s?(TI|SUPER)?|RX\s?(\d{4})\s?(XT|GRE)?|GT\s?(\d{3,4})/); if (!m) return ""; if (m[1]) return "RTX "+m[1]+(m[2]?" "+m[2]:""); if (m[3]) return "RX "+m[3]+(m[4]?" "+m[4]:""); return "GT "+m[5]; }
+function gpuClass(p){ const n=(p.name||"").toUpperCase(); if (/5080|5070\s?TI|9070\s?XT/.test(n)) return 6; if (/5070|9070|4070/.test(n)) return 5; if (/5060|9060/.test(n)) return 4; if (/5050|3060|6800|7600/.test(n)) return 3; if (/3050|1660|1650/.test(n)) return 2; if (/1030/.test(n)) return 1; return 0; }
+function gpuWatt(p){ return WATT[chipOf(p)] || wattOf(p) || (gpuClass(p)>=6?320:gpuClass(p)>=4?180:120); }
+function driveKind(p){ const n=(p.name||"").toUpperCase(); if (/NVME|M\.2|PCIE|PCI-?E/.test(n)) return "NVME"; if (/HDD|HARD DRIVE|3\.5/.test(n)) return "HDD"; return "SSD"; }
 function isAio(p){ return /LIQUID|AIO|RADIATOR|\b240\b|\b280\b|\b360\b/i.test(p.name||""); }
-function clean(cat){ return PARTS.filter(p => p.cat === cat && !junk(p)); }
-function slotsOf(board){ const f = formOf(board); return { m2: f === "itx" ? 2 : 2, sata: f === "itx" ? 4 : 4, dimm: dimmSlots(board) }; }
-function usedDrives(){ let m2 = 0, sata = 0; s.drives.forEach(id => { const p = byId[id]; if (!p) return; if (driveKind(p) === "NVME") m2++; else sata++; }); return { m2, sata }; }
-function ramSticks(){ return s.kits.reduce((n,k) => n + (byId[k.id] ? sticksOf(byId[k.id]) * k.qty : 0), 0); }
-function powerMath(){
-  let draw = 80 + s.drives.length * 8;
-  if (byId[s.cpu]) draw += wattOf(byId[s.cpu]) || 65;
-  if (byId[s.gpu]) draw += gpuWatt(byId[s.gpu]);
-  let need = 450;
-  if (draw > 300) need = 550;
-  if (draw > 400) need = 650;
-  if (draw > 500) need = 750;
-  if (draw > 620) need = 850;
-  if (draw > 760) need = 1000;
-  return { draw, need };
+function clean(cat){ return PARTS.filter(p => p.cat===cat && !junk(p)); }
+function specNow(){ const u=USES[s.use]||USES.Minecraft; return u[s.tier]||u.med; }
+function powerMath(){ let draw=90+(s.fanQty||0)*2; if (byId[s.cpu]) draw += wattOf(byId[s.cpu])||65; if (byId[s.gpu]) draw += gpuWatt(byId[s.gpu]); let need=450; if (draw>300) need=550; if (draw>400) need=650; if (draw>520) need=750; if (draw>640) need=850; if (draw>760) need=1000; return {draw,need}; }
+function cheapest(list){ return list.slice().sort((a,b)=>a.price-b.price)[0]||null; }
+function applyPlan(tier){
+  s.tier = tier;
+  const spec = specNow();
+  const am4 = clean("cpu").filter(p=>p.socket==="AM4"&&cores(p)>=6).sort((a,b)=>a.price-b.price);
+  const am5 = clean("cpu").filter(p=>p.socket==="AM5"&&cores(p)>=6&&cores(p)<=8).sort((a,b)=>a.price-b.price);
+  const cpu = tier==="min" ? (am4[0]||am5[0]) : tier==="med" ? (am5[0]||am4[0]) : tier==="high" ? (am5[Math.min(2, Math.max(0, am5.length-1))]||am5[0]) : (am5.filter(p=>cores(p)===8)[0]||am5[am5.length-1]||am4[0]);
+  s.cpu = cpu?cpu.id:"";
+  s.cpuBrand = cpu?cpuBrandOf(cpu):"AMD";
+  s.socket = cpu?cpu.socket:"";
+  const boards = clean("motherboard").filter(p=>cpu&&p.socket===cpu.socket&&formOf(p)==="matx").sort((a,b)=>a.price-b.price);
+  const board = boards[0] || clean("motherboard").filter(p=>cpu&&p.socket===cpu.socket).sort((a,b)=>a.price-b.price)[0];
+  s.board = board?board.id:"";
+  s.form = board?(formOf(board)||"matx"):"matx";
+  const kind = ramKindOf(board)||(s.socket==="AM5"?"DDR5":"DDR4");
+  s.ramKind = kind;
+  let kit = cheapest(clean("memory").filter(p=>ramKindOf(p)===kind&&sticksOf(p)===2&&gbOf(p)===spec[1]));
+  if (!kit) kit = cheapest(clean("memory").filter(p=>ramKindOf(p)===kind&&sticksOf(p)===2&&gbOf(p)>=Math.min(32,spec[1])));
+  s.kit = kit?kit.id:"";
+  const gpu = spec[0] ? (cheapest(clean("gpu").filter(p=>gpuClass(p)===spec[0])) || cheapest(clean("gpu").filter(p=>gpuClass(p)>0&&gpuClass(p)<spec[0]))) : null;
+  s.gpu = gpu?gpu.id:"";
+  if (gpu) s.gpuBrand = gpuBrandOf(gpu);
+  const drive = cheapest(clean("storage").filter(p=>driveKind(p)==="NVME"&&diskGb(p)>=spec[2]&&diskGb(p)<=spec[2]+1000)) || cheapest(clean("storage").filter(p=>driveKind(p)==="NVME"&&diskGb(p)>=spec[2]));
+  s.drive = drive?drive.id:"";
+  s.driveKind = "NVME";
+  const box = cheapest(clean("case").filter(p=>!board||fitsCase(p,board)));
+  s.box = box?box.id:"";
+  s.fan = "fan-p12";
+  s.fanQty = (tier==="high"||tier==="ultra") ? 3 : 2;
+  const cool = cheapest(clean("cooler").filter(p=>!isAio(p)));
+  s.cooler = cool?cool.id:"";
+  s.coolKind = "air";
+  s.paste = "paste-mx4";
+  const need = powerMath().need;
+  const psu = cheapest(clean("psu").filter(p=>wattOf(p)>=need));
+  s.psu = psu?psu.id:"";
 }
-function useNow(){ return USES.filter(u => u.name === s.use)[0] || USES[0]; }
-function el(tag, attrs, kids){
+function pct(){ if (step<2) return 0; return Math.min(100, Math.round((step-1)/11*100)); }
+function el(tag, attrs){
   const n = document.createElement(tag);
-  Object.keys(attrs||{}).forEach(k => { if (k === "text") n.textContent = attrs[k]; else if (k === "html") n.innerHTML = attrs[k]; else if (k === "class") n.className = attrs[k]; else if (k.slice(0,2) === "on") n.addEventListener(k.slice(2), attrs[k]); else n.setAttribute(k, attrs[k]); });
-  (kids||[]).forEach(c => c && n.appendChild(c));
+  Object.keys(attrs||{}).forEach(k=>{ if (k==="text") n.textContent=attrs[k]; else if (k==="class") n.className=attrs[k]; else if (k==="on") n.onclick=attrs[k]; else n.setAttribute(k, attrs[k]); });
   return n;
 }
-function pill(label, on, fn, disabled){
-  const attrs = { type:"button", class:on?"on":"", text:label };
-  const b = el("button", attrs);
-  if (disabled) b.setAttribute("disabled", "disabled");
-  else b.onclick = fn;
+function card(title, sub, price, on, fn){
+  const b = el("button", { type:"button", class:on?"card on":"card", on:fn });
+  if (price) b.appendChild(el("span", { class:"price", text:price }));
+  b.appendChild(el("b", { text:title }));
+  if (sub) b.appendChild(el("span", { text:sub }));
   return b;
 }
-function paintUses(){
-  const box = document.getElementById("uses");
-  box.replaceChildren();
-  USES.forEach(u => box.appendChild(pill(u.name, u.name === s.use, () => { s.use = u.name; s.tier = ""; render(); })));
-  const tiers = document.getElementById("tiers");
-  tiers.replaceChildren();
-  [["enough","Enough"],["comfortable","Comfortable"],["more","A bit more"]].forEach(pair => {
-    tiers.appendChild(pill(pair[1], s.tier === pair[0], () => applyPlan(pair[0])));
-  });
-  document.getElementById("useNote").textContent = useNow().note;
-}
-function pickCpu(list, tier){
-  const six = list.filter(p => cores(p) >= 6);
-  const bag = six.length ? six : list;
-  if (!bag.length) return null;
-  if (tier === "enough") return bag[0];
-  if (tier === "comfortable") return bag[Math.min(2, bag.length - 1)];
-  return bag.filter(p => cores(p) <= 8 && p.price < 450).pop() || bag[Math.min(4, bag.length - 1)];
-}
-function applyPlan(tier){
-  const use = useNow();
-  s.tier = tier;
-  const target = tier === "enough" ? use.gpuMin : tier === "comfortable" ? Math.min(use.gpuMax, Math.max(use.gpuMin, use.gpuMin + 1)) : use.gpuMax;
-  const socket = target >= 3 || use.ram >= 32 ? "AM5" : "AM4";
-  const cpus = clean("cpu").filter(p => p.socket === socket).sort((a,b) => a.price - b.price);
-  const cpu = pickCpu(cpus, tier) || pickCpu(clean("cpu").sort((a,b)=>a.price-b.price), tier);
-  s.cpu = cpu ? cpu.id : "";
-  s.cpuBrand = cpu ? cpuBrand(cpu) : "AMD";
-  s.socket = cpu ? cpu.socket : socket;
-  const boards = clean("motherboard").filter(p => p.socket === s.socket && formOf(p) === "matx").sort((a,b)=>a.price-b.price);
-  const board = boards[0] || clean("motherboard").filter(p => p.socket === s.socket).sort((a,b)=>a.price-b.price)[0];
-  s.board = board ? board.id : "";
-  s.form = board ? (formOf(board) || "atx") : "matx";
-  const kind = ramKindOf(board) || (s.socket === "AM5" ? "DDR5" : "DDR4");
-  s.ramKind = kind;
-  const kits = clean("memory").filter(p => ramKindOf(p) === kind && sticksOf(p) === 2 && gbOf(p) >= use.ram).sort((a,b)=>a.price-b.price);
-  const kit = kits[0] || clean("memory").filter(p => ramKindOf(p) === kind && sticksOf(p) <= dimmSlots(board)).sort((a,b)=>a.price-b.price)[0];
-  s.kits = kit ? [{ id:kit.id, qty:1 }] : [];
-  const drives = clean("storage").filter(p => driveKind(p) === "NVME" && diskGb(p) >= use.disk).sort((a,b)=>a.price-b.price);
-  s.drives = [(drives[0] || clean("storage").filter(p => driveKind(p) !== "HDD").sort((a,b)=>a.price-b.price)[0] || {}).id].filter(Boolean);
-  s.driveKind = "NVME";
-  if (target <= 0) s.gpu = "";
-  else {
-    const cards = clean("gpu").filter(p => gpuClass(p) >= target && gpuClass(p) <= use.gpuMax).sort((a,b)=>a.price-b.price);
-    const card = cards[0] || null;
-    s.gpu = card ? card.id : "";
-    if (card) s.gpuBrand = gpuBrand(card);
-  }
-  const cool = clean("cooler").filter(p => !isAio(p)).sort((a,b)=>a.price-b.price)[0];
-  s.cooler = cool ? cool.id : "";
-  s.coolKind = "air";
-  const box = clean("case").filter(p => !board || fitsCase(p, board)).sort((a,b)=>a.price-b.price)[0];
-  s.box = box ? box.id : "";
-  const need = powerMath().need;
-  const psu = clean("psu").filter(p => wattOf(p) >= need).sort((a,b)=>a.price-b.price)[0];
-  s.psu = psu ? psu.id : "";
-  render();
-}
-function row(part, on, fn, off, why){
-  const b = el("button", { type:"button", class: off ? "row off" : (on ? "row on" : "row") });
-  b.appendChild(el("b", { text: part.name }));
-  b.appendChild(el("span", { class:"price", text: money.format(part.price) }));
-  const meta = el("div", { class:"meta", text: why || specLine(part) });
-  b.appendChild(meta);
-  if (!off) b.onclick = fn;
-  return b;
-}
-function specLine(p){
-  if (p.cat === "gpu") {
-    const chip = chipOf(p);
-    const v = gbOf(p);
-    return (v ? v + " GB" : "VRAM not listed") + " · about " + gpuWatt(p) + " W · " + (HASH[chip] || "hash rate not listed") + " · rough comparison, not a quote";
-  }
-  if (p.cat === "memory") return ramKindOf(p) + " · " + gbOf(p) + " GB · " + sticksOf(p) + " stick" + (sticksOf(p) > 1 ? "s" : "");
-  if (p.cat === "storage") return driveKind(p) + " · " + (diskGb(p) >= 1000 ? (diskGb(p)/1000) + " TB" : diskGb(p) + " GB");
-  if (p.cat === "psu") return (wattOf(p) || "?") + " W";
-  if (p.cat === "cpu") return (p.socket || "") + " · " + cores(p) + " cores · " + (wattOf(p) || "?") + " W";
-  if (p.cat === "motherboard") return [p.socket, formOf(p).toUpperCase(), ramKindOf(p)].filter(Boolean).join(" · ");
-  if (p.cat === "cooler") return isAio(p) ? "Liquid cooler" : "Fan cooler";
-  if (p.cat === "case") return (formOf(p) || "case").toUpperCase();
-  return "";
-}
-function section(title, hint, pills, rows){
-  const sec = el("section");
-  sec.appendChild(el("h2", { text: title }));
-  if (hint) sec.appendChild(el("p", { class:"hint", text: hint }));
-  if (pills) sec.appendChild(pills);
-  const box = el("div", { class:"rows" });
-  rows.forEach(r => box.appendChild(r));
-  sec.appendChild(box);
-  return sec;
-}
+function goto(n){ step=n; render(); window.scrollTo(0,0); }
 function render(){
-  paintUses();
-  const main = document.getElementById("list");
-  main.replaceChildren();
-  const board = byId[s.board];
-  const cpu = byId[s.cpu];
-  const wantRam = ramKindOf(board) || s.ramKind;
-  const sockets = Array.from(new Set(clean("cpu").filter(p => cpuBrand(p) === s.cpuBrand).map(p => p.socket).filter(Boolean)));
-  const cpuPills = el("div", { class:"pills" });
-  ["AMD","INTEL"].forEach(b => cpuPills.appendChild(pill(b === "INTEL" ? "Intel" : "AMD", s.cpuBrand === b, () => { s.cpuBrand = b; s.socket = socketsOf(b)[0] || ""; render(); })));
-  socketsOf(s.cpuBrand).forEach(sk => cpuPills.appendChild(pill(sk, s.socket === sk, () => { s.socket = sk; render(); })));
-  const cpus = clean("cpu").filter(p => cpuBrand(p) === s.cpuBrand && (!s.socket || p.socket === s.socket)).sort((a,b)=>a.price-b.price).slice(0, 18);
-  main.appendChild(section("Processor", "Start with the brand, then the socket.", cpuPills, cpus.map(p => row(p, p.id === s.cpu, () => { s.cpu = p.id; if (board && board.socket !== p.socket) s.board = ""; render(); }))));
-
-  const formPills = el("div", { class:"pills" });
-  FORMS.forEach(pair => formPills.appendChild(pill(pair[1], s.form === pair[0], () => { s.form = pair[0]; render(); })));
-  const boards = clean("motherboard").filter(p => (!cpu || p.socket === cpu.socket) && formOf(p) === s.form).sort((a,b)=>a.price-b.price).slice(0, 16);
-  const boardRows = boards.map(p => row(p, p.id === s.board, () => {
-    const nextKind = ramKindOf(p);
-    if (s.kits.some(k => ramKindOf(byId[k.id]) && ramKindOf(byId[k.id]) !== nextKind)) s.kits = [];
-    s.board = p.id; s.ramKind = nextKind; render();
-  }));
-  if (!boardRows.length) boardRows.push(el("p", { class:"note", text:"No " + s.form.toUpperCase() + " board for this socket." }));
-  main.appendChild(section("Motherboard", "Size first, so the names are not stacked on top of each other.", formPills, boardRows));
-
-  const ramPills = el("div", { class:"pills" });
-  ["DDR3","DDR4","DDR5"].forEach(k => {
-    const bad = !!(wantRam && k !== wantRam);
-    ramPills.appendChild(pill(k, s.ramKind === k, () => { s.ramKind = k; render(); }, bad));
-  });
-  const kind = s.ramKind || wantRam || "DDR5";
-  const mem = clean("memory").filter(p => ramKindOf(p) === kind).sort((a,b)=>a.price-b.price).slice(0, 16);
-  const wrong = wantRam ? clean("memory").filter(p => ramKindOf(p) && ramKindOf(p) !== wantRam).slice(0, 3) : [];
-  const memRows = mem.map(p => row(p, s.kits.some(k => k.id === p.id), () => addKit(p)));
-  wrong.forEach(p => memRows.push(row(p, false, null, true, ramKindOf(p) + " does not fit this board.")));
-  main.appendChild(section("Memory", wantRam ? "This board takes " + wantRam + ". The other kinds are gray and cannot be added." : "Pick the kind, then the kit.", ramPills, memRows));
-
-  const gpuPills = el("div", { class:"pills" });
-  ["NVIDIA","AMD","INTEL"].forEach(b => gpuPills.appendChild(pill(b === "NVIDIA" ? "Nvidia" : b === "AMD" ? "AMD" : "Intel", s.gpuBrand === b, () => { s.gpuBrand = b; render(); })));
-  const cards = clean("gpu").filter(p => gpuBrand(p) === s.gpuBrand).sort((a,b)=>a.price-b.price).slice(0, 18);
-  const gpu = byId[s.gpu];
-  const gpuHint = gpu ? "This card wants a " + powerMath().need + " W power supply, once the rest of the computer is counted." : "Brand first. VRAM, watts, and a rough hash rate are under each card.";
-  main.appendChild(section("Graphics", gpuHint, gpuPills, cards.map(p => row(p, p.id === s.gpu, () => { s.gpu = p.id; render(); }))));
-
-  const dPills = el("div", { class:"pills" });
-  [["NVME","NVMe"],["SSD","SSD"],["HDD","Hard drive"]].forEach(pair => dPills.appendChild(pill(pair[1], s.driveKind === pair[0], () => { s.driveKind = pair[0]; render(); })));
-  const slot = slotsOf(board);
-  const used = usedDrives();
-  const dHint = "A board this size has about " + slot.m2 + " NVMe and " + slot.sata + " SATA connections. Using " + used.m2 + " NVMe and " + used.sata + " SATA.";
-  const disks = clean("storage").filter(p => driveKind(p) === s.driveKind).sort((a,b)=>a.price-b.price).slice(0, 14);
-  main.appendChild(section("Storage", dHint, dPills, disks.map(p => row(p, s.drives.indexOf(p.id) >= 0, () => addDrive(p)))));
-
-  const cPills = el("div", { class:"pills" });
-  cPills.appendChild(pill("Fan cooler", s.coolKind === "air", () => { s.coolKind = "air"; render(); }));
-  cPills.appendChild(pill("Liquid cooler", s.coolKind === "aio", () => { s.coolKind = "aio"; render(); }));
-  const cools = clean("cooler").filter(p => s.coolKind === "aio" ? isAio(p) : !isAio(p)).sort((a,b)=>a.price-b.price).slice(0, 12);
-  main.appendChild(section("Cooling", "A fan cooler is the efficient choice. It costs less, has no pump to fail, and is usually quieter. A liquid cooler is for a hot chip or a cramped case, not for more speed.", cPills, cools.map(p => row(p, p.id === s.cooler, () => { s.cooler = p.id; render(); }))));
-
-  const boxes = clean("case").filter(p => !board || fitsCase(p, board)).sort((a,b)=>a.price-b.price).slice(0, 12);
-  main.appendChild(section("Case", board ? "Only cases that can hold this board." : "Pick a board first if you want the case filtered.", null, boxes.map(p => row(p, p.id === s.box, () => { s.box = p.id; render(); }))));
-
-  const pow = powerMath();
-  const psu = byId[s.psu];
-  const low = psu && wattOf(psu) && wattOf(psu) < pow.need;
-  const psus = clean("psu").filter(p => wattOf(p) >= 400).sort((a,b)=>a.price-b.price).slice(0, 14);
-  const powerSec = section("Power", "The parts draw about " + pow.draw + " W. Buy a " + pow.need + " W supply so it is not running flat out.", null, psus.map(p => row(p, p.id === s.psu, () => { s.psu = p.id; render(); }, wattOf(p) && wattOf(p) < pow.need, wattOf(p) && wattOf(p) < pow.need ? "Too small for this computer." : "")));
-  if (low) powerSec.appendChild(el("p", { class:"warn", text:"This power supply is too low. Choose one of " + pow.need + " W or more." }));
-  main.appendChild(powerSec);
-  paintCart();
+  const rtl = lang==="ur";
+  document.documentElement.lang = lang;
+  document.documentElement.dir = rtl ? "rtl" : "ltr";
+  document.getElementById("bar").style.width = pct()+"%";
+  const back = document.getElementById("back");
+  back.hidden = step===0;
+  back.textContent = t("back");
+  const app = document.getElementById("app");
+  app.replaceChildren();
+  const which = STEPS[step];
+  if (which!=="use") app.appendChild(el("p", { class:"pct", text: pct()+"%" }));
+  const h = el("h1", { text: which==="use"?t("for"): which==="tier"? useLabel(s.use) : which==="done"? t("done") : t(which==="disk"?"disk":which==="case"?"case":which) });
+  app.appendChild(h);
+  const grid = el("div", { class:"grid" });
+  if (which==="use") Object.keys(USES).forEach(name => grid.appendChild(card(useLabel(name), "", "", name===s.use, ()=>{ s.use=name; goto(1); })));
+  if (which==="tier") TIERS.forEach(tier => { const snap=Object.assign({}, s, {tier}); const hold=s; s=Object.assign(blank(), {use:hold.use, tier}); applyPlan(tier); const price=total(); const line=[byId[s.cpu]&&byId[s.cpu].name, byId[s.gpu]?byId[s.gpu].name:t("none")].filter(Boolean).join(" · "); const id=s.cpu; s=hold; grid.appendChild(card(t(tier), line, money.format(price), false, ()=>{ applyPlan(tier); goto(2); })); });
+  if (which==="cpu"){ const pills=el("div",{class:"pills"}); ["AMD","INTEL"].forEach(b=>pills.appendChild(el("button",{type:"button", class:s.cpuBrand===b?"on":"", text:t(b==="AMD"?"amd":"intel"), on:()=>{ s.cpuBrand=b; s.socket=""; render(); }}))); const socks=[...new Set(clean("cpu").filter(p=>cpuBrandOf(p)===s.cpuBrand).map(p=>p.socket).filter(Boolean))]; socks.forEach(sk=>pills.appendChild(el("button",{type:"button", class:s.socket===sk?"on":"", text:sk, on:()=>{ s.socket=sk; render(); }}))); app.appendChild(pills); clean("cpu").filter(p=>cpuBrandOf(p)===s.cpuBrand && (!s.socket||p.socket===s.socket)).sort((a,b)=>a.price-b.price).slice(0,8).forEach(p=>grid.appendChild(card(p.name, p.socket+" · "+cores(p)+" cores", money.format(p.price), p.id===s.cpu, ()=>{ s.cpu=p.id; s.socket=p.socket; if (byId[s.board]&&byId[s.board].socket!==p.socket) s.board=""; goto(3); }))); }
+  if (which==="board"){ const pills=el("div",{class:"pills"}); [["itx","itx"],["matx","matx"],["atx","atx"],["eatx","eatx"]].forEach(pair=>pills.appendChild(el("button",{type:"button", class:s.form===pair[0]?"on":"", text:t(pair[1]), on:()=>{ s.form=pair[0]; render(); }}))); app.appendChild(pills); const cpu=byId[s.cpu]; clean("motherboard").filter(p=>(!cpu||p.socket===cpu.socket)&&formOf(p)===s.form).sort((a,b)=>a.price-b.price).slice(0,8).forEach(p=>grid.appendChild(card(p.name, [p.socket, ramKindOf(p)].filter(Boolean).join(" · "), money.format(p.price), p.id===s.board, ()=>{ s.board=p.id; s.ramKind=ramKindOf(p); if (byId[s.kit]&&ramKindOf(byId[s.kit])!==s.ramKind) s.kit=""; goto(4); }))); }
+  if (which==="mem"){ const want=ramKindOf(byId[s.board])||s.ramKind; const pills=el("div",{class:"pills"}); ["DDR3","DDR4","DDR5"].forEach(k=>{ const b=el("button",{type:"button", class:s.ramKind===k?"on":"", text:k}); if (want && k!==want) b.disabled=true; else b.onclick=()=>{ s.ramKind=k; render(); }; pills.appendChild(b); }); app.appendChild(pills); const kind=s.ramKind||want||"DDR5"; clean("memory").filter(p=>ramKindOf(p)===kind).sort((a,b)=>a.price-b.price).slice(0,8).forEach(p=>grid.appendChild(card(p.name, ramKindOf(p)+" · "+gbOf(p)+" GB", money.format(p.price), p.id===s.kit, ()=>{ s.kit=p.id; goto(5); }))); }
+  if (which==="gpu"){ const pills=el("div",{class:"pills"}); ["NVIDIA","AMD","INTEL"].forEach(b=>pills.appendChild(el("button",{type:"button", class:s.gpuBrand===b?"on":"", text:b==="NVIDIA"?t("nvidia"):b==="AMD"?t("amd"):"Intel", on:()=>{ s.gpuBrand=b; render(); }}))); app.appendChild(pills); grid.appendChild(card(t("none"), "", "", !s.gpu, ()=>{ s.gpu=""; goto(6); })); clean("gpu").filter(p=>gpuBrandOf(p)===s.gpuBrand).sort((a,b)=>a.price-b.price).slice(0,8).forEach(p=>{ const chip=chipOf(p); grid.appendChild(card(p.name, (gbOf(p)?gbOf(p)+" GB · ":"")+gpuWatt(p)+" W · "+(HASH[chip]||""), money.format(p.price), p.id===s.gpu, ()=>{ s.gpu=p.id; goto(6); })); }); }
+  if (which==="disk"){ const pills=el("div",{class:"pills"}); [["NVME","nvme"],["SSD","ssd"],["HDD","hdd"]].forEach(pair=>pills.appendChild(el("button",{type:"button", class:s.driveKind===pair[0]?"on":"", text:t(pair[1]), on:()=>{ s.driveKind=pair[0]; render(); }}))); app.appendChild(pills); clean("storage").filter(p=>driveKind(p)===s.driveKind).sort((a,b)=>a.price-b.price).slice(0,8).forEach(p=>grid.appendChild(card(p.name, driveKind(p)+" · "+(diskGb(p)>=1000?(diskGb(p)/1000)+" TB":diskGb(p)+" GB"), money.format(p.price), p.id===s.drive, ()=>{ s.drive=p.id; goto(7); }))); }
+  if (which==="case") clean("case").filter(p=>!byId[s.board]||fitsCase(p,byId[s.board])).sort((a,b)=>a.price-b.price).slice(0,8).forEach(p=>grid.appendChild(card(p.name, (formOf(p)||"").toUpperCase(), money.format(p.price), p.id===s.box, ()=>{ s.box=p.id; goto(8); })));
+  if (which==="fan"){ app.appendChild(el("p",{class:"muted", text:t("fansay")})); EXTRA.filter(p=>p.cat==="fan").forEach(p=>grid.appendChild(card((s.fan===p.id?s.fanQty+" × ":"")+p.name, "", money.format(p.price), p.id===s.fan, ()=>{ s.fan=p.id; render(); }))); const more=el("button",{type:"button", class:"go", text:"+  "+(s.fanQty||1), on:()=>{ s.fanQty=Math.min(6,(s.fanQty||1)+1); render(); }}); grid.appendChild(more); grid.appendChild(el("button",{type:"button", class:"go", text:t("thisone"), on:()=>goto(9)})); }
+  if (which==="cool"){ app.appendChild(el("p",{class:"muted", text:t("air")+" · "+t("aio")})); const pills=el("div",{class:"pills"}); [["air","air"],["aio","aio"]].forEach(pair=>pills.appendChild(el("button",{type:"button", class:s.coolKind===pair[0]?"on":"", text:t(pair[0]), on:()=>{ s.coolKind=pair[0]; render(); }}))); app.appendChild(pills); clean("cooler").filter(p=>s.coolKind==="aio"?isAio(p):!isAio(p)).sort((a,b)=>a.price-b.price).slice(0,8).forEach(p=>grid.appendChild(card(p.name, isAio(p)?t("aio"):t("air"), money.format(p.price), p.id===s.cooler, ()=>{ s.cooler=p.id; goto(10); }))); }
+  if (which==="paste"){ app.appendChild(el("p",{class:"muted", text:t("pastesay")})); pastes().forEach(p=>grid.appendChild(card(p.name, "", money.format(p.price), p.id===s.paste, ()=>{ s.paste=p.id; goto(11); }))); }
+  if (which==="psu"){ const pow=powerMath(); app.appendChild(el("p",{class:"muted", text:pow.need+" W"})); clean("psu").filter(p=>wattOf(p)>=400).sort((a,b)=>a.price-b.price).slice(0,8).forEach(p=>{ const low=wattOf(p)&&wattOf(p)<pow.need; grid.appendChild(card(p.name, low?t("warn"):(wattOf(p)+" W"), money.format(p.price), p.id===s.psu, ()=>{ if (low) return; s.psu=p.id; goto(12); })); }); if (byId[s.psu]&&wattOf(byId[s.psu])<pow.need) app.appendChild(el("p",{class:"warn", text:t("warn")+" "+pow.need+" W"})); }
+  if (which==="done"){ lines().forEach(line=>grid.appendChild(card(line[0], line[1], "", false, ()=>goto(line[2])))); app.appendChild(grid); const sum=el("p",{class:"pct", text:money.format(total())}); app.appendChild(sum); app.appendChild(el("p",{class:"muted", text:t("notsale")+" "+t("scan")})); const canvas=el("canvas"); app.appendChild(canvas); const code=lines().map(l=>l[0]+" "+l[1]).join("\n").slice(0,640); if (window.drewQR) window.drewQR.draw(canvas, code, 3); app.appendChild(el("button",{type:"button", class:"go", text:t("print"), on:printList})); writeCart(); return; }
+  app.appendChild(grid);
   writeCart();
-  tell();
 }
-function socketsOf(brand){ return Array.from(new Set(clean("cpu").filter(p => cpuBrand(p) === brand).map(p => p.socket).filter(Boolean))); }
-function addKit(p){
-  const board = byId[s.board];
-  const want = ramKindOf(board);
-  if (want && ramKindOf(p) !== want) return;
-  if (sticksOf(p) > dimmSlots(board)) return;
-  s.kits = [{ id:p.id, qty:1 }];
-  render();
-}
-function moreRam(p){
-  if (ramSticks() + sticksOf(p) > dimmSlots(byId[s.board])) return;
-  const have = s.kits.find(k => k.id === p.id);
-  if (have) have.qty += 1;
-  render();
-}
-function addDrive(p){
-  if (s.drives.indexOf(p.id) >= 0) { s.drives = s.drives.filter(id => id !== p.id); render(); return; }
-  const slot = slotsOf(byId[s.board]);
-  const used = usedDrives();
-  const kind = driveKind(p);
-  if (kind === "NVME" && used.m2 >= slot.m2) return;
-  if (kind !== "NVME" && used.sata >= slot.sata) return;
-  s.drives.push(p.id);
-  render();
-}
-function paintCart(){
-  const cart = document.getElementById("cart");
-  cart.replaceChildren();
-  cart.appendChild(el("h3", { text:"Your order" }));
-  const hints = [];
-  const use = useNow();
-  if (byId[s.gpu] && gpuClass(byId[s.gpu]) > use.gpuMax) hints.push("That card is more than this job needs.");
-  const pow = powerMath();
-  if (byId[s.psu] && wattOf(byId[s.psu]) && wattOf(byId[s.psu]) < pow.need) hints.push("Power supply is too small. " + pow.need + " W is the one to buy.");
-  if (s.coolKind === "aio") hints.push("A fan cooler is enough unless the case is very small.");
-  hints.slice(0, 2).forEach(t => cart.appendChild(el("p", { class:"warn", text:t })));
-  const lines = [];
-  if (s.cpu) lines.push({ id:s.cpu, label:"Processor" });
-  if (s.board) lines.push({ id:s.board, label:"Board" });
-  s.kits.forEach((k,i) => lines.push({ id:k.id, label:"Memory", qty:k.qty, plus:true, kit:i }));
-  if (s.gpu) lines.push({ id:s.gpu, label:"Graphics" });
-  s.drives.forEach((id,i) => lines.push({ id:id, label:"Drive", drive:i }));
-  if (s.cooler) lines.push({ id:s.cooler, label:"Cooler" });
-  if (s.box) lines.push({ id:s.box, label:"Case" });
-  if (s.psu) lines.push({ id:s.psu, label:"Power" });
-  if (!lines.length) cart.appendChild(el("p", { class:"note", text:"Nothing yet. Choose a part and it lands here." }));
-  let total = 0;
-  lines.forEach(line => {
-    const p = byId[line.id];
-    if (!p) return;
-    const qty = line.qty || 1;
-    total += p.price * qty;
-    const row = el("div", { class:"line" });
-    row.appendChild(el("b", { text:(qty > 1 ? qty + " × " : "") + p.name }));
-    const tools = el("span");
-    if (line.plus) {
-      tools.appendChild(el("span", { class:"qty", text:String(qty) }));
-      tools.appendChild(el("button", { type:"button", class:"plus", text:"+", onclick:() => moreRam(p) }));
-    }
-    const x = el("button", { type:"button", class:"x", text:"×" });
-    x.onclick = () => removeLine(line);
-    row.appendChild(tools);
-    row.appendChild(x);
-    cart.appendChild(row);
-  });
-  cart.appendChild(el("p", { class:"price", text: money.format(total) }));
-  cart.appendChild(el("button", { type:"button", class:"go", text:"Print this list", onclick: printList }));
-}
-function removeLine(line){
-  if (line.kit != null) s.kits.splice(line.kit, 1);
-  else if (line.drive != null) s.drives.splice(line.drive, 1);
-  else if (line.label === "Processor") s.cpu = "";
-  else if (line.label === "Board") s.board = "";
-  else if (line.label === "Graphics") s.gpu = "";
-  else if (line.label === "Cooler") s.cooler = "";
-  else if (line.label === "Case") s.box = "";
-  else if (line.label === "Power") s.psu = "";
-  render();
-}
-function printList(){
-  const lines = ["DREW BUILD / NOT A SALE", useNow().name, ""];
-  document.querySelectorAll("#cart .line b").forEach(n => lines.push(n.textContent));
-  const w = window.open("", "print");
-  w.document.write("<pre style='font:14px/1.5 ui-monospace,monospace'>" + lines.join("\n") + "</pre>");
-  w.document.close(); w.focus(); w.print();
-}
-function writeCart(){
-  const out = {};
-  if (s.cpu) out.cpu = s.cpu;
-  if (s.board) out.motherboard = s.board;
-  if (s.kits[0]) out.memory = s.kits[0].id;
-  if (s.gpu) out.gpu = s.gpu;
-  if (s.drives[0]) out.storage = s.drives[0];
-  if (s.drives.length > 1) out.storageExtra = s.drives.slice(1);
-  if (s.box) out.case = s.box;
-  if (s.cooler) out.cooler = s.cooler;
-  if (s.psu) out.psu = s.psu;
-  try { localStorage.setItem("drew-cart", JSON.stringify(out)); } catch (e) {}
-}
-function tell(){
-  const need = ["cpu","board","kits","drives","box","cooler","psu"].filter(k => k === "kits" ? s.kits.length : k === "drives" ? s.drives.length : s[k]);
-  const total = useNow().gpuMax === 0 ? 7 : 8;
-  const n = need.length + (s.gpu ? 1 : 0);
-  try { parent.postMessage({ type:"drew-progress", n: Math.min(n, total), total: total }, "*"); } catch (e) {}
-}
-function readCart(){ try { return JSON.parse(localStorage.getItem("drew-cart") || "{}"); } catch (e) { return {}; } }
-function open(){
-  document.getElementById("lock").hidden = true;
-  const saved = readCart();
-  ["cpu","motherboard","gpu","case","cooler","psu","storage"].forEach(id => {
-    const key = id === "motherboard" ? "board" : id === "storage" ? "drives" : id === "case" ? "box" : id;
-    if (id === "storage") { if (byId[saved.storage]) s.drives = [saved.storage].concat(saved.storageExtra || []).filter(x => byId[x]); }
-    else if (byId[saved[id]]) s[key] = saved[id];
-  });
-  if (byId[saved.memory]) s.kits = [{ id: saved.memory, qty: 1 }];
-  if (byId[s.cpu]) { s.cpuBrand = cpuBrand(byId[s.cpu]); s.socket = byId[s.cpu].socket; }
-  if (byId[s.board]) { s.form = formOf(byId[s.board]) || s.form; s.ramKind = ramKindOf(byId[s.board]); }
-  render();
-}
-document.getElementById("lockForm").onsubmit = (e) => {
-  e.preventDefault();
-  if (document.getElementById("lockPass").value !== "Password4") { document.getElementById("lockBad").textContent = "Wrong password"; return; }
-  try { sessionStorage.setItem("drew-apple", "1"); } catch (err) {}
-  open();
-};
-fetch("parts.json").then(r => r.json()).then(list => {
-  PARTS = list;
-  list.forEach(p => { byId[p.id] = p; });
-  let ok = false;
-  try { ok = sessionStorage.getItem("drew-apple") === "1"; } catch (e) {}
-  if (ok) open(); else render();
-}).catch(() => { document.getElementById("lockBad").textContent = "The parts list did not load."; });
+function pastes(){ const cat=PARTS.filter(p=>/thermal paste|heat sink compound|mx-4|mx-6/i.test(p.name)&&!/cooler|freezer|heatsink fan/i.test(p.name)&&!junk(p)); return EXTRA.filter(p=>p.cat==="paste").concat(cat); }
+function lines(){ const out=[]; const add=(id,i,qty)=>{ const p=byId[id]; if(!p) return; out.push([ (qty>1?qty+" × ":"")+p.name, money.format(p.price*(qty||1)), i ]); }; add(s.cpu,2); add(s.board,3); add(s.kit,4); if (s.gpu) add(s.gpu,5); add(s.drive,6); add(s.box,7); add(s.fan,8,s.fanQty); add(s.cooler,9); add(s.paste,10); add(s.psu,11); return out; }
+function total(){ let n=0; const add=(id,q)=>{ if(byId[id]) n+=byId[id].price*(q||1); }; add(s.cpu); add(s.board); add(s.kit); add(s.gpu); add(s.drive); add(s.box); add(s.fan,s.fanQty); add(s.cooler); add(s.paste); add(s.psu); return n; }
+function printList(){ const w=window.open("","print"); w.document.write("<pre style='font:14px/1.5 ui-monospace,monospace'>"+lines().map(l=>l[0]+"  "+l[1]).join("\n")+"\n\n"+t("notsale")+"</pre>"); w.document.close(); w.focus(); w.print(); }
+function writeCart(){ const out={}; if(s.cpu) out.cpu=s.cpu; if(s.board) out.motherboard=s.board; if(s.kit) out.memory=s.kit; if(s.gpu) out.gpu=s.gpu; if(s.drive) out.storage=s.drive; if(s.box) out.case=s.box; if(s.fan) out.fan=s.fan; if(s.cooler) out.cooler=s.cooler; if(s.paste) out.paste=s.paste; if(s.psu) out.psu=s.psu; try{ localStorage.setItem("drew-cart", JSON.stringify(out)); parent.postMessage({type:"drew-progress", n:Math.round(pct()/100*8), total:8}, "*"); }catch(e){} }
+function openSheet(){ const sheet=document.getElementById("sheet"); sheet.hidden=false; sheet.replaceChildren(); Object.keys(LANG).forEach(id=>{ sheet.appendChild(card(LANG[id].name, "", "", id===lang, ()=>{ lang=id; try{localStorage.setItem("bench-lang", id);}catch(e){} sheet.hidden=true; render(); })); }); }
+document.getElementById("langBtn").onclick=openSheet;
+document.getElementById("back").onclick=()=>{ if(step>0) goto(step-1); };
+document.getElementById("lockForm").onsubmit=(e)=>{ e.preventDefault(); if(document.getElementById("lockPass").value!=="Password4"){ document.getElementById("lockBad").textContent="Wrong password"; return; } try{sessionStorage.setItem("drew-apple","1");}catch(err){} document.getElementById("lock").hidden=true; render(); };
+fetch("parts.json").then(r=>r.json()).then(list=>{ PARTS=list; list.forEach(p=>{ byId[p.id]=p; }); EXTRA.forEach(p=>{ byId[p.id]=p; }); let ok=false; try{ ok=sessionStorage.getItem("drew-apple")==="1"; }catch(e){} if(ok) document.getElementById("lock").hidden=true; render(); }).catch(()=>{ document.getElementById("lockBad").textContent="The parts list did not load."; });
 </script>
 </body>
 </html>
