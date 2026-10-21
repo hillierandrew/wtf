@@ -61,6 +61,7 @@
   }
   #name.wide { max-width: min(92vw, 560px); }
   #name b { font-weight: 600; color: #fff; margin-left: 6px; }
+  #songTime { font-size: 11px; letter-spacing: 0; color: #9fffc4; font-variant-numeric: tabular-nums; padding: 0 4px; }
   #gate {
     position: fixed; inset: 0; z-index: 8;
     display: none; place-items: center;
@@ -102,8 +103,8 @@
   #shopBar {
     position: relative;
     display: grid;
-    grid-template-columns: auto 1fr auto;
-    grid-template-areas: "close title pct" "track track track";
+    grid-template-columns: auto auto 1fr auto;
+    grid-template-areas: "close store title pct" "track track track track";
     gap: 8px 12px;
     align-items: center;
     height: auto;
@@ -122,6 +123,11 @@
     grid-area: close;
     min-height: 36px; padding: 0 14px; border-radius: 980px;
     border: 0; background: #f5f5f7; color: #000; font: inherit; cursor: pointer;
+  }
+  #shopStore {
+    grid-area: store;
+    min-width: 44px; min-height: 36px; border: 0; border-radius: 980px;
+    background: transparent; color: inherit; font-size: 20px; cursor: pointer;
   }
   #shopFrame { flex: 1; width: 100%; border: 0; background: #000; min-height: 0; }
 
@@ -174,7 +180,9 @@
   <button id="play" type="button" aria-label="Play music">
     <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path id="playShape" fill="currentColor" d="M8 5v14l12-7z"/></svg>
   </button>
+  <span id="songTime">0:00/0:00</span>
   <button id="homeBtn" type="button" aria-label="Animations">🏠</button>
+  <button id="storeBtn" type="button" aria-label="Change store">🏪</button>
   <button id="pcBtn" type="button" aria-label="PC builder">💻</button>
   <span id="name"><span id="mark">🏠</span><b id="title">Diamond Drift</b></span>
 </div>
@@ -192,6 +200,7 @@
 <div id="shop">
   <div id="shopBar">
     <button id="shopClose" type="button">Close</button>
+    <button id="shopStore" type="button" aria-label="Next store">🏪</button>
     <span id="shopTitle">Build a computer</span>
     <span id="shopPct">0%</span>
     <div id="shopTrack"><div id="shopFill"></div></div>
@@ -219,6 +228,8 @@
   var skyParts = null;
   var skyBusy = false;
   var pcBtn = document.getElementById("pcBtn");
+  var storeBtn = document.getElementById("storeBtn");
+  var shopStore = document.getElementById("shopStore");
   var gate = document.getElementById("gate");
   var gateForm = document.getElementById("gateForm");
   var gatePass = document.getElementById("gatePass");
@@ -237,12 +248,31 @@
   function openShop(which) {
     shop.classList.add("open");
     document.body.classList.add("building");
-    setShopProgress(0, 8);
     var frame = document.getElementById("shopFrame");
     var src = which === "dream" ? "bench/dream.html" : which === "easy" ? "bench/easy.html" : which === "apple" ? "bench/apple.html" : "bench/";
     var title = document.getElementById("shopTitle");
     if (title) title.textContent = which === "dream" ? "Dream builder" : which === "easy" ? "Easy builder" : which === "apple" ? "Build" : "Build a computer";
     if (frame.getAttribute("src") !== src) frame.src = src;
+  }
+  var STORES = [
+    { id: "store", key: "drew-bench" },
+    { id: "dream", key: "drew-dream" },
+    { id: "easy", key: "drew-easy" },
+    { id: "apple", key: "drew-apple" }
+  ];
+  var storeAt = -1;
+  function currentStore() {
+    var src = document.getElementById("shopFrame").getAttribute("src") || "";
+    if (src.indexOf("dream") !== -1) return 1;
+    if (src.indexOf("easy") !== -1) return 2;
+    if (src.indexOf("apple") !== -1) return 3;
+    if (shop.classList.contains("open") && src) return 0;
+    return -1;
+  }
+  function cycleStore() {
+    storeAt = (currentStore() + 1) % STORES.length;
+    try { sessionStorage.setItem(STORES[storeAt].key, "1"); } catch (err) {}
+    openShop(STORES[storeAt].id);
   }
 
   var W = 0, H = 0, cols = 0, rows = 0, cellW = 0, cellH = 0, scale = 2, buf, data;
@@ -321,6 +351,32 @@
       var vein = Math.abs(Math.sin(ang * 3 + z * 0.35)) > 0.92 ? 1 : 0;
       return clamp01((facet * 0.55 + drip * 0.85 + vein * 0.7) * (r < hole + 0.05 ? (r - hole) / 0.05 : 1));
     }, "rain"],
+    ["Dreams", " .:-=+*#%@ ", function (x, y, t) {
+      var r0 = Math.hypot(x, y);
+      var th = Math.atan2(y, x);
+      var energy = dreamBass * 0.5 + dreamMid * 0.3 + dreamHigh * 0.2;
+      var sc = 1.35 * (1 + (0.12 + dreamBass * 0.38) * Math.sin(t * 0.45)) + dreamKick * 0.12;
+      var tw = 0.55 + dreamBass * 2.4;
+      var rot = dreamRot;
+      var r = r0 * sc;
+      var a = th + rot + tw * 0.4 / (0.45 + r0);
+      var px = r * Math.cos(a), py = r * Math.sin(a);
+      var fm = 1 + dreamMid * 0.55;
+      var s = Math.sin(px * 2.1 * fm + t * 1.1) + Math.sin(py * 1.7 * fm - t * 0.9) + Math.sin((px + py) * 1.3 * fm + t * 0.7) + Math.sin(r * 3.2 * fm - t * 1.5);
+      var v = 0.5 + 0.5 * Math.sin(s * 0.9 + t * 0.5);
+      var sp = 0.5 + 0.5 * Math.sin(px * 9 + t * 4.1) * Math.sin(py * 8 - t * 3.3);
+      return clamp01(v + dreamHigh * (0.08 + 0.22 * sp) + dreamKick * 0.35);
+    }],
+    ["Plasma", " .,-~:;=!*#$@", function (x, y, t) {
+      var distance = Math.hypot(x, y);
+      var zoom = 1 + Math.sin(t * 0.8) * 0.5;
+      var angle = Math.atan2(y, x) + Math.sin(t * 0.45 + distance * 1.1) * 0.8;
+      var nx = Math.cos(angle) * distance * 3.2 * zoom;
+      var ny = Math.sin(angle) * distance * 3.2 * zoom;
+      var tt = t * 1.4;
+      var v = Math.sin(nx + tt) + Math.sin(ny - tt) + Math.sin((nx + ny + tt) / 2) + Math.cos(Math.sqrt(nx * nx + ny * ny) - tt);
+      return clamp01((v + 4) / 8);
+    }],
     ["Diamond Drift", " .:-=+*#%@", function (x, y, t) {
       var p = warp(x, y, t), rot = t * 0.35, cs = Math.cos(rot), sn = Math.sin(rot);
       var rx = p[0] * cs - p[1] * sn, ry = p[0] * sn + p[1] * cs;
@@ -1746,18 +1802,97 @@ const E=[
     tick();
   }
 
-  var song = new Audio("dreams.mp3");
+  var song = new Audio("https://raw.githubusercontent.com/hillierandrew/wtf/main/dreams.mp3");
+  song.crossOrigin = "anonymous";
   song.loop = true;
-  song.preload = "none";
+  song.preload = "metadata";
+  var songTime = document.getElementById("songTime");
+  var songAudio, songAnalyser, songBins;
+  var dreamBass = 0, dreamMid = 0, dreamHigh = 0, dreamKick = 0, dreamRot = 0;
+  var dreamPeakB = 0.3, dreamPeakM = 0.2, dreamPeakH = 0.08, dreamSim = 0;
+  function clockText(sec) {
+    if (!isFinite(sec) || sec < 0) sec = 0;
+    var m = Math.floor(sec / 60);
+    var s = Math.floor(sec % 60);
+    return m + ":" + (s < 10 ? "0" : "") + s;
+  }
+  function paintSongTime() {
+    if (songTime) songTime.textContent = clockText(song.currentTime) + "/" + clockText(song.duration);
+  }
+  song.addEventListener("timeupdate", paintSongTime);
+  song.addEventListener("loadedmetadata", paintSongTime);
+  song.addEventListener("error", function () {
+    if (song.dataset.fellback) return;
+    song.dataset.fellback = "1";
+    song.src = "dreams.mp3";
+    if (playing) {
+      var again = song.play();
+      if (again && again.catch) again.catch(function () { playing = false; playBtn.classList.remove("playing"); });
+    }
+  });
+  function hookSong() {
+    if (songAudio || !window.AudioContext && !window.webkitAudioContext) return;
+    try {
+      songAudio = new (window.AudioContext || window.webkitAudioContext)();
+      var src = songAudio.createMediaElementSource(song);
+      songAnalyser = songAudio.createAnalyser();
+      songAnalyser.fftSize = 1024;
+      songAnalyser.smoothingTimeConstant = 0.8;
+      songBins = new Uint8Array(songAnalyser.frequencyBinCount);
+      src.connect(songAnalyser);
+      songAnalyser.connect(songAudio.destination);
+    } catch (err) { songAudio = null; }
+  }
+  function band(a, b) {
+    var s = 0, n = 0;
+    for (var i = a; i <= b && i < songBins.length; i++) { s += songBins[i]; n++; }
+    return n ? s / (n * 255) : 0;
+  }
+  function sampleDreams(dt) {
+    var tb, tm, th;
+    if (playing && songAnalyser) {
+      songAnalyser.getByteFrequencyData(songBins);
+      var hz = songAudio.sampleRate / songAnalyser.fftSize;
+      var b0 = Math.max(1, Math.ceil(20 / hz));
+      var b1 = Math.floor(150 / hz);
+      var b2 = Math.floor(2000 / hz);
+      var b3 = Math.min(songBins.length - 1, Math.floor(16000 / hz));
+      var rb = band(b0, b1), rm = band(b1 + 1, b2), rh = band(b2 + 1, b3);
+      dreamPeakB = Math.max(rb, dreamPeakB * 0.999, 0.3);
+      dreamPeakM = Math.max(rm, dreamPeakM * 0.999, 0.2);
+      dreamPeakH = Math.max(rh, dreamPeakH * 0.999, 0.08);
+      tb = Math.min(1, rb / dreamPeakB);
+      tm = Math.min(1, rm / dreamPeakM);
+      th = Math.min(1, rh / dreamPeakH);
+      if (rb > 0.45) dreamKick = Math.max(dreamKick, Math.min(1, rb));
+    } else {
+      var p = 0.5 + 0.5 * Math.sin(clock * 1.7);
+      tb = 0.22 + 0.28 * p * p * p;
+      tm = 0.25 + 0.12 * Math.sin(clock * 0.63);
+      th = 0.14 + 0.08 * Math.sin(clock * 0.9);
+      var before = Math.floor(dreamSim);
+      dreamSim += dt * 0.25;
+      if (Math.floor(dreamSim) !== before) dreamKick = Math.max(dreamKick, 0.45);
+    }
+    function glide(v, target) { return v + (target - v) * (1 - Math.exp(-dt * (target > v ? 28 : 3.2))); }
+    dreamBass = glide(dreamBass, tb);
+    dreamMid = glide(dreamMid, tm);
+    dreamHigh = glide(dreamHigh, th);
+    dreamKick *= Math.exp(-dt / 0.13);
+    dreamRot += dt * (0.08 + (dreamBass * 0.5 + dreamMid * 0.3 + dreamHigh * 0.2) * 0.9);
+  }
   function setPlaying(on) {
     playing = on;
     playBtn.classList.toggle("playing", on);
     playBtn.setAttribute("aria-label", on ? "Pause music" : "Play music");
     playShape.setAttribute("d", on ? "M6 5h4v14H6zM14 5h4v14h-4z" : "M8 5v14l12-7z");
     if (on) {
+      hookSong();
+      if (songAudio && songAudio.state === "suspended" && songAudio.resume) songAudio.resume();
       var pending = song.play();
       if (pending && pending.catch) pending.catch(function () { playing = false; playBtn.classList.remove("playing"); });
     } else song.pause();
+    paintSongTime();
   }
 
   function setPack(next) {
@@ -1884,6 +2019,8 @@ const E=[
       .then(function () { skyBusy = false; });
   });
   playBtn.addEventListener("click", function () { setPlaying(!playing); });
+  storeBtn.addEventListener("click", cycleStore);
+  shopStore.addEventListener("click", cycleStore);
   homeBtn.addEventListener("click", function () { setPack("home"); });
   pcBtn.addEventListener("click", function () {
     gateMsg.textContent = "";
@@ -2049,6 +2186,7 @@ const E=[
     last = now;
     var t = (now - started) / 1000;
     clock = t;
+    sampleDreams(dt);
     if (shop.classList.contains("open")) {
       /* the builder owns the screen */
     } else if (introOn && !spawned) {

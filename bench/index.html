@@ -476,6 +476,7 @@ function render() {
   });
   if (PARTS.length && !lock) applySuggestion();
   const parts = currentParts();
+  if (PARTS.length) writeCart(parts);
   try { parent.postMessage({ type: "drew-progress", n: CATS.filter(function (id) { return parts[id]; }).length, total: CATS.length }, "*"); } catch (e) {}
   const total = CATS.reduce((sum, id) => sum + (parts[id] ? parts[id].price : 0), 0);
   const sell = document.getElementById("sell");
@@ -582,9 +583,24 @@ document.getElementById("gateForm").onsubmit = (event) => {
     boot();
   } else document.getElementById("bad").textContent = t("bad");
 };
+function readCart() { try { return JSON.parse(localStorage.getItem("drew-cart") || "{}"); } catch (e) { return {}; } }
+function writeCart(parts) {
+  var out = {};
+  CATS.forEach(function (id) { if (parts[id]) out[id] = parts[id].id; });
+  try { localStorage.setItem("drew-cart", JSON.stringify(out)); } catch (e) {}
+}
 function boot() {
   document.getElementById("gate").hidden = true;
-  fetch("parts.json").then((res) => res.json()).then((data) => { PARTS = data; byId = {}; PARTS.forEach((p) => { byId[p.id] = p; }); render(); });
+  fetch("parts.json").then((res) => res.json()).then((data) => {
+    PARTS = data; byId = {}; PARTS.forEach((p) => { byId[p.id] = p; });
+    var cart = readCart();
+    var any = false;
+    Object.keys(cart).forEach(function (cat) {
+      if (byId[cart[cat]] && byId[cart[cat]].cat === cat) { build[cat] = cart[cat]; any = true; }
+    });
+    if (any) lock = true;
+    render();
+  });
 }
 setInterval(() => { artTick++; paintArt(); }, 1600);
 render();

@@ -111,9 +111,22 @@ const state = load();
 function load(){
   let s={};
   try { s=JSON.parse(localStorage.getItem("drew-easy-build")||"{}"); } catch(e){}
-  return Object.assign({ view:"home", layout:"desk", five:false, job:"School", game:"", level:"med", budget:800, accessories:false, power:"works", uses:["school"], priorities:["value"], owned:{}, ownedId:{}, unknown:{}, build:{}, why:{}, note:"", past:[], future:[], fans:null, asm:0, focus:"cpu" }, s);
+  s = Object.assign({ view:"home", layout:"desk", five:false, job:"School", game:"", level:"med", budget:800, accessories:false, power:"works", uses:["school"], priorities:["value"], owned:{}, ownedId:{}, unknown:{}, build:{}, why:{}, note:"", past:[], future:[], fans:null, asm:0, focus:"cpu" }, s);
+  try {
+    const cart = JSON.parse(localStorage.getItem("drew-cart") || "{}");
+    if (cart && Object.keys(cart).length) s.build = cart;
+  } catch (e) {}
+  return s;
 }
-function save(){ const c=JSON.parse(JSON.stringify(state)); delete c.past; delete c.future; try{ localStorage.setItem("drew-easy-build", JSON.stringify(c)); } catch(e){} }
+function save(){
+  const c=JSON.parse(JSON.stringify(state)); delete c.past; delete c.future;
+  try{ localStorage.setItem("drew-easy-build", JSON.stringify(c)); } catch(e){}
+  try {
+    const cart = {};
+    CATS.forEach(function (id) { if (c.build && c.build[id]) cart[id] = c.build[id]; });
+    localStorage.setItem("drew-cart", JSON.stringify(cart));
+  } catch (e) {}
+}
 function junk(p){ return /open box|renewed|recertified|sodimm|surveillance|purple|laptop|\becc\b/i.test(p.name)||p.price<12; }
 
 function sticksOf(p) {

@@ -119,6 +119,12 @@ function plan(){
   return out;
 }
 function selected(){ const m = {}; CATS.forEach(id => { if (byId[build[id]]) m[id] = byId[build[id]]; }); return m; }
+function readCart(){ try { return JSON.parse(localStorage.getItem("drew-cart") || "{}"); } catch (e) { return {}; } }
+function writeCart(){
+  const out = {};
+  CATS.forEach(id => { if (build[id]) out[id] = build[id]; });
+  try { localStorage.setItem("drew-cart", JSON.stringify(out)); } catch (e) {}
+}
 function tell(){
   const expected = CATS.filter(id => id !== "gpu" || (USES[useName] && USES[useName].gpu));
   const n = expected.filter(id => byId[build[id]]).length;
@@ -188,6 +194,7 @@ function render(){
     main.appendChild(section);
   });
   document.getElementById("total").textContent = money.format(total);
+  writeCart();
   tell();
 }
 function parallax(){
@@ -209,9 +216,14 @@ document.getElementById("print").onclick = () => {
 };
 function open(){
   document.getElementById("lock").hidden = true;
-  const next = plan();
+  const saved = readCart();
+  const has = Object.keys(saved).some(id => byId[saved[id]]);
   build = {};
-  CATS.forEach(id => { if (next[id]) build[id] = next[id].id; });
+  if (has) CATS.forEach(id => { if (byId[saved[id]] && byId[saved[id]].cat === id) build[id] = saved[id]; });
+  else {
+    const next = plan();
+    CATS.forEach(id => { if (next[id]) build[id] = next[id].id; });
+  }
   render();
 }
 document.getElementById("lockForm").onsubmit = (e) => {

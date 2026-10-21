@@ -393,6 +393,7 @@ function draw() {
   const next = {};
   CATS.forEach((id) => { if (parts[id]) next[id] = parts[id].id; });
   build = next;
+  try { localStorage.setItem("drew-cart", JSON.stringify(build)); } catch (e) {}
   try { parent.postMessage({ type: "drew-progress", n: CATS.filter(function (id) { return parts[id]; }).length, total: CATS.length }, "*"); } catch (e) {}
   const body = document.getElementById("rows");
   body.replaceChildren();
@@ -498,6 +499,12 @@ function start() {
     data.forEach((p) => { byId[p.id] = p; });
     const hash = location.hash.replace("#", "");
     if (hash) hash.split(",").forEach((id) => { if (byId[id]) build[byId[id].cat] = id; });
+    else {
+      try {
+        const cart = JSON.parse(localStorage.getItem("drew-cart") || "{}");
+        Object.keys(cart).forEach((cat) => { if (byId[cart[cat]] && byId[cart[cat]].cat === cat) build[cat] = cart[cat]; });
+      } catch (e) {}
+    }
     draw();
   });
   if (sessionStorage.getItem("dream-tour") === "1") document.getElementById("tour").hidden = true;
