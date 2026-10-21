@@ -49,6 +49,30 @@
     touch-action: manipulation;
   }
   #dock button.on { background: #ffffff18; color: #c6ff4a; }
+  #earthFloat {
+    position: fixed; top: max(10px, env(safe-area-inset-top)); right: max(10px, env(safe-area-inset-right));
+    z-index: 25; min-width: 48px; min-height: 48px; border: 0; border-radius: 999px;
+    background: #000a; color: #fff; font-size: 22px; cursor: pointer;
+    touch-action: manipulation;
+  }
+  body.entered #earthFloat { display: none; }
+  body:not(.entered) #dock,
+  body:not(.entered) #logo,
+  body:not(.entered) #veil,
+  body:not(.entered) #field { visibility: hidden; }
+  #trip, #trip canvas { position: fixed; inset: 0; width: 100%; height: 100%; height: 100dvh; display: block; background: #000; }
+  #trip { z-index: 20; touch-action: manipulation; }
+  #trip.gone { display: none; }
+  #glow { z-index: 21; pointer-events: none; mix-blend-mode: screen; opacity: .85; filter: blur(12px) brightness(1.6) saturate(1.6); }
+  #riz {
+    position: fixed; inset: 0; z-index: 30; display: none; background: #000; color: #b6ffb0;
+    padding: max(24px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
+    overflow: auto; touch-action: manipulation;
+    font: 600 clamp(14px, 3.4vw, 22px)/1.35 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    white-space: pre; text-align: center;
+  }
+  #riz.on { display: grid; place-items: center; }
+  #riz .box { text-align: left; max-width: 42em; }
   #dock button.playing { color: #7ee7ff; }
   #play svg { display: block; }
   #name {
@@ -177,6 +201,7 @@
   <button id="blockBtn" type="button" aria-label="Hide DREW.WTF">&#128683;</button>
   <button id="clockBtn" type="button" aria-label="Show the time">&#128336;</button>
   <button id="sunBtn" type="button" aria-label="Mississauga weather">&#9728;&#65039;</button>
+  <button id="earthBtn" type="button" aria-label="Layout, auto">&#127757;</button>
   <button id="play" type="button" aria-label="Play music">
     <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path id="playShape" fill="currentColor" d="M8 5v14l12-7z"/></svg>
   </button>
@@ -208,6 +233,9 @@
   </div>
   <iframe id="shopFrame" title="Build a computer"></iframe>
 </div>
+<button id="earthFloat" type="button" aria-label="Layout, auto">&#127757;</button>
+<div id="trip"><canvas id="c"></canvas><canvas id="glow"></canvas></div>
+<div id="riz" aria-live="assertive"><div class="box" id="rizBox"></div></div>
 <script>
 (function () {
   var canvas = document.getElementById("field");
@@ -1440,7 +1468,19 @@ const E=[
     "Diamond Drift": 1, "Chevron Spiral": 1, "Soft Blobs": 1, "Ouroboros": 1
   };
   function isPhone() {
+    var mode = window.drewLayoutMode || "auto";
+    if (mode === "phone") return true;
+    if (mode === "desktop" || mode === "tablet") return false;
     return window.matchMedia("(max-width: 820px) and (pointer: coarse), (max-height: 500px) and (pointer: coarse)").matches;
+  }
+  function isTablet() {
+    var mode = window.drewLayoutMode || "auto";
+    if (mode === "tablet") return true;
+    if (mode !== "auto") return false;
+    return window.matchMedia("(min-width: 700px) and (max-width: 1180px) and (pointer: coarse)").matches;
+  }
+  function layoutForcesPortrait() {
+    return (window.drewLayoutMode || "auto") === "phone";
   }
   function list() {
     if (pack === "earth") return EARTH;
@@ -1484,7 +1524,7 @@ const E=[
   function sceneXY(col, row) {
     var nx = (col + 0.5) / cols * 2 - 1;
     var ny = (row + 0.5) / rows * 2 - 1;
-    if (isPhone() && H > W) {
+    if (isPhone() && (layoutForcesPortrait() || H > W)) {
       var x = nx;
       var y = ny * (H / Math.max(1, W)) * 0.85;
       var band = 1.15;
@@ -1514,7 +1554,8 @@ const E=[
     H = Math.floor(vv ? vv.height : window.innerHeight);
     canvas.width = W; canvas.height = H;
     var phone = isPhone();
-    scale = phone ? 4 : (W > 1800 ? 2 : 3);
+    var tab = isTablet();
+    scale = phone ? 4 : tab ? 3 : (W < 800 ? 3 : (W > 1800 ? 2 : 3));
     cellW = 5 * scale + scale;
     cellH = 7 * scale + Math.max(1, scale - 1);
     cols = Math.max(16, Math.floor(W / cellW));
@@ -2130,6 +2171,25 @@ const E=[
   storeBtn.addEventListener("click", cycleStore);
   shopStore.addEventListener("click", cycleStore);
   homeBtn.addEventListener("click", function () { setPack("home"); });
+  window.drewLayoutMode = "auto";
+  var LAYOUTS = ["auto", "desktop", "tablet", "phone"];
+  var LAYOUT_WORD = { auto: "Auto", desktop: "Desktop", tablet: "Tablet", phone: "Phone" };
+  function cycleLayout(ev) {
+    if (ev) { ev.stopPropagation(); ev.preventDefault(); }
+    var i = LAYOUTS.indexOf(window.drewLayoutMode);
+    window.drewLayoutMode = LAYOUTS[(i + 1) % LAYOUTS.length];
+    var word = LAYOUT_WORD[window.drewLayoutMode];
+    [document.getElementById("earthBtn"), document.getElementById("earthFloat")].forEach(function (b) {
+      if (!b) return;
+      b.setAttribute("aria-label", "Layout, " + word);
+      b.classList.toggle("on", window.drewLayoutMode !== "auto");
+    });
+    PHONE_LIST = null;
+    if (!window.drewHold) resize();
+    if (window.drewRefit) window.drewRefit();
+  }
+  document.getElementById("earthBtn").addEventListener("click", cycleLayout);
+  document.getElementById("earthFloat").addEventListener("click", cycleLayout);
   pcBtn.addEventListener("click", function () {
     gateMsg.textContent = "";
     gatePass.value = "";
@@ -2182,10 +2242,26 @@ const E=[
     setShopProgress(+data.n || 0, +data.total || 8);
   });
   canvas.addEventListener("pointerdown", function () {
+    if (window.drewHold) return;
     if (introOn && !spawned) spawnDvd();
   });
 
   var last = performance.now(), raf = 0, started = performance.now();
+  window.drewHold = true;
+  window.drewEnter = function () {
+    if (!window.drewHold) return;
+    window.drewHold = false;
+    document.body.classList.add("entered");
+    var trip = document.getElementById("trip");
+    if (trip) trip.classList.add("gone");
+    started = performance.now();
+    last = started;
+    introOn = true;
+    spawned = false;
+    revealAt = 0;
+    document.body.classList.add("intro");
+    resize();
+  };
   var veilEl = document.getElementById("veil");
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var HYPER_FOR = 2.2, SHOOT_FOR = 2.0, GLOW_FOR = 10, BLACK_FOR = 1.35;
@@ -2291,6 +2367,7 @@ const E=[
     if (veilEl) veilEl.style.opacity = "";
   }
   function frame(now) {
+    if (window.drewHold) { raf = requestAnimationFrame(frame); return; }
     if (document.hidden) { raf = 0; return; }
     var dt = Math.min(0.05, (now - last) / 1000);
     last = now;
@@ -2360,11 +2437,12 @@ const E=[
     }, 340);
   }
   function uiHit(target) {
-    return target && target.closest && target.closest("#dock, #gate, #shop, button, input, a, textarea");
+    if (window.drewHold) return true;
+    return target && target.closest && target.closest("#dock, #gate, #shop, #earthFloat, #trip, #riz, button, input, a, textarea");
   }
   var wheelAt = 0;
   window.addEventListener("wheel", function (e) {
-    if (uiHit(e.target) || shop.classList.contains("open")) return;
+    if (window.drewHold || uiHit(e.target) || shop.classList.contains("open")) return;
     e.preventDefault();
     var now = performance.now();
     if (now - wheelAt < 60) return;
@@ -2372,6 +2450,7 @@ const E=[
     stepScene((e.deltaY || e.deltaX) > 0 ? 1 : -1);
   }, { passive: false });
   window.addEventListener("keydown", function (e) {
+    if (window.drewHold) return;
     if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) return;
     var dir = (e.key === "ArrowRight" || e.key === "ArrowDown") ? 1 : (e.key === "ArrowLeft" || e.key === "ArrowUp") ? -1 : 0;
     if (!dir || e.repeat) return;
@@ -2408,6 +2487,274 @@ const E=[
   raf = requestAnimationFrame(frame);
 })();
 </script>
+<script>
+(function () {
+  "use strict";
+  var trip = document.getElementById("trip");
+  var cv = document.getElementById("c");
+  var gl = document.getElementById("glow");
+  var g = cv.getContext("2d", { alpha: false });
+  var gg = gl.getContext("2d");
+  var CH = [" ", ".", ":", "-", "=", "+", "*", "#", "%", "@", "o", "O", "0", "|", "!", "I", "/", "\\"];
+  var HB = 18, LB = 6, NB = HB * LB * 2, SEG = Math.PI / 3;
+  var SATS = [70, 100], LIGHTS = [42, 54, 64, 72, 82, 90];
+  var cnt = new Int32Array(NB), off = new Int32Array(NB), cur = new Int32Array(NB);
+  var W, H, fs, cw, ch, cols, rows, N = 0, half, A, B, sf, phone;
+  var X, Y, R, TH, NX, NY, BID, CID, ORD;
+  var MS = [[-.86,.97,.55,.20,300,0,1],[-.6,1,.95,.30,180,1.3,1.2],[-.3,.98,.45,.17,60,2.1,.9],[-.05,1,1.15,.38,320,.7,1.4],[.28,.97,.6,.22,150,3.4,1],[.52,1,.85,.28,40,4.2,1.1],[.8,.98,.5,.19,270,5.1,.9],[.97,1,.7,.24,190,2.6,1]];
+  var NM = MS.length, NS = 48;
+  var CX = new Float32Array(NM), CY = new Float32Array(NM), RW = new Float32Array(NM), RH = new Float32Array(NM);
+  var SW = new Float32Array(NM), BY = new Float32Array(NM), GL = new Float32Array(NM), MH = new Float32Array(NM);
+  function resize() {
+    var mode = window.drewLayoutMode || "auto";
+    W = innerWidth; H = innerHeight;
+    phone = mode === "phone" || (mode === "auto" && Math.min(W, H) < 700 && W < 900);
+    var tablet = mode === "tablet" || (mode === "auto" && !phone && W < 1180);
+    fs = phone ? Math.max(15, Math.min(24, Math.round(Math.min(W, H) / 24))) : tablet ? Math.max(13, Math.min(18, Math.round(Math.min(W, H) / 42))) : Math.max(11, Math.min(16, Math.round(Math.min(W, H) / 58)));
+    cv.width = W; cv.height = H;
+    gl.width = Math.max(2, Math.floor(W / 6)); gl.height = Math.max(2, Math.floor(H / 6));
+    gl.style.display = phone ? "none" : "block";
+    g.font = fs + "px ui-monospace, Menlo, Consolas, monospace";
+    g.textBaseline = "top"; g.textAlign = "left";
+    cw = g.measureText("M").width || fs * 0.62; ch = fs * 1.15;
+    cols = Math.ceil(W / cw); rows = Math.ceil(H / ch); N = cols * rows;
+    X = new Float32Array(N); Y = new Float32Array(N); R = new Float32Array(N); TH = new Float32Array(N);
+    NX = new Float32Array(N); NY = new Float32Array(N);
+    BID = new Int16Array(N); CID = new Uint8Array(N); ORD = new Int32Array(N);
+    half = Math.min(W, H) / 2; A = W / 2 / half; B = H / 2 / half; sf = Math.min(1, A / 1.5 + 0.25);
+    if (phone && H > W) sf *= 0.92;
+    for (var r = 0, i = 0; r < rows; r++) for (var c = 0; c < cols; c++, i++) {
+      X[i] = c * cw; Y[i] = r * ch;
+      var nx = ((c + 0.5) * cw - W / 2) / half, ny = ((r + 0.5) * ch - H / 2) / half;
+      NX[i] = nx; NY[i] = ny; R[i] = Math.sqrt(nx * nx + ny * ny); TH[i] = Math.atan2(ny, nx);
+    }
+  }
+  window.drewRefit = resize;
+  addEventListener("resize", resize); resize();
+  function bk(h, L, S) {
+    var hb = Math.floor(h / (360 / HB)) % HB; if (hb < 0) hb += HB;
+    var lb = Math.floor((L - 18) / 12); lb = lb < 0 ? 0 : lb > LB - 1 ? LB - 1 : lb;
+    return ((hb * LB + lb) << 1) | (S >= 72 ? 1 : 0);
+  }
+  var bass = 0, mids = 0, highs = 0, kick = 0, simPhase = 0;
+  var RMX = 4, rrad = new Float32Array(RMX), ramp = new Float32Array(RMX);
+  function launch(amp) {
+    kick = Math.max(kick, amp); var k = 0;
+    for (var i = 0; i < RMX; i++) if (ramp[i] < ramp[k]) k = i;
+    rrad[k] = 0; ramp[k] = amp;
+  }
+  var last = 0, t = 0, hue = 200, rot = 0, pt = 0, alive = true;
+  function frame(ms) {
+    if (!alive) return;
+    requestAnimationFrame(frame);
+    var dt = Math.min(0.05, (ms - last) / 1000 || 0.016); last = ms; t += dt;
+    var p = 0.5 + 0.5 * Math.sin(t * 1.7);
+    var tb = 0.22 + 0.28 * p * p * p, tm = 0.25 + 0.12 * Math.sin(t * 0.63), th = 0.14 + 0.08 * Math.sin(t * 0.9 + 1.3);
+    var before = Math.floor(simPhase); simPhase += dt * 0.25; if (Math.floor(simPhase) !== before) launch(0.45);
+    function fol(v, tg) { return v + (tg - v) * (1 - Math.exp(-dt * (tg > v ? 28 : 3.2))); }
+    bass = fol(bass, tb); mids = fol(mids, tm); highs = fol(highs, th); kick *= Math.exp(-dt / 0.13);
+    var nr = 0, ar = [], aa = [];
+    for (var k = 0; k < RMX; k++) {
+      if (ramp[k] <= 0) continue;
+      rrad[k] += dt * 1.1; ramp[k] *= Math.exp(-dt / 0.8);
+      if (rrad[k] > 3 || ramp[k] < 0.03) { ramp[k] = 0; continue; }
+      ar[nr] = rrad[k]; aa[nr] = ramp[k]; nr++;
+    }
+    hue = (hue + dt * (7 + mids * 80 + kick * 300)) % 360;
+    rot += dt * (0.08 + (bass * 0.5 + mids * 0.3) * 0.9);
+    pt += dt * (0.6 + mids * 1.5);
+    var hi = highs, K = kick, HU = hue;
+    var sc = 1.35 * (1 + (0.12 + bass * 0.38) * Math.sin(t * 0.45) + 0.1 * hi * Math.sin(t * 2.3)) + K * 0.12;
+    var tw = 0.55 + bass * 2.4 + 0.3 * Math.sin(t * 0.21);
+    var fm = 1 + mids * 0.55;
+    var T1 = pt * 1.1, T2 = pt * 0.9, T3 = pt * 0.7, T4 = pt * 1.5, T5 = pt * 0.5, T6 = pt * 0.25;
+    var melt = 0.45 + 0.25 * Math.sin(t * 0.17) + bass * 0.5 + hi * 0.2;
+    var km = Math.max(0, Math.min(1, 0.6 + 1.1 * Math.sin(t * 0.09)));
+    for (var j = 0; j < NM; j++) {
+      var m = MS[j], pu = 1 + 0.08 * Math.sin(t * 1.5 + m[5]) + bass * 0.15 + K * 0.1, s = sf * pu;
+      CX[j] = m[0] * A * 0.95 + 0.05 * Math.sin(t * 0.8 + m[5]) * (1 + bass); BY[j] = m[1] * B;
+      CY[j] = BY[j] - m[2] * sf * pu * 1.05; RW[j] = m[3] * s; RH[j] = m[3] * s * 0.55;
+      SW[j] = m[3] * s * 0.17; GL[j] = m[6] * (0.6 + 0.5 * bass + K * 0.6); MH[j] = m[4];
+    }
+    var step = phone ? 1 : 1;
+    for (var i = 0; i < N; i += step) {
+      var r0 = R[i], nx = NX[i], ny = NY[i], r = r0 * sc, glow = 0;
+      for (var q = 0; q < nr; q++) { var d = r0 - ar[q], w = aa[q] / (1 + d * d * 60); r += d * w * 3.5; glow += w; }
+      var a = TH[i] + rot + tw * 1.6 / (0.45 + r0);
+      if (km > 0.001) { var af = ((a % SEG) + SEG) % SEG; a += (Math.abs(af - SEG * 0.5) - af) * km; }
+      var x = r * Math.cos(a), y = r * Math.sin(a);
+      var mel = melt * (0.5 + 0.5 * Math.sin(nx * 4 + t * 0.6 + Math.sin(nx * 9 + t) * 0.8)) * (0.35 + 0.65 * (ny + B) / (2 * B));
+      x += 0.45 * Math.sin(y * 1.7 + T1); y += 0.45 * Math.cos(x * 1.4 - T2) - mel * 1.4;
+      x += 0.3 * Math.sin(y * 2.6 + T3 + bass * 2); y += 0.3 * Math.cos(x * 2.2 - T4);
+      var s2 = Math.sin(x * 2.1 * fm + T1) + Math.sin(y * 1.7 * fm - T2) + Math.sin((x + y) * 1.3 * fm + T3) + Math.sin(r * 3.2 * fm - T4) + Math.cos(x * y * 0.6 + T5);
+      var v = 0.5 + 0.5 * Math.sin(s2 * 0.9 + T6) + glow * 0.22;
+      var sp = 0.5 + 0.5 * Math.sin(x * 29 + t * 4.1) * Math.sin(y * 31 - t * 3.3);
+      var mx = nx + 0.035 * Math.sin(ny * 7 + t * 1.3) * (1 + bass), my = ny - mel * 0.35;
+      var halo = 0, hh = 0, hit = -1, part = 0, sh = 0, px = 0, py = 0;
+      for (var u = 0; u < NM; u++) {
+        var dx = mx - CX[u], dy = my - CY[u], g1 = GL[u] / (1 + (dx * dx + dy * dy) * 9);
+        halo += g1; hh += g1 * MH[u];
+        if (hit >= 0) continue;
+        var rw = RW[u], rh = RH[u], e = dx * dx / (rw * rw) + dy * dy / (rh * rh);
+        if (dy <= 0.03 * rh && e < 1) { hit = u; part = 1; sh = 1 - e; px = dx / rw; py = dy / rh; }
+        else if (dy > 0 && dy < rh * 0.3 && dx * dx < rw * rw * 0.8) { hit = u; part = 3; px = dx; }
+        else if (my > CY[u] && my < BY[u]) {
+          var qq = (my - CY[u]) / (BY[u] - CY[u]), ww = SW[u] * (1 + 0.9 * qq * qq), cc = dx - 0.02 * Math.sin(my * 9 + u);
+          if (Math.abs(cc) < ww) { hit = u; part = 2; sh = 1 - Math.abs(cc) / ww; }
+        }
+      }
+      var hv = HU + r0 * 65 + v * 80 + glow * 30;
+      if (halo > 0.01) { var hm = Math.min(1, halo * 0.7); hv += (hh / halo - hv) * hm * 0.5; v += halo * 0.3; }
+      var lv = 34 + 46 * v + 9 * Math.sin(r0 * 7 - t * 2.2) + K * 24 + halo * 12;
+      var sat = 78 + 22 * hi;
+      var ci = Math.floor((v + hi * (0.18 + 0.4 * sp)) * 9 + 0.5);
+      if (hit >= 0) {
+        hv = MH[hit] + HU * 0.3 + sh * 50; sat = 100;
+        if (part === 1) {
+          var spot = Math.sin(px * 9 + hit * 2) * Math.sin(py * 9 + hit) > 0.78;
+          ci = spot ? 11 : 4 + Math.floor((1 - sh) * 5.5); lv = 52 + (1 - sh) * 34 + K * 20 + (spot ? 18 : 0); if (spot) hv += 120;
+        } else if (part === 2) { ci = 13 + ((Math.floor(my * 40) + hit) & 1); lv = 46 + 34 * sh + K * 16; }
+        else { ci = 16 + (Math.floor(px * 45) & 1); lv = 58 + K * 16; }
+      } else if (ci <= 0) { BID[i] = -1; continue; }
+      if (ci > 17) ci = 17;
+      BID[i] = bk(hv, lv, sat); CID[i] = ci;
+    }
+    var spores = phone ? 24 : NS;
+    for (var s = 0; s < spores; s++) {
+      var sy = B - ((t * (0.05 + 0.02 * (s % 7)) + s * 0.137) % 1) * 2.2 * B;
+      var sx = A * Math.sin(s * 12.9 + t * 0.2 * (1 + (s % 3) * 0.3)) + 0.05 * Math.sin(sy * 6 + t * 2 + s);
+      var c = Math.floor((sx * half + W / 2) / cw), r = Math.floor((sy * half + H / 2) / ch);
+      if (c < 0 || c >= cols || r < 0 || r >= rows) continue;
+      var ii = r * cols + c; BID[ii] = bk(HU + s * 23, 90, 100); CID[ii] = 1 + (s % 3) * 5;
+    }
+    cnt.fill(0);
+    for (var n = 0; n < N; n++) { var id = BID[n]; if (id >= 0) cnt[id]++; }
+    var sum = 0;
+    for (var b = 0; b < NB; b++) { off[b] = cur[b] = sum; sum += cnt[b]; }
+    for (var n2 = 0; n2 < N; n2++) { var id2 = BID[n2]; if (id2 >= 0) ORD[cur[id2]++] = n2; }
+    g.fillStyle = "rgba(0,0,0,.45)"; g.fillRect(0, 0, W, H);
+    for (var b2 = 0; b2 < NB; b2++) {
+      var nn = cnt[b2]; if (!nn) continue;
+      var rest = b2 >> 1;
+      g.fillStyle = "hsl(" + ((rest / LB | 0) * (360 / HB) + 10) + "," + SATS[b2 & 1] + "%," + LIGHTS[rest % LB] + "%)";
+      for (var j2 = off[b2], e2 = j2 + nn; j2 < e2; j2++) { var i3 = ORD[j2]; g.fillText(CH[CID[i3]], X[i3], Y[i3]); }
+    }
+    if (!phone) gg.drawImage(cv, 0, 0, gl.width, gl.height);
+  }
+  requestAnimationFrame(frame);
 
+  var actx = null;
+  var NOTES = [659.25, 659.25, 659.25, 523.25, 659.25, 783.99, 392];
+  function audio() {
+    if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === "suspended") actx.resume();
+    return actx;
+  }
+  function tone(freq, dur, vol) {
+    var ac = audio(), now = ac.currentTime;
+    var o = ac.createOscillator(), gn = ac.createGain();
+    o.type = "square"; o.frequency.value = freq;
+    gn.gain.setValueAtTime(0.0001, now);
+    gn.gain.exponentialRampToValueAtTime(Math.max(0.001, vol), now + 0.008);
+    gn.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+    o.connect(gn); gn.connect(ac.destination);
+    o.start(now); o.stop(now + dur + 0.02);
+  }
+  var taps = 0, born = performance.now(), riz = false, left = false;
+  function enter() {
+    if (left || riz) return;
+    left = true; alive = false;
+    trip.classList.add("gone");
+    if (window.drewEnter) window.drewEnter();
+  }
+  var DIG = {
+    "0": [" ### ", "#   #", "#   #", "#   #", "#   #", "#   #", " ### "],
+    "1": ["  #  ", " ##  ", "  #  ", "  #  ", "  #  ", "  #  ", " ### "],
+    "2": [" ### ", "#   #", "   # ", "  #  ", " #   ", "#    ", "#####"],
+    "3": [" ### ", "#   #", "   # ", " ### ", "   # ", "#   #", " ### "],
+    "4": ["#   #", "#   #", "#   #", "#####", "    #", "    #", "    #"],
+    "5": ["#####", "#    ", "#### ", "    #", "    #", "#   #", " ### "],
+    "6": [" ### ", "#    ", "#    ", "#### ", "#   #", "#   #", " ### "],
+    "7": ["#####", "    #", "   # ", "  #  ", "  #  ", "  #  ", "  #  "],
+    "8": [" ### ", "#   #", "#   #", " ### ", "#   #", "#   #", " ### "],
+    "9": [" ### ", "#   #", "#   #", " ####", "    #", "    #", " ### "]
+  };
+  function big(num) {
+    var s = String(num), rows = ["", "", "", "", "", "", ""];
+    for (var d = 0; d < s.length; d++) {
+      var glyph = DIG[s.charAt(d)];
+      for (var r = 0; r < 7; r++) rows[r] += glyph[r] + "  ";
+    }
+    return rows.join("\n");
+  }
+  function screen(num) {
+    var art = big(num).split("\n");
+    var width = 0;
+    for (var i = 0; i < art.length; i++) width = Math.max(width, art[i].length);
+    var pad = function (line) { while (line.length < width) line += " "; return line; };
+    var bar = "";
+    for (var n = 0; n < width + 4; n++) bar += "#";
+    var out = bar + "\n";
+    out += "# " + pad("") + " #\n";
+    for (var r = 0; r < art.length; r++) out += "# " + pad(art[r]) + " #\n";
+    out += "# " + pad("") + " #\n" + bar;
+    return out;
+  }
+  function startRiz() {
+    if (riz || left) return;
+    riz = true; alive = false;
+    trip.classList.add("gone");
+    var box = document.getElementById("rizBox");
+    var root = document.getElementById("riz");
+    root.classList.add("on");
+    var lines = ["HELLO RIZWAN", "NOW COPYING PHONE", "NOW UPLOADING TO... UNKNOWN", "DELETING..."];
+    var shown = [];
+    var step = 0;
+    function tickLine() {
+      if (step < lines.length) {
+        shown.push(lines[step]);
+        box.textContent = shown.join("\n\n");
+        step++;
+        setTimeout(tickLine, 900);
+        return;
+      }
+      var load = 0;
+      var bar = setInterval(function () {
+        load += 1;
+        var fill = "";
+        for (var i = 0; i < 16; i++) fill += i < load ? "#" : "-";
+        box.textContent = shown.join("\n\n") + "\n\nLOADING  [" + fill + "]";
+        if (load >= 16) {
+          clearInterval(bar);
+          var n = 10;
+          function count() {
+            box.textContent = screen(n);
+            tone(n === 0 ? 440 : 880, n === 0 ? 0.55 : 0.18, 0.62);
+            if (n > 0) { n--; setTimeout(count, 1000); }
+          }
+          count();
+        }
+      }, 120);
+    }
+    tickLine();
+  }
+  function maybeRiz() {
+    if (!riz && !left && taps >= 6 && performance.now() - born >= 10000) startRiz();
+  }
+  setInterval(maybeRiz, 200);
+  function onTap() {
+    if (riz || left) return;
+    if (taps < 7) tone(NOTES[taps], taps >= 5 ? 0.32 : 0.14, 0.2);
+    taps++;
+    if (taps >= 6 && performance.now() - born >= 10000) { startRiz(); return; }
+    if (taps >= 7) enter();
+  }
+  trip.addEventListener("pointerdown", function (e) {
+    if (e.target && e.target.id === "earthFloat") return;
+    if (e.button !== 0) return;
+    onTap();
+  });
+})();
+</script>
 </body>
 </html>
