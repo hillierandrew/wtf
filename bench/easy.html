@@ -5,46 +5,45 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Let's Build Your Perfect PC</title>
 <style>
-  :root { color-scheme: light; --bg:#f4f1ea; --ink:#1b1b1b; --card:#fff; --line:#1b1b1b; --blue:#0b3a8a; --orange:#c45c00; }
+  :root { color-scheme: light; --bg:#f3f1ec; --ink:#161616; --card:#fffcf8; --line:#e3dfd6; --blue:#161616; --orange:#8a4b12; }
   * { box-sizing: border-box; }
-  html, body { margin:0; background:var(--bg); color:var(--ink); font:20px/1.45 Georgia, "Iowan Old Style", serif; }
-  button, input, select { font:18px/1.3 system-ui, sans-serif; color:inherit; }
-  button, select, input { min-height:52px; border-radius:12px; border:2px solid var(--ink); background:#fff; padding:8px 12px; }
+  html, body { margin:0; background:var(--bg); color:var(--ink); font:18px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  button, input, select { font:17px/1.3 system-ui, sans-serif; color:inherit; }
+  button, select, input { min-height:52px; border-radius:12px; border:1px solid var(--line); background:#fff; padding:8px 12px; }
   button { cursor:pointer; }
-  button.primary { background:var(--blue); color:#fff; border-color:var(--blue); }
-  button:focus-visible, select:focus-visible, input:focus-visible { outline:3px solid var(--orange); outline-offset:3px; }
-  .top { position:sticky; top:0; z-index:2; background:#fff; border-bottom:2px solid var(--ink); display:flex; gap:8px; overflow:auto; padding:8px; }
-  .top button { min-height:48px; white-space:nowrap; }
-  .wrap { width:min(1100px,100%); margin:0 auto; padding:16px 14px 80px; }
-  h1 { font-size:clamp(32px,5vw,52px); line-height:1.05; margin:8px 0; }
-  .note { background:#fff; border:2px dashed var(--ink); border-radius:12px; padding:10px 12px; font:16px/1.4 system-ui, sans-serif; }
-  .layout { display:grid; gap:14px; }
-  body.desk .layout { grid-template-columns: 1fr 320px; align-items:start; }
-  .card { background:var(--card); border:2px solid var(--ink); border-radius:16px; padding:12px; margin:0 0 10px; }
+  button.primary { background:var(--ink); color:#fff; border-color:var(--ink); border-radius:999px; font-weight:680; }
+  button:focus-visible, select:focus-visible, input:focus-visible { outline:2px solid var(--ink); outline-offset:3px; }
+  .top { position:sticky; top:0; z-index:2; background:rgba(243,241,236,.92); backdrop-filter:blur(16px); border-bottom:1px solid var(--line); display:flex; gap:6px; overflow:auto; padding:8px 10px; }
+  .top button { min-height:44px; white-space:nowrap; border-radius:999px; background:transparent; }
+  .wrap { width:min(880px,100%); margin:0 auto; padding:18px 16px 108px; }
+  h1 { font-size:clamp(36px,6vw,52px); line-height:1; letter-spacing:-0.045em; font-weight:560; margin:8px 0; }
+  .note { background:transparent; border:0; border-top:1px solid var(--line); border-radius:0; padding:12px 0; font:15px/1.45 system-ui, sans-serif; color:#5e5a54; }
+  .layout { display:grid; gap:18px; }
+  body.desk .layout { grid-template-columns: 1fr 300px; align-items:start; }
+  .card { background:transparent; border:0; border-bottom:1px solid var(--line); border-radius:0; padding:14px 0; margin:0; }
   .row { display:flex; flex-wrap:wrap; gap:8px; margin:8px 0; }
-  .muted { font:16px/1.35 system-ui, sans-serif; }
-  .price { font-weight:800; font-variant-numeric: tabular-nums; }
-  .fit { border-color:var(--blue); }
-  .nope { border-color:var(--orange); background:#fff7ef; }
-  .mark { font-weight:800; }
-  .mark.yes { color:var(--blue); }
-  .mark.no { color:var(--orange); }
+  .muted { font:15px/1.4 system-ui, sans-serif; color:#5e5a54; }
+  .price { font-weight:680; font-variant-numeric: tabular-nums; letter-spacing:-0.02em; }
+  .fit { border-color:var(--line); }
+  .nope { border-color:#e7c7a4; background:#fff8f1; border-radius:16px; padding:12px; }
+  .mark { font-weight:700; }
+  .mark.yes { color:#145c32; }
+  .mark.no { color:#8a4b12; }
   select, input[type="number"], input[type="search"] { width:100%; max-width:520px; display:block; margin:6px 0; }
   .cart { position:sticky; top:72px; }
-  body.phone .eat { display:flex; gap:10px; align-items:center; background:#fff; border:1px solid #e4e4e4; border-radius:16px; padding:12px; margin:8px 0; flex-wrap:wrap; }
-  .eat { display:flex; gap:10px; align-items:center; background:#fff; border:1px solid #e4e4e4; border-radius:16px; padding:12px; margin:8px 0; flex-wrap:wrap; }
+  .purpose { display:flex; align-items:center; min-height:72px; margin:8px 0 18px; padding:0 18px; border-radius:999px; background:#161616; color:#fff; text-decoration:none; font-weight:680; font-size:18px; }
+  .eat { display:flex; gap:10px; align-items:center; background:transparent; border:0; border-bottom:1px solid var(--line); border-radius:0; padding:12px 0; margin:0; flex-wrap:wrap; }
   .eat-mid { flex:1; min-width:0; }
   .eat-mid .muted { display:block; }
-  canvas.grow { width:100%; height:64px; border-radius:10px; display:block; flex:1 0 100%; margin-top:6px; }
-  body.phone .eat-ico { width:52px; height:52px; border-radius:14px; background:#f3f0ea; display:grid; place-items:center; font-size:26px; flex:none; }
-  body.phone .eat-mid { flex:1; min-width:0; }
+  canvas.grow { width:100%; height:56px; border-radius:8px; display:block; flex:1 0 100%; margin-top:6px; }
   body.phone .eat-mid .muted { display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   body.phone .x { min-width:44px; min-height:44px; border-radius:999px; }
-  body.phone .eat-bar, body.phone .order-bar { position:sticky; bottom:0; display:flex; gap:12px; align-items:center; background:#fff; border-top:1px solid #ddd; padding:12px 14px calc(12px + env(safe-area-inset-bottom)); margin:12px -14px -80px; z-index:3; }
-  body.phone .order-bar button, body.phone .eat-bar button.primary { flex:1; background:#111; color:#fff; border-color:#111; border-radius:999px; min-height:56px; }
-  .order-head { background:#111; color:#fff; border-radius:18px; padding:16px; }
+  body.phone .eat-bar, body.phone .order-bar { position:fixed; left:0; right:0; bottom:0; display:flex; gap:12px; align-items:center; background:rgba(243,241,236,.94); backdrop-filter:blur(16px); border-top:1px solid var(--line); padding:12px 16px calc(12px + env(safe-area-inset-bottom)); z-index:3; }
+  body.phone .order-bar button, body.phone .eat-bar button.primary { flex:1; background:#161616; color:#fff; border-color:#161616; border-radius:999px; min-height:56px; }
+  .order-head { background:#161616; color:#fff; border-radius:20px; padding:18px; }
   .order-head p { margin:6px 0 0; color:#ddd; font:16px/1.35 system-ui, sans-serif; }
-  #lock { position:fixed; inset:0; background:var(--bg); display:grid; place-items:center; z-index:6; }
+  #lock { position:fixed; inset:0; background:var(--bg); display:grid; place-items:center; z-index:6; padding:18px; }
+  #lock form { width:min(420px,100%); }
   #lock[hidden] { display:none !important; }
   #printFrame { position:absolute; width:0; height:0; border:0; }
   @media (max-width:800px) { body.desk .layout { grid-template-columns:1fr; } }
@@ -78,7 +77,12 @@ const GAMES = {
   Minecraft:{ low:[0,8], med:[1,16], high:[2,16], ult:[3,16] },
   "Escape from Tarkov":{ low:[2,16], med:[3,32], high:[3,32], ult:[4,32] },
   Warzone:{ low:[2,16], med:[3,16], high:[3,32], ult:[4,32] },
-  Valorant:{ low:[1,16], med:[2,16], high:[2,16], ult:[3,16] }
+  Valorant:{ low:[1,16], med:[2,16], high:[2,16], ult:[3,16] },
+  "Call of Duty":{ low:[2,16], med:[3,16], high:[4,32], ult:[5,32] },
+  "Diablo IV":{ low:[2,16], med:[3,16], high:[3,16], ult:[4,32] },
+  "Halo Infinite":{ low:[2,16], med:[3,16], high:[4,16], ult:[5,32] },
+  "World of Warcraft":{ low:[0,16], med:[2,16], high:[3,32], ult:[4,32] },
+  "Age of Empires IV":{ low:[0,16], med:[2,16], high:[3,16], ult:[3,32] }
 };
 const JOBS = {
   School:{ gpu:0, ram:16, disk:"1TB", note:"School work does not need a separate graphics card." },
@@ -87,7 +91,8 @@ const JOBS = {
   Premiere:{ gpu:3, ram:32, disk:"2TB", note:"Video editing likes a graphics card and a big SSD." },
   "After Effects":{ gpu:3, ram:32, disk:"1TB", note:"Motion work likes memory first, then a graphics card." },
   Streaming:{ gpu:3, ram:16, disk:"1TB", note:"Streaming likes a graphics card so the game and the broadcast can share the work." },
-  "Netflix, YouTube, Twitch":{ gpu:0, ram:16, disk:"1TB", note:"Watching video does not need a separate graphics card." }
+  "Netflix, YouTube, Twitch":{ gpu:0, ram:16, disk:"1TB", note:"Watching video does not need a separate graphics card." },
+  "AutoCAD and Revit":{ gpu:3, ram:32, disk:"1TB", note:"Drawings want a graphics card. Large 3D models commonly want 32 GB. This is not an Autodesk certification." }
 };
 const FACTS = {
   cpu:["Processor","This part thinks. Programs run here.","It must match the motherboard."],
@@ -534,6 +539,7 @@ function render(){
   save();
 }
 function viewHome(app){
+  app.append(el("a",{class:"purpose", href:"use.html", text:"I am buying it for one game or program"}));
   app.append(el("h1",{text:"Let's build your PC on paper."}), el("p",{text:"You do not need to know the parts. Pick a job or a game. I will fill a list you can take shopping."}));
   banner(app);
   const box=el("div",{class:"card"});
@@ -573,9 +579,9 @@ function viewDash(app){
 }
 function escHtml(s){
   return String(s).replace(/[&<>]/g, function(c){
-    if(c==="&") return "&";
-    if(c==="<") return "<";
-    return ">";
+    if(c==="&") return "&" + "amp;";
+    if(c==="<") return "&" + "lt;";
+    return "&" + "gt;";
   });
 }
 function paintBuild(g, w, h, p, parts){

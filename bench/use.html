@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>One game or one program</title>
+<style>
+  :root { color-scheme: light; --bg:#f3f1ec; --ink:#161616; --muted:#5e5a54; --line:#e3dfd6; --paper:#fffcf8; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  button, a { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  .wrap { width: min(640px, 100%); margin: 0 auto; padding: 18px 18px 148px; }
+  header { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 8px; }
+  .back {
+    min-width: 64px; min-height: 44px; padding: 0 4px; border: 0; background: transparent;
+    color: var(--ink); font-weight: 650;
+  }
+  .back:focus-visible, .pick:focus-visible, .pill:focus-visible, .print:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+  .eyebrow { margin: 0; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 650; }
+  h1 { font-size: clamp(36px, 8vw, 52px); line-height: 0.98; letter-spacing: -0.045em; font-weight: 560; margin: 4px 0 8px; }
+  .lede { margin: 0 0 8px; color: var(--muted); max-width: 38em; }
+  .group { margin: 28px 0 0; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 650; }
+  .pick {
+    display: flex; width: 100%; min-height: 76px; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 14px 0; border: 0; border-bottom: 1px solid var(--line); background: transparent; text-align: left;
+  }
+  .pick b { display: block; font-size: 20px; letter-spacing: -0.02em; font-weight: 620; }
+  .pick small { display: block; color: var(--muted); margin-top: 2px; }
+  .chev { color: var(--muted); font-size: 20px; }
+  .say { font-size: 16px; line-height: 1.45; margin: 8px 0 18px; }
+  .parts { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+  .parts li { display: grid; grid-template-columns: 108px 1fr auto; gap: 10px; align-items: baseline; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .parts .k { color: var(--muted); font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .parts .n { font-weight: 560; }
+  .parts .s { display: block; color: var(--muted); font-size: 14px; font-weight: 450; margin-top: 2px; }
+  .parts b { font-variant-numeric: tabular-nums; font-weight: 650; white-space: nowrap; }
+  .fine { color: var(--muted); font-size: 14px; line-height: 1.45; margin: 16px 0 0; }
+  .dock {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 3;
+    background: rgba(243,241,236,.94); backdrop-filter: blur(16px);
+    border-top: 1px solid var(--line);
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+  }
+  .dock-in { width: min(640px, 100%); margin: 0 auto; }
+  .pills { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+  .pill {
+    min-height: 44px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--ink);
+  }
+  .pill.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .dock-row { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
+  .dock-row span { display: block; color: var(--muted); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .dock-row strong { font-size: 22px; font-variant-numeric: tabular-nums; letter-spacing: -0.03em; }
+  .print {
+    margin-left: auto; min-height: 56px; padding: 0 22px; border: 0; border-radius: 999px;
+    background: #161616; color: #fff; font-weight: 680;
+  }
+  #printFrame { position: absolute; width: 0; height: 0; border: 0; }
+  @media (max-width: 420px) {
+    .parts li { grid-template-columns: 1fr auto; }
+    .parts .k { grid-column: 1 / -1; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <button class="back" id="back" type="button">Back</button>
+    <div>
+      <p class="eyebrow">Paper list</p>
+      <h1 id="title">What is this computer for?</h1>
+    </div>
+  </header>
+  <main id="app"></main>
+</div>
+<footer class="dock" id="dock" hidden>
+  <div class="dock-in">
+    <div class="pills" role="tablist" aria-label="How strong">
+      <button class="pill" type="button" data-tier="starts">Starts</button>
+      <button class="pill" type="button" data-tier="comfortable">Comfortable</button>
+      <button class="pill" type="button" data-tier="high">High-end</button>
+    </div>
+    <div class="dock-row">
+      <div><span id="dockLabel">Comfortable</span><strong id="dockTotal">$0</strong></div>
+      <button class="print" id="print" type="button">Print this list</button>
+    </div>
+  </div>
+</footer>
+<iframe id="printFrame" title="Print"></iframe>
+<script src="qr.js"></script>
+<script>
+// PLAN
+const CATS = ["cpu","motherboard","memory","storage","case","cooler","gpu","psu"];
+const LABEL = { cpu:"Processor", motherboard:"Board", memory:"Memory", storage:"Storage", case:"Case", cooler:"Cooler", gpu:"Graphics", psu:"Power" };
+const money = new Intl.NumberFormat("en-CA", { style:"currency", currency:"CAD" });
+const TIERS = ["starts","comfortable","high"];
+const TIER_NAME = { starts:"Starts", comfortable:"Comfortable", high:"High-end" };
+let PARTS = [];
+
+const GROUPS = [
+  { name:"Games", items:[
+    { id:"cod", name:"Call of Duty", sub:"Current game and Warzone", tiers:{
+      starts: spec("six", 2, 16, "1TB", "Starts means the game can open. Activision's minimum is an old RX 470 or GTX 970 and 8 GB of memory. Those cards are not on this list. This is a current entry card and 16 GB, the smallest kit sold here."),
+      comfortable: spec("new6", 4, 16, "1TB", "Comfortable is the computer people buy so the game feels settled. The publisher's recommended row is still an RTX 3060 or RX 6600 XT and 12 GB. This list has one leftover 3060 and no 6600 XT. A current 5060-class card and 16 GB is the stand-in. An i7-8700K is a 2018 chip and is not sold here. No frame rate is promised."),
+      high: spec("eight", 5, 32, "2TB", "High-end is for high settings and a high-refresh screen. Activision's competitive row names an RX 9070 XT, an RTX 4080, or an RTX 5070. This is the closest 16 GB card at that level, with 32 GB and a current 8-core. No frame rate is promised.")
+    }},
+    { id:"halo", name:"Halo Infinite", sub:"Campaign and multiplayer", tiers:{
+      starts: spec("six", 2, 16, "1TB", "343's low row is an RX 570 or GTX 1050 Ti and 8 GB. Starts is a current entry card and 16 GB. It will open. It is not their recommended computer."),
+      comfortable: spec("new6", 4, 16, "1TB", "Their recommended row is an RTX 2070 or RX 5700 XT and 16 GB. Neither is stocked new here. Comfortable is a current mid card and 16 GB on a newer 6-core. No frame rate is promised."),
+      high: spec("eight", 5, 32, "1TB", "Their ultra row is an RTX 3080 or RX 6800 XT and 16 GB. High-end is a current 16 GB card at that level, plus 32 GB. No frame rate is promised.")
+    }},
+    { id:"wow", name:"World of Warcraft", sub:"Retail and Classic", tiers:{
+      starts: spec("apu", 0, 16, "1TB", "The current game will open on a modern processor with its own graphics and 16 GB. This is not a raid computer."),
+      comfortable: spec("new6", 4, 16, "1TB", "Raids and heavy addons want a newer 6-core more than a giant card. Comfortable is that 6-core, 16 GB, and a current mid card. The old 8700K and 3060 line was a comfort pick, not the minimum, and it is not what this list sells."),
+      high: spec("eight", 5, 32, "1TB", "High-end is an 8-core, 32 GB, and a stronger current card for busy raids. Addons and how many people are on screen still matter more than a flagship card. No frame rate is promised.")
+    }},
+    { id:"diablo", name:"Diablo IV", sub:"Current season and expansions", tiers:{
+      starts: spec("six", 2, 16, "1TB", "Blizzard's minimum is a GTX 660 class card and 8 GB. Starts is a current entry card and 16 GB, nearer their medium row than that minimum."),
+      comfortable: spec("new6", 4, 16, "1TB", "Blizzard's high 1080p row is an RTX 2060 or RX 5700 XT, 16 GB, and a 6-core such as an 8700K. A 3060 is a step above that row, and this shelf barely has one. Comfortable is a current mid card and 16 GB. No frame rate is promised."),
+      high: spec("eight", 5, 32, "1TB", "Blizzard's ultra row is an RTX 3080 or RX 6800 XT class card. High-end steps to a current 16 GB card in that class, with 32 GB. No frame rate is promised.")
+    }},
+    { id:"aoe", name:"Age of Empires IV", sub:"Large matches are the processor", tiers:{
+      starts: spec("apu", 0, 16, "512GB", "The official minimum is an old low-power chip, integrated graphics, and 8 GB. Starts is a current processor with graphics and 16 GB."),
+      comfortable: spec("new6", 2, 16, "1TB", "The official recommended row is a 6-core and a GTX 970 or RX 570. Late games are mostly the processor. A GTX 1660 is not on this list. Comfortable is a current 6-core, 16 GB, and a modest card."),
+      high: spec("eight", 3, 32, "1TB", "High-end is an 8-core and 32 GB for large matches. The card stays modest on purpose. No frame rate is promised.")
+    }},
+    { id:"tarkov", name:"Escape from Tarkov", sub:"Raids, not the menu", tiers:{
+      starts: spec("six", 2, 16, "1TB", "This list is not quoting a publisher table for Tarkov. Starts is a current 6-core, 16 GB, and an entry card. A raid can still hitch."),
+      comfortable: spec("new6", 4, 32, "1TB", "Comfortable is what people buy so a raid is not a slideshow: a newer 6-core, 32 GB, and a current mid card. Minimum parts are a bad time here. No frame rate is promised."),
+      high: spec("eight", 5, 32, "2TB", "High-end raises the card and uses an 8-core and 32 GB. Memory and the processor still do more of the work than a flagship card.")
+    }},
+    { id:"cs2", name:"Counter-Strike 2", sub:"Lighter than Call of Duty", tiers:{
+      starts: spec("six", 2, 16, "1TB", "Counter-Strike is lighter than Call of Duty. Starts is a current entry card and 16 GB. This list has no frame-rate test."),
+      comfortable: spec("new6", 4, 16, "1TB", "Comfortable is a newer 6-core and a current mid card, which is what people buy for a high-refresh screen. No frame rate is promised."),
+      high: spec("eight", 5, 32, "1TB", "High-end is a stronger current card and 32 GB. It does not promise a frame rate.")
+    }}
+  ]},
+  { name:"Programs", items:[
+    { id:"office", name:"Office and email", sub:"No game card", tiers:{
+      starts: spec("apu", 0, 16, "1TB", "Office work does not need a separate graphics card. Starts is a current processor with its own graphics and 16 GB."),
+      comfortable: spec("apu-mid", 0, 16, "1TB", "The same idea, with a slightly newer processor that still includes graphics and a cooler. 16 GB is enough for documents."),
+      high: spec("apu-new", 0, 32, "2TB", "High-end stays on processor graphics and moves to 32 GB and a larger SSD. A game card would be wasted money here.")
+    }},
+    { id:"school", name:"School", sub:"Writing, class, light creative work", tiers:{
+      starts: spec("apu", 0, 16, "1TB", "School work opens on a processor with graphics and 16 GB. A separate card is not required."),
+      comfortable: spec("apu-mid", 0, 16, "1TB", "Comfortable is the same kind of computer with a bit more processor. Still no game card."),
+      high: spec("new6", 2, 32, "1TB", "High-end adds 32 GB and a modest card, for the student who also edits or plays. It is optional, not a school requirement.")
+    }},
+    { id:"photoshop", name:"Photoshop", sub:"Memory first, then a card", tiers:{
+      starts: spec("six", 2, 16, "1TB", "16 GB and a modest card is the usual floor for photo work. This is not an Adobe-certified machine."),
+      comfortable: spec("new6", 4, 32, "1TB", "Comfortable moves to 32 GB and a current mid card. Bigger files use the memory before they use a flagship card."),
+      high: spec("eight", 5, 32, "2TB", "High-end is an 8-core, 32 GB, a stronger card, and a larger SSD. 64 GB kits exist on the list and cost much more, so they are not the default. No export-time promise.")
+    }},
+    { id:"premiere", name:"Premiere", sub:"Video timeline", tiers:{
+      starts: spec("new6", 4, 32, "1TB", "Video wants a current card, 32 GB, and an SSD. Starts here is already that, not a minimum laptop. This is not an Adobe quote."),
+      comfortable: spec("new6", 4, 32, "2TB", "Comfortable keeps the mid card and gives the footage a 2 TB SSD. The card is the same class. The space is the difference."),
+      high: spec("eight", 5, 32, "2TB", "High-end steps the card up and uses an 8-core. No render-time number is promised.")
+    }},
+    { id:"ae", name:"After Effects", sub:"Motion, memory first", tiers:{
+      starts: spec("six", 2, 16, "1TB", "Motion work wants memory before a huge card. Starts is 16 GB and a modest card so a short project can open. This is not an Adobe quote."),
+      comfortable: spec("new6", 4, 32, "1TB", "Comfortable is 32 GB and a current mid card. That is the step that matters."),
+      high: spec("eight", 5, 32, "2TB", "High-end adds an 8-core, a stronger card, and a larger SSD. Still 32 GB. A 64 GB kit is a separate, much more expensive choice.")
+    }},
+    { id:"cad", name:"AutoCAD and Revit", sub:"Drawings and 3D models", tiers:{
+      starts: spec("six", 2, 16, "1TB", "A discrete card and 16 GB is the usual recommendation for this work. Starts is that floor, on a current 6-core. This is not an Autodesk certification."),
+      comfortable: spec("new6", 3, 32, "1TB", "Large 3D models commonly want 32 GB. Comfortable is a newer 6-core, 32 GB, and a current card. No view-speed number is promised."),
+      high: spec("eight", 4, 32, "2TB", "High-end is an 8-core, 32 GB, a stronger current card, and a larger SSD. Still not a certified workstation.")
+    }},
+    { id:"stream", name:"Streaming", sub:"Game plus a broadcast", tiers:{
+      starts: spec("six", 2, 16, "1TB", true, "Starts can play and can broadcast, on an Nvidia entry card so the encoder is there. 16 GB is tight once the game and the broadcast are both open."),
+      comfortable: spec("new6", 4, 32, "2TB", true, "Comfortable is a current Nvidia mid card, 32 GB, and a 2 TB SSD. Nvidia is the pick because broadcast software uses its encoder."),
+      high: spec("eight", 5, 32, "2TB", false, "High-end steps to a 16 GB card and an 8-core. On this list that card is often AMD, which draws the game and does not have Nvidia's encoder. Use Comfortable if the encoder is the point. No frame rate is promised.")
+    }}
+  ]}
+];
+
+function spec(cpu, gpu, ram, disk, nvidia, say) {
+  if (typeof nvidia === "string") return { cpu:cpu, gpu:gpu, ram:ram, disk:disk, nvidia:false, say:nvidia };
+  return { cpu:cpu, gpu:gpu, ram:ram, disk:disk, nvidia:!!nvidia, say:say };
+}
+function findPurpose(id) {
+  for (const group of GROUPS) {
+    const hit = group.items.find((item) => item.id === id);
+    if (hit) return hit;
+  }
+  return null;
+}
+function junk(p) { return /open box|renewed|recertified|sodimm|surveillance|purple|laptop|\becc\b/i.test(p.name) || p.price < 12; }
+function sticksOf(p) {
+  const n = (p && p.name) || "";
+  const m = n.match(/\((\d+)\s*[x×]\s*\d+/i) || n.match(/\b(\d+)\s*[x×]\s*\d+\s*GB/i);
+  return m ? +m[1] : 1;
+}
+function ramKindOf(p) {
+  if (!p) return "";
+  if (p.ram) return p.ram;
+  const m = (p.name || "").toUpperCase().match(/DDR[2-5]/);
+  if (m) return m[0];
+  if (p.socket === "AM5" || p.socket === "LGA1851") return "DDR5";
+  if (p.socket === "AM4") return "DDR4";
+  return "";
+}
+function formOf(p) {
+  if (!p) return "";
+  if (p.form) return p.form;
+  const n = p.name.toUpperCase();
+  if (/MICRO|MATX|M-ATX/.test(n)) return "matx";
+  if (/MINI-?ITX|\bITX\b/.test(n)) return "itx";
+  if (/E-?ATX|FULL/.test(n)) return "full";
+  if (/\bATX\b/.test(n)) return "atx";
+  return "";
+}
+function fitsCase(box, board) {
+  const rank = { itx:1, matx:2, atx:3, eatx:4, full:4 };
+  return (rank[formOf(box)] || 3) >= (rank[formOf(board)] || 2);
+}
+function dimmSlots(board) {
+  if (!board) return 4;
+  const n = (board.name || "").toUpperCase();
+  if (/2\s*DIMM/.test(n)) return 2;
+  if (/4\s*DIMM/.test(n)) return 4;
+  if (formOf(board) === "itx") return 2;
+  return 4;
+}
+function gbOf(p) { const m = p.name.toUpperCase().match(/\b(4|8|16|32|64|96|128)GB\b/); return m ? +m[1] : 0; }
+function wattOf(p) { if (!p) return 0; if (p.watt) return p.watt; const m = p.name.toUpperCase().match(/(\d{3,4})\s?W/); return m ? +m[1] : 0; }
+function diskGb(p) {
+  const n = p.name.toUpperCase().replace(/\s+/g, "");
+  if (/(^|[^0-9])8TB/.test(n)) return 8000;
+  if (/(^|[^0-9])4TB/.test(n)) return 4000;
+  if (/(^|[^0-9])2TB/.test(n)) return 2000;
+  if (/(^|[^0-9])1TB/.test(n)) return 1000;
+  if (/512GB|500GB/.test(n)) return 512;
+  return 0;
+}
+function vramOf(p) {
+  const n = p.name.toUpperCase();
+  const m = n.match(/(\d+)\s*GB/) || n.match(/(\d+)\s*G\b/);
+  return m ? +m[1] : 0;
+}
+function gpuClass(p) {
+  const n = (p.name || "").toUpperCase();
+  if (/5090|4090/.test(n)) return 7;
+  if (/5080|4080|5070\s?TI|4070\s?TI|9070\s?XT/.test(n)) return 6;
+  if (/5060\s?TI|N506T/.test(n)) return 5;
+  if (/5070|9070|4070/.test(n)) return 5;
+  if (/5060|9060|4060/.test(n)) return 4;
+  if (/5050|3060|6600|7600/.test(n)) return 3;
+  if (/3050|1660|1650|6500/.test(n)) return 2;
+  if (/1030|1050/.test(n)) return 1;
+  return 0;
+}
+function needWatts(parts) {
+  const c = parts.gpu ? gpuClass(parts.gpu) : 0;
+  return c >= 5 ? 850 : c >= 4 ? 750 : c >= 3 ? 650 : c >= 2 ? 550 : c ? 450 : 400;
+}
+function fitWhy(part, parts) {
+  if (!part) return "That part is not on the list.";
+  if (junk(part)) return "Laptop, open-box, and server parts are not offered.";
+  const others = Object.assign({}, parts || {});
+  delete others[part.cat];
+  if (part.cat === "cpu" && others.motherboard && part.socket && others.motherboard.socket && part.socket !== others.motherboard.socket) return "That processor is " + part.socket + " and this motherboard is " + others.motherboard.socket + ".";
+  if (part.cat === "motherboard" && others.cpu && part.socket && others.cpu.socket && part.socket !== others.cpu.socket) return "That motherboard is " + part.socket + " and this processor is " + others.cpu.socket + ".";
+  if ((part.cat === "cpu" && others.motherboard) || (part.cat === "motherboard" && others.cpu)) {
+    const cpu = part.cat === "cpu" ? part : others.cpu;
+    const board = part.cat === "motherboard" ? part : others.motherboard;
+    const a = ramKindOf(cpu), b = ramKindOf(board);
+    if (a && b && a !== b) return "That processor wants " + a + " and the motherboard is " + b + ".";
+  }
+  if (part.cat === "memory") {
+    if (/SODIMM|SO-DIMM|LAPTOP/i.test(part.name)) return "Laptop memory does not fit a desktop motherboard.";
+    const kind = ramKindOf(part);
+    const want = ramKindOf(others.motherboard) || ramKindOf(others.cpu);
+    if (kind && want && kind !== want) return kind + " memory does not fit a " + want + " board.";
+    const sticks = sticksOf(part);
+    if (sticks !== 1 && sticks !== 2 && sticks !== 4) return "That kit is " + sticks + " sticks. These boards take 1, 2, or 4. Not " + sticks + ".";
+    const slots = dimmSlots(others.motherboard);
+    if (sticks > slots) return "That kit is " + sticks + " sticks and this board has " + slots + " memory slots.";
+  }
+  if (part.cat === "motherboard" && others.memory) {
+    const kind = ramKindOf(others.memory), want = ramKindOf(part);
+    if (kind && want && kind !== want) return "The memory already chosen is " + kind + " and that board is " + want + ".";
+    if (sticksOf(others.memory) > dimmSlots(part)) return "The memory kit has more sticks than that board has slots.";
+  }
+  if (part.cat === "case" && others.motherboard && formOf(part) && formOf(others.motherboard) && !fitsCase(part, others.motherboard)) return "That case is too small for this motherboard.";
+  if (part.cat === "motherboard" && others.case && formOf(part) && formOf(others.case) && !fitsCase(others.case, part)) return "This case is too small for that motherboard.";
+  if (part.cat === "psu" && others.gpu) {
+    const w = wattOf(part), need = needWatts(others);
+    if (w && w < need) return "That power supply is " + w + "W. This graphics card wants about " + need + "W.";
+  }
+  if (part.cat === "gpu" && others.psu) {
+    const w = wattOf(others.psu), need = needWatts(Object.assign({}, others, { gpu: part }));
+    if (w && w < need) return "This power supply is too small for that card.";
+  }
+  return "";
+}
+function keepFitting(map) {
+  const order = ["cpu","motherboard","memory","case","storage","cooler","gpu","psu"];
+  const kept = {};
+  order.forEach((id) => { const part = map[id]; if (part && !fitWhy(part, kept)) kept[id] = part; });
+  return kept;
+}
+function cheapest(cat, pred) {
+  let best = null;
+  for (const p of PARTS) {
+    if (p.cat !== cat || junk(p)) continue;
+    if (pred && !pred(p)) continue;
+    if (!best || p.price < best.price) best = p;
+  }
+  return best;
+}
+function pickCpu(kind) {
+  if (kind === "apu") return cheapest("cpu", (p) => /5500GT/.test(p.name));
+  if (kind === "apu-mid") return cheapest("cpu", (p) => /5600GT/.test(p.name));
+  if (kind === "apu-new") return cheapest("cpu", (p) => /8500G/.test(p.name));
+  if (kind === "six") return cheapest("cpu", (p) => /Ryzen 5 5500 /.test(p.name));
+  if (kind === "new6") return cheapest("cpu", (p) => /Ryzen 5 7600X(?!3D)/.test(p.name));
+  if (kind === "eight") return cheapest("cpu", (p) => /Ryzen 7 7700X /.test(p.name));
+  return null;
+}
+function pickBoard(cpu) {
+  const socket = cpu.socket;
+  const ram = socket === "AM5" || socket === "LGA1851" ? "DDR5" : "DDR4";
+  return cheapest("motherboard", (p) => p.socket === socket && p.ram === ram && formOf(p) !== "itx")
+    || cheapest("motherboard", (p) => p.socket === socket && p.ram === ram);
+}
+function pickMem(board, gb) {
+  const kind = board.ram;
+  const slots = dimmSlots(board);
+  return cheapest("memory", (p) => p.ram === kind && gbOf(p) === gb && sticksOf(p) === 2 && sticksOf(p) <= slots)
+    || cheapest("memory", (p) => p.ram === kind && gbOf(p) >= gb && sticksOf(p) === 2 && sticksOf(p) <= slots);
+}
+function isNvme(p) { return /NVME|M\.2|PCI-?E|PCIE/i.test(p.name) && !/HDD|HARD DRIVE/i.test(p.name); }
+function pickDisk(target) {
+  const want = target === "2TB" ? 2000 : target === "512GB" ? 512 : 1000;
+  const list = PARTS.filter((p) => p.cat === "storage" && !junk(p) && isNvme(p) && diskGb(p) >= want && diskGb(p) < want * 2).sort((a, b) => a.price - b.price);
+  return list[0] || cheapest("storage", (p) => isNvme(p) && diskGb(p) >= want);
+}
+function pickCase(board) {
+  return cheapest("case", (p) => fitsCase(p, board) && !/open air|test bench/i.test(p.name));
+}
+function pickCooler() {
+  return cheapest("cooler", (p) => /AG400|AK400|HEATPIPE|TOWER/i.test(p.name) && !/LOW PROFILE/i.test(p.name))
+    || cheapest("cooler", (p) => !/LOW PROFILE/i.test(p.name));
+}
+function pickGpu(minClass, preferNvidia) {
+  let list = [];
+  for (let c = minClass; c <= 6 && !list.length; c++) {
+    list = PARTS.filter((p) => p.cat === "gpu" && !junk(p) && gpuClass(p) === c && p.price < 4000 && !/QUADRO|RTX PRO/i.test(p.name));
+  }
+  if (!list.length) return null;
+  list.sort((a, b) => a.price - b.price);
+  const floor = list[0].price;
+  let band = list.filter((p) => p.price <= floor + 80);
+  if (preferNvidia) {
+    const nv = band.filter((p) => /GEFORCE|NVIDIA|RTX/i.test(p.name));
+    if (nv.length) band = nv;
+  }
+  band.sort((a, b) => vramOf(b) - vramOf(a) || a.price - b.price);
+  return band[0];
+}
+function pickPsu(need) {
+  return cheapest("psu", (p) => { const w = wattOf(p); return w >= need && w <= need + 200; })
+    || cheapest("psu", (p) => wattOf(p) >= need);
+}
+function planBuild(spec) {
+  const out = {};
+  const cpu = pickCpu(spec.cpu);
+  if (!cpu) return { parts:{}, missing:["cpu"] };
+  out.cpu = cpu;
+  const board = pickBoard(cpu);
+  if (board) out.motherboard = board;
+  if (out.motherboard) {
+    const mem = pickMem(out.motherboard, spec.ram);
+    if (mem) out.memory = mem;
+  }
+  const disk = pickDisk(spec.disk);
+  if (disk) out.storage = disk;
+  if (out.motherboard) {
+    const box = pickCase(out.motherboard);
+    if (box) out.case = box;
+  }
+  if (!/cooler/i.test(cpu.name)) {
+    const cooler = pickCooler();
+    if (cooler) out.cooler = cooler;
+  }
+  if (spec.gpu > 0) {
+    const gpu = pickGpu(spec.gpu, spec.nvidia);
+    if (gpu) out.gpu = gpu;
+  }
+  const psu = pickPsu(needWatts(out));
+  if (psu) out.psu = psu;
+  const kept = keepFitting(out);
+  return {
+    parts: kept,
+    includedCooler: !kept.cooler && /cooler/i.test(cpu.name),
+    integrated: spec.gpu === 0
+  };
+}
+function totalOf(parts) { return Object.values(parts).reduce((sum, part) => sum + (part ? part.price : 0), 0); }
+function subLine(id, part) {
+  if (id === "memory") return sticksOf(part) + " sticks · " + (part.ram || "");
+  if (id === "cpu") return part.socket || "";
+  if (id === "gpu") return vramOf(part) ? vramOf(part) + " GB" : "";
+  if (id === "psu") return wattOf(part) ? wattOf(part) + "W" : "";
+  return "";
+}
+// DOM
+const state = { id:"", tier:"comfortable" };
+try {
+  const saved = JSON.parse(sessionStorage.getItem("drew-use") || "{}");
+  if (saved.id) state.id = saved.id;
+  if (TIERS.indexOf(saved.tier) >= 0) state.tier = saved.tier;
+} catch (e) {}
+function persist() { try { sessionStorage.setItem("drew-use", JSON.stringify(state)); } catch (e) {} }
+function el(tag, attrs, kids) {
+  const node = document.createElement(tag);
+  Object.entries(attrs || {}).forEach(([key, value]) => {
+    if (key === "class") node.className = value;
+    else if (key === "text") node.textContent = value;
+    else if (key === "html") node.innerHTML = value;
+    else node.setAttribute(key, value);
+  });
+  (kids || []).forEach((kid) => node.appendChild(kid));
+  return node;
+}
+function current() {
+  const purpose = findPurpose(state.id);
+  if (!purpose) return null;
+  const tier = purpose.tiers[state.tier] || purpose.tiers.comfortable;
+  return { purpose, tier, build: planBuild(tier) };
+}
+function render() {
+  const app = document.getElementById("app");
+  const dock = document.getElementById("dock");
+  app.replaceChildren();
+  const picked = state.id && findPurpose(state.id);
+  document.getElementById("title").textContent = picked ? picked.name : "What is this computer for?";
+  if (!picked || !PARTS.length) {
+    dock.hidden = true;
+    app.appendChild(el("p", { class:"lede", text:"Pick one. Then choose Starts, Comfortable, or High-end. The list uses saved Canadian prices. It is not a sale, and it does not promise a frame rate." }));
+    if (!PARTS.length) app.appendChild(el("p", { class:"lede", text:"The parts list is still loading." }));
+    GROUPS.forEach((group) => {
+      app.appendChild(el("div", { class:"group", text:group.name }));
+      group.items.forEach((item) => {
+        const button = el("button", { class:"pick", type:"button" });
+        const text = el("span", {}, [el("b", { text:item.name }), el("small", { text:item.sub })]);
+        button.append(text, el("span", { class:"chev", text:"›" }));
+        button.onclick = () => { state.id = item.id; state.tier = "comfortable"; persist(); render(); window.scrollTo(0, 0); };
+        app.appendChild(button);
+      });
+    });
+    return;
+  }
+  const view = current();
+  dock.hidden = false;
+  document.querySelectorAll(".pill").forEach((button) => button.classList.toggle("on", button.dataset.tier === state.tier));
+  document.getElementById("dockLabel").textContent = TIER_NAME[state.tier];
+  document.getElementById("dockTotal").textContent = money.format(totalOf(view.build.parts));
+  app.appendChild(el("p", { class:"lede", text:picked.sub }));
+  app.appendChild(el("p", { class:"say", text:view.tier.say }));
+  const list = el("ul", { class:"parts" });
+  CATS.forEach((id) => {
+    const part = view.build.parts[id];
+    if (!part && id === "cooler" && view.build.includedCooler) {
+      list.appendChild(row(LABEL[id], "Included with the processor", "", "In the box"));
+      return;
+    }
+    if (!part && id === "gpu" && view.build.integrated) {
+      list.appendChild(row(LABEL[id], "The processor draws the picture", "", "None"));
+      return;
+    }
+    if (!part) return;
+    list.appendChild(row(LABEL[id], part.name, subLine(id, part), money.format(part.price)));
+  });
+  app.appendChild(list);
+  const reasons = [];
+  CATS.forEach((id) => {
+    const part = view.build.parts[id];
+    if (part) {
+      const why = fitWhy(part, view.build.parts);
+      if (why) reasons.push(why);
+    }
+  });
+  if (!view.build.parts.cpu || !view.build.parts.memory) reasons.push("A required part was missing from the saved list.");
+  app.appendChild(el("p", { class:"fine", text: reasons.length ? reasons.join(" ") : "One of each part. Memory is one kit, and only 1, 2, or 4 sticks. Prices are the saved list in Canadian dollars, not live prices. Tax and shipping are not included. Card length is not on the list, so the case fit of a long card is not checked." }));
+}
+function row(k, name, sub, price) {
+  const nameNode = el("div", { class:"n" }, [document.createTextNode(name)]);
+  if (sub) nameNode.appendChild(el("span", { class:"s", text:sub }));
+  return el("li", {}, [el("div", { class:"k", text:k }), nameNode, el("b", { text:price })]);
+}
+function paperText() {
+  const view = current();
+  if (!view) return "";
+  const lines = ["DREW PAPER BUILD / NOT A SALE", view.purpose.name + " — " + TIER_NAME[state.tier], ""];
+  CATS.forEach((id) => {
+    const part = view.build.parts[id];
+    if (part) lines.push(LABEL[id] + ": " + part.name + " — " + money.format(part.price));
+    else if (id === "cooler" && view.build.includedCooler) lines.push("Cooler: included with the processor");
+    else if (id === "gpu" && view.build.integrated) lines.push("Graphics: processor graphics, no separate card");
+  });
+  lines.push("", "Total " + money.format(totalOf(view.build.parts)));
+  lines.push("Saved CAD prices. Not a sale. No frame rate is promised.");
+  lines.push(view.tier.say);
+  return lines.join("\n");
+}
+function esc(s) { return String(s).replace(/[&<>]/g, (c) => c === "&" ? "&" : c === "<" ? "<" : ">"); }
+function printList() {
+  const text = paperText();
+  const doc = document.getElementById("printFrame").contentDocument;
+  let img = "";
+  if (window.drewQR && text) {
+    const canvas = document.createElement("canvas");
+    window.drewQR.draw(canvas, text.slice(0, 500), 6);
+    img = "<img alt='Scanner code' src='" + canvas.toDataURL("image/png") + "' style='width:220px;height:220px'>";
+  }
+  doc.open();
+  doc.write("<!DOCTYPE html><html><head><title>Paper build</title><style>body{font:14px/1.4 system-ui,sans-serif;margin:24px;color:#161616} h1{font-size:20px;letter-spacing:-0.03em} pre{white-space:pre-wrap;font:13px/1.4 ui-monospace,Menlo,monospace}</style></head><body><h1>Paper build</h1>" + img + "<pre>" + esc(text) + "</pre></body></html>");
+  doc.close();
+  const frame = document.getElementById("printFrame");
+  frame.contentWindow.focus();
+  frame.contentWindow.print();
+}
+document.getElementById("back").onclick = () => {
+  if (state.id) { state.id = ""; persist(); render(); return; }
+  if (history.length > 1) history.back();
+  else location.href = "index.html";
+};
+document.getElementById("print").onclick = printList;
+document.querySelectorAll(".pill").forEach((button) => {
+  button.onclick = () => { state.tier = button.dataset.tier; persist(); render(); };
+});
+render();
+fetch("parts.json").then((res) => res.json()).then((data) => { PARTS = data; render(); });
+</script>
+</body>
+</html>

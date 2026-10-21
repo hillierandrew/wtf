@@ -21,6 +21,19 @@
     background: rgba(0,0,0,.55); border: 2px solid #ffe14a;
     font-size: 22px; font-weight: 700;
   }
+  a.use {
+    display: flex; align-items: center; justify-content: space-between;
+    min-height: 64px; margin: 8px 0; padding: 0 16px; border-radius: 16px;
+    background: #ffe14a; color: #111; font-weight: 800; text-decoration: none;
+  }
+  .dock { display: none; }
+  body.phone .dock {
+    display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 4;
+    justify-content: space-between; align-items: center;
+    padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+    background: rgba(0,0,0,.88); border-top: 1px solid #ffe14a;
+  }
+  body.phone { padding-bottom: 84px; }
   .budget {
     margin: 8px 0; padding: 10px 12px; border-radius: 16px; background: rgba(0,0,0,.5);
   }
@@ -82,6 +95,7 @@
   <button class="icon" id="langBtn" type="button" aria-label="Language">🔤</button>
 </header>
 <p class="pitch" id="pitch"></p>
+<a class="use" href="use.html">For one game or program <span>→</span></a>
 <div class="budget">
   <div><span id="budgetWord">Budget</span> <b id="budgetLabel">$700</b></div>
   <input id="budget" type="range" min="0" max="20000" step="50" value="700" />
@@ -98,6 +112,7 @@
   <section id="parts"></section>
 </div>
 <div id="langs"></div>
+<div class="dock"><span>Paper total</span><b id="dockTotal">$0</b></div>
 <script>
 const JOBS = ["elementary","highschool","college","office","cad","video","dj","stream","fortnite","roblox","minecraft","warzone","apex","tarkov"];
 const NEED = {
@@ -465,6 +480,8 @@ function render() {
   if (total > budget + 1) sell.textContent = t("over") + " " + money.format(total);
   else if (budget - total > 250) sell.textContent = t("under") + " " + money.format(total);
   else sell.textContent = money.format(total);
+  const dockTotal = document.getElementById("dockTotal");
+  if (dockTotal) dockTotal.textContent = money.format(total);
   paintArt();
   paintMachine(parts);
   const list = document.getElementById("parts");
