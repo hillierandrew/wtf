@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Build the PC of your Dreams</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #ececec; color: #1c1c1c; font: 16px/1.45 Georgia, "Times New Roman", serif; }
+  button, input, select { font: 15px/1.2 system-ui, sans-serif; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 28px 18px 64px; }
+  h1 { text-align: center; font-weight: 500; font-size: clamp(32px, 5vw, 52px); margin: 12px 0 8px; letter-spacing: -0.02em; }
+  .sub { text-align: center; font-size: clamp(18px, 2.4vw, 26px); margin: 0 0 14px; }
+  .lead, .notes { font: 14px/1.45 system-ui, sans-serif; color: #333; }
+  .notes { font-size: 13px; }
+  .notes b { font-variant: small-caps; letter-spacing: 0.04em; }
+  .controls { margin: 18px 0; font: 15px/1.3 system-ui, sans-serif; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  input[type="number"], input[type="text"], select {
+    background: #fff; border: 1px solid #bbb; border-radius: 4px; padding: 8px 10px; min-height: 36px;
+  }
+  input[type="number"] { width: 110px; }
+  button.dark, button.ghost {
+    background: #3c3c3c; color: #fff; border: 0; border-radius: 4px; min-height: 36px; padding: 0 12px; cursor: pointer;
+  }
+  button.ghost { background: #5c5c5c; }
+  button.dark:hover, button.ghost:hover { background: #222; }
+  .fine { width: 100%; font: 13px/1.3 system-ui, sans-serif; color: #444; margin: 4px 0 10px; }
+  .fine input { width: min(420px, 100%); }
+  .remain { float: right; font: 14px/1.3 system-ui, sans-serif; }
+  table { width: 100%; border-collapse: collapse; background: #f7f7f7; font: 14px/1.35 system-ui, sans-serif; }
+  th, td { border-bottom: 1px solid #ddd; padding: 8px 6px; text-align: left; vertical-align: top; }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #555; }
+  .thumb {
+    width: 54px; height: 54px; border-radius: 4px; background: #ddd; display: grid; place-items: center;
+    font-weight: 800; cursor: pointer; border: 0;
+  }
+  .total { font-weight: 800; font-size: 18px; }
+  .issues {
+    margin-top: 14px; background: #7d4454; color: #fff; border-radius: 8px; padding: 14px 16px;
+    font: 15px/1.4 system-ui, sans-serif;
+  }
+  .issues h2 { margin: 0 0 8px; font-size: 16px; }
+  .rowbtns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  #adder, #zoom {
+    margin-top: 12px; background: #fff; border: 1px solid #ccc; border-radius: 8px; padding: 12px;
+    font: 14px/1.35 system-ui, sans-serif;
+  }
+  #adder[hidden], #zoom[hidden], #tour[hidden], #lock[hidden] { display: none !important; }
+  .pick { display: block; width: 100%; text-align: left; margin-top: 6px; background: #fff; border: 1px solid #ccc; border-radius: 6px; padding: 8px; cursor: pointer; }
+  #tour {
+    position: fixed; inset: 0; background: rgba(40,40,40,.45); display: grid; place-items: center; z-index: 5; padding: 16px;
+  }
+  .card { width: min(420px, 100%); background: #b07c8b; color: #fff; border-radius: 6px; padding: 22px 18px; text-align: center; font: 18px/1.4 system-ui, sans-serif; box-shadow: 0 10px 30px #0006; }
+  .card .nav { display: flex; gap: 8px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
+  .card button { background: #f4f4f4; color: #222; border: 0; border-radius: 4px; min-height: 36px; padding: 0 14px; cursor: pointer; }
+  #lock { position: fixed; inset: 0; background: #ececec; display: grid; place-items: center; z-index: 6; }
+  #lock form { width: min(360px, 92vw); text-align: center; }
+  .bad { color: #8d243c; min-height: 1.2em; font: 14px system-ui, sans-serif; }
+  @media (max-width: 720px) {
+    table, thead, tbody, tr, th, td { display: block; }
+    thead { display: none; }
+    tr { border-bottom: 8px solid #ececec; }
+    .remain { float: none; display: block; margin: 8px 0; }
+  }
+</style>
+</head>
+<body>
+<div id="lock">
+  <form id="lockForm">
+    <h1>Dream builder</h1>
+    <input id="lockPass" type="password" placeholder="Password" aria-label="Password" />
+    <p class="bad" id="lockBad"></p>
+    <button class="dark" type="submit">Open</button>
+  </form>
+</div>
+<div id="tour">
+  <div class="card">
+    <p id="tourText"></p>
+    <div class="nav">
+      <button type="button" id="tourBack">BACK</button>
+      <button type="button" id="tourNext">NEXT</button>
+      <button type="button" id="tourSkip">SKIP TOUR</button>
+    </div>
+  </div>
+</div>
+<div class="wrap">
+  <h1>Build the PC of your Dreams... with a click!</h1>
+  <p class="sub">Try the builder and cost calculator. Worry about nothing but your budget.</p>
+  <p class="lead">Pick a use, set what you can spend, and the parts are chosen so they fit each other. You can swap any part after.</p>
+  <p class="notes"><b>Notes:</b> Set a budget. Press <b>Suggest a Build</b> and press it again if you want a different one. <b>Add Component</b> starts from the parts you already have. Click a thumbnail to read the part. Copy the build link if you want to show it to someone.</p>
+  <div class="controls">
+    <label>Set Your Budget: $ <input id="budget" type="number" min="0" max="20000" step="50" value="1000" /></label>
+    <button class="dark" id="setBudget" type="button">Set</button>
+    <button class="ghost" id="clearBudget" type="button">Clear Budget</button>
+    <select id="use" aria-label="What is this computer for">
+      <option>Gaming</option>
+      <option>Home Server</option>
+      <option>Office</option>
+      <option>School</option>
+      <option>Video Editing</option>
+      <option>Streaming</option>
+    </select>
+    <select id="brand" aria-label="Processor brand">
+      <option value="any">AMD or Intel</option>
+      <option value="amd">AMD</option>
+      <option value="intel">Intel</option>
+    </select>
+    <select id="graphics" aria-label="Graphics">
+      <option value="either">Graphics: either</option>
+      <option value="dedicated">Graphics: dedicated</option>
+      <option value="integrated">Graphics: integrated</option>
+    </select>
+  </div>
+  <div class="fine">Fine-tune your budget <input id="fine" type="range" min="70" max="130" value="100" /> <span id="fineLabel">100%</span></div>
+  <div class="controls">
+    <label>Must include <input id="must" type="text" placeholder="optional, like 5070 or B550" /></label>
+  </div>
+  <div class="rowbtns">
+    <button class="dark" id="suggest" type="button">Suggest a Build</button>
+    <button class="dark" id="addBtn" type="button">Add Component</button>
+    <button class="ghost" id="clearParts" type="button">Clear Components</button>
+    <button class="ghost" id="copyBtn" type="button">Copy build link</button>
+  </div>
+  <p class="remain" id="remain">Remaining budget: $1,000.00</p>
+  <table>
+    <thead>
+      <tr><th>Component</th><th>Image</th><th>Product</th><th>Brand</th><th>Key specs</th><th>Qty</th><th>Price</th><th></th></tr>
+    </thead>
+    <tbody id="rows"></tbody>
+    <tfoot><tr><td class="total" id="total" colspan="8">Total: $0.00</td></tr></tfoot>
+  </table>
+  <div id="adder" hidden>
+    <label>Add <select id="addCat"></select></label>
+    <input id="addSearch" type="text" placeholder="Search" style="margin-left:8px" />
+    <div id="addList"></div>
+  </div>
+  <div id="zoom" hidden></div>
+  <div class="issues">
+    <h2>Compatibility issues</h2>
+    <ul id="issues"></ul>
+  </div>
+</div>
+<script>
+const CATS = ["cpu","motherboard","memory","gpu","storage","case","cooler","psu"];
+const NAMES = { cpu:"CPU", motherboard:"Motherboard", memory:"Memory", gpu:"Video card", storage:"Storage", case:"Case", cooler:"Cooler", psu:"Power supply" };
+const USES = {
+  Gaming: { gpu: 3, ram: 16, disk: "1TB" },
+  "Home Server": { gpu: 0, ram: 16, disk: "2TB" },
+  Office: { gpu: 0, ram: 16, disk: "1TB" },
+  School: { gpu: 0, ram: 16, disk: "1TB" },
+  "Video Editing": { gpu: 3, ram: 32, disk: "2TB" },
+  Streaming: { gpu: 2, ram: 16, disk: "2TB" }
+};
+const TOUR = [
+  "Gaming? Home Server? Or slowly realizing you just built a $1,000 Facebook machine.",
+  "Set your budget. Pick what the computer is for. Then press Suggest a Build. Press it again for a different mix.",
+  "Add Component if you want to choose a part yourself. The box at the bottom says what is still missing."
+];
+const money = new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" });
+let PARTS = [];
+let byId = {};
+let build = {};
+let budget = 1000;
+let gen = 0;
+let tourStep = 0;
+function junk(p) { return /open box|renewed|recertified|sodimm|surveillance|purple|laptop|\becc\b/i.test(p.name) || p.price < 12; }
+function brandOf(p) { return p.brand || (p.name.split(" ")[0] || ""); }
+function gbOf(p) { const m = p.name.toUpperCase().match(/\b(4|8|16|32|64)GB\b/); return m ? +m[1] : 0; }
+function wattOf(p) { if (!p) return 0; if (p.watt) return p.watt; const m = p.name.toUpperCase().match(/(\d{3,4})\s?W/); return m ? +m[1] : 0; }
+function gpuTier(p) {
+  const n = p.name.toUpperCase();
+  if (/5090|4090/.test(n)) return 6;
+  if (/5080|4080|5070\s?TI|9070\s?XT/.test(n)) return 5;
+  if (/\b5070\b|\b9070\b|4070/.test(n)) return 4;
+  if (/5060|7600|4060/.test(n)) return 3;
+  if (/3050|1650|6500/.test(n)) return 2;
+  if (/1030/.test(n)) return 1;
+  return 0;
+}
+function isAmd(p) { return p.socket === "AM4" || p.socket === "AM5" || /AMD|RYZEN/i.test(p.name); }
+function isIntel(p) { return /LGA/.test(p.socket || "") || /INTEL|CORE I/i.test(p.name); }
+function formOf(p) {
+  if (!p) return "";
+  if (p.form) return p.form;
+  const n = p.name.toUpperCase();
+  if (/MICRO|MATX|M-ATX/.test(n)) return "matx";
+  if (/ITX/.test(n)) return "itx";
+  if (/ATX/.test(n)) return "atx";
+  return "";
+}
+function fitsCase(box, board) {
+  const rank = { itx: 1, matx: 2, atx: 3, eatx: 4, full: 4 };
+  return (rank[formOf(box)] || 3) >= (rank[formOf(board)] || 2);
+}
+function specs(p) {
+  return [p.socket, p.ram, p.form && p.form.toUpperCase(), p.watt && (p.watt + "W"), (p.name.match(/\b\d+GB\b/i) || [])[0]].filter(Boolean).slice(0, 4).join(" · ");
+}
+function pool(cat, pred) {
+  return PARTS.filter((p) => p.cat === cat && !junk(p) && (!pred || pred(p))).sort((a, b) => a.price - b.price);
+}
+function choose(list, cap, rotate) {
+  if (!list.length) return null;
+  const under = list.filter((p) => p.price <= cap + 0.001);
+  const bag = (under.length ? under : [list[0]]).slice(0, 8);
+  return bag[(rotate || 0) % bag.length];
+}
+function effectiveBudget() {
+  return Math.max(0, Math.round(budget * (Number(document.getElementById("fine").value) / 100)));
+}
+function suggest() {
+  const use = USES[document.getElementById("use").value];
+  const brand = document.getElementById("brand").value;
+  const graphics = document.getElementById("graphics").value;
+  const cap = effectiveBudget();
+  const wantGpu = graphics === "integrated" ? 0 : Math.max(use.gpu, graphics === "dedicated" ? 2 : 0);
+  const out = {};
+  let cpus = pool("cpu", (p) => {
+    if (brand === "amd" && !isAmd(p)) return false;
+    if (brand === "intel" && !isIntel(p)) return false;
+    if (graphics === "integrated") return /GT|GRAPHICS|\bG\b|8500G|8600G/i.test(p.name);
+    return true;
+  });
+  if (wantGpu === 0) cpus = cpus.filter((p) => /GT|GRAPHICS|8500G|8600G/i.test(p.name)).concat(cpus);
+  const cpuCap = wantGpu ? cap * 0.22 : cap * 0.4;
+  out.cpu = choose(cpus, Math.max(180, cpuCap), gen) || choose(pool("cpu"), cap, gen);
+  if (!out.cpu) return;
+  const socket = out.cpu.socket;
+  const ramKind = socket === "AM5" || socket === "LGA1851" ? "DDR5" : (out.cpu.ram || (socket === "AM4" || socket === "LGA1700" ? "DDR4" : ""));
+  out.motherboard = choose(pool("motherboard", (p) => (!socket || p.socket === socket) && (!ramKind || !p.ram || p.ram === ramKind)), Math.max(120, cap * 0.16), gen);
+  const kind = (out.motherboard && out.motherboard.ram) || ramKind || "DDR4";
+  let gb = use.ram;
+  if (cap < 700) gb = 8;
+  else if (cap < 1200) gb = Math.min(gb, 16);
+  out.memory = choose(pool("memory", (p) => p.ram === kind && gbOf(p) === gb), Math.max(100, cap * 0.2), gen)
+    || choose(pool("memory", (p) => p.ram === kind && gbOf(p) >= 8), cap * 0.25, gen);
+  const disk = cap < 700 ? "512GB" : use.disk;
+  out.storage = choose(pool("storage", (p) => /SSD|NVME|M\.2/i.test(p.name) && !/HDD|HARD DRIVE/i.test(p.name) && p.name.toUpperCase().includes(disk)), cap * 0.12, gen)
+    || choose(pool("storage", (p) => /SSD|NVME/i.test(p.name)), cap * 0.12, gen);
+  out.case = choose(pool("case", (p) => fitsCase(p, out.motherboard)), cap * 0.1, gen) || choose(pool("case"), cap, gen);
+  if (wantGpu > 0 && graphics !== "integrated") {
+    const maxTier = cap >= 2200 && wantGpu >= 3 ? 4 : cap >= 1500 ? Math.max(wantGpu, 3) : cap >= 1000 ? 2 : 1;
+    out.gpu = choose(pool("gpu", (p) => { const t = gpuTier(p); return t >= 1 && t <= maxTier; }).sort((a, b) => gpuTier(b) - gpuTier(a) || a.price - b.price), cap * 0.42, gen);
+  }
+  const tier = out.gpu ? gpuTier(out.gpu) : 0;
+  const needW = tier >= 4 ? 750 : tier >= 3 ? 650 : tier >= 2 ? 550 : tier ? 450 : 400;
+  out.psu = choose(pool("psu", (p) => wattOf(p) >= needW), cap * 0.1, gen) || choose(pool("psu"), cap, gen);
+  if (!/cooler/i.test(out.cpu.name)) out.cooler = choose(pool("cooler"), 80, gen);
+  const must = document.getElementById("must").value.trim().toLowerCase();
+  if (must) {
+    const hit = PARTS.filter((p) => !junk(p) && p.name.toLowerCase().includes(must)).sort((a, b) => a.price - b.price)[0];
+    if (hit) out[hit.cat] = hit;
+  }
+  build = {};
+  Object.keys(out).forEach((id) => { if (out[id]) build[id] = out[id].id; });
+  gen += 1;
+  draw();
+}
+function partsNow() {
+  const map = {};
+  CATS.forEach((id) => { if (byId[build[id]]) map[id] = byId[build[id]]; });
+  return map;
+}
+function issues(parts) {
+  const list = [];
+  const graphics = document.getElementById("graphics").value;
+  if (!parts.cpu) list.push("A CPU is required");
+  if (!parts.motherboard) list.push("A motherboard is required");
+  if (!parts.memory) list.push("At least one RAM module is required");
+  if (!parts.case) list.push("A case is required");
+  if (!parts.psu) list.push("A power supply is required");
+  if (parts.cpu && parts.motherboard && parts.cpu.socket && parts.motherboard.socket && parts.cpu.socket !== parts.motherboard.socket) list.push("That processor does not fit this motherboard");
+  if (parts.memory && parts.motherboard && parts.memory.ram && parts.motherboard.ram && parts.memory.ram !== parts.motherboard.ram) list.push("That memory does not fit this motherboard");
+  if (parts.case && parts.motherboard && !fitsCase(parts.case, parts.motherboard)) list.push("That case is too small for this motherboard");
+  if (graphics === "dedicated" && !parts.gpu) list.push("A dedicated graphics card is required");
+  if (parts.gpu && parts.psu) {
+    const need = gpuTier(parts.gpu) >= 4 ? 750 : gpuTier(parts.gpu) >= 3 ? 650 : gpuTier(parts.gpu) >= 2 ? 550 : 450;
+    if (wattOf(parts.psu) && wattOf(parts.psu) < need) list.push("The power supply is too small for that graphics card");
+  }
+  return list;
+}
+function draw() {
+  const parts = partsNow();
+  const body = document.getElementById("rows");
+  body.replaceChildren();
+  let total = 0;
+  CATS.forEach((id) => {
+    const part = parts[id];
+    if (!part) return;
+    total += part.price;
+    const tr = document.createElement("tr");
+    const cells = [NAMES[id], "", part.name, brandOf(part), specs(part) || "—", "1", money.format(part.price), ""];
+    cells.forEach((text, index) => {
+      const td = document.createElement("td");
+      if (index === 1) {
+        const thumb = document.createElement("button");
+        thumb.type = "button";
+        thumb.className = "thumb";
+        thumb.textContent = brandOf(part).slice(0, 2).toUpperCase();
+        thumb.onclick = () => {
+          const zoom = document.getElementById("zoom");
+          zoom.hidden = false;
+          zoom.textContent = part.name + " — " + money.format(part.price) + (specs(part) ? " — " + specs(part) : "");
+        };
+        td.appendChild(thumb);
+      } else if (index === 7) {
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "ghost";
+        remove.textContent = "Remove";
+        remove.onclick = () => { delete build[id]; draw(); };
+        td.appendChild(remove);
+      } else td.textContent = text;
+      tr.appendChild(td);
+    });
+    body.appendChild(tr);
+  });
+  document.getElementById("total").textContent = "Total: " + money.format(total);
+  const left = effectiveBudget() - total;
+  document.getElementById("remain").textContent = "Remaining budget: " + money.format(left);
+  const box = document.getElementById("issues");
+  box.replaceChildren();
+  const found = issues(parts);
+  (found.length ? found : ["None. These parts can go in the same computer."]).forEach((line) => {
+    const li = document.createElement("li");
+    li.textContent = line;
+    box.appendChild(li);
+  });
+}
+function showTour() {
+  document.getElementById("tourText").textContent = TOUR[tourStep];
+}
+function fillAdder() {
+  const cat = document.getElementById("addCat").value;
+  const q = document.getElementById("addSearch").value.toLowerCase();
+  const list = document.getElementById("addList");
+  list.replaceChildren();
+  pool(cat).filter((p) => !q || p.name.toLowerCase().includes(q)).slice(0, 30).forEach((part) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "pick";
+    button.textContent = part.name + "  " + money.format(part.price);
+    button.onclick = () => { build[part.cat] = part.id; document.getElementById("adder").hidden = true; draw(); };
+    list.appendChild(button);
+  });
+}
+function start() {
+  document.getElementById("lock").hidden = true;
+  const cat = document.getElementById("addCat");
+  CATS.forEach((id) => { const o = document.createElement("option"); o.value = id; o.textContent = NAMES[id]; cat.appendChild(o); });
+  fetch("parts.json").then((res) => res.json()).then((data) => {
+    PARTS = data;
+    data.forEach((p) => { byId[p.id] = p; });
+    const hash = location.hash.replace("#", "");
+    if (hash) hash.split(",").forEach((id) => { if (byId[id]) build[byId[id].cat] = id; });
+    draw();
+  });
+  if (sessionStorage.getItem("dream-tour") === "1") document.getElementById("tour").hidden = true;
+  else showTour();
+}
+document.getElementById("setBudget").onclick = () => { budget = Math.max(0, Math.min(20000, Number(document.getElementById("budget").value) || 0)); draw(); };
+document.getElementById("clearBudget").onclick = () => { budget = 0; document.getElementById("budget").value = 0; draw(); };
+document.getElementById("fine").oninput = () => { document.getElementById("fineLabel").textContent = document.getElementById("fine").value + "%"; draw(); };
+document.getElementById("suggest").onclick = () => { if (PARTS.length) suggest(); };
+document.getElementById("clearParts").onclick = () => { build = {}; gen = 0; draw(); };
+document.getElementById("addBtn").onclick = () => { const box = document.getElementById("adder"); box.hidden = !box.hidden; if (!box.hidden) fillAdder(); };
+document.getElementById("addCat").onchange = fillAdder;
+document.getElementById("addSearch").oninput = fillAdder;
+document.getElementById("copyBtn").onclick = () => {
+  const link = location.href.split("#")[0] + "#" + CATS.map((id) => build[id]).filter(Boolean).join(",");
+  if (navigator.clipboard) navigator.clipboard.writeText(link);
+  document.getElementById("copyBtn").textContent = "Copied";
+};
+document.getElementById("tourBack").onclick = () => { tourStep = Math.max(0, tourStep - 1); showTour(); };
+document.getElementById("tourNext").onclick = () => { tourStep += 1; if (tourStep >= TOUR.length) { document.getElementById("tour").hidden = true; sessionStorage.setItem("dream-tour", "1"); } else showTour(); };
+document.getElementById("tourSkip").onclick = () => { document.getElementById("tour").hidden = true; sessionStorage.setItem("dream-tour", "1"); };
+document.getElementById("lockForm").onsubmit = (event) => {
+  event.preventDefault();
+  if (document.getElementById("lockPass").value === "Password2") {
+    sessionStorage.setItem("drew-dream", "1");
+    start();
+  } else document.getElementById("lockBad").textContent = "Wrong password";
+};
+if (sessionStorage.getItem("drew-dream") === "1") start();
+</script>
+</body>
+</html>

@@ -166,7 +166,7 @@
 <div id="shop">
   <div id="shopBar">
     <button id="shopClose" type="button">Close</button>
-    <span>Build a computer</span>
+    <span id="shopTitle">Build a computer</span>
   </div>
   <iframe id="shopFrame" title="Build a computer"></iframe>
 </div>
@@ -196,11 +196,13 @@
   var shop = document.getElementById("shop");
   var shopClose = document.getElementById("shopClose");
 
-  function openShop() {
-    try { sessionStorage.setItem("drew-bench", "1"); } catch (err) {}
+  function openShop(which) {
     shop.classList.add("open");
     var frame = document.getElementById("shopFrame");
-    if (!frame.getAttribute("src")) frame.src = "bench/";
+    var src = which === "dream" ? "bench/dream.html" : "bench/";
+    var title = document.getElementById("shopTitle");
+    if (title) title.textContent = which === "dream" ? "Dream builder" : "Build a computer";
+    if (frame.getAttribute("src") !== src) frame.src = src;
   }
 
   var W = 0, H = 0, cols = 0, rows = 0, cellW = 0, cellH = 0, scale = 2, buf, data;
@@ -1762,9 +1764,6 @@ const E=[
   pigBtn.addEventListener("click", function () { setPack("pig"); });
   elephantBtn.addEventListener("click", function () { setPack("elephant"); });
   pcBtn.addEventListener("click", function () {
-    try {
-      if (sessionStorage.getItem("drew-bench") === "1") { openShop(); return; }
-    } catch (err) {}
     gateMsg.textContent = "";
     gatePass.value = "";
     gate.classList.add("open");
@@ -1776,8 +1775,13 @@ const E=[
   gateForm.addEventListener("submit", function (e) {
     e.preventDefault();
     if (gatePass.value === "Password1") {
+      try { sessionStorage.setItem("drew-bench", "1"); } catch (err) {}
       gate.classList.remove("open");
-      openShop();
+      openShop("store");
+    } else if (gatePass.value === "Password2") {
+      try { sessionStorage.setItem("drew-dream", "1"); } catch (err) {}
+      gate.classList.remove("open");
+      openShop("dream");
     } else {
       gateMsg.textContent = "Wrong password";
       gatePass.select();
