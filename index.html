@@ -1481,11 +1481,26 @@ const E=[
     framePurple = (frameS > 0.5 ? frameB[3] : frameA[3]) === "purple";
     frameRain = (frameS > 0.5 ? frameB[3] : frameA[3]) === "rain";
   }
+  function sceneXY(col, row) {
+    var nx = (col + 0.5) / cols * 2 - 1;
+    var ny = (row + 0.5) / rows * 2 - 1;
+    if (isPhone() && H > W) {
+      var x = nx;
+      var y = ny * (H / Math.max(1, W)) * 0.85;
+      var band = 1.15;
+      var u = y / band;
+      var cell = Math.floor(u);
+      var f = u - cell;
+      if (((cell % 2) + 2) % 2) f = 1 - f;
+      y = (f * 2 - 1) * band;
+      return [x, y];
+    }
+    return [nx * (W / Math.max(1, H)), ny];
+  }
   function sample(col, row, t) {
     prepare(t);
-    var aspect = W / Math.max(1, H);
-    var x = ((col + 0.5) / cols * 2 - 1) * aspect;
-    var y = ((row + 0.5) / rows) * 2 - 1;
+    var xy = sceneXY(col, row);
+    var x = xy[0], y = xy[1];
     var tt = frameT;
     var ix = arguments[3] || 0;
     var a = frameA[2](x, y, tt, ix, row);
@@ -2169,14 +2184,13 @@ const E=[
   }
   function paintIntro(age) {
     data.fill(0);
-    var aspect = W / Math.max(1, H);
     var originX = ((W - cols * cellW) * 0.5) | 0;
     var originY = ((H - rows * cellH) * 0.5) | 0;
     var ramp = " .oO0#@%";
     for (var row = 0; row < rows; row++) {
       for (var col = 0; col < cols; col++) {
-        var x = ((col + 0.5) / cols * 2 - 1) * aspect;
-        var y = ((row + 0.5) / rows) * 2 - 1;
+        var xy = sceneXY(col, row);
+        var x = xy[0], y = xy[1];
         var v = ouroAt(x, y, age);
         var ii = Math.max(0, Math.min(ramp.length - 1, (v * (ramp.length - 1)) | 0));
         var ch = ramp.charAt(ii);
