@@ -31,7 +31,11 @@
   .mark.no { color:var(--orange); }
   select, input[type="number"], input[type="search"] { width:100%; max-width:520px; display:block; margin:6px 0; }
   .cart { position:sticky; top:72px; }
-  body.phone .eat { display:flex; gap:10px; align-items:center; background:#fff; border:1px solid #e4e4e4; border-radius:16px; padding:12px; margin:8px 0; }
+  body.phone .eat { display:flex; gap:10px; align-items:center; background:#fff; border:1px solid #e4e4e4; border-radius:16px; padding:12px; margin:8px 0; flex-wrap:wrap; }
+  .eat { display:flex; gap:10px; align-items:center; background:#fff; border:1px solid #e4e4e4; border-radius:16px; padding:12px; margin:8px 0; flex-wrap:wrap; }
+  .eat-mid { flex:1; min-width:0; }
+  .eat-mid .muted { display:block; }
+  canvas.grow { width:100%; height:64px; border-radius:10px; display:block; flex:1 0 100%; margin-top:6px; }
   body.phone .eat-ico { width:52px; height:52px; border-radius:14px; background:#f3f0ea; display:grid; place-items:center; font-size:26px; flex:none; }
   body.phone .eat-mid { flex:1; min-width:0; }
   body.phone .eat-mid .muted { display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -60,6 +64,7 @@
   <button type="button" id="deskBtn" type="button" aria-label="Desktop layout">🖥️</button>
 </nav>
 <main class="wrap" id="app"></main>
+<script src="qr.js"></script>
 <script>
 const CATS = ["cpu","motherboard","memory","gpu","storage","case","cooler","psu"];
 const LABEL = { cpu:"Processor", motherboard:"Motherboard", memory:"Memory", gpu:"Graphics card", storage:"Storage", case:"Case", cooler:"Cooler", psu:"Power supply" };
@@ -125,10 +130,34 @@ function boxBudget(variant){ let n=+state.budget||0; if(state.accessories) n=Mat
 function fanInfo(part){
   if(!part) return null;
   const n=part.name;
-  const m=n.match(/(\d+)\s*x\s*(?:pre-installed|ARGB|PWM|120mm)?[^.]{0,24}fan/i)||n.match(/(\d+)\s*fans?\s*included/i)||n.match(/with\s+(\d+)\s*fans?/i)||n.match(/(\d+)\s*fans?\b/i)||n.match(/(\d+)F\b/);
-  const form=formOf(part)||"atx";
-  const slots=form==="itx"?3:form==="matx"?4:form==="full"?7:6;
-  return { included:m?+m[1]:0, known:!!m, slots, form };
+  const manual=[
+    { test:/pop xl air rgb/i, included:4, slots:6, source:"Fractal's Pop XL Air RGB page: 3 front fans and 1 rear fan in the box. Mounts are 3 front, 2 top, and 1 rear." },
+    { test:/pop 2 air/i, included:3, slots:7, source:"Fractal's Pop 2 Air page: 3 front fans in the box. Mounts are 3 front, 3 top, and 1 rear." },
+    { test:/pop air/i, included:3, slots:5, source:"Fractal's Pop Air page: 2 front fans and 1 rear fan in the box. Mounts are 2 front, 2 top, and 1 rear." },
+    { test:/north momentum/i, included:3, slots:6, source:"Fractal's North Momentum page: 3 front fans in the box. Mounts are 3 front, 2 top, and 1 rear. North XL is a different case." },
+    { test:/north(?! xl)/i, included:2, slots:8, source:"Fractal's North page: 2 front fans in the box. Mounts are 3 front, 2 top, 2 side, and 1 rear." },
+    { test:/icue 4000d rgb/i, included:3, slots:8, source:"Corsair's iCUE 4000D RGB Airflow page: 3 fans in the box, and up to 8 spots for 120 mm fans. This is not the FRAME 4000D." },
+    { test:/4000d airflow/i, included:2, slots:6, source:"Corsair's 4000D Airflow page: 2 fans in the box. Mounts are 3 front, 2 top, and 1 rear. This is not the FRAME 4000D." },
+    { test:/lancool 216(?!\s*x)/i, included:3, slots:10, source:"Lian Li's Lancool 216 page: 2 front fans and 1 rear fan in the box, and a maximum of 10 fan spots." },
+    { test:/cc-h51f[wb]-01/i, included:2, slots:6, source:"NZXT's H5 (2023) FAQ for model CC-H51F: 2 fans in the box. Mounts are 2 front, 2 top, 1 bottom, and 1 rear. A different H5 year is not counted." }
+  ].find(row=>row.test.test(n));
+  if(manual) return { included:manual.included, slots:manual.slots, known:true, source:manual.source };
+  let included=null;
+  const rules=[
+    /(\d+)\s*x\s*[^,]{0,30}fans?\s*included/i,
+    /(\d+)\s*fans?\s*included/i,
+    /(\d+)\s*x\s*pre-installed/i,
+    /(\d+)\s*pre-installed/i,
+    /with\s+(\d+)\s*fans?/i,
+    /(\d+)\s*[*x×]\s*.{0,40}?fans?\b/i,
+    /(\d+)\s*fans?\b/i,
+    /(\d+)F\b/
+  ];
+  for(const rule of rules){
+    const m=n.match(rule);
+    if(m){ included=+m[1]; break; }
+  }
+  return { included, slots:null, known:included!=null, source: included!=null ? "The product name states this fan count. It does not state how many spots the case has, so that number is not guessed." : "This listing does not include the fan page from the manual. No fan total is shown." };
 }
 function plan(variant){
   const cap=boxBudget(variant), want=gpuTarget(), out={}, why={};
@@ -272,7 +301,7 @@ function cart(parts){
     const st=part?statusFor(id, flags):"warn";
     const row=el("div",{class:"card "+(st==="bad"?"nope":"fit")});
     const mark=st==="bad"?"✕ Does not fit":st==="warn"?"▲ Check":"✓ Fits";
-    row.append(el("b",{text:LABEL[id]}), el("div",{class:"mark "+(st==="bad"?"no":"yes"), text:mark}), el("p",{text:part?part.name:"Model unknown"}));
+    row.append(growBar(parts), el("b",{text:LABEL[id]}), el("div",{class:"mark "+(st==="bad"?"no":"yes"), text:mark}), el("p",{text:part?part.name:"Model unknown"}));
     if(part) row.append(el("p",{class:"price", text:money.format(part.price)}));
     const why=(flags.filter(f=>f.cat===id).map(f=>f.text).join(" "))||state.why[id]||"";
     if(why) row.append(el("p",{class:"muted", text:why}));
@@ -284,7 +313,8 @@ function cart(parts){
   box.append(el("p",{class:"price", text:"List total "+money.format(totalOf(parts))}), el("p",{class:"muted", text:"Budget set aside "+money.format(boxBudget(0))}));
   const tools=el("div",{class:"row"});
   tools.append(
-    el("button",{class:"primary", type:"button", text:"Print paper list", onclick:printReceipt}),
+    el("button",{class:"primary", type:"button", text:"Scanner code", onclick:()=>{ state.view="checkout"; render(); }}),
+    el("button",{type:"button", text:"Print paper list", onclick:printReceipt}),
     el("button",{type:"button", text:"Undo", onclick:undo}),
     el("button",{type:"button", text:"Clear all", onclick:()=>{ pushHist(); state.build={}; state.fans=null; render(); }})
   );
@@ -294,13 +324,22 @@ function cart(parts){
 function fanBlock(casePart){
   if(!casePart) return null;
   const info=fanInfo(casePart);
-  const have=state.fans==null?info.included:state.fans;
-  const wrap=el("div",{class:"card "+(have>info.slots?"nope":"fit")});
-  wrap.append(el("b",{text:"Case fans "+have+"/"+info.slots}));
-  wrap.append(el("p",{class:"muted", text:info.known?"The case name lists "+info.included+" fan"+(info.included===1?"":"s")+" in the box. Spot count is a typical number for a "+info.form.toUpperCase()+" case, not a measured factory diagram.":"The case name does not say how many fans are in the box, so the count starts at 0. The "+info.slots+" spots are typical for this size, not a factory number."}));
-  if(have>info.slots) wrap.append(el("p",{text:"You have "+have+" fans and this case has about "+info.slots+" spots. "+(have-info.slots)+" "+(have-info.slots===1?"is":"are")+" extra."}));
-  else if(have<info.slots) wrap.append(el("p",{text:"You can still add "+(info.slots-have)+" fan"+(info.slots-have===1?"":"s")+"."}));
-  else wrap.append(el("p",{text:"Fan count matches the spots."}));
+  const have=state.fans==null?(info.included==null?0:info.included):state.fans;
+  const wrap=el("div",{class:"card "+(info.slots!=null&&have>info.slots?"nope":"fit")});
+  if(info.slots!=null){
+    wrap.append(el("b",{text:"Case fans "+have+"/"+info.slots}));
+    wrap.append(el("p",{class:"muted", text:info.source}));
+    if(have>info.slots) wrap.append(el("p",{text:"You have "+have+" fans and this case has "+info.slots+" spots. "+(have-info.slots)+" extra."}));
+    else if(have<info.slots) wrap.append(el("p",{text:"You can still add "+(info.slots-have)+" fan"+(info.slots-have===1?"":"s")+"."}));
+    else wrap.append(el("p",{text:"Fan count matches the spots in the manual."}));
+  } else if(info.included!=null){
+    wrap.append(el("b",{text:"Fans in the box: "+info.included}));
+    wrap.append(el("p",{class:"muted", text:info.source}));
+    if(state.fans!=null && state.fans>info.included) wrap.append(el("p",{text:"You listed "+state.fans+" fans. The listing does not say whether the extras fit. Check the case manual."}));
+  } else {
+    wrap.append(el("b",{text:"Fans: not in the manual we have"}));
+    wrap.append(el("p",{text:info.source}));
+  }
   const input=el("input",{type:"number", min:"0", max:"12", value:String(have), "aria-label":"How many fans you will install"});
   input.onchange=()=>{ state.fans=Math.max(0, Math.min(12, +input.value||0)); render(); };
   wrap.append(el("label",{text:"Fans you will install"}), input);
@@ -318,23 +357,45 @@ function undo(){
   state.build=prev.build||prev; state.fans=prev.fans==null?state.fans:prev.fans;
   render();
 }
+function paperCode(parts){
+  const lines=["DREW PAPER BUILD","NOT A SALE"];
+  CATS.forEach(id=>{
+    if(!parts[id]) return;
+    lines.push(LABEL[id]+": "+parts[id].name.slice(0,40)+" $"+Number(parts[id].price).toFixed(2));
+  });
+  lines.push("TOTAL $"+totalOf(parts).toFixed(2));
+  const info=parts.case?fanInfo(parts.case):null;
+  if(info&&info.slots!=null){
+    const have=state.fans==null?info.included:state.fans;
+    lines.push("FANS "+have+"/"+info.slots);
+  } else if(info&&info.included!=null) lines.push("FANS IN BOX "+info.included);
+  else if(parts.case) lines.push("FANS unknown");
+  let text=lines.join("\n");
+  if(text.length>500) text=lines.map(line=>line.slice(0,48)).join("\n").slice(0,500);
+  return text;
+}
+function qrCanvas(text){
+  const canvas=document.createElement("canvas");
+  if(window.drewQR) window.drewQR.draw(canvas, text, 4);
+  return canvas;
+}
 function printReceipt(){
   const parts=selected();
   const flags=checks(parts);
   const info=parts.case?fanInfo(parts.case):null;
-  const have=info?(state.fans==null?info.included:state.fans):0;
+  const have=info?(state.fans==null?(info.included||0):state.fans):0;
   const rows=CATS.filter(id=>parts[id]).map(id=>{
     const st=statusFor(id, flags);
     const word=st==="bad"?"DOES NOT FIT":st==="warn"?"CHECK":"FITS";
     return LABEL[id].padEnd(16)+" "+word+"\n  "+parts[id].name+"\n  "+money.format(parts[id].price);
   }).join("\n\n");
-  const fanLine=info?("\nFANS "+have+"/"+info.slots+(have>info.slots?"\n"+ (have-info.slots)+" extra fan(s). This case does not have a spot for all of them.":"")+(info.known?"":"\nIncluded fans were not written on the case name.")):"";
+  const fanLine=!info?"":(info.slots!=null?("\nFANS "+have+"/"+info.slots+(have>info.slots?"\n"+(have-info.slots)+" extra.":"")):(info.included!=null?"\nFANS IN BOX "+info.included+"\nSpot count is not in the listing.":"\nFANS: not in the listing."));
   const problems=flags.map(f=>(f.level==="bad"?"X ":"? ")+f.text).join("\n");
   const text=[
     "PAPER BUILD",
     "NOT A SALE. NOT A RECEIPT.",
     "Nothing was purchased.",
-    "Take this list to a store.",
+    "Scan the code. It is the same list.",
     "",
     state.game?("Game: "+state.game+" / "+state.level):("Job: "+state.job),
     state.note||"",
@@ -348,9 +409,12 @@ function printReceipt(){
     "CHECKS",
     problems||"None stored."
   ].join("\n");
+  const code=qrCanvas(paperCode(parts));
+  const img=code.toDataURL("image/png");
+  const safe=escHtml(text);
   const doc=document.getElementById("printFrame").contentDocument;
   doc.open();
-  doc.write("<!DOCTYPE html><html><head><title>Paper build</title><style>body{font:14px/1.35 ui-monospace,Menlo,monospace;margin:18px;color:#000;background:#fff} h1{font-size:18px} pre{white-space:pre-wrap}</style></head><body><h1>Paper build</h1><pre>"+text.replace(/[&<>]/g, c=>({"&":"&","<":"<",">":">"}[c]))+"</pre></body></html>");
+  doc.write("<!DOCTYPE html><html><head><title>Paper build</title><style>body{font:14px/1.35 ui-monospace,Menlo,monospace;margin:18px;color:#000;background:#fff} h1{font-size:18px} img{width:220px;height:220px} pre{white-space:pre-wrap}</style></head><body><h1>Paper build</h1><img alt='Build code' src='"+img+"'><pre>"+safe+"</pre></body></html>");
   doc.close();
   document.getElementById("printFrame").contentWindow.focus();
   document.getElementById("printFrame").contentWindow.print();
@@ -399,6 +463,58 @@ function viewDash(app){
   layout.append(main, cart(parts));
   app.appendChild(layout);
 }
+function escHtml(s){
+  return String(s).replace(/[&<>]/g, function(c){
+    if(c==="&") return "&";
+    if(c==="<") return "<";
+    return ">";
+  });
+}
+function paintBuild(g, w, h, p, parts){
+  g.fillStyle="#10280a";
+  g.fillRect(0,0,w,h);
+  const fw=Math.max(8,(w-4)*Math.min(1,p));
+  g.fillStyle="#3ddc4a";
+  g.fillRect(2,2,fw,h-4);
+  g.save();
+  g.beginPath();
+  g.rect(2,2,fw,h-4);
+  g.clip();
+  g.fillStyle="#041404";
+  const size=Math.max(10, Math.min(15, Math.floor(h/8.4)));
+  g.font=size+"px ui-monospace, Menlo, monospace";
+  g.textBaseline="top";
+  function bit(id, at, yes, no){ return (p>=at && parts && parts[id]) ? yes : no; }
+  const lines=[
+    ".----------------.",
+    "| CASE "+bit("case",0.12,"[#]","[ ]")+"       |",
+    "| CPU  "+bit("cpu",0.26,"####","    ")+"      |",
+    "| RAM  "+bit("memory",0.40,"||||","    ")+"      |",
+    "| SSD  "+bit("storage",0.52,"==>","   ")+"       |",
+    "| GPU  "+bit("gpu",0.66,"====>","     ")+"     |",
+    "| PSU  "+bit("psu",0.82,"####","    ")+"      |",
+    "'----------------'"
+  ];
+  lines.forEach((line,i)=>g.fillText(line, 6, 4+i*(size+1)));
+  g.restore();
+}
+function liveBar(parts, w, h){
+  const canvas=document.createElement("canvas");
+  canvas.width=w; canvas.height=h; canvas.className="grow";
+  canvas.setAttribute("aria-hidden","true");
+  const g=canvas.getContext("2d");
+  const reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const start=performance.now();
+  function frame(now){
+    if(!canvas.isConnected) return;
+    paintBuild(g, w, h, reduce?1:((now-start)%2800)/2800, parts);
+    if(!reduce) requestAnimationFrame(frame);
+  }
+  frame(start);
+  return canvas;
+}
+function growBar(parts){ return liveBar(parts, 320, 78); }
+function towerBar(parts){ return liveBar(parts, 420, 150); }
 function viewPhone(app, parts){
   const flags=checks(parts);
   app.append(el("h1",{text:"Your list"}), el("p",{class:"muted", text:"Tap a part to change it. This is not an order."}));
@@ -409,7 +525,7 @@ function viewPhone(app, parts){
     const word=st==="bad"?"✕ Does not fit":st==="warn"?"▲ Check":"✓ Fits";
     const row=el("div",{class:"eat"});
     row.append(
-      el("div",{class:"eat-ico", text:({cpu:"Cpu",motherboard:"Board",memory:"Ram",gpu:"Gpu",storage:"Ssd",case:"Case",cooler:"Fan",psu:"Psu"})[id]}),
+      growBar(parts),
       el("div",{class:"eat-mid"}, [el("b",{text:LABEL[id]}), el("span",{class:"muted", text:part.name}), el("span",{class:"muted", text:word})]),
       el("div",{}, [el("div",{class:"price", text:money.format(part.price)}), el("button",{class:"x", type:"button", text:"✕", "aria-label":"Remove "+LABEL[id], onclick:(e)=>{ e.stopPropagation(); pushHist(); delete state.build[id]; render(); }})])
     );
@@ -419,13 +535,19 @@ function viewPhone(app, parts){
   const fans=fanBlock(parts.case);
   if(fans) app.appendChild(fans);
   const bar=el("div",{class:"eat-bar"});
-  bar.append(el("div",{}, [el("div",{class:"muted", text:"Paper total"}), el("b",{class:"price", text:money.format(totalOf(parts))})]), el("button",{class:"primary", type:"button", text:"Review", onclick:()=>{ state.view="checkout"; render(); }}));
+  bar.append(el("div",{}, [el("div",{class:"muted", text:"Paper total"}), el("b",{class:"price", text:money.format(totalOf(parts))})]), el("button",{class:"primary", type:"button", text:"Scanner code", onclick:()=>{ state.view="checkout"; render(); }}));
   app.appendChild(bar);
 }
 function viewCheckout(app){
   const parts=selected();
   const flags=checks(parts);
-  app.append(el("div",{class:"order-head"}, [el("h1",{text:"Review"}), el("p",{text:"Not a delivery. Nothing is charged. Print this and take it to a store."})]));
+  app.append(el("div",{class:"order-head"}, [el("h1",{text:"Scanner code"}), el("p",{text:"Not a payment. Nothing is charged. Print this and a scanner can read the parts list off the paper."})]));
+  app.appendChild(towerBar(parts));
+  const code=qrCanvas(paperCode(parts));
+  code.style.width="180px";
+  code.style.height="180px";
+  code.setAttribute("aria-label", "Scanner code for this paper build");
+  app.append(el("p",{class:"muted", text:"Scan this at the counter. It is the parts list, not a payment."}), code);
   CATS.forEach(id=>{
     if(!parts[id]) return;
     const st=statusFor(id, flags);
@@ -435,13 +557,14 @@ function viewCheckout(app){
     ]));
   });
   const info=parts.case?fanInfo(parts.case):null;
-  if(info){
+  if(info&&info.slots!=null){
     const have=state.fans==null?info.included:state.fans;
     app.append(el("p",{text:"Fans "+have+"/"+info.slots+(have>info.slots?" · "+(have-info.slots)+" extra":"")}));
-  }
+  } else if(info&&info.included!=null) app.append(el("p",{text:"Fans in the box: "+info.included+". Spot count is not in the listing."}));
+  else if(info) app.append(el("p",{text:"Fan count is not in this listing. Nothing was guessed."}));
   app.append(el("p",{class:"muted", text:"Subtotal "+money.format(totalOf(parts))+". Tax and shipping are added by the store, not here."}));
   const bar=el("div",{class:"order-bar"});
-  bar.append(el("button",{type:"button", text:"Back", onclick:()=>{ state.view="dash"; render(); }}), el("button",{class:"primary", type:"button", text:"Print list", onclick:printReceipt}));
+  bar.append(el("button",{type:"button", text:"Back", onclick:()=>{ state.view="dash"; render(); }}), el("button",{class:"primary", type:"button", text:"Print scanner code", onclick:printReceipt}));
   app.appendChild(bar);
 }
 function viewExplore(app){
@@ -496,9 +619,13 @@ function viewAsm(app){
 function fanLine(casePart){
   if(!casePart) return "Pick a case before counting fans.";
   const info=fanInfo(casePart);
-  const have=state.fans==null?info.included:state.fans;
-  if(have>info.slots) return "You listed "+have+" fans and this case has about "+info.slots+" spots. Leave the extra fans out.";
-  return "Fan spots: "+have+" of about "+info.slots+". Mount only the fans that have a real spot.";
+  const have=state.fans==null?(info.included||0):state.fans;
+  if(info.slots!=null){
+    if(have>info.slots) return "You listed "+have+" fans and the manual has "+info.slots+" spots. Leave the extra fans out.";
+    return "Fan spots from the manual: "+have+" of "+info.slots+".";
+  }
+  if(info.included!=null) return "The listing says "+info.included+" fan"+(info.included===1?"":"s")+" come in the box. It does not say how many spots, so that is not guessed.";
+  return "This case listing does not include the fan page. No number is guessed.";
 }
 document.querySelectorAll("[data-go]").forEach(btn=> btn.onclick=()=>{ state.view=btn.getAttribute("data-go"); render(); });
 document.getElementById("phoneBtn").onclick=()=> setLayout("phone");
