@@ -117,7 +117,17 @@
     border: 0; background: #d6ff4a; color: #111; font: inherit; cursor: pointer;
   }
 
-  #shopFrame { flex: 1; width: 100%; border: 0; background: transparent; min-height: 0; }
+  #sky {
+    position: fixed; inset: 0; z-index: 3; pointer-events: none; overflow: hidden;
+  }
+  #sky span {
+    position: absolute; left: 0; top: 0;
+    font: 800 clamp(28px, 7vw, 72px) Impact, "Arial Black", sans-serif;
+    letter-spacing: 0.02em; white-space: nowrap;
+    text-shadow: 0 0 12px #000, 0 0 18px currentColor;
+    will-change: transform;
+  }
+  body.building #sky { visibility: hidden; }
   #blockBtn {
     min-width: 44px; min-height: 44px; border: 0; border-radius: 999px;
     background: #ffffff18; color: #fff; font-size: 20px; cursor: pointer;
@@ -148,6 +158,7 @@
 <canvas id="field"></canvas>
 <div id="veil"></div>
 <div id="logo" aria-hidden="true"><canvas id="ink"></canvas></div>
+<div id="sky" hidden></div>
 <div id="dock">
   <button id="blockBtn" type="button" aria-label="Hide DREW.WTF">&#128683;</button>
   <button id="clockBtn" type="button" aria-label="Show the time">&#128336;</button>
@@ -199,11 +210,10 @@
   var blockBtn = document.getElementById("blockBtn");
   var clockBtn = document.getElementById("clockBtn");
   var sunBtn = document.getElementById("sunBtn");
-  var nameEl = document.getElementById("name");
   var logoOff = false;
   var faceMode = 0;
   var skyOn = false;
-  var skyText = "";
+  var skyParts = null;
   var skyBusy = false;
   var pcBtn = document.getElementById("pcBtn");
   var gate = document.getElementById("gate");
@@ -1761,7 +1771,6 @@ const E=[
     return h12 + ":" + mm + (h < 12 ? " AM" : " PM");
   }
   function setSceneLabel(label, mark) {
-    if (skyOn) return;
     if (nameTitle.textContent !== label) nameTitle.textContent = label;
     if (mark && nameMark.textContent !== mark) nameMark.textContent = mark;
   }
@@ -1779,17 +1788,57 @@ const E=[
     if (code >= 95) return "Thunderstorm";
     return "Weather";
   }
-  function paintSky(text) {
+  var sky = document.getElementById("sky");
+  var skyBits = [];
+  function launchSky(parts) {
     skyOn = true;
-    nameMark.textContent = "\u2600\uFE0F";
-    nameTitle.textContent = text;
-    nameEl.classList.add("wide");
     sunBtn.classList.add("on");
     sunBtn.setAttribute("aria-label", "Hide the weather");
+    sky.hidden = false;
+    sky.innerHTML = "";
+    skyBits = [];
+    for (var i = 0; i < parts.length; i++) {
+      var el = document.createElement("span");
+      el.textContent = parts[i];
+      el.style.color = "hsl(" + ((38 + i * 52) % 360) + " 100% 70%)";
+      sky.appendChild(el);
+      var dir = Math.random() * Math.PI * 2;
+      var mag = 80 + Math.random() * 90;
+      skyBits.push({ el: el, x: 8, y: 8 + i * 36, vx: Math.cos(dir) * mag, vy: Math.sin(dir) * mag });
+    }
+    var vw = window.innerWidth, vh = window.innerHeight;
+    for (var j = 0; j < skyBits.length; j++) {
+      var b = skyBits[j];
+      b.w = b.el.offsetWidth;
+      b.h = b.el.offsetHeight;
+      b.x = Math.random() * Math.max(1, vw - b.w);
+      b.y = Math.random() * Math.max(1, vh - b.h);
+      if (Math.abs(b.vx) < 50) b.vx = b.vx < 0 ? -80 : 80;
+      if (Math.abs(b.vy) < 40) b.vy = b.vy < 0 ? -70 : 70;
+    }
+  }
+  function stepSky(dt) {
+    if (!skyOn) return;
+    var vw = window.innerWidth, vh = window.innerHeight;
+    for (var i = 0; i < skyBits.length; i++) {
+      var b = skyBits[i];
+      b.w = b.el.offsetWidth || b.w;
+      b.h = b.el.offsetHeight || b.h;
+      b.x += b.vx * dt;
+      b.y += b.vy * dt;
+      if (b.x <= 0) { b.x = 0; if (b.vx < 0) b.vx = -b.vx; }
+      if (b.y <= 0) { b.y = 0; if (b.vy < 0) b.vy = -b.vy; }
+      if (b.x + b.w >= vw) { b.x = Math.max(0, vw - b.w); if (b.vx > 0) b.vx = -b.vx; }
+      if (b.y + b.h >= vh) { b.y = Math.max(0, vh - b.h); if (b.vy > 0) b.vy = -b.vy; }
+      var wobble = 1 + Math.sin(clock * 1.7 + i) * 0.05;
+      b.el.style.transform = "translate3d(" + b.x.toFixed(1) + "px," + b.y.toFixed(1) + "px,0) scale(" + wobble.toFixed(3) + ")";
+    }
   }
   function hideSky() {
     skyOn = false;
-    nameEl.classList.remove("wide");
+    skyBits = [];
+    sky.innerHTML = "";
+    sky.hidden = true;
     sunBtn.classList.remove("on");
     sunBtn.setAttribute("aria-label", "Mississauga weather");
   }
@@ -1807,22 +1856,22 @@ const E=[
   });
   sunBtn.addEventListener("click", function () {
     if (skyOn) { hideSky(); return; }
-    if (skyText) { paintSky(skyText); return; }
+    if (skyParts) { launchSky(skyParts); return; }
     if (skyBusy) return;
     skyBusy = true;
-    paintSky("Mississauga\u2026");
+    launchSky(["Mississauga\u2026"]);
     fetch("https://api.open-meteo.com/v1/forecast?latitude=43.589&longitude=-79.644&current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=America%2FToronto&forecast_days=1")
       .then(function (r) { if (!r.ok) throw new Error("bad"); return r.json(); })
       .then(function (data) {
         var now = Math.round(data.current.temperature_2m);
         var hi = Math.round(data.daily.temperature_2m_max[0]);
         var lo = Math.round(data.daily.temperature_2m_min[0]);
-        skyText = "Mississauga " + now + "\u00B0C \u00B7 " + skyWord(data.daily.weather_code[0]) + " \u00B7 high " + hi + "\u00B0 low " + lo + "\u00B0";
-        if (skyOn) paintSky(skyText);
+        skyParts = ["Mississauga", now + "\u00B0C", skyWord(data.daily.weather_code[0]), "High " + hi + "\u00B0", "Low " + lo + "\u00B0"];
+        if (skyOn) launchSky(skyParts);
       })
       .catch(function () {
-        skyText = "";
-        if (skyOn) nameTitle.textContent = "Weather didn't load";
+        skyParts = null;
+        if (skyOn) launchSky(["Weather didn't load"]);
       })
       .then(function () { skyBusy = false; });
   });
@@ -2118,6 +2167,7 @@ const E=[
         }
       }
     }
+    stepSky(dt);
     raf = requestAnimationFrame(frame);
   }
   if (window.visualViewport) window.visualViewport.addEventListener("resize", function () { resize(); });
