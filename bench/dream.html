@@ -94,7 +94,7 @@
     <button class="ghost" type="button" id="phoneBtn" aria-label="Mobile layout">📱 Phone</button>
     <button class="ghost" type="button" id="deskBtn" aria-label="Desktop layout">🖥️ Desk</button>
   </div>
-  <p class="lead">Pick a use, set what you can spend, and the parts are chosen so they fit each other. You can swap any part after.</p>
+  <p class="lead">Pick a use, set what you can spend, and only parts that fit each other can be added. One of each part. A memory kit is one item and already includes its sticks. A kit of 3 or 5 sticks cannot be added, and DDR4 cannot go on a DDR3 or DDR5 board.</p>
   <p class="notes"><b>Notes:</b> Set a budget. Press <b>Suggest a Build</b> and press it again if you want a different one. <b>Add Component</b> starts from the parts you already have. Click a thumbnail to read the part. Copy the build link if you want to show it to someone.</p>
   <div class="controls">
     <label>Set Your Budget: $ <input id="budget" type="number" min="0" max="20000" step="50" value="1000" /></label>
@@ -175,6 +175,7 @@ let build = {};
 let budget = 1000;
 let gen = 0;
 let tourStep = 0;
+let refused = "";
 function junk(p) { return /open box|renewed|recertified|sodimm|surveillance|purple|laptop|\becc\b/i.test(p.name) || p.price < 12; }
 function brandOf(p) { return p.brand || (p.name.split(" ")[0] || ""); }
 function gbOf(p) { const m = p.name.toUpperCase().match(/\b(4|8|16|32|64)GB\b/); return m ? +m[1] : 0; }
@@ -204,6 +205,92 @@ function fitsCase(box, board) {
   const rank = { itx: 1, matx: 2, atx: 3, eatx: 4, full: 4 };
   return (rank[formOf(box)] || 3) >= (rank[formOf(board)] || 2);
 }
+
+function sticksOf(p) {
+  const n = (p && p.name) || "";
+  const m = n.match(/\((\d+)\s*[x×]\s*\d+/i) || n.match(/\b(\d+)\s*[x×]\s*\d+\s*GB/i);
+  return m ? +m[1] : 1;
+}
+function ramKindOf(p) {
+  if (!p) return "";
+  if (p.ram) return p.ram;
+  const m = (p.name || "").toUpperCase().match(/DDR[2-5]/);
+  if (m) return m[0];
+  if (p.socket === "AM5" || p.socket === "LGA1851") return "DDR5";
+  if (p.socket === "AM4") return "DDR4";
+  return "";
+}
+function dimmSlots(board) {
+  if (!board) return 4;
+  const n = (board.name || "").toUpperCase();
+  if (/2\s*DIMM/.test(n)) return 2;
+  if (/4\s*DIMM/.test(n)) return 4;
+  if (formOf(board) === "itx") return 2;
+  return 4;
+}
+function needWatts(parts) {
+  const tier = parts.gpu ? gpuTier(parts.gpu) : 0;
+  return tier >= 4 ? 750 : tier >= 3 ? 650 : tier >= 2 ? 550 : tier ? 450 : 400;
+}
+function fitWhy(part, parts) {
+  if (!part) return "That part is not on the list.";
+  if (junk(part)) return "Laptop, open-box, and server parts are not offered.";
+  const others = Object.assign({}, parts || {});
+  delete others[part.cat];
+  if (part.cat === "cpu" && others.motherboard && part.socket && others.motherboard.socket && part.socket !== others.motherboard.socket) {
+    return "That processor is " + part.socket + " and this motherboard is " + others.motherboard.socket + ".";
+  }
+  if (part.cat === "motherboard" && others.cpu && part.socket && others.cpu.socket && part.socket !== others.cpu.socket) {
+    return "That motherboard is " + part.socket + " and this processor is " + others.cpu.socket + ".";
+  }
+  if ((part.cat === "cpu" && others.motherboard) || (part.cat === "motherboard" && others.cpu)) {
+    const cpu = part.cat === "cpu" ? part : others.cpu;
+    const board = part.cat === "motherboard" ? part : others.motherboard;
+    const a = ramKindOf(cpu), b = ramKindOf(board);
+    if (a && b && a !== b) return "That processor wants " + a + " and the motherboard is " + b + ".";
+  }
+  if (part.cat === "memory") {
+    if (/SODIMM|SO-DIMM|LAPTOP/i.test(part.name)) return "Laptop memory does not fit a desktop motherboard.";
+    const kind = ramKindOf(part);
+    const want = ramKindOf(others.motherboard) || ramKindOf(others.cpu);
+    if (kind && want && kind !== want) return kind + " memory does not fit a " + want + " board.";
+    const sticks = sticksOf(part);
+    if (sticks !== 1 && sticks !== 2 && sticks !== 4) return "That kit is " + sticks + " sticks. These boards take 1, 2, or 4. Not " + sticks + ".";
+    const slots = dimmSlots(others.motherboard);
+    if (sticks > slots) return "That kit is " + sticks + " sticks and this board has " + slots + " memory slots.";
+  }
+  if (part.cat === "motherboard" && others.memory) {
+    const kind = ramKindOf(others.memory), want = ramKindOf(part);
+    if (kind && want && kind !== want) return "The memory already chosen is " + kind + " and that board is " + want + ".";
+    const sticks = sticksOf(others.memory), slots = dimmSlots(part);
+    if (sticks > slots) return "The memory kit is " + sticks + " sticks and that board has " + slots + " slots.";
+  }
+  if (part.cat === "case" && others.motherboard && formOf(part) && formOf(others.motherboard) && !fitsCase(part, others.motherboard)) {
+    return "That case is too small for this motherboard.";
+  }
+  if (part.cat === "motherboard" && others.case && formOf(part) && formOf(others.case) && !fitsCase(others.case, part)) {
+    return "This case is too small for that motherboard.";
+  }
+  if (part.cat === "psu" && others.gpu) {
+    const w = wattOf(part), need = needWatts(others);
+    if (w && w < need) return "That power supply is " + w + "W. This graphics card needs about " + need + "W.";
+  }
+  if (part.cat === "gpu" && others.psu) {
+    const w = wattOf(others.psu), need = needWatts(Object.assign({}, others, { gpu: part }));
+    if (w && w < need) return "This power supply is " + w + "W. That card needs about " + need + "W. Pick a bigger power supply first.";
+  }
+  return "";
+}
+function keepFitting(map) {
+  const order = ["cpu", "motherboard", "memory", "case", "storage", "cooler", "gpu", "psu"];
+  const kept = {};
+  order.forEach((id) => {
+    const part = map[id];
+    if (part && !fitWhy(part, kept)) kept[id] = part;
+  });
+  return kept;
+}
+
 function specs(p) {
   return [p.socket, p.ram, p.form && p.form.toUpperCase(), p.watt && (p.watt + "W"), (p.name.match(/\b\d+GB\b/i) || [])[0]].filter(Boolean).slice(0, 4).join(" · ");
 }
@@ -243,8 +330,10 @@ function suggest() {
   let gb = use.ram;
   if (cap < 700) gb = 8;
   else if (cap < 1200) gb = Math.min(gb, 16);
-  out.memory = choose(pool("memory", (p) => p.ram === kind && gbOf(p) === gb), Math.max(100, cap * 0.2), gen)
-    || choose(pool("memory", (p) => p.ram === kind && gbOf(p) >= 8), cap * 0.25, gen);
+  const slots = dimmSlots(out.motherboard);
+  const memOk = (p, loose) => p.ram === kind && sticksOf(p) <= slots && (sticksOf(p) === 2 || (loose && (sticksOf(p) === 1 || sticksOf(p) === 4))) && (loose || gbOf(p) === gb);
+  out.memory = choose(pool("memory", (p) => memOk(p, false)), Math.max(100, cap * 0.2), gen)
+    || choose(pool("memory", (p) => memOk(p, true) && gbOf(p) >= 8), cap * 0.25, gen);
   const disk = cap < 700 ? "512GB" : use.disk;
   out.storage = choose(pool("storage", (p) => /SSD|NVME|M\.2/i.test(p.name) && !/HDD|HARD DRIVE/i.test(p.name) && p.name.toUpperCase().includes(disk)), cap * 0.12, gen)
     || choose(pool("storage", (p) => /SSD|NVME/i.test(p.name)), cap * 0.12, gen);
@@ -258,9 +347,14 @@ function suggest() {
   out.psu = choose(pool("psu", (p) => wattOf(p) >= needW), cap * 0.1, gen) || choose(pool("psu"), cap, gen);
   if (!/cooler/i.test(out.cpu.name)) out.cooler = choose(pool("cooler"), 80, gen);
   const must = document.getElementById("must").value.trim().toLowerCase();
+  refused = "";
   if (must) {
     const hit = PARTS.filter((p) => !junk(p) && p.name.toLowerCase().includes(must)).sort((a, b) => a.price - b.price)[0];
-    if (hit) out[hit.cat] = hit;
+    if (hit) {
+      const why = fitWhy(hit, out);
+      if (why) refused = "Not added. " + why;
+      else out[hit.cat] = hit;
+    }
   }
   build = {};
   Object.keys(out).forEach((id) => { if (out[id]) build[id] = out[id].id; });
@@ -291,7 +385,10 @@ function issues(parts) {
   return list;
 }
 function draw() {
-  const parts = partsNow();
+  const parts = keepFitting(partsNow());
+  const next = {};
+  CATS.forEach((id) => { if (parts[id]) next[id] = parts[id].id; });
+  build = next;
   const body = document.getElementById("rows");
   body.replaceChildren();
   let total = 0;
@@ -300,7 +397,8 @@ function draw() {
     if (!part) return;
     total += part.price;
     const tr = document.createElement("tr");
-    const cells = [NAMES[id], "", part.name, brandOf(part), specs(part) || "—", "1", money.format(part.price), ""];
+    const qty = part.cat === "memory" ? String(sticksOf(part)) : "1";
+    const cells = [NAMES[id], "", part.name, brandOf(part), specs(part) || "—", qty, money.format(part.price), ""];
     cells.forEach((text, index) => {
       const td = document.createElement("td");
       if (index === 1) {
@@ -334,6 +432,7 @@ function draw() {
   const box = document.getElementById("issues");
   box.replaceChildren();
   const found = issues(parts);
+  if (refused) found.unshift(refused);
   (found.length ? found : ["None. These parts can go in the same computer."]).forEach((line) => {
     const li = document.createElement("li");
     li.textContent = line;
@@ -348,12 +447,28 @@ function fillAdder() {
   const q = document.getElementById("addSearch").value.toLowerCase();
   const list = document.getElementById("addList");
   list.replaceChildren();
-  pool(cat).filter((p) => !q || p.name.toLowerCase().includes(q)).slice(0, 30).forEach((part) => {
+  const now = partsNow();
+  const fits = pool(cat).filter((p) => !fitWhy(p, now) && (!q || p.name.toLowerCase().includes(q)));
+  if (!fits.length) {
+    const note = document.createElement("p");
+    note.textContent = "Nothing on the list fits the parts already chosen. Change the processor or the motherboard first.";
+    list.appendChild(note);
+    return;
+  }
+  fits.slice(0, 40).forEach((part) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "pick";
-    button.textContent = part.name + "  " + money.format(part.price);
-    button.onclick = () => { build[part.cat] = part.id; document.getElementById("adder").hidden = true; draw(); };
+    const sticks = part.cat === "memory" ? " · " + sticksOf(part) + " stick" + (sticksOf(part) === 1 ? "" : "s") : "";
+    button.textContent = part.name + sticks + "  " + money.format(part.price);
+    button.onclick = () => {
+      const why = fitWhy(part, partsNow());
+      if (why) { refused = "Not added. " + why; draw(); return; }
+      refused = "";
+      build[part.cat] = part.id;
+      document.getElementById("adder").hidden = true;
+      draw();
+    };
     list.appendChild(button);
   });
 }

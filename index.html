@@ -264,6 +264,35 @@
   }
 
   var HOME = [
+    ["Looking for the Rain", " .:-=+*#%@", function (x, y, t) {
+      var ax = Math.abs(x), ay = Math.abs(y);
+      var ang = Math.atan2(ay, ax);
+      var r = Math.hypot(x, y);
+      var hole = 0.085 + Math.sin(t * 0.55) * 0.012;
+      if (r < hole) return 0;
+      var lip = r < hole + 0.045 ? (r - hole) / 0.045 : 1;
+      var z = Math.log(r + 0.12) * 7.5 - t * 1.45;
+      var spokes = Math.pow(Math.abs(Math.sin(ang * 16 + Math.sin(z * 0.65) * 1.6)), 0.42);
+      var water = Math.sin(z * 11 + ang * 26) * 0.5 + 0.5;
+      var crystal = Math.sin(ang * 48 + z * 2.4 + Math.sin(t * 0.8 + ang * 9)) * 0.5 + 0.5;
+      var plant = Math.sin(ax * 17 + Math.sin(ay * 11 - t * 0.6) * 2.2 + z) * 0.5 + 0.5;
+      var v = spokes * (0.28 + 0.46 * water + 0.26 * crystal) * (0.5 + 0.5 * plant);
+      var halo = Math.exp(-Math.pow((r - (hole + 0.07)) * 11, 2));
+      var edge = 0.62 + 0.38 * (1 - Math.min(r, 1.6) / 1.6);
+      return clamp01(v * lip * edge + halo * 0.9);
+    }, "rain"],
+    ["Crystal Rain", " .~-=+*#%@ ", function (x, y, t) {
+      var sx = x < 0 ? -x : x, sy = y < 0 ? -y : y;
+      var ang = Math.atan2(sy, sx), r = Math.hypot(x, y);
+      var hole = 0.07;
+      if (r < hole) return 0;
+      var z = 8 / (r + 0.18) - t * 1.2;
+      var fold = Math.abs(Math.sin(ang * 8 + Math.sin(t * 0.4) * 0.4));
+      var facet = Math.abs(Math.sin(z * 0.9 + fold * 9));
+      var drip = Math.pow(Math.abs(Math.sin(sx * 22 + z + Math.sin(sy * 8 - t))), 6);
+      var vein = Math.abs(Math.sin(ang * 3 + z * 0.35)) > 0.92 ? 1 : 0;
+      return clamp01((facet * 0.55 + drip * 0.85 + vein * 0.7) * (r < hole + 0.05 ? (r - hole) / 0.05 : 1));
+    }, "rain"],
     ["Diamond Drift", " .:-=+*#%@", function (x, y, t) {
       var p = warp(x, y, t), rot = t * 0.35, cs = Math.cos(rot), sn = Math.sin(rot);
       var rx = p[0] * cs - p[1] * sn, ry = p[0] * sn + p[1] * cs;
@@ -1301,7 +1330,7 @@ const E=[
     return ALL;
   }
 
-  var timeOff = 0, clock = 0, cr = 0, prepKey = "", frameA, frameB, frameS = 0, frameName = "", frameT = 0, frameIdx = 0, frameCount = 1, framePurple = false;
+  var timeOff = 0, clock = 0, cr = 0, prepKey = "", frameA, frameB, frameS = 0, frameName = "", frameT = 0, frameIdx = 0, frameCount = 1, framePurple = false, frameRain = false;
   function prepare(t) {
     var key = pack + "|" + timeOff + "|" + t;
     if (prepKey === key) return;
@@ -1326,6 +1355,7 @@ const E=[
     frameIdx = frameS > 0.5 ? nxt : idx;
     frameCount = items.length;
     framePurple = (frameS > 0.5 ? frameB[3] : frameA[3]) === "purple";
+    frameRain = (frameS > 0.5 ? frameB[3] : frameA[3]) === "rain";
   }
   function sample(col, row, t) {
     prepare(t);
@@ -1336,7 +1366,7 @@ const E=[
     var ix = arguments[3] || 0;
     var a = frameA[2](x, y, tt, ix, row);
     var b = frameS ? frameB[2](x, y, tt, ix, row) : a;
-    return { a: a, b: b, s: frameS, ramp: frameA[1], rampB: frameB[1], name: frameName, purple: framePurple, n: frameIdx, total: frameCount };
+    return { a: a, b: b, s: frameS, ramp: frameA[1], rampB: frameB[1], name: frameName, purple: framePurple, rain: frameRain, n: frameIdx, total: frameCount };
   }
 
   function resize() {
@@ -1408,6 +1438,10 @@ const E=[
           var pal = pals[(Math.floor(hue0 / 30) + Math.floor(v * 4) + (col >> 3)) % pals.length];
           rr = pal[0]; gg = pal[1]; bb = pal[2];
           alpha = (120 + v * 135) | 0;
+        } else if (s.rain) {
+          var silver = (12 + v * 238) | 0;
+          rr = silver; gg = silver; bb = (silver * 0.9) | 0;
+          alpha = (30 + v * 225) | 0;
         } else if (s.purple) {
           var phue = 268 + v * 42 + Math.sin(t * 0.5 + row * 0.08) * 6;
           var plight = (0.16 + v * 0.5) * breathe;
