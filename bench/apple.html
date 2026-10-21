@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Build</title>
+<style>
+  :root { color-scheme: light; --bg:#f5f5f7; --ink:#1d1d1f; --muted:#6e6e73; --line:#d2d2d7; --card:#fff; }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--ink); font: 17px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  button, select { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  #lock { position: fixed; inset: 0; z-index: 8; display: grid; place-items: center; background: var(--bg); padding: 24px; }
+  #lock[hidden] { display: none !important; }
+  #lock form { width: min(420px, 100%); }
+  #lock input, select, .ghost { width: 100%; min-height: 48px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); padding: 8px 12px; }
+  .go { min-height: 48px; border: 0; border-radius: 980px; background: #1d1d1f; color: #fff; padding: 0 22px; font-weight: 600; }
+  .hero { position: relative; min-height: 88vh; display: grid; align-items: end; padding: 12vh 6vw 10vh; overflow: hidden; }
+  .orb { position: absolute; border-radius: 50%; filter: blur(2px); pointer-events: none; }
+  .orb.a { width: 46vw; height: 46vw; left: -8vw; top: 8vh; background: radial-gradient(circle, #c7d2fe, transparent 70%); }
+  .orb.b { width: 38vw; height: 38vw; right: -6vw; top: 22vh; background: radial-gradient(circle, #fde68a, transparent 70%); }
+  .hero-copy { position: relative; max-width: 16em; }
+  .eyebrow { margin: 0 0 8px; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+  h1 { margin: 0; font-size: clamp(48px, 8vw, 92px); line-height: .92; letter-spacing: -0.045em; font-weight: 600; }
+  .lede { font-size: clamp(19px, 2.4vw, 24px); color: var(--muted); max-width: 28em; }
+  .uses { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+  .uses button { min-height: 44px; border-radius: 980px; border: 1px solid var(--line); background: rgba(255,255,255,.72); padding: 0 16px; backdrop-filter: blur(10px); }
+  .uses button.on { background: #1d1d1f; color: #fff; border-color: #1d1d1f; }
+  section.part { min-height: 70vh; display: grid; align-items: center; padding: 10vh 6vw; border-top: 1px solid var(--line); }
+  .part-inner { width: min(880px, 100%); margin: 0 auto; display: grid; gap: 18px; }
+  @media (min-width: 800px) { .part-inner { grid-template-columns: .8fr 1.2fr; align-items: end; } }
+  .kicker { font-size: 21px; color: var(--muted); margin: 0; }
+  .part h2 { margin: 0; font-size: clamp(40px, 6vw, 72px); letter-spacing: -0.04em; font-weight: 600; line-height: .95; }
+  .name { font-size: 20px; margin: 0; }
+  .price { font-size: 28px; letter-spacing: -0.03em; font-weight: 600; margin: 8px 0; }
+  .why { color: #b45309; min-height: 1.2em; }
+  .bar { position: sticky; bottom: 0; display: flex; justify-content: space-between; gap: 16px; align-items: center; padding: 14px 6vw calc(14px + env(safe-area-inset-bottom)); background: rgba(245,245,247,.86); backdrop-filter: blur(18px); border-top: 1px solid var(--line); }
+  html[data-theme="dark"] .uses button { background: #1d1d1f; }
+  html[data-theme="dark"] .uses button.on { background: #f5f5f7; color: #000; }
+  html[data-theme="dark"] .bar { background: rgba(0,0,0,.8); }
+  html[data-theme="dark"] .orb.a { background: radial-gradient(circle, #312e81, transparent 70%); }
+  html[data-theme="dark"] .orb.b { background: radial-gradient(circle, #78350f, transparent 70%); }
+</style>
+</head>
+<body>
+<div id="lock"><form id="lockForm"><p class="eyebrow">Password4</p><h1>Build.</h1><input id="lockPass" type="password" autocomplete="current-password" aria-label="Password" /><p id="lockBad" class="why"></p><button class="go" type="submit">Continue</button></form></div>
+<header class="hero">
+  <div class="orb a" data-parallax="-0.18"></div>
+  <div class="orb b" data-parallax="-0.08"></div>
+  <div class="hero-copy" data-parallax="0.12">
+    <p class="eyebrow">One computer</p>
+    <h1>Built for what you actually do.</h1>
+    <p class="lede">Choose a use. The list fills with parts that fit each other. Change any one. Nothing here is a sale.</p>
+    <div class="uses" id="uses"></div>
+  </div>
+</header>
+<main id="list"></main>
+<div class="bar"><div><b id="total">$0</b><div id="count" class="kicker">0 of 8</div></div><button class="go" id="print" type="button">Print this list</button></div>
+<script src="bulb.js"></script>
+<script>
+const CATS = ["cpu","motherboard","memory","gpu","storage","case","cooler","psu"];
+const LABEL = { cpu:"Processor", motherboard:"Motherboard", memory:"Memory", gpu:"Graphics", storage:"Storage", case:"Case", cooler:"Cooler", psu:"Power" };
+const USES = {
+  School: { gpu:0, ram:16, disk:1000 },
+  "Photo and video": { gpu:3, ram:32, disk:2000 },
+  "Call of Duty": { gpu:4, ram:16, disk:1000 },
+  "Watching video": { gpu:0, ram:16, disk:1000 }
+};
+const money = new Intl.NumberFormat("en-CA", { style:"currency", currency:"CAD" });
+let PARTS = [], byId = {}, useName = "School", build = {};
+function junk(p){ return /open box|renewed|recertified|sodimm|surveillance|purple|laptop|\becc\b/i.test(p.name) || p.price < 12; }
+function sticksOf(p){ const m = (p.name||"").match(/\((\d+)\s*[x×]/i) || (p.name||"").match(/\b(\d+)\s*[x×]\s*\d+\s*GB/i); return m ? +m[1] : 1; }
+function ramKindOf(p){ if (!p) return ""; if (p.ram) return p.ram; const m = (p.name||"").toUpperCase().match(/DDR[2-5]/); if (m) return m[0]; if (p.socket === "AM5" || p.socket === "LGA1851") return "DDR5"; if (p.socket === "AM4") return "DDR4"; return ""; }
+function formOf(p){ if (!p) return ""; if (p.form) return p.form; const n = (p.name||"").toUpperCase(); if (/MICRO|MATX|M-ATX/.test(n)) return "matx"; if (/ITX/.test(n)) return "itx"; if (/E-?ATX|FULL/.test(n)) return "full"; if (/ATX/.test(n)) return "atx"; return ""; }
+function fitsCase(box, board){ const r = { itx:1, matx:2, atx:3, full:4, eatx:4 }; return (r[formOf(box)] || 3) >= (r[formOf(board)] || 2); }
+function dimmSlots(board){ if (!board) return 4; const n = (board.name||"").toUpperCase(); if (/2\s*DIMM/.test(n)) return 2; if (formOf(board) === "itx") return 2; return 4; }
+function gbOf(p){ const m = (p.name||"").toUpperCase().match(/\b(4|8|16|32|64|96|128)\s?GB\b/); return m ? +m[1] : 0; }
+function diskGb(p){ const n = (p.name||"").toUpperCase(); const tb = n.match(/(\d+)\s?TB/); if (tb) return +tb[1] * 1000; const gb = n.match(/(\d+)\s?GB/); return gb ? +gb[1] : 0; }
+function wattOf(p){ if (!p) return 0; if (p.watt) return p.watt; const m = (p.name||"").toUpperCase().match(/(\d{3,4})\s?W/); return m ? +m[1] : 0; }
+function gpuClass(p){ const n = (p.name||"").toUpperCase(); if (/5090|4090/.test(n)) return 7; if (/5080|4080|5070\s?TI|9070\s?XT/.test(n)) return 6; if (/5060\s?TI|5070|9070|4070/.test(n)) return 5; if (/5060|9060|4060/.test(n)) return 4; if (/5050|3060|6600|7600/.test(n)) return 3; if (/3050|1660|1650|6500/.test(n)) return 2; return 0; }
+function needWatts(parts){ const g = parts.gpu ? gpuClass(parts.gpu) : 0; return g >= 6 ? 850 : g >= 5 ? 750 : g >= 4 ? 650 : g >= 3 ? 550 : 450; }
+function fitWhy(part, parts){
+  if (!part || junk(part)) return "That part is not offered.";
+  const others = Object.assign({}, parts); delete others[part.cat];
+  if (part.cat === "cpu" && others.motherboard && part.socket && others.motherboard.socket && part.socket !== others.motherboard.socket) return "Wrong socket for this motherboard.";
+  if (part.cat === "motherboard" && others.cpu && part.socket && others.cpu.socket && part.socket !== others.cpu.socket) return "Wrong socket for this processor.";
+  if (part.cat === "memory") {
+    const want = ramKindOf(others.motherboard) || ramKindOf(others.cpu);
+    const kind = ramKindOf(part);
+    if (kind && want && kind !== want) return kind + " does not fit this board.";
+    const sticks = sticksOf(part);
+    if (sticks !== 1 && sticks !== 2 && sticks !== 4) return "That kit is " + sticks + " sticks. Boards here take 1, 2, or 4.";
+    if (sticks > dimmSlots(others.motherboard)) return "Too many sticks for this board.";
+  }
+  if (part.cat === "case" && others.motherboard && !fitsCase(part, others.motherboard)) return "That case is too small.";
+  if (part.cat === "motherboard" && others.case && !fitsCase(others.case, part)) return "This case is too small for that board.";
+  if (part.cat === "psu" && others.gpu && wattOf(part) && wattOf(part) < needWatts(others)) return "That power supply is too small.";
+  if (part.cat === "gpu" && others.psu && wattOf(others.psu) && wattOf(others.psu) < needWatts(Object.assign({}, others, { gpu: part }))) return "The power supply is too small for that card.";
+  return "";
+}
+function pool(cat, parts){ return PARTS.filter(p => p.cat === cat && !junk(p) && !fitWhy(p, parts)).sort((a,b) => a.price - b.price); }
+function cheapest(cat, pred, parts){ return pool(cat, parts).filter(pred)[0] || null; }
+function plan(){
+  const want = USES[useName] || USES.School;
+  const kept = {};
+  kept.cpu = cheapest("cpu", p => p.socket === "AM5", kept) || cheapest("cpu", p => p.socket === "AM4", kept);
+  kept.motherboard = cheapest("motherboard", p => p.socket && p.socket === (kept.cpu && kept.cpu.socket), kept);
+  const kind = ramKindOf(kept.motherboard);
+  kept.memory = cheapest("memory", p => ramKindOf(p) === kind && gbOf(p) >= want.ram && sticksOf(p) === 2, kept) || cheapest("memory", p => ramKindOf(p) === kind && sticksOf(p) === 2, kept);
+  kept.storage = cheapest("storage", p => diskGb(p) >= want.disk && /NVME|M\.2|PCIE|PCI-?E/i.test(p.name), kept) || cheapest("storage", p => diskGb(p) >= 500, kept);
+  kept.case = cheapest("case", p => fitsCase(p, kept.motherboard), kept);
+  kept.cooler = cheapest("cooler", () => true, kept);
+  if (want.gpu) kept.gpu = cheapest("gpu", p => gpuClass(p) >= want.gpu && gpuClass(p) <= want.gpu + 1, kept) || cheapest("gpu", p => gpuClass(p) >= want.gpu, kept);
+  const need = needWatts(kept);
+  kept.psu = cheapest("psu", p => wattOf(p) >= need, kept);
+  const out = {};
+  CATS.forEach(id => { if (kept[id] && !fitWhy(kept[id], out)) out[id] = kept[id]; });
+  return out;
+}
+function selected(){ const m = {}; CATS.forEach(id => { if (byId[build[id]]) m[id] = byId[build[id]]; }); return m; }
+function tell(){
+  const expected = CATS.filter(id => id !== "gpu" || (USES[useName] && USES[useName].gpu));
+  const n = expected.filter(id => byId[build[id]]).length;
+  const el = document.getElementById("count");
+  if (el) el.textContent = n + " of " + expected.length;
+  try { parent.postMessage({ type:"drew-progress", n:n, total:expected.length }, "*"); } catch (e) {}
+}
+function renderUses(){
+  const box = document.getElementById("uses");
+  box.replaceChildren();
+  Object.keys(USES).forEach(name => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = name;
+    b.className = name === useName ? "on" : "";
+    b.onclick = () => { useName = name; const next = plan(); build = {}; CATS.forEach(id => { if (next[id]) build[id] = next[id].id; }); render(); document.getElementById("list").scrollIntoView({ behavior:"smooth" }); };
+    box.appendChild(b);
+  });
+}
+function render(){
+  renderUses();
+  const parts = selected();
+  const main = document.getElementById("list");
+  main.replaceChildren();
+  let total = 0;
+  CATS.forEach(id => {
+    const part = parts[id];
+    if (part) total += part.price;
+    const section = document.createElement("section");
+    section.className = "part";
+    const inner = document.createElement("div");
+    inner.className = "part-inner";
+    const copy = document.createElement("div");
+    copy.innerHTML = "<p class='kicker'>" + LABEL[id] + "</p><h2 data-parallax='0.04'>" + LABEL[id] + ".</h2>";
+    const side = document.createElement("div");
+    const name = document.createElement("p");
+    name.className = "name";
+    name.textContent = part ? part.name : "Not chosen yet.";
+    const price = document.createElement("p");
+    price.className = "price";
+    price.textContent = part ? money.format(part.price) : "";
+    const sel = document.createElement("select");
+    const blank = document.createElement("option");
+    blank.value = "";
+    blank.textContent = part ? "Change it" : "Choose one that fits";
+    sel.appendChild(blank);
+    pool(id, parts).slice(0, 40).forEach(p => {
+      const o = document.createElement("option");
+      o.value = p.id;
+      o.textContent = money.format(p.price) + "  " + p.name;
+      if (part && p.id === part.id) o.selected = true;
+      sel.appendChild(o);
+    });
+    sel.onchange = () => {
+      if (!sel.value) return;
+      const next = byId[sel.value];
+      const why = fitWhy(next, parts);
+      if (why) { note.textContent = why; sel.value = part ? part.id : ""; return; }
+      build[id] = next.id;
+      render();
+    };
+    const note = document.createElement("p");
+    note.className = "why";
+    side.append(name, price, sel, note);
+    inner.append(copy, side);
+    section.appendChild(inner);
+    main.appendChild(section);
+  });
+  document.getElementById("total").textContent = money.format(total);
+  tell();
+}
+function parallax(){
+  const y = window.scrollY || 0;
+  document.querySelectorAll("[data-parallax]").forEach(node => {
+    const d = parseFloat(node.getAttribute("data-parallax")) || 0;
+    node.style.transform = "translate3d(0," + (y * d).toFixed(1) + "px,0)";
+  });
+}
+window.addEventListener("scroll", parallax, { passive: true });
+document.getElementById("print").onclick = () => {
+  const parts = selected();
+  const lines = CATS.map(id => parts[id] ? LABEL[id] + ": " + parts[id].name + "  " + money.format(parts[id].price) : LABEL[id] + ": not chosen");
+  const w = window.open("", "print");
+  w.document.write("<pre style='font:14px/1.5 ui-monospace,monospace'>" + lines.join("\n") + "\n\nNot a sale.</pre>");
+  w.document.close();
+  w.focus();
+  w.print();
+};
+function open(){
+  document.getElementById("lock").hidden = true;
+  const next = plan();
+  build = {};
+  CATS.forEach(id => { if (next[id]) build[id] = next[id].id; });
+  render();
+}
+document.getElementById("lockForm").onsubmit = (e) => {
+  e.preventDefault();
+  if (document.getElementById("lockPass").value !== "Password4") {
+    document.getElementById("lockBad").textContent = "Wrong password";
+    return;
+  }
+  try { sessionStorage.setItem("drew-apple", "1"); } catch (err) {}
+  open();
+};
+fetch("parts.json").then(r => r.json()).then(list => {
+  PARTS = list;
+  list.forEach(p => { byId[p.id] = p; });
+  let ok = false;
+  try { ok = sessionStorage.getItem("drew-apple") === "1"; } catch (e) {}
+  if (ok) open();
+}).catch(() => { document.getElementById("lockBad").textContent = "The parts list did not load."; });
+</script>
+</body>
+</html>

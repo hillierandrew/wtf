@@ -7,7 +7,7 @@
 <style>
   :root { color-scheme: light; --bg:#f3f1ec; --ink:#161616; --card:#fffcf8; --line:#e3dfd6; --blue:#161616; --orange:#8a4b12; }
   * { box-sizing: border-box; }
-  html, body { margin:0; background:var(--bg); color:var(--ink); font:18px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  html, body { margin:0; min-height:100%; background:var(--bg); color:var(--ink); font:18px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
   button, input, select { font:17px/1.3 system-ui, sans-serif; color:inherit; }
   button, select, input { min-height:52px; border-radius:12px; border:1px solid var(--line); background:#fff; padding:8px 12px; }
   button { cursor:pointer; }
@@ -64,6 +64,7 @@
 </nav>
 <main class="wrap" id="app"></main>
 <script src="qr.js"></script>
+<script src="bulb.js"></script>
 <script>
 const CATS = ["cpu","motherboard","memory","gpu","storage","case","cooler","psu"];
 const LABEL = { cpu:"Processor", motherboard:"Motherboard", memory:"Memory", gpu:"Graphics card", storage:"Storage", case:"Case", cooler:"Cooler", psu:"Power supply" };
@@ -537,6 +538,8 @@ function render(){
   app.replaceChildren();
   ({home:viewHome, dash:viewDash, explore:viewExplore, compare:viewCompare, build:viewAsm, checkout:viewCheckout}[state.view]||viewHome)(app);
   save();
+  var filled = CATS.filter(function (id) { return byId[state.build[id]]; }).length;
+  try { parent.postMessage({ type: "drew-progress", n: filled, total: CATS.length }, "*"); } catch (e) {}
 }
 function viewHome(app){
   app.append(el("a",{class:"purpose", href:"use.html", text:"I am buying it for one game or program"}));

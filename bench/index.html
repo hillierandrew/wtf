@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-ink="light">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -113,6 +113,7 @@
 </div>
 <div id="langs"></div>
 <div class="dock"><span>Paper total</span><b id="dockTotal">$0</b></div>
+<script src="bulb.js"></script>
 <script>
 const JOBS = ["elementary","highschool","college","office","cad","video","dj","stream","fortnite","roblox","minecraft","warzone","apex","tarkov"];
 const NEED = {
@@ -475,6 +476,7 @@ function render() {
   });
   if (PARTS.length && !lock) applySuggestion();
   const parts = currentParts();
+  try { parent.postMessage({ type: "drew-progress", n: CATS.filter(function (id) { return parts[id]; }).length, total: CATS.length }, "*"); } catch (e) {}
   const total = CATS.reduce((sum, id) => sum + (parts[id] ? parts[id].price : 0), 0);
   const sell = document.getElementById("sell");
   if (total > budget + 1) sell.textContent = t("over") + " " + money.format(total);

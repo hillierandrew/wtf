@@ -7,7 +7,7 @@
 <style>
   :root { color-scheme: light; --bg:#f3f1ec; --ink:#161616; --muted:#5e5a54; --line:#e3dfd6; --paper:#fffcf8; }
   * { box-sizing: border-box; }
-  html, body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--ink); font: 17px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
   button, a { font: inherit; color: inherit; }
   button { cursor: pointer; }
   .wrap { width: min(640px, 100%); margin: 0 auto; padding: 18px 18px 148px; }
@@ -88,6 +88,7 @@
 </footer>
 <iframe id="printFrame" title="Print"></iframe>
 <script src="qr.js"></script>
+<script src="bulb.js"></script>
 <script>
 // PLAN
 const CATS = ["cpu","motherboard","memory","storage","case","cooler","gpu","psu"];
@@ -436,6 +437,9 @@ function render() {
   app.replaceChildren();
   const picked = state.id && findPurpose(state.id);
   document.getElementById("title").textContent = picked ? picked.name : "What is this computer for?";
+  var progressBuild = picked && PARTS.length ? (current() && current().build) : null;
+  var progressN = progressBuild ? Object.keys(progressBuild).filter(function (k) { return progressBuild[k]; }).length : 0;
+  try { parent.postMessage({ type: "drew-progress", n: progressN, total: 8 }, "*"); } catch (e) {}
   if (!picked || !PARTS.length) {
     dock.hidden = true;
     app.appendChild(el("p", { class:"lede", text:"Pick one. Then choose Starts, Comfortable, or High-end. The list uses saved Canadian prices. It is not a sale, and it does not promise a frame rate." }));

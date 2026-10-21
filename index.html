@@ -96,26 +96,34 @@
   #shop {
     position: fixed; inset: 0; z-index: 12;
     display: none; flex-direction: column;
-    background: #0c0c0e;
+    background: #000;
   }
   #shop.open { display: flex; }
   #shopBar {
     position: relative;
-    display: flex; align-items: center; gap: 12px;
-    height: 128px; min-height: 128px;
-    padding: 8px 10px;
-    background: #000;
-    color: #f6f1e8;
-    font: 600 16px/1 system-ui, sans-serif;
-    overflow: hidden;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: "close title pct" "track track track";
+    gap: 8px 12px;
+    align-items: center;
+    height: auto;
+    min-height: 0;
+    padding: 12px 16px 10px;
+    background: rgba(0,0,0,.92);
+    color: #f5f5f7;
+    font: 600 15px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    border-bottom: 1px solid rgba(255,255,255,.12);
   }
-  #barArt { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-  #shopClose, #shopTitle { position: relative; z-index: 2; }
-  #shopTitle { text-shadow: 0 1px 2px #000; }
+  #shopTitle { grid-area: title; }
+  #shopPct { grid-area: pct; font-variant-numeric: tabular-nums; color: #a1a1a6; }
+  #shopTrack { grid-area: track; height: 3px; border-radius: 99px; background: #2c2c2e; overflow: hidden; }
+  #shopFill { height: 100%; width: 0%; background: #f5f5f7; }
   #shopClose {
-    min-height: 44px; padding: 0 14px; border-radius: 10px;
-    border: 0; background: #d6ff4a; color: #111; font: inherit; cursor: pointer;
+    grid-area: close;
+    min-height: 36px; padding: 0 14px; border-radius: 980px;
+    border: 0; background: #f5f5f7; color: #000; font: inherit; cursor: pointer;
   }
+  #shopFrame { flex: 1; width: 100%; border: 0; background: #000; min-height: 0; }
 
   #sky {
     position: fixed; inset: 0; z-index: 3; pointer-events: none; overflow: hidden;
@@ -132,7 +140,6 @@
     min-width: 44px; min-height: 44px; border: 0; border-radius: 999px;
     background: #ffffff18; color: #fff; font-size: 20px; cursor: pointer;
   }
-  body.intro #logo { visibility: hidden; }
   body.logo-off #logo { visibility: hidden !important; }
   body.intro #field { transform: none !important; }
   body.building #field,
@@ -148,6 +155,7 @@
     }
   }
   @media (max-width: 720px) {
+    #shopTrack { display: none; }
     #dock button { min-width: 48px; min-height: 48px; font-size: 22px; }
     #name { max-width: 34vw; }
   }
@@ -166,10 +174,7 @@
   <button id="play" type="button" aria-label="Play music">
     <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path id="playShape" fill="currentColor" d="M8 5v14l12-7z"/></svg>
   </button>
-  <button id="homeBtn" type="button" aria-label="Default animations">🏠</button>
-  <button id="earthBtn" type="button" aria-label="Mother animations">🌍</button>
-  <button id="pigBtn" type="button" aria-label="Webcore animations">🐷</button>
-  <button id="elephantBtn" type="button" aria-label="Elephant animations">🐘</button>
+  <button id="homeBtn" type="button" aria-label="Animations">🏠</button>
   <button id="pcBtn" type="button" aria-label="PC builder">💻</button>
   <span id="name"><span id="mark">🏠</span><b id="title">Diamond Drift</b></span>
 </div>
@@ -188,7 +193,8 @@
   <div id="shopBar">
     <button id="shopClose" type="button">Close</button>
     <span id="shopTitle">Build a computer</span>
-    <canvas id="barArt" aria-hidden="true"></canvas>
+    <span id="shopPct">0%</span>
+    <div id="shopTrack"><div id="shopFill"></div></div>
   </div>
   <iframe id="shopFrame" title="Build a computer"></iframe>
 </div>
@@ -204,9 +210,6 @@
   var playBtn = document.getElementById("play");
   var playShape = document.getElementById("playShape");
   var homeBtn = document.getElementById("homeBtn");
-  var earthBtn = document.getElementById("earthBtn");
-  var pigBtn = document.getElementById("pigBtn");
-  var elephantBtn = document.getElementById("elephantBtn");
   var blockBtn = document.getElementById("blockBtn");
   var clockBtn = document.getElementById("clockBtn");
   var sunBtn = document.getElementById("sunBtn");
@@ -224,14 +227,21 @@
   var shop = document.getElementById("shop");
   var shopClose = document.getElementById("shopClose");
 
+  function setShopProgress(n, total) {
+    var pct = total ? Math.max(0, Math.min(100, Math.round((n / total) * 100))) : 0;
+    var fill = document.getElementById("shopFill");
+    var label = document.getElementById("shopPct");
+    if (fill) fill.style.width = pct + "%";
+    if (label) label.textContent = pct + "%";
+  }
   function openShop(which) {
     shop.classList.add("open");
     document.body.classList.add("building");
-    sizeBar();
+    setShopProgress(0, 8);
     var frame = document.getElementById("shopFrame");
-    var src = which === "dream" ? "bench/dream.html" : which === "easy" ? "bench/easy.html" : "bench/";
+    var src = which === "dream" ? "bench/dream.html" : which === "easy" ? "bench/easy.html" : which === "apple" ? "bench/apple.html" : "bench/";
     var title = document.getElementById("shopTitle");
-    if (title) title.textContent = which === "dream" ? "Dream builder" : which === "easy" ? "Easy builder" : "Build a computer";
+    if (title) title.textContent = which === "dream" ? "Dream builder" : which === "easy" ? "Easy builder" : which === "apple" ? "Build" : "Build a computer";
     if (frame.getAttribute("src") !== src) frame.src = src;
   }
 
@@ -1354,7 +1364,7 @@ const E=[
     if (prepKey === key) return;
     prepKey = key;
     var items = list();
-    var HOLD = 5.4, FADE = 1.8, CYCLE = HOLD + FADE;
+    var HOLD = 32, FADE = 8, CYCLE = HOLD + FADE;
     var T = t + timeOff;
     var cyc = T / CYCLE;
     var base = Math.floor(cyc);
@@ -1754,10 +1764,8 @@ const E=[
     if (pack === next) return;
     pack = next;
     homeBtn.classList.toggle("on", pack === "home");
-    earthBtn.classList.toggle("on", pack === "earth");
-    pigBtn.classList.toggle("on", pack === "pig");
-    elephantBtn.classList.toggle("on", pack === "elephant");
     timeOff = -clock;
+    prepKey = "";
   }
 
   function faceText() {
@@ -1877,9 +1885,6 @@ const E=[
   });
   playBtn.addEventListener("click", function () { setPlaying(!playing); });
   homeBtn.addEventListener("click", function () { setPack("home"); });
-  earthBtn.addEventListener("click", function () { setPack("earth"); });
-  pigBtn.addEventListener("click", function () { setPack("pig"); });
-  elephantBtn.addEventListener("click", function () { setPack("elephant"); });
   pcBtn.addEventListener("click", function () {
     gateMsg.textContent = "";
     gatePass.value = "";
@@ -1906,6 +1911,10 @@ const E=[
       try { sessionStorage.setItem("drew-easy", "1"); } catch (err) {}
       gate.classList.remove("open");
       openShop("easy");
+    } else if (gatePass.value === "Password4") {
+      try { sessionStorage.setItem("drew-apple", "1"); } catch (err) {}
+      gate.classList.remove("open");
+      openShop("apple");
     } else {
       gateMsg.textContent = "Wrong password";
       gatePass.select();
@@ -1922,60 +1931,14 @@ const E=[
   if (Math.abs(vx) < 70) vx = vx < 0 ? -90 : 90;
   if (Math.abs(vy) < 60) vy = vy < 0 ? -80 : 80;
 
-  var bar = document.getElementById("barArt");
-  var bctx = bar.getContext("2d");
-  function sizeBar() {
-    var r = bar.parentElement.getBoundingClientRect();
-    var dpr = Math.min(2, window.devicePixelRatio || 1);
-    bar.width = Math.max(2, Math.floor(r.width * dpr));
-    bar.height = Math.max(2, Math.floor(r.height * dpr));
-  }
-  function paintBar(t) {
-    var w = bar.width, h = bar.height;
-    if (w < 4) return;
-    bctx.setTransform(1, 0, 0, 1, 0, 0);
-    bctx.fillStyle = "#050505";
-    bctx.fillRect(0, 0, w, h);
-    var pad = Math.max(8, h * 0.08);
-    var x0 = pad, y0 = h * 0.22, bw = w - pad * 2, bh = h - y0 - pad;
-    var p = (t % 7) / 7;
-    bctx.strokeStyle = "#9dff57";
-    bctx.lineWidth = Math.max(2, h * 0.02);
-    bctx.strokeRect(x0, y0, bw, bh);
-    bctx.save();
-    bctx.beginPath();
-    bctx.rect(x0 + 2, y0 + 2, Math.max(0, (bw - 4) * p), bh - 4);
-    bctx.clip();
-    bctx.fillStyle = "#14320c";
-    bctx.fillRect(x0, y0, bw, bh);
-    bctx.fillStyle = "#d6ff4a";
-    var font = Math.max(11, Math.floor(bh / 8));
-    bctx.font = font + "px ui-monospace, Menlo, monospace";
-    bctx.textBaseline = "top";
-    var lines = [
-      ".----------------------.",
-      "| CASE                 |",
-      "| CPU " + (p > 0.16 ? "[####]" : "[    ]") + "            |",
-      "| RAM " + (p > 0.32 ? "|| ||" : "|  | ") + "             |",
-      "| SSD " + (p > 0.48 ? "[==]>" : "[  ] ") + "             |",
-      "| GPU " + (p > 0.64 ? "[======]>" : "[        ]") + "      |",
-      "| PSU " + (p > 0.8 ? "[####]" : "[    ]") + "            |",
-      "'----------------------'"
-    ];
-    for (var i = 0; i < lines.length; i++) bctx.fillText(lines[i], x0 + 8, y0 + 4 + i * (bh / 8.3));
-    bctx.globalAlpha = 0.45;
-    var marks = "*oO";
-    for (var s = 0; s < 10; s++) {
-      var sx = x0 + ((s * 53 + t * 36) % Math.max(20, bw));
-      var sy = y0 + ((Math.sin(t * 1.4 + s) * 0.5 + 0.5) * Math.max(8, bh - font));
-      bctx.fillText(marks.charAt(s % 3), sx, sy);
-    }
-    bctx.restore();
-    bctx.fillStyle = "#d6ff4a";
-    bctx.font = Math.max(13, Math.floor(h * 0.14)) + "px ui-monospace, Menlo, monospace";
-    bctx.textBaseline = "top";
-    bctx.fillText("BUILDING " + Math.floor(p * 100) + "%", x0, 6);
-  }
+  window.addEventListener("message", function (e) {
+    var data = e.data;
+    if (!data || data.type !== "drew-progress") return;
+    setShopProgress(+data.n || 0, +data.total || 8);
+  });
+  canvas.addEventListener("pointerdown", function () {
+    if (introOn && !spawned) spawnDvd();
+  });
 
   var last = performance.now(), raf = 0, started = performance.now();
   var veilEl = document.getElementById("veil");
@@ -1996,35 +1959,44 @@ const E=[
     F: [0x1f,0x10,0x10,0x1e,0x10,0x10,0x10]
   };
   var WORD_TEXT = "DREW.WTF";
-  function hyperHash(n) {
-    n = Math.sin(n * 127.1) * 43758.5453;
-    return n - Math.floor(n);
-  }
-  function hyperAt(x, y, t) {
+  function ouroAt(x, y, t) {
     var r = Math.hypot(x, y);
-    var ai = Math.floor(Math.atan2(y, x) * 30 / Math.PI);
-    var v = 0;
-    var tt = t * 2;
-    for (var k = 0; k < 3; k++) {
-      var h = hyperHash(ai + k * 37.7);
-      var p = (tt * (0.2 + h * 0.5) + h * 5) % 1;
-      if (Math.abs(r - p * 1.5) < 0.03 + p * 0.07) v = Math.max(v, p);
-    }
-    return Math.max(v, Math.exp(-r * r * 18));
+    var d = ((Math.atan2(y, x) - t * 2) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+    return (1 - d / 6.283185) * Math.max(0, 1 - Math.abs(r - 0.6) * 10);
   }
-  function wordOn(col, row, scale01) {
-    var cellsW = WORD_TEXT.length * 6 - 1;
-    var unit = Math.min(cols * 0.92 / cellsW, rows * 0.72 / 7);
-    var s = Math.max(0.015, scale01) * unit;
-    var gw = cellsW * s, gh = 7 * s;
-    var u = (col + 0.5 - (cols - gw) / 2) / s;
-    var v = (row + 0.5 - (rows - gh) / 2) / s;
-    var ci = Math.floor(u / 6);
-    if (ci < 0 || ci >= WORD_TEXT.length) return false;
-    var px = u - ci * 6, py = v | 0;
-    if (px < 0 || px >= 5 || py < 0 || py >= 7) return false;
-    var bits = WORD_BITS[WORD_TEXT.charAt(ci)][py];
-    return (bits & (16 >> (px | 0))) !== 0;
+  function paintIntro(age) {
+    data.fill(0);
+    var aspect = W / Math.max(1, H);
+    var originX = ((W - cols * cellW) * 0.5) | 0;
+    var originY = ((H - rows * cellH) * 0.5) | 0;
+    var ramp = " .oO0#@%";
+    for (var row = 0; row < rows; row++) {
+      for (var col = 0; col < cols; col++) {
+        var x = ((col + 0.5) / cols * 2 - 1) * aspect;
+        var y = ((row + 0.5) / rows) * 2 - 1;
+        var v = ouroAt(x, y, age);
+        var ii = Math.max(0, Math.min(ramp.length - 1, (v * (ramp.length - 1)) | 0));
+        var ch = ramp.charAt(ii);
+        var hue = (age * 28 + v * 70 + col * 1.2) % 360;
+        var rgb = hsl(hue, 1, 0.18 + v * 0.62);
+        stampCell(col, row, originX, originY, ch, rgb[0], rgb[1], rgb[2], (40 + v * 215) | 0);
+      }
+    }
+    ctx.putImageData(buf, 0, 0);
+    canvas.style.transform = "none";
+    canvas.style.opacity = "1";
+    if (veilEl) veilEl.style.opacity = "0.35";
+    setSceneLabel("Ouroboros \u00B7 click once", "\uD83C\uDFE0");
+  }
+  function stepIntroLogo(t) {
+    var u = Math.min(1, t / 2.8);
+    var s = (0.04 + (1 - Math.pow(1 - u, 3)) * 1.02) * (1 + Math.sin(t * 2.4) * 0.035);
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var w = baseW * s, h = baseH * s;
+    logo.style.visibility = "visible";
+    logo.style.opacity = String(Math.min(1, 0.15 + u));
+    logo.style.transform = "translate3d(" + ((vw - w) / 2).toFixed(2) + "px," + ((vh - h) / 2).toFixed(2) + "px,0) scale(" + s.toFixed(4) + ")";
+    drawInk(t);
   }
   function stampCell(col, row, originX, originY, ch, rr, gg, bb, alpha) {
     var glyph = FONT[ch] || FONT[" "];
@@ -2054,69 +2026,6 @@ const E=[
       }
     }
   }
-  function paintIntro(age) {
-    data.fill(0);
-    var shoot = 0, glow = 0, black = 0, label = "Hyperspace";
-    if (age < HYPER_FOR) {
-      shoot = 0;
-    } else if (age < HYPER_FOR + SHOOT_FOR) {
-      var u = (age - HYPER_FOR) / SHOOT_FOR;
-      shoot = 1 - Math.pow(1 - u, 2.6);
-      label = "DREW.WTF";
-    } else if (age < HYPER_FOR + SHOOT_FOR + GLOW_FOR) {
-      shoot = 1;
-      glow = (age - HYPER_FOR - SHOOT_FOR) / GLOW_FOR;
-      label = "DREW.WTF";
-    } else {
-      shoot = 1;
-      glow = 1;
-      black = Math.min(1, (age - HYPER_FOR - SHOOT_FOR - GLOW_FOR) / BLACK_FOR);
-      label = "DREW.WTF";
-    }
-    var aspect = W / Math.max(1, H);
-    var originX = ((W - cols * cellW) * 0.5) | 0;
-    var originY = ((H - rows * cellH) * 0.5) | 0;
-    var ramp = " .:-=+*#%@";
-    var pulse = 0.42 + 0.58 * (0.5 + 0.5 * Math.sin(age * 7.5));
-    if (glow > 0 && Math.sin(age * 6.2) > 0.55) pulse = 1;
-    var dim = 1 - black;
-    for (var row = 0; row < rows; row++) {
-      for (var col = 0; col < cols; col++) {
-        var x = ((col + 0.5) / cols * 2 - 1) * aspect;
-        var y = ((row + 0.5) / rows) * 2 - 1;
-        var on = shoot > 0.02 && wordOn(col, row, shoot);
-        var ch, rr, gg, bb, alpha;
-        if (on) {
-          ch = pulse > 0.82 ? "@" : pulse > 0.5 ? "#" : "*";
-          if (pulse > 0.9) { rr = 255; gg = 255; bb = 255; }
-          else {
-            var rgb = hsl((age * 90 + col * 3) % 360, 1, 0.42 + pulse * 0.38);
-            rr = rgb[0]; gg = rgb[1]; bb = rgb[2];
-          }
-          alpha = (210 + pulse * 45) | 0;
-        } else {
-          var v = hyperAt(x, y, age);
-          var ii = Math.max(0, Math.min(ramp.length - 1, (v * (ramp.length - 1)) | 0));
-          ch = ramp.charAt(ii);
-          var hue = (age * 40 + v * 80 + col * 1.4) % 360;
-          var light = (0.28 + v * 0.55);
-          var bg = hsl(hue, 1, light);
-          rr = bg[0]; gg = bg[1]; bb = bg[2];
-          alpha = (140 + v * 115) | 0;
-        }
-        if (dim < 1) {
-          rr = (rr * dim) | 0; gg = (gg * dim) | 0; bb = (bb * dim) | 0;
-          alpha = (alpha * dim) | 0;
-        }
-        stampCell(col, row, originX, originY, ch, rr, gg, bb, alpha);
-      }
-    }
-    ctx.putImageData(buf, 0, 0);
-    canvas.style.transform = "none";
-    canvas.style.opacity = "1";
-    if (veilEl) veilEl.style.opacity = String(dim);
-    if (nameTitle.textContent !== label) setSceneLabel(label, "🏠");
-  }
   function spawnDvd() {
     document.body.classList.remove("intro");
     spawned = true;
@@ -2132,6 +2041,7 @@ const E=[
     if (Math.abs(vx) < 70) vx = vx < 0 ? -90 : 90;
     if (Math.abs(vy) < 60) vy = vy < 0 ? -80 : 80;
     logo.style.visibility = "visible";
+    if (veilEl) veilEl.style.opacity = "";
   }
   function frame(now) {
     if (document.hidden) { raf = 0; return; }
@@ -2140,18 +2050,10 @@ const E=[
     var t = (now - started) / 1000;
     clock = t;
     if (shop.classList.contains("open")) {
-      paintBar(t);
+      /* the builder owns the screen */
     } else if (introOn && !spawned) {
-      var age = (now - started) / 1000;
-      if (age < INTRO_LEN) paintIntro(age);
-      else {
-        spawnDvd();
-        paintASCII(t);
-        stepLogo(dt, t);
-        canvas.style.opacity = "0";
-        logo.style.opacity = "0";
-        if (veilEl) veilEl.style.opacity = "0";
-      }
+      paintIntro(t);
+      stepIntroLogo(t);
     } else {
       paintASCII(t);
       stepLogo(dt, t);
@@ -2173,7 +2075,6 @@ const E=[
   if (window.visualViewport) window.visualViewport.addEventListener("resize", function () { resize(); });
   window.addEventListener("resize", function () {
     resize();
-    sizeBar();
     if (x + baseW > window.innerWidth) x = Math.max(0, window.innerWidth - baseW);
     if (y + baseH > window.innerHeight) y = Math.max(0, window.innerHeight - baseH);
   });
