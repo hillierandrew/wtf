@@ -121,6 +121,8 @@
     min-width: 44px; min-height: 44px; border: 0; border-radius: 999px;
     background: #ffffff18; color: #fff; font-size: 20px; cursor: pointer;
   }
+  body.intro #logo { visibility: hidden; }
+  body.intro #field { transform: none !important; }
   body.building #field,
   body.building #logo,
   body.building #veil,
@@ -144,7 +146,7 @@
   }
 </style>
 </head>
-<body>
+<body class="intro">
 <h1>DREW.WTF</h1>
 <canvas id="field"></canvas>
 <div id="veil"></div>
@@ -1852,6 +1854,162 @@ const E=[
   }
 
   var last = performance.now(), raf = 0, started = performance.now();
+  var veilEl = document.getElementById("veil");
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var HYPER_FOR = 2.2, SHOOT_FOR = 2.0, GLOW_FOR = 10, BLACK_FOR = 1.35;
+  var INTRO_LEN = HYPER_FOR + SHOOT_FOR + GLOW_FOR + BLACK_FOR;
+  var introOn = !reduceMotion;
+  var spawned = !introOn;
+  var revealAt = 0;
+  if (!introOn) document.body.classList.remove("intro");
+  var WORD_BITS = {
+    D: [0x1e,0x11,0x11,0x11,0x11,0x11,0x1e],
+    R: [0x1e,0x11,0x11,0x1e,0x14,0x12,0x11],
+    E: [0x1f,0x10,0x10,0x1e,0x10,0x10,0x1f],
+    W: [0x11,0x11,0x11,0x15,0x15,0x15,0x0a],
+    ".": [0,0,0,0,0,0x0c,0x0c],
+    T: [0x1f,0x04,0x04,0x04,0x04,0x04,0x04],
+    F: [0x1f,0x10,0x10,0x1e,0x10,0x10,0x10]
+  };
+  var WORD_TEXT = "DREW.WTF";
+  function hyperHash(n) {
+    n = Math.sin(n * 127.1) * 43758.5453;
+    return n - Math.floor(n);
+  }
+  function hyperAt(x, y, t) {
+    var r = Math.hypot(x, y);
+    var ai = Math.floor(Math.atan2(y, x) * 30 / Math.PI);
+    var v = 0;
+    var tt = t * 2;
+    for (var k = 0; k < 3; k++) {
+      var h = hyperHash(ai + k * 37.7);
+      var p = (tt * (0.2 + h * 0.5) + h * 5) % 1;
+      if (Math.abs(r - p * 1.5) < 0.03 + p * 0.07) v = Math.max(v, p);
+    }
+    return Math.max(v, Math.exp(-r * r * 18));
+  }
+  function wordOn(col, row, scale01) {
+    var cellsW = WORD_TEXT.length * 6 - 1;
+    var unit = Math.min(cols * 0.92 / cellsW, rows * 0.72 / 7);
+    var s = Math.max(0.015, scale01) * unit;
+    var gw = cellsW * s, gh = 7 * s;
+    var u = (col + 0.5 - (cols - gw) / 2) / s;
+    var v = (row + 0.5 - (rows - gh) / 2) / s;
+    var ci = Math.floor(u / 6);
+    if (ci < 0 || ci >= WORD_TEXT.length) return false;
+    var px = u - ci * 6, py = v | 0;
+    if (px < 0 || px >= 5 || py < 0 || py >= 7) return false;
+    var bits = WORD_BITS[WORD_TEXT.charAt(ci)][py];
+    return (bits & (16 >> (px | 0))) !== 0;
+  }
+  function stampCell(col, row, originX, originY, ch, rr, gg, bb, alpha) {
+    var glyph = FONT[ch] || FONT[" "];
+    if (!(glyph[0] | glyph[1] | glyph[2] | glyph[3] | glyph[4] | glyph[5] | glyph[6])) return;
+    var x0 = originX + col * cellW;
+    var y0 = originY + row * cellH;
+    for (var gy = 0; gy < 7; gy++) {
+      var bits = glyph[gy];
+      if (!bits) continue;
+      var py = y0 + gy * scale;
+      if (py < 0 || py >= H) continue;
+      for (var gx = 0; gx < 5; gx++) {
+        if ((bits & (16 >> gx)) === 0) continue;
+        var px = x0 + gx * scale;
+        if (px < 0 || px >= W) continue;
+        for (var sy = 0; sy < scale; sy++) {
+          var yy = py + sy;
+          if (yy >= H) break;
+          var rowI = yy * W;
+          for (var sx = 0; sx < scale; sx++) {
+            var xx = px + sx;
+            if (xx >= W) break;
+            var p = (rowI + xx) * 4;
+            data[p] = rr; data[p + 1] = gg; data[p + 2] = bb; data[p + 3] = alpha;
+          }
+        }
+      }
+    }
+  }
+  function paintIntro(age) {
+    data.fill(0);
+    var shoot = 0, glow = 0, black = 0, label = "Hyperspace";
+    if (age < HYPER_FOR) {
+      shoot = 0;
+    } else if (age < HYPER_FOR + SHOOT_FOR) {
+      var u = (age - HYPER_FOR) / SHOOT_FOR;
+      shoot = 1 - Math.pow(1 - u, 2.6);
+      label = "DREW.WTF";
+    } else if (age < HYPER_FOR + SHOOT_FOR + GLOW_FOR) {
+      shoot = 1;
+      glow = (age - HYPER_FOR - SHOOT_FOR) / GLOW_FOR;
+      label = "DREW.WTF";
+    } else {
+      shoot = 1;
+      glow = 1;
+      black = Math.min(1, (age - HYPER_FOR - SHOOT_FOR - GLOW_FOR) / BLACK_FOR);
+      label = "DREW.WTF";
+    }
+    var aspect = W / Math.max(1, H);
+    var originX = ((W - cols * cellW) * 0.5) | 0;
+    var originY = ((H - rows * cellH) * 0.5) | 0;
+    var ramp = " .:-=+*#%@";
+    var pulse = 0.42 + 0.58 * (0.5 + 0.5 * Math.sin(age * 7.5));
+    if (glow > 0 && Math.sin(age * 6.2) > 0.55) pulse = 1;
+    var dim = 1 - black;
+    for (var row = 0; row < rows; row++) {
+      for (var col = 0; col < cols; col++) {
+        var x = ((col + 0.5) / cols * 2 - 1) * aspect;
+        var y = ((row + 0.5) / rows) * 2 - 1;
+        var on = shoot > 0.02 && wordOn(col, row, shoot);
+        var ch, rr, gg, bb, alpha;
+        if (on) {
+          ch = pulse > 0.82 ? "@" : pulse > 0.5 ? "#" : "*";
+          if (pulse > 0.9) { rr = 255; gg = 255; bb = 255; }
+          else {
+            var rgb = hsl((age * 90 + col * 3) % 360, 1, 0.42 + pulse * 0.38);
+            rr = rgb[0]; gg = rgb[1]; bb = rgb[2];
+          }
+          alpha = (210 + pulse * 45) | 0;
+        } else {
+          var v = hyperAt(x, y, age);
+          var ii = Math.max(0, Math.min(ramp.length - 1, (v * (ramp.length - 1)) | 0));
+          ch = ramp.charAt(ii);
+          var hue = (age * 40 + v * 80 + col * 1.4) % 360;
+          var light = (0.28 + v * 0.55);
+          var bg = hsl(hue, 1, light);
+          rr = bg[0]; gg = bg[1]; bb = bg[2];
+          alpha = (140 + v * 115) | 0;
+        }
+        if (dim < 1) {
+          rr = (rr * dim) | 0; gg = (gg * dim) | 0; bb = (bb * dim) | 0;
+          alpha = (alpha * dim) | 0;
+        }
+        stampCell(col, row, originX, originY, ch, rr, gg, bb, alpha);
+      }
+    }
+    ctx.putImageData(buf, 0, 0);
+    canvas.style.transform = "none";
+    canvas.style.opacity = "1";
+    if (veilEl) veilEl.style.opacity = String(dim);
+    if (nameTitle.textContent !== label) nameTitle.textContent = label;
+    nameMark.textContent = "🏠";
+  }
+  function spawnDvd() {
+    document.body.classList.remove("intro");
+    spawned = true;
+    revealAt = performance.now();
+    timeOff = -clock;
+    prepKey = "";
+    var vw = window.innerWidth, vh = window.innerHeight;
+    x = Math.max(0, (vw - baseW) * 0.5);
+    y = Math.max(0, (vh - baseH) * 0.38);
+    var dir = Math.random() * Math.PI * 2;
+    vx = Math.cos(dir) * 170;
+    vy = Math.sin(dir) * 130;
+    if (Math.abs(vx) < 70) vx = vx < 0 ? -90 : 90;
+    if (Math.abs(vy) < 60) vy = vy < 0 ? -80 : 80;
+    logo.style.visibility = "visible";
+  }
   function frame(now) {
     if (document.hidden) { raf = 0; return; }
     var dt = Math.min(0.05, (now - last) / 1000);
@@ -1860,9 +2018,31 @@ const E=[
     clock = t;
     if (shop.classList.contains("open")) {
       paintBar(t);
+    } else if (introOn && !spawned) {
+      var age = (now - started) / 1000;
+      if (age < INTRO_LEN) paintIntro(age);
+      else {
+        spawnDvd();
+        paintASCII(t);
+        stepLogo(dt, t);
+        canvas.style.opacity = "0";
+        logo.style.opacity = "0";
+        if (veilEl) veilEl.style.opacity = "0";
+      }
     } else {
       paintASCII(t);
       stepLogo(dt, t);
+      if (revealAt) {
+        var rev = Math.min(1, (now - revealAt) / 900);
+        if (rev < 1) {
+          canvas.style.opacity = String(rev);
+          logo.style.opacity = String(rev);
+          if (veilEl) veilEl.style.opacity = String(rev);
+        } else {
+          revealAt = 0;
+          if (veilEl) veilEl.style.opacity = "";
+        }
+      }
     }
     raf = requestAnimationFrame(frame);
   }
