@@ -95,16 +95,22 @@
   #shop {
     position: fixed; inset: 0; z-index: 12;
     display: none; flex-direction: column;
-    background: rgba(0, 0, 0, 0.28);
+    background: #0c0c0e;
   }
   #shop.open { display: flex; }
   #shopBar {
+    position: relative;
     display: flex; align-items: center; gap: 12px;
+    height: 92px; min-height: 92px;
     padding: 8px 10px;
-    background: rgba(0, 0, 0, 0.45);
+    background: #000;
     color: #f6f1e8;
     font: 600 16px/1 system-ui, sans-serif;
+    overflow: hidden;
   }
+  #barArt { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  #shopClose, #shopTitle { position: relative; z-index: 2; }
+  #shopTitle { text-shadow: 0 1px 2px #000; }
   #shopClose {
     min-height: 44px; padding: 0 14px; border-radius: 10px;
     border: 0; background: #d6ff4a; color: #111; font: inherit; cursor: pointer;
@@ -115,7 +121,10 @@
     min-width: 44px; min-height: 44px; border: 0; border-radius: 999px;
     background: #ffffff18; color: #fff; font-size: 20px; cursor: pointer;
   }
-  body.clean #logo { display: none; }
+  body.building #field,
+  body.building #logo,
+  body.building #veil,
+  body.building #dock { visibility: hidden; }
   body.clean #dock {
     background: transparent; border-color: transparent; padding: 0;
     box-shadow: none;
@@ -167,6 +176,7 @@
   <div id="shopBar">
     <button id="shopClose" type="button">Close</button>
     <span id="shopTitle">Build a computer</span>
+    <canvas id="barArt" aria-hidden="true"></canvas>
   </div>
   <iframe id="shopFrame" title="Build a computer"></iframe>
 </div>
@@ -198,6 +208,8 @@
 
   function openShop(which) {
     shop.classList.add("open");
+    document.body.classList.add("building");
+    sizeBar();
     var frame = document.getElementById("shopFrame");
     var src = which === "dream" ? "bench/dream.html" : which === "easy" ? "bench/easy.html" : "bench/";
     var title = document.getElementById("shopTitle");
@@ -1242,7 +1254,11 @@ const E=[
 ["Moire Drift",0,1,(x,y,t)=>o(H(x-S(t*.4)*.5,y)*60)*o(H(x+S(t*.3)*.5,y-C(t*.2)*.3)*60)],
 ["Drip Drop Top",4,1,(x,y,t,i,j)=>{let h=hs(i*.7),d=j-(((t*.25*(.5+h)+h*3)%1)*(rows+8)-4);return d<0?.35+.25*hs(i+j*.31):d<2?1-d*.4:0}],
 ["Loading… 99% (never)",2,1,(x,y,t)=>{let p=.99*(1-Math.exp(-(t%14)*.4));if(ab(y)<.1&&ab(x)<.84&&(ab(y)>.075||ab(x)>.81))return 1;if(ab(y)<.075&&ab(x)<.81)return x<-.81+1.62*p?.85:.18;return .3*o(x*8+S(y*6+t)*2)*o(y*9-t)}],
-["Gravity Unplugged ↑",3,1,(x,y,t,i,j)=>{let h=hs(i*1.3),d=(t*(2+h*6)+h*99)%(rows+12)-(rows-j);return d>0&&d<12?1-d/12:0}]
+["Gravity Unplugged",3,1,(x,y,t,i,j)=>{let h=hs(i*1.3),d=(t*(2+h*6)+h*99)%(rows+12)-(rows-j);return d>0&&d<12?1-d/12:0}],
+["Cap Forest",1,1,(x,y,t)=>{let g=.55,cx=(F(x/g)+.5)*g,cy=(F((y+t*.15)/g)+.5)*g,dx=x-cx,dy=y-cy;dy+=S(t+cx*4)*.05;if(dy<.05&&dx*dx/.18+dy*dy/.12<1)return .45+.55*o(dx*20+t*3);if(ab(dx)<.06&&dy>0&&dy<.42)return .7;return .08*o(x*8+y*6-t)}],
+["Melting Room",0,1,(x,y,t)=>{let m=y+S(x*6+t*2)*.18+.25*S(t*.7);let wall=ab(S(x*5+S(y*3+t)))>.92||ab(S(m*7))>.9;let drip=hs(F(x*14))>.82&&m<((t*.4+hs(F(x*14)))%1)*1.4-.2;return wall||drip?1:.12+.2*o(m*10)}],
+["Breathing Wallpaper",2,1,(x,y,t)=>{let s=.7+.25*S(t);let u=x*s,v=y*s;return o(S(u*4+t)+S(v*4-t*.7)+S((u+v)*3+t*.4)+S(H(u,v)*6-t*2))}],
+["Living Floor",5,1,(x,y,t)=>{let w=y*.6+S(x*3+t)*.2;return o(S(x*10+S(w*6+t)*3)+S(w*8-t*2))*o(H(x,y)*3-t)}]
 ];
     var SAFE = [" .:-=+*#%@", " .oO0#@%", " .:+#*X%", " |/\\xX#@", " .~=oO#"];
     return E.map(function (scene) {
@@ -1665,7 +1681,7 @@ const E=[
     clean = !clean;
     document.body.classList.toggle("clean", clean);
     blockBtn.setAttribute("aria-label", clean ? "Show the name and buttons" : "Hide the name and buttons");
-    if (clean) { gate.classList.remove("open"); shop.classList.remove("open"); }
+    if (clean) { gate.classList.remove("open"); shop.classList.remove("open"); document.body.classList.remove("building"); }
   });
   playBtn.addEventListener("click", function () { setPlaying(!playing); });
   homeBtn.addEventListener("click", function () { setPack("home"); });
@@ -1680,7 +1696,10 @@ const E=[
   });
   gateCancel.addEventListener("click", function () { gate.classList.remove("open"); });
   gate.addEventListener("click", function (e) { if (e.target === gate) gate.classList.remove("open"); });
-  shopClose.addEventListener("click", function () { shop.classList.remove("open"); });
+  shopClose.addEventListener("click", function () {
+    shop.classList.remove("open");
+    document.body.classList.remove("building");
+  });
   gateForm.addEventListener("submit", function (e) {
     e.preventDefault();
     if (gatePass.value === "Password1") {
@@ -1711,6 +1730,59 @@ const E=[
   if (Math.abs(vx) < 70) vx = vx < 0 ? -90 : 90;
   if (Math.abs(vy) < 60) vy = vy < 0 ? -80 : 80;
 
+  var bar = document.getElementById("barArt");
+  var bctx = bar.getContext("2d");
+  function sizeBar() {
+    var r = bar.parentElement.getBoundingClientRect();
+    var dpr = Math.min(2, window.devicePixelRatio || 1);
+    bar.width = Math.max(2, Math.floor(r.width * dpr));
+    bar.height = Math.max(2, Math.floor(r.height * dpr));
+  }
+  function paintBar(t) {
+    var w = bar.width, h = bar.height;
+    if (w < 4) return;
+    bctx.setTransform(1, 0, 0, 1, 0, 0);
+    bctx.fillStyle = "#050505";
+    bctx.fillRect(0, 0, w, h);
+    bctx.fillStyle = "#d7c4ff";
+    bctx.font = Math.max(12, Math.floor(h / 7)) + "px ui-monospace, Menlo, monospace";
+    bctx.textBaseline = "top";
+    var phase = Math.floor(t * 1.4) % 5;
+    var lines = [
+      "  .-------- TOWER --------.",
+      "  | CPU " + (phase > 0 ? "[####]" : "[    ]") + "  drop |",
+      "  | RAM " + (phase > 1 ? "|| ||" : "|  | ") + "  click |",
+      "  | NVME " + (phase > 2 ? "[==]>" : "[  ] ") + " slide |",
+      "  | GPU " + (phase > 3 ? "[======]>" : "[      ]") + " |",
+      "  '-----------------------'"
+    ];
+    for (var i = 0; i < lines.length; i++) bctx.fillText(lines[i], 8, 4 + i * (h / 8));
+    for (var s = 0; s < 18; s++) {
+      var sx = ((s * 97 + t * 40) % (w + 20)) - 10;
+      var sy = (Math.sin(t * 1.3 + s) * 0.5 + 0.5) * h * 0.62;
+      bctx.fillStyle = s % 2 ? "#ff8ad4" : "#b388ff";
+      bctx.fillText(s % 3 ? "*" : "o", sx, sy);
+    }
+    var y = h * 0.74, bh = Math.max(10, h * 0.16), x0 = w * 0.28, bw = w * 0.68;
+    var p = (t % 6) / 6;
+    bctx.strokeStyle = "#9dff57";
+    bctx.lineWidth = 2;
+    bctx.strokeRect(x0, y, bw, bh);
+    bctx.fillStyle = "#12300a";
+    bctx.fillRect(x0, y, bw, bh);
+    bctx.fillStyle = "#3ddc4a";
+    bctx.fillRect(x0 + 2, y + 2, Math.max(0, (bw - 4) * p), bh - 4);
+    bctx.font = Math.max(11, Math.floor(bh * 0.7)) + "px ui-monospace, Menlo, monospace";
+    bctx.fillStyle = "#041404";
+    var glyphs = "█▓▒░*oO";
+    var step = Math.max(8, bh * 0.7);
+    for (var gx = x0 + 4; gx < x0 + (bw - 4) * p; gx += step) {
+      bctx.fillText(glyphs.charAt(Math.floor(t * 8 + gx) % glyphs.length), gx, y + 2);
+    }
+    bctx.fillStyle = "#d6ff4a";
+    bctx.fillText("BUILDING " + Math.floor(p * 100) + "%", x0, y - Math.max(14, h * 0.14));
+  }
+
   var last = performance.now(), raf = 0, started = performance.now();
   function frame(now) {
     if (document.hidden) { raf = 0; return; }
@@ -1718,13 +1790,18 @@ const E=[
     last = now;
     var t = (now - started) / 1000;
     clock = t;
-    paintASCII(t);
-    stepLogo(dt, t);
+    if (shop.classList.contains("open")) {
+      paintBar(t);
+    } else {
+      paintASCII(t);
+      stepLogo(dt, t);
+    }
     raf = requestAnimationFrame(frame);
   }
   if (window.visualViewport) window.visualViewport.addEventListener("resize", function () { resize(); });
   window.addEventListener("resize", function () {
     resize();
+    sizeBar();
     if (x + baseW > window.innerWidth) x = Math.max(0, window.innerWidth - baseW);
     if (y + baseH > window.innerHeight) y = Math.max(0, window.innerHeight - baseH);
   });
