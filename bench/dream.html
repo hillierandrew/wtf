@@ -57,12 +57,15 @@
   #lock { position: fixed; inset: 0; background: #ececec; display: grid; place-items: center; z-index: 6; }
   #lock form { width: min(360px, 92vw); text-align: center; }
   .bad { color: #8d243c; min-height: 1.2em; font: 14px system-ui, sans-serif; }
-  @media (max-width: 720px) {
-    table, thead, tbody, tr, th, td { display: block; }
-    thead { display: none; }
-    tr { border-bottom: 8px solid #ececec; }
-    .remain { float: none; display: block; margin: 8px 0; }
-  }
+  body.phone table, body.phone thead, body.phone tbody, body.phone tr, body.phone th, body.phone td { display: block; }
+  body.phone thead { display: none; }
+  body.phone tr { background: #fff; border-radius: 16px; margin: 8px 0; padding: 8px; }
+  body.phone .remain { float: none; display: block; margin: 8px 0; }
+  body.desk .wrap { max-width: 1100px; }
+  .mode button.on { outline: 3px solid #111; }
+  .orderbar { display: none; }
+  body.phone .orderbar { display: flex; position: sticky; bottom: 0; gap: 12px; align-items: center; background: #fff; border-top: 1px solid #ddd; padding: 12px; margin: 16px -18px -64px; }
+  body.phone .orderbar button { flex: 1; background: #111; color: #fff; border: 0; border-radius: 999px; min-height: 56px; font-weight: 700; }
 </style>
 </head>
 <body>
@@ -87,6 +90,10 @@
 <div class="wrap">
   <h1>Build the PC of your Dreams... with a click!</h1>
   <p class="sub">Try the builder and cost calculator. Worry about nothing but your budget.</p>
+  <div class="controls mode">
+    <button class="ghost" type="button" id="phoneBtn" aria-label="Mobile layout">📱 Phone</button>
+    <button class="ghost" type="button" id="deskBtn" aria-label="Desktop layout">🖥️ Desk</button>
+  </div>
   <p class="lead">Pick a use, set what you can spend, and the parts are chosen so they fit each other. You can swap any part after.</p>
   <p class="notes"><b>Notes:</b> Set a budget. Press <b>Suggest a Build</b> and press it again if you want a different one. <b>Add Component</b> starts from the parts you already have. Click a thumbnail to read the part. Copy the build link if you want to show it to someone.</p>
   <div class="controls">
@@ -139,6 +146,10 @@
   <div class="issues">
     <h2>Compatibility issues</h2>
     <ul id="issues"></ul>
+  </div>
+  <div class="orderbar">
+    <div><div>Paper total</div><b id="orderTotal">$0.00</b></div>
+    <button type="button" id="orderBtn">Review list</button>
   </div>
 </div>
 <script>
@@ -316,6 +327,8 @@ function draw() {
     body.appendChild(tr);
   });
   document.getElementById("total").textContent = "Total: " + money.format(total);
+  const orderTotal = document.getElementById("orderTotal");
+  if (orderTotal) orderTotal.textContent = money.format(total);
   const left = effectiveBudget() - total;
   document.getElementById("remain").textContent = "Remaining budget: " + money.format(left);
   const box = document.getElementById("issues");
@@ -344,8 +357,20 @@ function fillAdder() {
     list.appendChild(button);
   });
 }
+function preferredLayout(){
+  try { const saved = sessionStorage.getItem("drew-layout"); if (saved === "phone" || saved === "desk") return saved; } catch (e) {}
+  return window.matchMedia("(max-width: 820px)").matches ? "phone" : "desk";
+}
+function setLayout(next){
+  try { sessionStorage.setItem("drew-layout", next); } catch (e) {}
+  document.body.classList.toggle("phone", next === "phone");
+  document.body.classList.toggle("desk", next === "desk");
+  document.getElementById("phoneBtn").classList.toggle("on", next === "phone");
+  document.getElementById("deskBtn").classList.toggle("on", next === "desk");
+}
 function start() {
   document.getElementById("lock").hidden = true;
+  setLayout(preferredLayout());
   const cat = document.getElementById("addCat");
   CATS.forEach((id) => { const o = document.createElement("option"); o.value = id; o.textContent = NAMES[id]; cat.appendChild(o); });
   fetch("parts.json").then((res) => res.json()).then((data) => {
@@ -358,6 +383,9 @@ function start() {
   if (sessionStorage.getItem("dream-tour") === "1") document.getElementById("tour").hidden = true;
   else showTour();
 }
+document.getElementById("phoneBtn").onclick = () => setLayout("phone");
+document.getElementById("deskBtn").onclick = () => setLayout("desk");
+document.getElementById("orderBtn").onclick = () => window.print();
 document.getElementById("setBudget").onclick = () => { budget = Math.max(0, Math.min(20000, Number(document.getElementById("budget").value) || 0)); draw(); };
 document.getElementById("clearBudget").onclick = () => { budget = 0; document.getElementById("budget").value = 0; draw(); };
 document.getElementById("fine").oninput = () => { document.getElementById("fineLabel").textContent = document.getElementById("fine").value + "%"; draw(); };

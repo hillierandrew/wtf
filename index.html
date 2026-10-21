@@ -56,7 +56,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: min(46vw, 220px);
+    max-width: min(72vw, 460px);
     font-size: 12px;
   }
   #name b { font-weight: 600; color: #fff; margin-left: 6px; }
@@ -1212,7 +1212,7 @@ const E=[
 ["Black Hole Buddy 🖱",0,1,(x,y,t)=>{let d=x-mx,e=y-my,r=H(d,e);return o(4/(r+.1)+A(e,d)*2-t*5)*Mn(1,r*3)}],
 ["Cursor Ripples 🖱",1,1,(x,y,t)=>{let r=H(x-mx,y-my);return o(r*20-t*6)/(1+r*2.5)}],
 ["The Eye Watches 🖱",1,1,(x,y,t)=>{let r=H(x,y),a=A(y,x),L=H(mx,my),k=L>.35?.35/L:1,p=x-mx*k,q=y-my*k,d=H(p,q);if(r>.8)return r<1.25?.25*o(a*20+r*10-t*3):0;if(d<.09+.03*S(t))return 0;if(d<.34)return .55+.4*o(A(q,p)*12+t*2);return .25*o(x*9+S(y*7+t)*2)}],
-["Mushroom Mind 🍄",0,1,(x,y,t)=>{x+=S(y*5+t*2)*.03;let r=H(x,y);if(y<.12&&x*x/.5+(y-.12)**2/.32<1)return o(x*14)*o(y*14+t)>.8?1:.45+.2*o(r*18-t*3);if(ab(x)<.13+.04*S(y*7-t*2)&&y>=.12&&y<.75)return .3+.3*o(y*20-t*4);return .2*o(r*12-t*2)}],
+["Mushroom Mind",0,1,(x,y,t)=>{x+=S(y*5+t*2)*.03;let r=H(x,y);if(y<.12&&x*x/.5+(y-.12)**2/.32<1)return o(x*14)*o(y*14+t)>.8?1:.45+.2*o(r*18-t*3);if(ab(x)<.13+.04*S(y*7-t*2)&&y>=.12&&y<.75)return .3+.3*o(y*20-t*4);return .2*o(r*12-t*2)},"purple"],
 ["Wormholes",3,1,(x,y,t)=>o(y*12+S(x*3+t)*3+t)],
 ["Drunk Checkerboard",2,1,(x,y,t)=>((F(x*5+2*S(y*3+t))+F(y*5+2*C(x*3-t)))&1)?.9:.15],
 ["Kaleido-Scope",5,1,(x,y,t)=>{let k=ab((A(y,x)+P)%(P/3)-P/6);return o(H(x,y)*10+S(k*8+t)*3-t*2)}],
@@ -1233,7 +1233,7 @@ const E=[
 ["Highway To Nowhere ⚡",0,1,(x,y,t)=>y<.02?(H(x,y+.3)<.3&&S(y*70)>-.2?.9:hs(F(x*30)*7.7+F(y*20))>.985?.8:0):(ab(S(x/(y+.02)*3))>.96||ab(S(1/(y+.02)*2-t*8))>.96?.9/(1+.15/(y+.02)):.03)],
 ["Ouroboros",1,1,(x,y,t)=>{let r=H(x,y),d=((A(y,x)-t*2)%(2*P)+2*P)%(2*P);return(1-d/6.283)*Mx(0,1-ab(r-.6)*10)}],
 ["Hyperspace ⚡",0,2,(x,y,t)=>{let r=H(x,y),ai=F(A(y,x)*30/P),v=0;for(let k=0;k<3;k++){let h=hs(ai+k*37.7),p=(t*(.2+h*.5)+h*5)%1;if(ab(r-p*1.5)<.03+p*.07)v=Mx(v,p)}return v}],
-["Spores Rising 🍄",1,1,(x,y,t)=>{let s=0;for(let k=0;k<16;k++){let X=S(k*7.1)*1.4+S(t*.5+k)*.12,Y=1.2-((t*.08*(1+k%3)+k*.37)%1)*2.4;s+=.0025*(1+k%3)/(H(x-X,y-Y)**2+.0006)}return Mn(1,s)}],
+["Spores Rising",1,1,(x,y,t)=>{let s=0;for(let k=0;k<16;k++){let X=S(k*7.1)*1.4+S(t*.5+k)*.12,Y=1.2-((t*.08*(1+k%3)+k*.37)%1)*2.4;s+=.0025*(1+k%3)/(H(x-X,y-Y)**2+.0006)}return Mn(1,s)},"purple"],
 ["Ghost Comet Trail 🖱",1,1,(x,y)=>{let s=0,n=tr.length;for(let k=0;k<n;k++)s+=.004*(k/n)/(H(x-tr[k][0],y-tr[k][1])**2+.002);return Mn(1,s)}],
 ["Quad-Mirror Ripples 🖱",0,1,(x,y,t)=>o(H(ab(x)-ab(mx),ab(y)-ab(my))*18-t*4)],
 ["Bubble Lattice",1,1,(x,y,t)=>{let u=(x*5%1+1)%1-.5,w=(y*5%1+1)%1-.5;return Mx(0,1-H(u,w)*(2.2-.8*S(F(x*5)+F(y*5)*1.7+t*2)))}],
@@ -1255,10 +1255,32 @@ const E=[
 ["Drip Drop Top",4,1,(x,y,t,i,j)=>{let h=hs(i*.7),d=j-(((t*.25*(.5+h)+h*3)%1)*(rows+8)-4);return d<0?.35+.25*hs(i+j*.31):d<2?1-d*.4:0}],
 ["Loading… 99% (never)",2,1,(x,y,t)=>{let p=.99*(1-Math.exp(-(t%14)*.4));if(ab(y)<.1&&ab(x)<.84&&(ab(y)>.075||ab(x)>.81))return 1;if(ab(y)<.075&&ab(x)<.81)return x<-.81+1.62*p?.85:.18;return .3*o(x*8+S(y*6+t)*2)*o(y*9-t)}],
 ["Gravity Unplugged",3,1,(x,y,t,i,j)=>{let h=hs(i*1.3),d=(t*(2+h*6)+h*99)%(rows+12)-(rows-j);return d>0&&d<12?1-d/12:0}],
-["Cap Forest",1,1,(x,y,t)=>{let g=.55,cx=(F(x/g)+.5)*g,cy=(F((y+t*.15)/g)+.5)*g,dx=x-cx,dy=y-cy;dy+=S(t+cx*4)*.05;if(dy<.05&&dx*dx/.18+dy*dy/.12<1)return .45+.55*o(dx*20+t*3);if(ab(dx)<.06&&dy>0&&dy<.42)return .7;return .08*o(x*8+y*6-t)}],
-["Melting Room",0,1,(x,y,t)=>{let m=y+S(x*6+t*2)*.18+.25*S(t*.7);let wall=ab(S(x*5+S(y*3+t)))>.92||ab(S(m*7))>.9;let drip=hs(F(x*14))>.82&&m<((t*.4+hs(F(x*14)))%1)*1.4-.2;return wall||drip?1:.12+.2*o(m*10)}],
-["Breathing Wallpaper",2,1,(x,y,t)=>{let s=.7+.25*S(t);let u=x*s,v=y*s;return o(S(u*4+t)+S(v*4-t*.7)+S((u+v)*3+t*.4)+S(H(u,v)*6-t*2))}],
-["Living Floor",5,1,(x,y,t)=>{let w=y*.6+S(x*3+t)*.2;return o(S(x*10+S(w*6+t)*3)+S(w*8-t*2))*o(H(x,y)*3-t)}]
+["Cap Forest",1,1,(x,y,t)=>{let g=.55,cx=(F(x/g)+.5)*g,cy=(F((y+t*.15)/g)+.5)*g,dx=x-cx,dy=y-cy;dy+=S(t+cx*4)*.05;if(dy<.05&&dx*dx/.18+dy*dy/.12<1)return .45+.55*o(dx*20+t*3);if(ab(dx)<.06&&dy>0&&dy<.42)return .7;return .08*o(x*8+y*6-t)},"purple"],
+["Melting Room",0,1,(x,y,t)=>{let m=y+S(x*6+t*2)*.18+.25*S(t*.7);let wall=ab(S(x*5+S(y*3+t)))>.92||ab(S(m*7))>.9;let drip=hs(F(x*14))>.82&&m<((t*.4+hs(F(x*14)))%1)*1.4-.2;return wall||drip?1:.12+.2*o(m*10)},"purple"],
+["Breathing Wallpaper",2,1,(x,y,t)=>{let s=.7+.25*S(t);let u=x*s,v=y*s;return o(S(u*4+t)+S(v*4-t*.7)+S((u+v)*3+t*.4)+S(H(u,v)*6-t*2))},"purple"],
+["Living Floor",5,1,(x,y,t)=>{let w=y*.6+S(x*3+t)*.2;return o(S(x*10+S(w*6+t)*3)+S(w*8-t*2))*o(H(x,y)*3-t)},"purple"],
+["Blasphemy Caps",1,1,(x,y,t)=>{
+  function cap(cx,cy,w,h,stem){
+    let dx=x-cx+S(t*.7+cx*3)*.02, dy=y-cy;
+    let e=(dx*dx)/(w*w)+(dy*dy)/(h*h);
+    if(e<1&&dy<h*.2){let rim=e>.72?.15:0;let gill=dy>-h*.1&&ab(S(dx/w*18))>.62?.2:0;return (dy<-h*.25?1:.78)-rim-gill}
+    if(ab(dx)<w*.18&&dy>-h*.1&&dy<stem) return .55;
+    return 0;
+  }
+  let v=y>.62?.22+.1*o(x*16+S(y*22)):.05*o(x*5+y*3-t);
+  let caps=[[-.32,-.22,.4,.3,.78],[.18,-.08,.3,.22,.5],[.46,.02,.26,.18,.42],[.02,.1,.2,.15,.36],[-.02,.28,.34,.2,.26],[.5,.22,.16,.12,.28],[-.48,.16,.2,.15,.34]];
+  for(let i=0;i<caps.length;i++){let c=caps[i],b=1+.035*S(t*1.3+i);v=Mx(v,cap(c[0],c[1]+S(t*.6+i)*.02,c[2]*b,c[3]*b,c[4]))}
+  if(y>.42&&y<.66&&x>-.4&&x<.45) v=Mx(v,.32);
+  return Mn(1,v);
+},"purple"],
+["Gill Light",1,1,(x,y,t)=>{let u=x+S(y*2+t)*.08;let ribs=ab(S(u*22+S(t)))>.72&&y<S(x*3)*.2+.15;let dome=u*u*.8+(y+.15)*(y+.15)<.55;return dome?(ribs?1:.55+.2*o(y*12-t)):.06}],
+["Spore Lanterns",0,1,(x,y,t)=>{let s=0;for(let k=0;k<9;k++){let X=S(k*2.1)*.9,Y=C(k*1.7)*.55+S(t*.5+k)*.08,r=.16+.04*(k%3);let d=H(x-X,(y-Y)*1.15);if(d<r)s=Mx(s,1-d/r);else if(ab(x-X)<r*.2&&y>Y&&y<Y+.45)s=Mx(s,.45)}return s||.05*o(y*8-t)}],
+["Mycelium Web",3,1,(x,y,t)=>{let n=0;for(let k=0;k<6;k++){let a=S(k*3+t*.4),b=C(k*2.2-t*.3);n+=.03/(ab((y-b)-(x-a)*S(t+k))+.03)}return Mn(1,n*.15)*.85+.08*o(H(x,y)*6-t)}],
+["Violet Rain",1,1,(x,y,t)=>{let col=F(x*7);let drop=((y*3+t*(.6+hs(col)) )%1);let on=ab((x*7%1)-.5)<.08&&drop<.35;return on?1-drop:.08+.2*hs(col+F(t*2))}],
+["Cap Tunnel",0,1,(x,y,t)=>{let r=H(x*.7,y);let a=A(y,x);let cap=ab(S(a*5+t))<.45&&r<.75&&r>.2;let gill=ab(S(a*16-t*2))>.8&&r<.7;return cap?(gill?1:.6):.08*o(8/ (r+.2) -t*3)}],
+["Stem Cathedral",2,1,(x,y,t)=>{let col=F((x+2)*3.5);let cx=(col+.5)/3.5-2;let dx=x-cx;let h=.2+.55*hs(col*4);let stem=ab(dx)<.06&&y>-h&&y<.85;let dome=H(dx,(y+h)*.8)<.22+.04*S(t+col);return dome?1:(stem?.6:.05)}],
+["Purple Rings",1,1,(x,y,t)=>o(H(x,y)*10-t*2.4+S(t)*2)*o(A(y,x)*2+t)],
+["Ink Caps",0,1,(x,y,t)=>{let g=.62,cx=(F(x/g)+.5)*g,cy=(F(y/g)+.5)*g,dx=x-cx,dy=y-cy+S(t+cx)* .04;let e=dx*dx/.12+dy*dy/.07;if(e<1&&dy<0)return .9;if(e<1.2&&dy< .08)return .45;if(ab(dx)<.04&&dy>0&&dy<.25)return .6;return .07}]
 ];
     var SAFE = [" .:-=+*#%@", " .oO0#@%", " .:+#*X%", " |/\\xX#@", " .~=oO#"];
     return E.map(function (scene) {
@@ -1266,7 +1288,7 @@ const E=[
       var speed = scene[2] || 1;
       var fn = scene[3];
       var name = String(scene[0]).replace(/[^\x20-\x7E]+/g, " ").replace(/\s+/g, " ").trim();
-      return [name, ramp, function (x, y, t, i, j) { return fn(x, y, t * speed, i, j); }];
+      return [name, ramp, function (x, y, t, i, j) { return fn(x, y, t * speed, i, j); }, scene[4] === "purple" ? "purple" : ""];
     });
   })();
 
@@ -1279,7 +1301,7 @@ const E=[
     return ALL;
   }
 
-  var timeOff = 0, clock = 0, cr = 0, prepKey = "", frameA, frameB, frameS = 0, frameName = "", frameT = 0;
+  var timeOff = 0, clock = 0, cr = 0, prepKey = "", frameA, frameB, frameS = 0, frameName = "", frameT = 0, frameIdx = 0, frameCount = 1, framePurple = false;
   function prepare(t) {
     var key = pack + "|" + timeOff + "|" + t;
     if (prepKey === key) return;
@@ -1298,9 +1320,12 @@ const E=[
     frameA = items[idx];
     frameB = items[nxt];
     frameT = T;
-    if (frameA[3]) frameA[3](T);
-    if (frameS && frameB[3]) frameB[3](T);
+    if (typeof frameA[3] === "function") frameA[3](T);
+    if (frameS && typeof frameB[3] === "function") frameB[3](T);
     frameName = frameS > 0.5 ? frameB[0] : frameA[0];
+    frameIdx = frameS > 0.5 ? nxt : idx;
+    frameCount = items.length;
+    framePurple = (frameS > 0.5 ? frameB[3] : frameA[3]) === "purple";
   }
   function sample(col, row, t) {
     prepare(t);
@@ -1311,7 +1336,7 @@ const E=[
     var ix = arguments[3] || 0;
     var a = frameA[2](x, y, tt, ix, row);
     var b = frameS ? frameB[2](x, y, tt, ix, row) : a;
-    return { a: a, b: b, s: frameS, ramp: frameA[1], rampB: frameB[1], name: frameName };
+    return { a: a, b: b, s: frameS, ramp: frameA[1], rampB: frameB[1], name: frameName, purple: framePurple, n: frameIdx, total: frameCount };
   }
 
   function resize() {
@@ -1383,6 +1408,12 @@ const E=[
           var pal = pals[(Math.floor(hue0 / 30) + Math.floor(v * 4) + (col >> 3)) % pals.length];
           rr = pal[0]; gg = pal[1]; bb = pal[2];
           alpha = (120 + v * 135) | 0;
+        } else if (s.purple) {
+          var phue = 268 + v * 42 + Math.sin(t * 0.5 + row * 0.08) * 6;
+          var plight = (0.16 + v * 0.5) * breathe;
+          var prgb = hsl(phue, 0.78, plight);
+          rr = prgb[0]; gg = prgb[1]; bb = prgb[2];
+          alpha = (170 + v * 85) | 0;
         } else {
           var hue = (hue0 + v * 70 + col * 1.6 + row * 0.5) % 360;
           var light = (0.42 + v * 0.4) * breathe;
@@ -1428,7 +1459,8 @@ const E=[
       canvas.style.transform = "scale(" + zoom.toFixed(4) + ")";
       canvas.style.opacity = String(0.8 + Math.sin(t * 0.85) * 0.16);
     }
-    if (nameTitle.textContent !== shown) nameTitle.textContent = shown;
+    var label = shown + " · " + ((s && s.n) + 1) + " of " + (s && s.total);
+    if (nameTitle.textContent !== label) nameTitle.textContent = label;
     nameMark.textContent = MARK[pack] || "🏠";
   }
 
