@@ -167,9 +167,77 @@
     return parseText(text.replace(/<[^>]+>/g, "\n"));
   }
 
+  /* A pasted specs list, the kind with "========== CPU ==========" and "Name : ...".
+     Not a Speccy file. Storage rows end with a size in GB. "Fixed hard disk media"
+     is what Windows calls every internal drive, so it is not treated as a hard drive. */
+  function parseDump(text) {
+    var blocks = {};
+    var name = "";
+    String(text).split(/\r?\n/).forEach(function (line) {
+      var head = line.match(/^={3,}\s*(.+?)\s*={3,}\s*$/);
+      if (head) { name = head[1].trim().toUpperCase(); blocks[name] = []; return; }
+      if (name) blocks[name].push(line);
+    });
+    function rows(keys) {
+      for (var i = 0; i < keys.length; i++) if (blocks[keys[i]]) return blocks[keys[i]];
+      return [];
+    }
+    function field(list, key) {
+      var re = new RegExp("^\\s*" + key + "\\s*:\\s*(.+)$", "i");
+      for (var i = 0; i < list.length; i++) {
+        var m = list[i].match(re);
+        if (m && m[1].trim()) return m[1].trim();
+      }
+      return "";
+    }
+    function clean(s) {
+      return String(s || "").replace(/\(R\)|\(TM\)/gi, "").replace(/\s+/g, " ").trim();
+    }
+    var cpuRows = rows(["CPU"]);
+    var cpu = clean(field(cpuRows, "Name"));
+    var cores = parseInt(field(cpuRows, "NumberOfCores"), 10) || 0;
+    var gpus = [];
+    rows(["GPU / GRAPHICS", "GPU", "GRAPHICS"]).forEach(function (line) {
+      var m = line.match(/^\s*Name\s*:\s*(.+)$/i);
+      if (m && m[1].trim() && !/basic display/i.test(m[1])) gpus.push(clean(m[1]));
+    });
+    var ramGB = 0;
+    var ramType = "";
+    rows(["RAM", "MEMORY"]).forEach(function (line) {
+      var total = line.match(/Total RAM \(GB\)\s*:\s*([\d.]+)/i);
+      if (total) ramGB = Math.round(num(total[1]));
+      var typ = line.match(/\b(DDR[2345]|LPDDR[45])\b/i);
+      if (typ) ramType = typ[1].toUpperCase();
+    });
+    var disks = [];
+    rows(["STORAGE", "DRIVES"]).forEach(function (line) {
+      var m = line.match(/^(.*?)\s+([\d.]+)\s*$/);
+      if (!m) return;
+      var gb = num(m[2]);
+      if (!(gb >= 8)) return;
+      var model = m[1].replace(/\s*(Fixed hard disk media|External hard disk media|SSD|HDD|NVMe|Unspecified)\s*$/i, "").trim();
+      if (!model || /^(model|-{3,}|mediatype|sizegb)$/i.test(model)) return;
+      var kind = /nvme|sn\d|skc|wd_black|black sn/i.test(model) ? "NVMe" : /ssd/i.test(model) ? "SSD" : /\bhdd\b/i.test(model) ? "HDD" : "drive";
+      disks.push({ gb: gb, kind: kind, name: model });
+    });
+    return {
+      cpu: cpu,
+      cores: cores,
+      ramGB: ramGB,
+      ramType: ramType,
+      slots: { total: 0, used: 0, free: 0 },
+      gpus: gpus,
+      disks: disks,
+      laptop: /laptop/i.test(text),
+      source: "speccy"
+    };
+  }
+
   function parse(raw) {
     var text = String(raw || "").replace(/^\uFEFF/, "");
     if (!text.trim()) return null;
+    if (/<speccydata[\s>]/i.test(text)) return parseSpeccyXml(text);
+    if (/={5,}/.test(text) && /NumberOfCores|Total RAM|SizeGB|AdapterRAM/i.test(text)) return parseDump(text);
     if (text.indexOf("<") !== -1 && /<\/[a-z]/i.test(text)) return parseXml(text);
     return parseText(text);
   }
@@ -303,11 +371,12 @@
     drop.className = "speccy-drop";
     drop.textContent = "Drop the Speccy file here";
     var p = document.createElement("p");
-    p.textContent = "In Speccy, click File, then Save as XML, or Save as Text file. Drop that file on the box, or choose it. The file stays on this device. Nothing is sent anywhere.";
+    p.textContent = "Drop a Speccy file, or paste a specs list. Speccy: File, then Save as XML. The file stays on this device. Nothing is sent anywhere.";
     var area = document.createElement("textarea");
     area.rows = 4;
-    area.placeholder = "Or paste the Speccy text here";
-    area.setAttribute("aria-label", "Speccy text");
+    area.placeholder = "Or paste the specs here";
+    area.spellcheck = false;
+    area.setAttribute("aria-label", "Specs");
     var status = document.createElement("p");
     status.className = "speccy-status";
     var row = document.createElement("div");
@@ -332,7 +401,7 @@
       if (!spec || (!spec.cpu && !spec.ramGB && !(spec.gpus && spec.gpus.length) && !(spec.disks && spec.disks.length))) {
         out.replaceChildren();
         var err = document.createElement("p");
-        err.textContent = "That did not look like a Speccy report. Use File, then Save as XML.";
+        err.textContent = "Nothing in there matched a processor, memory, a graphics card, or a drive. Drop the Speccy XML, or paste the whole specs list.";
         out.appendChild(err);
         return;
       }
