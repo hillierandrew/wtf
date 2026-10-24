@@ -47,6 +47,7 @@
   }
   html[data-theme="dark"] .pills button { background: #2c2c2e; }
   html[data-theme="dark"] .card.on { outline-color: #f5f5f7; }
+  body.desk #app { width: min(1100px, 100%); }
   html[data-theme="dark"] #bar { background: #f5f5f7; }
 </style>
 </head>
@@ -54,12 +55,19 @@
 <div id="bar"></div>
 <button id="langBtn" type="button" aria-label="Language">🔤</button>
 <div id="lock"><form id="lockForm"><p class="muted">Password4</p><h1>Build.</h1><input id="lockPass" type="password" autocomplete="current-password" aria-label="Password" /><p id="lockBad" class="warn"></p><button class="go" type="submit">Continue</button></form></div>
+<div id="speccy"></div>
 <main id="app"></main>
 <button id="back" type="button" hidden>Back</button>
 <div id="sheet" hidden></div>
 <script src="bulb.js"></script>
 <script src="qr.js"></script>
+<script src="speccy.js"></script>
 <script>
+function setLayout(next) {
+  document.body.classList.toggle("phone", next !== "desk");
+  document.body.classList.toggle("desk", next === "desk");
+  try { sessionStorage.setItem("drew-layout", next === "desk" ? "desk" : "phone"); } catch (e) {}
+}
 const LANG = {
   en:{ name:"English", for:"What is this computer for?", min:"Minimum", med:"Medium", high:"High", ultra:"Ultra", cpu:"Processor", board:"Motherboard", mem:"Memory", gpu:"Graphics", disk:"Storage", case:"Case", fan:"Fans", cool:"Cooler", paste:"Thermal paste", psu:"Power", done:"Done", back:"Back", thisone:"This one", scan:"Checkout code", print:"Print", none:"No graphics card", warn:"Power supply is too small.", pct:"complete", notsale:"Not a sale.", air:"Fan cooler", aio:"Liquid cooler", nvme:"NVMe", ssd:"SSD", hdd:"Hard drive", itx:"Mini-ITX", matx:"Micro-ATX", atx:"ATX", eatx:"E-ATX", model:"3D modelling", video:"Video editing", photo:"Photo", school:"School", office:"Office", fansay:"Two or three fans move air through the case.", pastesay:"A little paste sits between the cooler and the processor.", amd:"AMD", intel:"Intel", nvidia:"Nvidia" },
   fr:{ name:"Français", for:"Cet ordinateur sert à quoi?", min:"Minimum", med:"Moyen", high:"Élevé", ultra:"Ultra", cpu:"Processeur", board:"Carte mère", mem:"Mémoire", gpu:"Carte graphique", disk:"Stockage", case:"Boîtier", fan:"Ventilateurs", cool:"Refroidisseur", paste:"Pâte thermique", psu:"Alimentation", done:"Terminé", back:"Retour", thisone:"Celui-ci", scan:"Code de caisse", print:"Imprimer", none:"Sans carte graphique", warn:"Alimentation trop petite.", pct:"terminé", notsale:"Ce n est pas une vente.", air:"Ventilateur", aio:"Liquide", nvme:"NVMe", ssd:"SSD", hdd:"Disque dur", itx:"Mini-ITX", matx:"Micro-ATX", atx:"ATX", eatx:"E-ATX", model:"Modélisation 3D", video:"Montage vidéo", photo:"Photo", school:"École", office:"Bureau", fansay:"Deux ou trois ventilateurs font circuler l air.", pastesay:"Un peu de pâte entre le refroidisseur et le processeur.", amd:"AMD", intel:"Intel", nvidia:"Nvidia" },

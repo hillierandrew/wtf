@@ -148,9 +148,9 @@ try { localStorage.setItem("drew-safe", "1"); } catch (e) {}
   #shopBar {
     position: relative;
     display: grid;
-    grid-template-columns: auto auto 1fr auto;
-    grid-template-areas: "close store title pct" "track track track track";
-    gap: 8px 12px;
+    grid-template-columns: auto auto auto 1fr auto;
+    grid-template-areas: "close phone store title pct" "track track track track track";
+    gap: 8px 10px;
     align-items: center;
     height: auto;
     min-height: 0;
@@ -169,11 +169,12 @@ try { localStorage.setItem("drew-safe", "1"); } catch (e) {}
     min-height: 36px; padding: 0 14px; border-radius: 980px;
     border: 0; background: #f5f5f7; color: #000; font: inherit; cursor: pointer;
   }
-  #shopStore {
-    grid-area: store;
-    min-width: 44px; min-height: 36px; border: 0; border-radius: 980px;
-    background: transparent; color: inherit; font-size: 20px; cursor: pointer;
+  #shopPhone, #shopStore {
+    min-width: 44px; min-height: 44px; border: 0; border-radius: 980px;
+    background: transparent; color: inherit; font-size: 22px; cursor: pointer;
   }
+  #shopPhone { grid-area: phone; }
+  #shopStore { grid-area: store; }
   #shopFrame { flex: 1; width: 100%; border: 0; background: #000; min-height: 0; }
 
   #sky {
@@ -241,13 +242,20 @@ try { localStorage.setItem("drew-safe", "1"); } catch (e) {}
     margin: 0; text-align: center; pointer-events: none;
     font-family: ui-monospace, Menlo, Consolas, monospace;
   }
-  #saverTitle {
-    top: 36%;
-    color: #ececec;
-    font-size: clamp(42px, 12vw, 92px);
-    font-weight: 700;
-    letter-spacing: -0.04em;
+  #saverTitle { display: none; }
+  #dvd {
+    position: fixed; z-index: 22; left: 0; top: 0;
+    margin: 0; padding: 10px 16px;
+    font: 800 clamp(22px, 6vw, 48px)/1 Impact, "Arial Black", sans-serif;
+    letter-spacing: 0.06em;
+    color: #f2f2f2;
+    background: #111;
+    border: 3px solid #f2f2f2;
+    cursor: pointer;
+    user-select: none;
+    will-change: transform;
   }
+  body.entered #dvd, body.building #dvd { display: none; }
   #saverHint {
     top: calc(36% + clamp(64px, 14vw, 110px));
     color: #9a9a9a;
@@ -278,6 +286,7 @@ try { localStorage.setItem("drew-safe", "1"); } catch (e) {}
 <h1>DREW.WTF</h1>
 <canvas id="field"></canvas>
 <div id="saver" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+<button id="dvd" type="button" aria-label="Drew">DREW.WTF</button>
 <div id="veil"></div>
 <div id="logo" aria-hidden="true"><canvas id="ink"></canvas></div>
 <div id="sky" hidden></div>
@@ -310,7 +319,8 @@ try { localStorage.setItem("drew-safe", "1"); } catch (e) {}
 <div id="shop">
   <div id="shopBar">
     <button id="shopClose" type="button">Close</button>
-    <button id="shopStore" type="button" aria-label="Next store">🏪</button>
+    <button id="shopPhone" type="button" aria-label="Phone layout" aria-pressed="false">📱</button>
+    <button id="shopStore" type="button" aria-label="Change store">🏬</button>
     <span id="shopTitle">Build a computer</span>
     <span id="shopPct">0%</span>
     <div id="shopTrack"><div id="shopFill"></div></div>
@@ -320,7 +330,7 @@ try { localStorage.setItem("drew-safe", "1"); } catch (e) {}
 <button id="earthFloat" type="button" aria-label="Page style"></button>
 <div id="trip"><canvas id="c"></canvas><canvas id="glow"></canvas>
   <p id="saverTitle">DREW.WTF</p>
-  <p id="saverHint">Tap to enter</p>
+  <p id="saverHint">Tap to enter. Tap Drew three times for a store.</p>
 </div>
 <button id="safeBtn" type="button" aria-pressed="true">turn off epileptic mode 🛑</button>
 <div id="riz" aria-live="assertive"><div class="box" id="rizBox"></div></div>
@@ -372,6 +382,7 @@ try { localStorage.setItem("drew-safe", "1"); } catch (e) {}
     var title = document.getElementById("shopTitle");
     if (title) title.textContent = which === "dream" ? "Dream builder" : which === "easy" ? "Easy builder" : which === "apple" ? "Build" : "Build a computer";
     if (frame.getAttribute("src") !== src) frame.src = src;
+    else pushLayout();
   }
   var STORES = [
     { id: "store", key: "drew-bench" },
@@ -392,6 +403,71 @@ try { localStorage.setItem("drew-safe", "1"); } catch (e) {}
     storeAt = (currentStore() + 1) % STORES.length;
     try { sessionStorage.setItem(STORES[storeAt].key, "1"); } catch (err) {}
     openShop(STORES[storeAt].id);
+  }
+  /* 📱 on the shop bar tells the iframe to use the phone or desk layout.
+     🏬 cycles the four password stores. Three taps on the DVD logo opens one at random. */
+  var shopLayout = "phone";
+  try {
+    var savedLayout = sessionStorage.getItem("drew-layout");
+    if (savedLayout === "phone" || savedLayout === "desk") shopLayout = savedLayout;
+    else shopLayout = matchMedia("(max-width: 820px)").matches ? "phone" : "desk";
+  } catch (err) {}
+  function pushLayout() {
+    var frame = document.getElementById("shopFrame");
+    var btn = document.getElementById("shopPhone");
+    if (btn) btn.setAttribute("aria-pressed", shopLayout === "phone" ? "true" : "false");
+    try { frame.contentWindow.postMessage({ type: "drew-layout", layout: shopLayout }, "*"); } catch (e) {}
+  }
+  var shopPhone = document.getElementById("shopPhone");
+  if (shopPhone) shopPhone.addEventListener("click", function () {
+    shopLayout = shopLayout === "phone" ? "desk" : "phone";
+    try { sessionStorage.setItem("drew-layout", shopLayout); } catch (e) {}
+    pushLayout();
+  });
+  var shopFrameEl = document.getElementById("shopFrame");
+  if (shopFrameEl) shopFrameEl.addEventListener("load", pushLayout);
+  function openRandomStore() {
+    var i = Math.floor(Math.random() * STORES.length);
+    try { sessionStorage.setItem(STORES[i].key, "1"); } catch (e) {}
+    if (window.drewEnter) window.drewEnter();
+    openShop(STORES[i].id);
+    pushLayout();
+  }
+  function startDvd() {
+    var el = document.getElementById("dvd");
+    if (!el) return;
+    var x = 24, y = 36, vx = 2.1, vy = 1.55, clicks = 0, last = 0;
+    var shades = ["#f4f4f4", "#d0d0d0", "#a3a3a3", "#e6e6e6"];
+    var shade = 0;
+    el.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      clicks += 1;
+      if (clicks >= 3) openRandomStore();
+    });
+    function tick(now) {
+      if (!window.drewHold) return;
+      var dt = last ? Math.min(34, now - last) : 16;
+      last = now;
+      var step = dt / 16.67;
+      x += vx * step;
+      y += vy * step;
+      var maxX = Math.max(0, innerWidth - el.offsetWidth);
+      var maxY = Math.max(0, innerHeight - el.offsetHeight);
+      var hit = false;
+      if (x <= 0) { x = 0; vx = Math.abs(vx); hit = true; }
+      else if (x >= maxX) { x = maxX; vx = -Math.abs(vx); hit = true; }
+      if (y <= 0) { y = 0; vy = Math.abs(vy); hit = true; }
+      else if (y >= maxY) { y = maxY; vy = -Math.abs(vy); hit = true; }
+      if (hit) {
+        shade = (shade + 1) % shades.length;
+        el.style.color = shades[shade];
+        el.style.borderColor = shades[shade];
+      }
+      el.style.transform = "translate3d(" + x.toFixed(1) + "px," + y.toFixed(1) + "px,0)";
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
   }
 
   var W = 0, H = 0, cols = 0, rows = 0, cellW = 0, cellH = 0, scale = 2, buf, data;
@@ -2600,6 +2676,7 @@ const E=[
     if (!uiHit(e.target)) e.preventDefault();
   });
   if (!document.documentElement.classList.contains("safe")) raf = requestAnimationFrame(frame);
+  startDvd();
 })();
 </script>
 <script>

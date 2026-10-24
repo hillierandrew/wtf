@@ -99,6 +99,7 @@
   </div>
   <p class="lead">Pick a use, set what you can spend, and only parts that fit each other can be added. One of each part. A memory kit is one item and already includes its sticks. A kit of 3 or 5 sticks cannot be added, and DDR4 cannot go on a DDR3 or DDR5 board.</p>
   <p class="notes"><b>Notes:</b> Set a budget. Press <b>Suggest a Build</b> and press it again if you want a different one. <b>Add Component</b> starts from the parts you already have. Click a thumbnail to read the part. Copy the build link if you want to show it to someone.</p>
+  <div id="speccy"></div>
   <div class="controls">
     <label>Set Your Budget: $ <input id="budget" type="number" min="0" max="20000" step="50" value="1000" /></label>
     <button class="dark" id="setBudget" type="button">Set</button>
@@ -170,6 +171,7 @@
 </div>
 <script src="bulb.js"></script>
 <script src="qr.js"></script>
+<script src="speccy.js"></script>
 <script>
 const CATS = ["cpu","motherboard","memory","gpu","storage","case","cooler","psu"];
 const NAMES = { cpu:"CPU", motherboard:"Motherboard", memory:"Memory", gpu:"Video card", storage:"Storage", case:"Case", cooler:"Cooler", psu:"Power supply" };
