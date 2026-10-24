@@ -2426,6 +2426,17 @@ const E=[
     if (!data || data.type !== "drew-progress") return;
     setShopProgress(+data.n || 0, +data.total || 8);
   });
+  var detailCode = "";
+  window.addEventListener("keydown", function (e) {
+    if (!shop.classList.contains("open") || e.repeat) return;
+    var target = e.target;
+    if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA")) return;
+    if (!/^[0-9]$/.test(e.key)) { detailCode = ""; return; }
+    detailCode = (detailCode + e.key).slice(-3);
+    if (detailCode !== "123") return;
+    detailCode = "";
+    try { document.getElementById("shopFrame").contentWindow.postMessage({ type: "drew-detail" }, "*"); } catch (err) {}
+  });
   canvas.addEventListener("pointerdown", function () {
     if (window.drewHold) return;
     if (introOn && !spawned) spawnDvd();

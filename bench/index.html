@@ -155,6 +155,19 @@
   html[data-theme="dark"] .go, html[data-theme="dark"] #phoneBtn.on, html[data-theme="dark"] #deskBtn.on { color: #000; }
   html[data-theme="dark"] body.phone .dock, html[data-theme="dark"] #gate form, html[data-theme="dark"] input { background: #1c1c1e; color: #f5f5f7; }
   @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } body { padding: 18px 16px 48px; } }
+  body.detail #parts { background: #141414; border: 1px solid #2c2c2c; border-radius: 12px; overflow: hidden; padding: 0; }
+  body.detail .sheet-head { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; padding: 16px 16px 12px; background: #101010; color: #f3f3f3; }
+  body.detail .sheet-head strong { font-size: 18px; letter-spacing: -0.03em; }
+  body.detail .sheet-head span { font-variant-numeric: tabular-nums; color: #c8c8c8; }
+  body.detail .sec { border-top: 2px solid #3d7dff; border-image: linear-gradient(90deg, #3d7dff, #e25a1c) 1; }
+  body.detail .kicker { display: block; margin: 0; padding: 8px 16px; background: #1a1a1a; color: #d5d5d5; font-size: 11px; letter-spacing: 0.16em; font-weight: 700; }
+  body.detail .srow { display: grid; grid-template-columns: 112px 1fr; gap: 12px; width: 100%; margin: 0; padding: 14px 16px; min-height: 0; border: 0; border-radius: 0; border-bottom: 1px solid #2a2a2a; background: #171717; color: #f4f4f4; text-align: left; box-shadow: none; }
+  body.detail .lab { color: #8d8d8d; font-size: 12px; letter-spacing: 0.08em; padding-top: 3px; }
+  body.detail .srow strong { display: block; font-size: 16px; letter-spacing: -0.02em; font-weight: 700; }
+  body.detail .srow em { display: block; margin-top: 4px; color: #9a9a9a; font-style: normal; font-size: 13px; font-weight: 400; }
+  body.detail .pill { display: inline-block; margin: 8px 6px 0 0; padding: 3px 9px; border-radius: 999px; background: #2563eb; color: #fff; font-size: 12px; font-weight: 700; letter-spacing: 0; }
+  body.detail .pill.alt { background: #c2410c; }
+  @media (max-width: 520px) { body.detail .srow { grid-template-columns: 84px 1fr; padding: 12px; } }
 </style>
 </head>
 <body>
@@ -267,6 +280,7 @@ const money = new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD
 let lang = localStorage.getItem("bench-lang") || "en";
 let PARTS = [];
 let byId = {};
+let detailOn = false;
 let build = {};
 let job = "elementary";
 let budget = 700;
@@ -604,6 +618,7 @@ function render() {
   if (dockTotal) dockTotal.textContent = money.format(total);
   paintArt();
   paintMachine(parts);
+  document.body.classList.toggle("detail", detailOn && !swap);
   const list = document.getElementById("parts");
   list.replaceChildren();
   if (swap) {
@@ -631,6 +646,7 @@ function render() {
     };
     return;
   }
+  if (detailOn) { list.appendChild(specSheet(parts, total)); return; }
   CATS.forEach((id) => {
     const part = parts[id];
     const button = document.createElement("button");
@@ -752,6 +768,133 @@ document.getElementById("gateForm").onsubmit = (event) => {
   } else document.getElementById("bad").textContent = t("bad");
 };
 function readCart() { try { return JSON.parse(localStorage.getItem("drew-cart") || "{}"); } catch (e) { return {}; } }
+function pickFact(name, re) {
+  var m = String(name || "").match(re);
+  return m ? String(m[1] || m[0]).trim() : "";
+}
+function cleanName(name) {
+  return String(name || "").replace(/\s*\(open box\)/ig, "").replace(/\s+/g, " ").trim();
+}
+function formWord(form) {
+  var f = String(form || "").toLowerCase();
+  if (f === "itx") return "Mini-ITX";
+  if (f === "matx") return "Micro-ATX";
+  if (f === "atx") return "ATX";
+  if (f === "eatx") return "E-ATX";
+  return form ? String(form).toUpperCase() : "";
+}
+function sheetRow(sec, cat, label, title, sub, pills) {
+  if (!title) return;
+  var btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "srow";
+  var lab = document.createElement("span");
+  lab.className = "lab";
+  lab.textContent = label;
+  var body = document.createElement("span");
+  var strong = document.createElement("strong");
+  strong.textContent = title;
+  body.appendChild(strong);
+  if (sub) {
+    var em = document.createElement("em");
+    em.textContent = sub;
+    body.appendChild(em);
+  }
+  (pills || []).filter(Boolean).forEach(function (pill, i) {
+    var s = document.createElement("span");
+    s.className = "pill" + (i ? " alt" : "");
+    s.textContent = pill;
+    body.appendChild(s);
+  });
+  btn.append(lab, body);
+  btn.onclick = function () { swap = cat; render(); };
+  sec.appendChild(btn);
+}
+function sheetSec(parent, title) {
+  var sec = document.createElement("section");
+  sec.className = "sec";
+  var k = document.createElement("b");
+  k.className = "kicker";
+  k.textContent = title;
+  sec.appendChild(k);
+  parent.appendChild(sec);
+  return sec;
+}
+function specSheet(parts, total) {
+  var sheet = document.createElement("div");
+  var head = document.createElement("div");
+  head.className = "sheet-head";
+  var title = document.createElement("strong");
+  title.textContent = jobName(job);
+  var price = document.createElement("span");
+  price.textContent = money.format(total || 0);
+  head.append(title, price);
+  sheet.appendChild(head);
+  var cpu = parts.cpu;
+  if (cpu) {
+    var sec = sheetSec(sheet, "PROCESSOR");
+    var cores = pickFact(cpu.name, /(\d+)\s*-?\s*cores?/i);
+    var threads = pickFact(cpu.name, /(\d+)\s*-?\s*threads?/i);
+    var ghz = pickFact(cpu.name, /(\d+(?:\.\d+)?)\s*GHz/i);
+    var nm = pickFact(cpu.name, /(\d+)\s*nm/i);
+    var line = [cores && cores + " cores", threads && threads + " threads"].filter(Boolean).join(" / ");
+    if (ghz) line = line ? line + ", up to " + ghz + " GHz" : ghz + " GHz";
+    sheetRow(sec, "cpu", "CPU", cleanName(cpu.name), line, [cpu.watt ? cpu.watt + "W TDP" : "", cpu.socket || ""]);
+    if (nm || cpu.socket) sheetRow(sec, "cpu", "ARCHITECTURE", nm ? nm + " nm" : cpu.socket, [cpu.brand, nm ? cpu.socket : ""].filter(Boolean).join(" · "), []);
+  }
+  var gpu = parts.gpu;
+  if (gpu) {
+    var gsec = sheetSec(sheet, "GRAPHICS");
+    var vram = String(gpu.name).match(/(\d+)\s*GB\s*(GDDR\dX?|DDR\dL?)/i);
+    var memType = vram ? vram[2].toUpperCase() : "";
+    sheetRow(gsec, "gpu", "GPU", cleanName(gpu.name), vram ? vram[1] + " GB " + memType : "", [gpu.brand || "", gpu.watt ? gpu.watt + "W" : ""]);
+    if (vram) sheetRow(gsec, "gpu", "VRAM", vram[1] + " GB " + memType, "Dedicated", []);
+  }
+  var mem = parts.memory;
+  if (mem) {
+    var msec = sheetSec(sheet, "MEMORY");
+    var kit = String(mem.name).match(/(\d+)\s*x\s*(\d+)\s*GB/i);
+    var gb = kit ? String(+kit[1] * +kit[2]) : pickFact(mem.name, /(\d+)\s*GB/i);
+    var kind = mem.ram || pickFact(mem.name, /(DDR\dL?|LPDDR\d)/i);
+    var speed = pickFact(mem.name, /(\d{3,5})\s*MHz/i);
+    var cl = pickFact(mem.name, /CL\s*(\d+)/i);
+    var memTitle = [gb && gb + " GB", kind].filter(Boolean).join(" ") || cleanName(mem.name);
+    var memSub = [kit && kit[1] + " x " + kit[2] + " GB", speed && speed + " MHz", cl && "CL" + cl].filter(Boolean).join(" · ");
+    sheetRow(msec, "memory", "MEMORY", memTitle, memSub, [kind || "", mem.brand || ""]);
+  }
+  var disk = parts.storage;
+  if (disk) {
+    var dsec = sheetSec(sheet, "STORAGE");
+    var size = String(disk.name).match(/(\d+(?:\.\d+)?)\s*(TB|GB)/i);
+    var iface = /NVME|M\.2/i.test(disk.name) ? "NVMe" : /SATA/i.test(disk.name) ? "SATA III" : "";
+    var media = /HDD|HARD DRIVE/i.test(disk.name) ? "Hard drive" : /SSD|NVME|M\.2/i.test(disk.name) ? "SSD" : "";
+    sheetRow(dsec, "storage", "DRIVE", cleanName(disk.name), [size && size[1] + " " + size[2].toUpperCase(), media].filter(Boolean).join(" · "), [iface, disk.brand || ""]);
+  }
+  var board = parts.motherboard;
+  if (board) {
+    var bsec = sheetSec(sheet, "BOARD");
+    var wifi = /wifi|wi-fi/i.test(board.name) ? "Wi-Fi" : "";
+    sheetRow(bsec, "motherboard", "BOARD", cleanName(board.name), [board.socket, board.ram, formWord(board.form)].filter(Boolean).join(" · "), [formWord(board.form), wifi]);
+  }
+  var psu = parts.psu;
+  if (psu) {
+    var psec = sheetSec(sheet, "POWER");
+    sheetRow(psec, "psu", "SUPPLY", cleanName(psu.name), psu.watt ? psu.watt + "W" : "", [psu.watt ? psu.watt + "W" : "", formWord(psu.form)]);
+  }
+  var cool = parts.cooler;
+  if (cool) {
+    var csec = sheetSec(sheet, "COOLING");
+    var rad = pickFact(cool.name, /(120|140|240|280|360|420)\s?mm/i);
+    sheetRow(csec, "cooler", "COOLER", cleanName(cool.name), rad ? rad + " mm" : "", [rad ? rad + " mm" : "", cool.brand || ""]);
+  }
+  var box = parts.case;
+  if (box) {
+    var ksec = sheetSec(sheet, "CASE");
+    var glass = /tempered glass/i.test(box.name) ? "Tempered glass" : "";
+    sheetRow(ksec, "case", "CASE", cleanName(box.name), [formWord(box.form), glass].filter(Boolean).join(" · "), [formWord(box.form), box.brand || ""]);
+  }
+  return sheet;
+}
 function writeCart(parts) {
   var out = {};
   CATS.forEach(function (id) { if (parts[id]) out[id] = parts[id].id; });
@@ -773,6 +916,39 @@ function boot() {
 setInterval(() => { artTick++; paintArt(); }, 1600);
 render();
 if (sessionStorage.getItem("drew-bench") === "1") boot();
+var detailCode = "";
+window.addEventListener("keydown", function (e) {
+  if (e.repeat) return;
+  var target = e.target;
+  if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA")) return;
+  if (!/^[0-9]$/.test(e.key)) { detailCode = ""; return; }
+  detailCode = (detailCode + e.key).slice(-3);
+  if (detailCode === "123") { detailCode = ""; detailOn = !detailOn; render(); }
+});
+var detailTaps = 0;
+var detailTapAt = 0;
+document.addEventListener("pointerup", function () {
+  var touch = window.matchMedia("(pointer: coarse)").matches || window.matchMedia("(max-width: 1024px)").matches;
+  if (!touch) return;
+  var now = performance.now();
+  if (now - detailTapAt > 650) detailTaps = 0;
+  detailTapAt = now;
+  detailTaps += 1;
+  if (detailTaps < 3) return;
+  detailTaps = 0;
+  detailOn = !detailOn;
+  render();
+  document.addEventListener("click", function stop(ev) {
+    ev.preventDefault();
+    ev.stopPropagation();
+    document.removeEventListener("click", stop, true);
+  }, true);
+});
+window.addEventListener("message", function (e) {
+  if (!e.data || e.data.type !== "drew-detail") return;
+  detailOn = !detailOn;
+  render();
+});
 </script>
 </body>
 </html>
