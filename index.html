@@ -4,6 +4,22 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#000000" />
+<!--
+  Map for the next editor:
+  #trip / canvas#c  splash. html.safe (default) paints a still grey screen instead of the mushroom field.
+  #safeBtn          label "turn off epileptic mode". Writes localStorage drew-safe=1.
+  html.safe         hides #glow, greys #field/#logo/#veil, skips the rainbow intro, slows the background.
+  #shop #shopFrame  store iframe. The builder posts {type:"drew-progress", n, total} and #shopFill shows it.
+  bench/index.html  the store in the screenshot. #railL and #railR fill the empty sides.
+-->
+<script>
+/* drew-safe missing or anything but "0" => still grey splash. Runs before paint so the mushrooms never flash on. */
+try {
+  if (localStorage.getItem("drew-safe") !== "0") document.documentElement.classList.add("safe");
+} catch (e) {
+  document.documentElement.classList.add("safe");
+}
+</script>
 <title>DREW.WTF</title>
 <style>
   html, body { margin: 0; height: 100%; height: 100dvh; background: #000; overflow: hidden; touch-action: none; }
@@ -196,6 +212,30 @@
     #dock button { min-width: 48px; min-height: 48px; font-size: 22px; }
     #name { max-width: 34vw; }
   }
+  /* Safe splash: black, grey, white. No saturated glow, no hue spin. */
+  html.safe #glow { display: none !important; }
+  html.safe #field,
+  html.safe #logo,
+  html.safe #veil { filter: grayscale(1) contrast(1.05); }
+  #safeBtn {
+    position: fixed;
+    left: 50%;
+    bottom: max(22px, calc(env(safe-area-inset-bottom) + 16px));
+    transform: translateX(-50%);
+    z-index: 28;
+    max-width: calc(100vw - 24px);
+    min-height: 48px;
+    padding: 0 18px;
+    border-radius: 999px;
+    border: 1px solid #d0d0d0;
+    background: #111;
+    color: #f2f2f2;
+    font: 700 15px/1.2 ui-monospace, Menlo, Consolas, monospace;
+    cursor: pointer;
+    touch-action: manipulation;
+    white-space: nowrap;
+  }
+  body.entered #safeBtn { display: none; }
 </style>
 </head>
 <body class="intro">
@@ -242,6 +282,7 @@
 </div>
 <button id="earthFloat" type="button" aria-label="Page style"></button>
 <div id="trip"><canvas id="c"></canvas><canvas id="glow"></canvas></div>
+<button id="safeBtn" type="button" aria-pressed="true">turn off epileptic mode 🛑</button>
 <div id="riz" aria-live="assertive"><div class="box" id="rizBox"></div></div>
 <script>
 (function () {
@@ -2274,14 +2315,21 @@ const E=[
     if (trip) trip.classList.add("gone");
     started = performance.now();
     last = started;
-    introOn = true;
-    spawned = false;
+    /* Safe mode skips the rainbow ouroboros intro (hue spins ~28deg/s across the whole field). */
+    if (document.documentElement.classList.contains("safe")) {
+      introOn = false;
+      spawned = true;
+      document.body.classList.remove("intro");
+    } else {
+      introOn = true;
+      spawned = false;
+      document.body.classList.add("intro");
+    }
     revealAt = 0;
-    document.body.classList.add("intro");
     resize();
   };
   var veilEl = document.getElementById("veil");
-  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches || document.documentElement.classList.contains("safe");
   var HYPER_FOR = 2.2, SHOOT_FOR = 2.0, GLOW_FOR = 10, BLACK_FOR = 1.35;
   var INTRO_LEN = HYPER_FOR + SHOOT_FOR + GLOW_FOR + BLACK_FOR;
   var introOn = !reduceMotion;
@@ -2387,6 +2435,11 @@ const E=[
   function frame(now) {
     if (window.drewHold) { raf = requestAnimationFrame(frame); return; }
     if (document.hidden) { raf = 0; return; }
+    /* Safe mode repaints the background about 3 times a second so it cannot strobe. */
+    if (document.documentElement.classList.contains("safe")) {
+      if (frame.safeNext && now < frame.safeNext) { raf = requestAnimationFrame(frame); return; }
+      frame.safeNext = now + 320;
+    }
     var dt = Math.min(0.05, (now - last) / 1000);
     last = now;
     var t = (now - started) / 1000;
@@ -2524,6 +2577,48 @@ const E=[
   var NM = MS.length, NS = 48;
   var CX = new Float32Array(NM), CY = new Float32Array(NM), RW = new Float32Array(NM), RH = new Float32Array(NM);
   var SW = new Float32Array(NM), BY = new Float32Array(NM), GL = new Float32Array(NM), MH = new Float32Array(NM);
+  /*
+   * SAFE SPLASH
+   * window.drewSafe is true unless localStorage drew-safe === "0".
+   * true  -> paintSafe() draws one still black/grey frame. frame() returns.
+   * false -> the mushroom field below runs (hue spin, kick flashes, spores).
+   * #safeBtn only turns safe on. It does not turn the mushrooms back on.
+   */
+  window.drewSafe = document.documentElement.classList.contains("safe");
+  function paintSafe() {
+    if (!W || !H) return;
+    gl.style.display = "none";
+    g.fillStyle = "#000";
+    g.fillRect(0, 0, W, H);
+    g.textAlign = "center";
+    g.textBaseline = "middle";
+    g.fillStyle = "#ececec";
+    g.font = "700 " + Math.max(36, Math.min(W * 0.08, 88)) + "px ui-monospace, Menlo, Consolas, monospace";
+    g.fillText("DREW.WTF", W / 2, H * 0.4);
+    g.fillStyle = "#8a8a8a";
+    g.font = "600 " + Math.max(14, Math.min(W * 0.028, 22)) + "px ui-monospace, Menlo, Consolas, monospace";
+    g.fillText("black   grey   still", W / 2, H * 0.4 + Math.max(44, H * 0.07));
+    g.fillStyle = "#5c5c5c";
+    g.fillText("tap the lower half to enter", W / 2, H * 0.4 + Math.max(78, H * 0.13));
+    g.textAlign = "left";
+    g.textBaseline = "top";
+  }
+  function turnSafeOn() {
+    window.drewSafe = true;
+    document.documentElement.classList.add("safe");
+    try { localStorage.setItem("drew-safe", "1"); } catch (e) {}
+    var btn = document.getElementById("safeBtn");
+    if (btn) btn.setAttribute("aria-pressed", "true");
+    paintSafe();
+  }
+  var safeBtn = document.getElementById("safeBtn");
+  if (safeBtn) {
+    safeBtn.addEventListener("pointerdown", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      turnSafeOn();
+    });
+  }
   function resize() {
     var mode = window.drewLayoutMode || "auto";
     W = innerWidth; H = innerHeight;
@@ -2547,6 +2642,7 @@ const E=[
       var nx = ((c + 0.5) * cw - W / 2) / half, ny = ((r + 0.5) * ch - H / 2) / half;
       NX[i] = nx; NY[i] = ny; R[i] = Math.sqrt(nx * nx + ny * ny); TH[i] = Math.atan2(ny, nx);
     }
+    if (window.drewSafe) paintSafe();
   }
   window.drewRefit = resize;
   addEventListener("resize", resize); resize();
@@ -2564,7 +2660,7 @@ const E=[
   }
   var last = 0, t = 0, hue = 200, rot = 0, pt = 0, alive = true;
   function frame(ms) {
-    if (!alive) return;
+    if (!alive || window.drewSafe) return;
     requestAnimationFrame(frame);
     var dt = Math.min(0.05, (ms - last) / 1000 || 0.016); last = ms; t += dt;
     var p = 0.5 + 0.5 * Math.sin(t * 1.7);
@@ -2758,14 +2854,15 @@ const E=[
     tickLine();
   }
   function maybeRiz() {
+    if (window.drewSafe) return;
     if (!riz && !left && taps >= 6 && performance.now() - born >= 10000) startRiz();
   }
   setInterval(maybeRiz, 200);
   function onTap() {
     if (riz || left) return;
-    if (taps < 7) tone(NOTES[taps], taps >= 5 ? 0.32 : 0.14, 0.2);
+    if (!window.drewSafe && taps < 7) tone(NOTES[taps], taps >= 5 ? 0.32 : 0.14, 0.2);
     taps++;
-    if (taps >= 6 && performance.now() - born >= 10000) { startRiz(); return; }
+    if (!window.drewSafe && taps >= 6 && performance.now() - born >= 10000) { startRiz(); return; }
     if (taps >= 7) enter();
   }
   trip.addEventListener("pointerdown", function (e) {

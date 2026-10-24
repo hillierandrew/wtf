@@ -55,6 +55,47 @@
   .layout { width: min(980px, 100%); margin: 28px auto 0; display: grid; gap: 28px; }
   body.desk .layout { grid-template-columns: 280px 1fr; align-items: start; }
   body.phone .layout, body.phone .grid { grid-template-columns: 1fr !important; }
+  /* Side rails. On a wide screen the picker stays in the middle column.
+     #railL (progress) takes the left gutter. #railR (the box) takes the right. */
+  #railL, #railR {
+    background: var(--card);
+    border-radius: 18px;
+    padding: 16px 16px 8px;
+    margin: 12px auto;
+    width: min(980px, 100%);
+  }
+  .rail-kicker { margin: 0 0 10px; color: var(--muted); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .meter { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; }
+  .meter > div { height: 100%; width: 0; background: var(--ink); }
+  #meterLabel { margin: 8px 0 0; font-variant-numeric: tabular-nums; }
+  .ticks { list-style: none; margin: 8px 0 0; padding: 0; }
+  .ticks li { display: flex; justify-content: space-between; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .ticks .ok { color: var(--ink); }
+  .ticks .no { color: var(--muted); }
+  body.desk #app {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) minmax(480px, 720px) minmax(250px, 1fr);
+    column-gap: 22px;
+    align-items: start;
+    width: min(1480px, 100%);
+    margin: 0 auto;
+  }
+  body.desk #app > header,
+  body.desk #app > .pitch,
+  body.desk #app > a.use,
+  body.desk #app > .budget,
+  body.desk #app > #jobs,
+  body.desk #app > #sell,
+  body.desk #app > #parts { grid-column: 2; width: auto; margin-left: 0; margin-right: 0; }
+  body.desk #app > #railL { grid-column: 1; grid-row: 1 / span 8; position: sticky; top: 12px; width: auto; margin: 0; }
+  body.desk #app > #railR { grid-column: 3; grid-row: 1 / span 8; position: sticky; top: 12px; width: auto; margin: 0; }
+  body.phone #app { display: flex; flex-direction: column; }
+  body.phone #app > #railL { order: 6; }
+  body.phone #app > #railR { order: 7; }
+  body.phone #app > #parts { order: 8; }
+  @media (prefers-reduced-motion: reduce) {
+    .bay.go, .bay.drop.go { animation: none; }
+  }
   #phoneBtn.on, #deskBtn.on { background: var(--chip); color: #fff; }
   .stage { background: transparent; padding: 0; }
   .machine { font: 13px/1.35 ui-monospace, Menlo, Consolas, monospace; white-space: pre; color: var(--muted); }
@@ -97,6 +138,13 @@
     <button class="go" id="gateOpen" type="submit">Open</button>
   </form>
 </div>
+<div id="app">
+<aside id="railL" aria-label="Build progress">
+  <p class="rail-kicker">In the box</p>
+  <div class="meter" aria-hidden="true"><div id="meterFill"></div></div>
+  <p id="meterLabel" class="muted">0 / 8</p>
+  <ul class="ticks" id="meterList"></ul>
+</aside>
 <header>
   <button class="back" id="back" type="button">←</button>
   <h1 id="title">Build a computer</h1>
@@ -113,13 +161,13 @@
 </div>
 <div id="jobs" class="grid"></div>
 <p class="muted" id="sell"></p>
-<div class="layout">
-  <section class="stage">
-    <pre class="art" id="art"></pre>
-    <div class="machine" id="machine"></div>
-    <p class="muted" id="story"></p>
-  </section>
-  <section id="parts"></section>
+<aside id="railR" aria-label="The computer so far">
+  <p class="rail-kicker">The box</p>
+  <pre class="art" id="art"></pre>
+  <div class="machine" id="machine"></div>
+  <p class="muted" id="story"></p>
+</aside>
+<section id="parts"></section>
 </div>
 <div id="langs"></div>
 <div class="dock"><span>Paper total</span><b id="dockTotal">$0</b><button class="icon" id="codeBtn" type="button">QR</button></div>
@@ -127,6 +175,14 @@
 <script src="qr.js"></script>
 <script src="bulb.js"></script>
 <script>
+/*
+ * bench/index.html — the store behind "Build a computer".
+ * Center column: budget slider + job buttons. Picking a job calls assemble() and fills `build`.
+ * #railL: how many of the 8 categories are filled, plus a price per row.
+ * #railR: ASCII case. paintMachine() redraws a row when that part changes.
+ * Parent frame listens for postMessage {type:"drew-progress", n, total} and moves #shopFill.
+ * scheduleRender: the slider used to rebuild the DOM on every input event. Now one render per frame.
+ */
 const JOBS = ["elementary","highschool","college","office","cad","video","dj","stream","fortnite","roblox","minecraft","warzone","apex","tarkov"];
 const NEED = {
   elementary: { gpu: 0, ram: 8, disk: "512GB" },
@@ -178,7 +234,7 @@ let swap = "";
 let seen = {};
 let artTick = 0;
 const ARTS = [
-"   \\\\   //\n  (\\\\_//)\n  ( o.o )   mushrooms\n  (> < )",
+"   .--------.\n  |  CASE  |\n  |  ....  |\n   '--------'",
 "  .----.\n  |RAM ||\n  | || ||  click\n  '----'",
 "  [NVME]\n  ======>  slide\n  |||||",
 "  [GPU========>]\n  sliding in",
@@ -498,6 +554,7 @@ function render() {
   if (PARTS.length) writeCart(parts);
   try { parent.postMessage({ type: "drew-progress", n: CATS.filter(function (id) { return parts[id]; }).length, total: CATS.length }, "*"); } catch (e) {}
   const total = CATS.reduce((sum, id) => sum + (parts[id] ? parts[id].price : 0), 0);
+  paintRails(parts, total);
   const sell = document.getElementById("sell");
   if (total > budget + 1) sell.textContent = t("over") + " " + money.format(total);
   else if (budget - total > 250) sell.textContent = t("under") + " " + money.format(total);
@@ -573,11 +630,41 @@ function card(part, onclick) {
   button.onclick = onclick;
   return button;
 }
+function paintRails(parts, total) {
+  /* Left rail: 8 categories. A row is .ok once that part is in the build. */
+  var filled = 0;
+  var list = document.getElementById("meterList");
+  var fill = document.getElementById("meterFill");
+  var label = document.getElementById("meterLabel");
+  if (list) list.replaceChildren();
+  CATS.forEach(function (id) {
+    var part = parts[id];
+    if (part) filled++;
+    if (!list) return;
+    var li = document.createElement("li");
+    li.className = part ? "ok" : "no";
+    var name = document.createElement("span");
+    name.textContent = (part ? "● " : "○ ") + catLabel(id);
+    var val = document.createElement("span");
+    val.textContent = part ? money.format(part.price) : "—";
+    li.append(name, val);
+    list.appendChild(li);
+  });
+  if (fill) fill.style.width = Math.round((filled / CATS.length) * 100) + "%";
+  if (label) label.textContent = filled + " / " + CATS.length + "  ·  " + money.format(total || 0);
+}
+let renderQueued = false;
+function scheduleRender() {
+  if (renderQueued) return;
+  renderQueued = true;
+  requestAnimationFrame(function () { renderQueued = false; render(); });
+}
 document.getElementById("budget").oninput = (event) => {
   budget = +event.target.value;
   lock = false;
   swap = "";
-  render();
+  document.getElementById("budgetLabel").textContent = money.format(budget);
+  scheduleRender();
 };
 document.getElementById("back").onclick = () => { if (swap) { swap = ""; render(); } };
 document.getElementById("phoneBtn").onclick = () => { layout = "phone"; render(); };
