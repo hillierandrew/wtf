@@ -279,7 +279,8 @@ try { localStorage.setItem("drew-safe", "1"); } catch (e) {}
     cursor: pointer;
     touch-action: manipulation;
   }
-  body.entered #safeBtn, body.entered #saverTitle, body.entered #saverHint { display: none; }
+  /* Splash is only the bouncing word. No hint, no button, no grey shapes. */
+  #saver, #saverHint, #saverTitle, #safeBtn, #earthFloat { display: none !important; }
 </style>
 </head>
 <body class="intro">
@@ -330,7 +331,7 @@ try { localStorage.setItem("drew-safe", "1"); } catch (e) {}
 <button id="earthFloat" type="button" aria-label="Page style"></button>
 <div id="trip"><canvas id="c"></canvas><canvas id="glow"></canvas>
   <p id="saverTitle">DREW.WTF</p>
-  <p id="saverHint">Tap to enter. Tap Drew three times for a store.</p>
+  <p id="saverHint"></p>
 </div>
 <button id="safeBtn" type="button" aria-pressed="true">turn off epileptic mode 🛑</button>
 <div id="riz" aria-live="assertive"><div class="box" id="rizBox"></div></div>
@@ -426,6 +427,17 @@ try { localStorage.setItem("drew-safe", "1"); } catch (e) {}
   });
   var shopFrameEl = document.getElementById("shopFrame");
   if (shopFrameEl) shopFrameEl.addEventListener("load", pushLayout);
+  /* Six taps anywhere on the black screen open the builder. Nothing on screen says so. */
+  var screenTaps = 0;
+  document.addEventListener("pointerdown", function (e) {
+    if (e.button !== 0 || !window.drewHold) return;
+    if (shop.classList.contains("open") || gate.classList.contains("open")) return;
+    screenTaps += 1;
+    if (screenTaps < 6) return;
+    screenTaps = 0;
+    try { sessionStorage.setItem("drew-bench", "1"); } catch (err) {}
+    openShop("store");
+  }, true);
   function openRandomStore() {
     var i = Math.floor(Math.random() * STORES.length);
     try { sessionStorage.setItem(STORES[i].key, "1"); } catch (e) {}
@@ -436,14 +448,11 @@ try { localStorage.setItem("drew-safe", "1"); } catch (e) {}
   function startDvd() {
     var el = document.getElementById("dvd");
     if (!el) return;
-    var x = 24, y = 36, vx = 2.1, vy = 1.55, clicks = 0, last = 0;
+    var x = 24, y = 36, vx = 2.1, vy = 1.55, last = 0;
     var shades = ["#f4f4f4", "#d0d0d0", "#a3a3a3", "#e6e6e6"];
     var shade = 0;
     el.addEventListener("click", function (e) {
       e.preventDefault();
-      e.stopPropagation();
-      clicks += 1;
-      if (clicks >= 3) openRandomStore();
     });
     function tick(now) {
       if (!window.drewHold) return;
@@ -2710,14 +2719,6 @@ const E=[
     gl.style.display = "none";
     g.fillStyle = "#000";
     g.fillRect(0, 0, W, H);
-    g.textAlign = "center";
-    g.textBaseline = "middle";
-    g.fillStyle = "#ececec";
-    g.font = "700 " + Math.max(36, Math.min(W * 0.08, 88)) + "px ui-monospace, Menlo, Consolas, monospace";
-    g.fillText("DREW.WTF", W / 2, H * 0.4);
-    g.fillStyle = "#9a9a9a";
-    g.font = "600 " + Math.max(16, Math.min(W * 0.04, 22)) + "px ui-monospace, Menlo, Consolas, monospace";
-    g.fillText("Tap to enter", W / 2, H * 0.4 + Math.max(56, H * 0.08));
     g.textAlign = "left";
     g.textBaseline = "top";
   }
@@ -2980,15 +2981,16 @@ const E=[
   setInterval(maybeRiz, 200);
   function onTap() {
     if (riz || left) return;
-    if (window.drewSafe) { enter(); return; }
+    if (window.drewSafe) return;
     if (taps < 7) tone(NOTES[taps], taps >= 5 ? 0.32 : 0.14, 0.2);
     taps++;
     if (taps >= 6 && performance.now() - born >= 10000) { startRiz(); return; }
     if (taps >= 7) enter();
   }
   trip.addEventListener("pointerdown", function (e) {
+    if (window.drewSafe) return;
     if (e.button !== 0) return;
-    if (!window.drewSafe && e.clientY < window.innerHeight * 0.5) return;
+    if (e.clientY < window.innerHeight * 0.5) return;
     onTap();
   });
   if (!window.drewSafe) requestAnimationFrame(frame);
