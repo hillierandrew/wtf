@@ -17,13 +17,13 @@
   }
 
   function gbIn(line) {
-    var tb = String(line).match(/(\d+(?:\.\d+)?)\s*TB\b/i);
-    if (tb) return num(tb[1]) * 1000;
-    var gb = String(line).match(/(\d+(?:\.\d+)?)\s*GB\b/i);
-    if (gb) return num(gb[1]);
-    var mb = String(line).match(/(\d+(?:\.\d+)?)\s*MB(?:ytes)?\b/i);
-    if (mb && /size|memory|capacity/i.test(line)) return num(mb[1]) / 1024;
-    return 0;
+    var m = String(line).match(/(\d+(?:\.\d+)?)\s*(TB|GB|MB(?:ytes)?)\b/i);
+    if (!m) return 0;
+    var n = num(m[1]);
+    var unit = m[2].toUpperCase();
+    if (unit.indexOf("TB") === 0) return n * 1000;
+    if (unit.indexOf("MB") === 0) return /size|memory|capacity/i.test(line) ? n / 1024 : 0;
+    return n;
   }
 
   function sections(text) {
@@ -95,40 +95,76 @@
       gpus.push(line.replace(/\s+\d+\s*°C.*$/, ""));
     });
     var disks = [];
+    var seenDisk = {};
     diskRows.forEach(function (line) {
       var gb = gbIn(line);
-      if (!gb) return;
+      if (!gb || gb < 8) return;
       var kind = /nvme|m\.2/i.test(line) ? "NVMe" : /ssd/i.test(line) ? "SSD" : /hdd|hard disk|sata \(hdd\)/i.test(line) ? "HDD" : "drive";
+      var key = Math.round(gb) + kind;
+      if (seenDisk[key]) return;
+      seenDisk[key] = 1;
       disks.push({ gb: gb, kind: kind, name: line });
     });
-    return { cpu: cpu, cores: cores, ramGB: ramGB, ramType: ramType, slots: slots, gpus: gpus, disks: disks, source: "speccy" };
+    var seenGpu = {};
+    var gpuClean = [];
+    gpus.forEach(function (g) {
+      var key = g.toUpperCase().replace(/^\d+\s*MB\s*/, "").replace(/\s+/g, " ").trim();
+      if (seenGpu[key]) return;
+      seenGpu[key] = 1;
+      gpuClean.push(g);
+    });
+    return { cpu: cpu, cores: cores, ramGB: ramGB, ramType: ramType, slots: slots, gpus: gpuClean, disks: disks, laptop: /Computer type:\s*Notebook/i.test(text) || /Laptop GPU/i.test(text), source: "speccy" };
+  }
+
+  /* Speccy's Save as XML file. Names live in title="" and value="", not in the tag text.
+     Only hardware lines are kept. User names, IPs, and the process list are ignored. */
+  function parseSpeccyXml(text) {
+    var re = /<([A-Za-z][\w:.-]*)(\s[^>]*?)?\s*(\/?)>/g;
+    var lines = [];
+    var section = "";
+    var drive = "";
+    var m;
+    function decode(s) {
+      return String(s || "").replace(/"/g, '"').replace(/&/g, "&").replace(/'/g, "'").replace(/</g, "<").replace(/>/g, ">");
+    }
+    while ((m = re.exec(text))) {
+      var tag = m[1].toLowerCase();
+      var attrs = {};
+      var am = /([A-Za-z_:][\w:.-]*)\s*=\s*"([^"]*)"/g;
+      var a;
+      while ((a = am.exec(m[2] || ""))) attrs[a[1].toLowerCase()] = decode(a[2]);
+      var title = attrs.title || "";
+      var value = attrs.value || "";
+      if ((tag === "mainsection" || tag === "section") && /^(CPU|RAM|Graphics|Storage)$/i.test(title)) {
+        section = /^cpu$/i.test(title) ? "CPU" : /^ram$/i.test(title) ? "RAM" : /^graphics$/i.test(title) ? "Graphics" : "Storage";
+        lines.push(section);
+        drive = "";
+      }
+      if (tag === "section" && section === "Storage" && /ssd|hdd|nvme/i.test(title) && !/partition|smart/i.test(title)) drive = title;
+      if (tag !== "entry") continue;
+      if (section === "CPU" && /^Cores$/i.test(title) && /^\d+$/.test(value)) lines.push("  Cores " + value);
+      if (section === "CPU" && /Core |Ryzen|Xeon|Celeron|Pentium|Athlon/i.test(title)) lines.push("  " + title.replace(/\s+\d+\s*°C.*$/, ""));
+      if (section === "RAM" && /GB/i.test(title) && /channel|ddr/i.test(title)) lines.push("  " + title);
+      if (section === "RAM" && /memory slots$/i.test(title)) lines.push("  " + title + " " + value);
+      if (section === "RAM" && /^Type$/i.test(title) && /DDR/i.test(value)) lines.push("  Type " + value);
+      if (section === "RAM" && /^Size$/i.test(title) && /MBytes/i.test(value)) lines.push("  Size " + value);
+      if (section === "Graphics" && /nvidia|geforce|radeon|\buhd\b|iris|\barc\b|\brtx\b|\bgtx\b/i.test(title + " " + value) && !/sli disabled/i.test(title)) {
+        lines.push("  " + (/nvidia|geforce|radeon|\buhd\b|iris|\brtx\b|\bgtx\b/i.test(title) ? title : value));
+      }
+      if (section === "Storage" && /GB|TB/i.test(title) && /ssd|hdd|nvme/i.test(title)) lines.push("  " + title);
+      if (section === "Storage" && /^Capacity$/i.test(title) && drive) {
+        lines.push("  " + value + " " + drive);
+        drive = "";
+      }
+    }
+    var flat = lines.join("\n");
+    if (/Computer type:\s*Notebook/i.test(text)) flat += "\nComputer type: Notebook";
+    return parseText(flat);
   }
 
   function parseXml(text) {
-    try {
-      var doc = new DOMParser().parseFromString(text, "text/xml");
-      if (!doc || doc.querySelector("parsererror")) throw new Error("bad xml");
-      var lines = [];
-      var section = "";
-      function walk(node) {
-        if (!node || node.nodeType !== 1) return;
-        var tag = node.nodeName.toLowerCase();
-        if (node.children && node.children.length && /cpu|processor|ram|memory|graphic|display|storage|disk|drive/.test(tag)) {
-          var label = /cpu|processor/.test(tag) ? "CPU" : /ram|memory/.test(tag) ? "RAM" : /graph|display/.test(tag) ? "Graphics" : "Storage";
-          if (label !== section) { section = label; lines.push(section); }
-        }
-        if (!node.children || !node.children.length) {
-          var v = (node.textContent || "").trim();
-          if (v) lines.push("  " + node.nodeName + " " + v);
-        } else {
-          for (var i = 0; i < node.children.length; i++) walk(node.children[i]);
-        }
-      }
-      walk(doc.documentElement);
-      return parseText(lines.join("\n"));
-    } catch (e) {
-      return parseText(text.replace(/<[^>]+>/g, "\n"));
-    }
+    if (/<speccydata[\s>]/i.test(text)) return parseSpeccyXml(text);
+    return parseText(text.replace(/<[^>]+>/g, "\n"));
   }
 
   function parse(raw) {
@@ -184,7 +220,9 @@
       var best = spec.gpus[0];
       var tier = 0;
       spec.gpus.forEach(function (g) { var t = gpuTier(g); if (t >= tier) { tier = t; best = g; } });
-      if (tier <= 0) lines.push({ kind: "upgrade", title: "Upgrade the graphics card if they play games.", detail: best + " is built into the processor. Fine for school and video calls. Not fine for new games." });
+      if (spec.laptop && tier <= 1) lines.push({ kind: tier <= 0 ? "upgrade" : "maybe", title: tier <= 0 ? "The graphics are stuck in the laptop." : "The graphics card cannot be swapped.", detail: best + (tier <= 0 ? " A different computer is the upgrade, not a card." : " It still runs older games. A newer laptop is the upgrade.") });
+      else if (spec.laptop) lines.push({ kind: "keep", title: "Leave the graphics card.", detail: best + ". It is soldered in, and it is already strong enough." });
+      else if (tier <= 0) lines.push({ kind: "upgrade", title: "Upgrade the graphics card if they play games.", detail: best + " is built into the processor. Fine for school and video calls. Not fine for new games." });
       else if (tier === 1) lines.push({ kind: "maybe", title: "The graphics card can be upgraded.", detail: best + " still runs older games. A newer card is the upgrade if the picture is the problem." });
       else lines.push({ kind: "keep", title: "Leave the graphics card.", detail: best + "." });
     } else {
@@ -207,6 +245,7 @@
     } else {
       lines.push({ kind: "maybe", title: "Storage was not in the file.", detail: "Paste the Storage section too." });
     }
+    if (spec.laptop) lines.push({ kind: "maybe", title: "This is a laptop.", detail: "The processor and the graphics card are soldered on. Empty memory slots can take a stick. Storage can be swapped. A desktop graphics card will not fit." });
     return lines;
   }
 
@@ -260,12 +299,17 @@
     el.className = (el.className ? el.className + " " : "") + "speccy-box";
     var h = document.createElement("h2");
     h.textContent = "Your PC, from Speccy";
+    var drop = document.createElement("div");
+    drop.className = "speccy-drop";
+    drop.textContent = "Drop the Speccy file here";
     var p = document.createElement("p");
-    p.textContent = "On their computer, open Speccy. Click File, then Save as Text file. Open that file, copy all of it, and paste it here. A file works too.";
+    p.textContent = "In Speccy, click File, then Save as XML, or Save as Text file. Drop that file on the box, or choose it. The file stays on this device. Nothing is sent anywhere.";
     var area = document.createElement("textarea");
-    area.rows = 5;
-    area.placeholder = "Paste the Speccy text here";
+    area.rows = 4;
+    area.placeholder = "Or paste the Speccy text here";
     area.setAttribute("aria-label", "Speccy text");
+    var status = document.createElement("p");
+    status.className = "speccy-status";
     var row = document.createElement("div");
     row.className = "speccy-row";
     var go = document.createElement("button");
@@ -279,7 +323,7 @@
     guess.textContent = "Guess from this browser";
     var file = document.createElement("input");
     file.type = "file";
-    file.accept = ".txt,.xml,text/plain,text/xml";
+    file.accept = ".txt,.xml,text/plain,text/xml,application/xml";
     file.hidden = true;
     var out = document.createElement("div");
     out.className = "speccy-out";
@@ -288,29 +332,50 @@
       if (!spec || (!spec.cpu && !spec.ramGB && !(spec.gpus && spec.gpus.length) && !(spec.disks && spec.disks.length))) {
         out.replaceChildren();
         var err = document.createElement("p");
-        err.textContent = "That did not look like a Speccy report. Use File, Save as Text file, and paste the whole thing.";
+        err.textContent = "That did not look like a Speccy report. Use File, then Save as XML.";
         out.appendChild(err);
         return;
       }
       render(out, spec);
     }
-    go.addEventListener("click", function () { run(area.value); });
-    fileBtn.addEventListener("click", function () { file.click(); });
-    file.addEventListener("change", function () {
-      var f = file.files && file.files[0];
+    function readFile(f) {
       if (!f) return;
       var reader = new FileReader();
-      reader.onload = function () { area.value = String(reader.result || ""); run(area.value); };
+      reader.onload = function () {
+        status.textContent = "Read " + f.name + ". It stayed on this device.";
+        area.value = "";
+        run(String(reader.result || ""));
+      };
+      reader.onerror = function () { status.textContent = "That file could not be read."; };
       reader.readAsText(f);
+    }
+    go.addEventListener("click", function () { run(area.value); });
+    fileBtn.addEventListener("click", function () { file.click(); });
+    file.addEventListener("change", function () { readFile(file.files && file.files[0]); });
+    guess.addEventListener("click", function () { status.textContent = ""; render(out, browserGuess()); });
+    ["dragenter", "dragover"].forEach(function (name) {
+      el.addEventListener(name, function (e) {
+        e.preventDefault();
+        el.classList.add("speccy-hot");
+      });
     });
-    guess.addEventListener("click", function () { render(out, browserGuess()); });
+    el.addEventListener("dragleave", function (e) {
+      if (e.target === el) el.classList.remove("speccy-hot");
+    });
+    el.addEventListener("drop", function (e) {
+      e.preventDefault();
+      el.classList.remove("speccy-hot");
+      readFile(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]);
+    });
     row.append(go, fileBtn, guess);
-    el.append(h, p, area, file, row, out);
+    el.append(h, drop, p, area, status, file, row, out);
   }
 
   var css = document.createElement("style");
   css.textContent = [
     ".speccy-box{margin:12px 0 18px;padding:14px;border:1px solid rgba(127,127,127,.45);border-radius:16px}",
+    ".speccy-box.speccy-hot{outline:2px solid currentColor;outline-offset:3px}",
+    ".speccy-drop{margin:0 0 8px;padding:18px 12px;border:1px dashed rgba(127,127,127,.7);border-radius:14px;text-align:center;font-weight:600}",
     ".speccy-box h2{margin:0 0 8px;font-size:22px;letter-spacing:-.03em}",
     ".speccy-box p{margin:8px 0}",
     ".speccy-box textarea{width:100%;min-height:96px;box-sizing:border-box;font:14px/1.4 ui-monospace,Menlo,Consolas,monospace;padding:10px;border-radius:12px;border:1px solid rgba(127,127,127,.45);background:transparent;color:inherit}",
