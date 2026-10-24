@@ -6,19 +6,17 @@
 <meta name="theme-color" content="#000000" />
 <!--
   Map for the next editor:
-  #trip / canvas#c  splash. html.safe (default) paints a still grey screen instead of the mushroom field.
-  #safeBtn          label "turn off epileptic mode". Writes localStorage drew-safe=1.
-  html.safe         hides #glow, greys #field/#logo/#veil, skips the rainbow intro, slows the background.
+  #trip / canvas#c  old mushroom field. Not started while html.safe is on.
+  #saver            slow screensaver. CSS transforms only.
+  #safeBtn          "turn off epileptic mode". Keeps html.safe on.
+  #saverTitle       the only words on the splash, plus "Tap to enter".
   #shop #shopFrame  store iframe. The builder posts {type:"drew-progress", n, total} and #shopFill shows it.
   bench/index.html  the store in the screenshot. #railL and #railR fill the empty sides.
 -->
 <script>
-/* drew-safe missing or anything but "0" => still grey splash. Runs before paint so the mushrooms never flash on. */
-try {
-  if (localStorage.getItem("drew-safe") !== "0") document.documentElement.classList.add("safe");
-} catch (e) {
-  document.documentElement.classList.add("safe");
-}
+/* Always calm on load. The full-screen canvas is what freezes Chrome, so it does not start. */
+document.documentElement.classList.add("safe");
+try { localStorage.setItem("drew-safe", "1"); } catch (e) {}
 </script>
 <title>DREW.WTF</title>
 <style>
@@ -212,11 +210,50 @@ try {
     #dock button { min-width: 48px; min-height: 48px; font-size: 22px; }
     #name { max-width: 34vw; }
   }
-  /* Safe splash: black, grey, white. No saturated glow, no hue spin. */
-  html.safe #glow { display: none !important; }
-  html.safe #field,
-  html.safe #logo,
-  html.safe #veil { filter: grayscale(1) contrast(1.05); }
+  /* Calm splash. CSS only, so the page does not start a full-screen canvas. */
+  #saver {
+    position: fixed; inset: 0; z-index: 0; overflow: hidden;
+    background: #000; pointer-events: none;
+  }
+  #saver i {
+    position: absolute; display: block; border-radius: 50%;
+    background: #1c1c1c;
+    animation: saver-drift 32s ease-in-out infinite;
+  }
+  #saver i:nth-child(1) { width: 46vw; height: 46vw; left: -8%; top: 18%; animation-duration: 36s; }
+  #saver i:nth-child(2) { width: 28vw; height: 28vw; right: -6%; bottom: 12%; background: #2a2a2a; animation-duration: 28s; animation-delay: -8s; }
+  #saver i:nth-child(3) { width: 16vw; height: 16vw; left: 38%; top: 8%; background: #111; animation-duration: 24s; animation-delay: -4s; }
+  #saver i:nth-child(4) { width: 70vw; height: 70vw; left: 20%; top: 40%; background: #161616; animation-duration: 42s; animation-delay: -14s; }
+  @keyframes saver-drift {
+    0% { transform: translate3d(0, 0, 0); }
+    50% { transform: translate3d(6vw, -4vh, 0); }
+    100% { transform: translate3d(0, 0, 0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #saver i { animation: none; }
+  }
+  html.safe #glow, html.safe #c { display: none !important; }
+  html.safe #trip { background: transparent; }
+  html.safe #field, html.safe #logo, html.safe #veil { display: none !important; }
+  body.building #saver { visibility: hidden; }
+  #saverTitle, #saverHint {
+    position: absolute; left: 16px; right: 16px; z-index: 2;
+    margin: 0; text-align: center; pointer-events: none;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+  }
+  #saverTitle {
+    top: 36%;
+    color: #ececec;
+    font-size: clamp(42px, 12vw, 92px);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+  }
+  #saverHint {
+    top: calc(36% + clamp(64px, 14vw, 110px));
+    color: #9a9a9a;
+    font-size: clamp(16px, 4vw, 22px);
+    font-weight: 600;
+  }
   #safeBtn {
     position: fixed;
     left: 50%;
@@ -227,20 +264,20 @@ try {
     min-height: 48px;
     padding: 0 18px;
     border-radius: 999px;
-    border: 1px solid #d0d0d0;
-    background: #111;
+    border: 1px solid #3a3a3a;
+    background: #141414;
     color: #f2f2f2;
     font: 700 15px/1.2 ui-monospace, Menlo, Consolas, monospace;
     cursor: pointer;
     touch-action: manipulation;
-    white-space: nowrap;
   }
-  body.entered #safeBtn { display: none; }
+  body.entered #safeBtn, body.entered #saverTitle, body.entered #saverHint { display: none; }
 </style>
 </head>
 <body class="intro">
 <h1>DREW.WTF</h1>
 <canvas id="field"></canvas>
+<div id="saver" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
 <div id="veil"></div>
 <div id="logo" aria-hidden="true"><canvas id="ink"></canvas></div>
 <div id="sky" hidden></div>
@@ -281,7 +318,10 @@ try {
   <iframe id="shopFrame" title="Build a computer"></iframe>
 </div>
 <button id="earthFloat" type="button" aria-label="Page style"></button>
-<div id="trip"><canvas id="c"></canvas><canvas id="glow"></canvas></div>
+<div id="trip"><canvas id="c"></canvas><canvas id="glow"></canvas>
+  <p id="saverTitle">DREW.WTF</p>
+  <p id="saverHint">Tap to enter</p>
+</div>
 <button id="safeBtn" type="button" aria-pressed="true">turn off epileptic mode 🛑</button>
 <div id="riz" aria-live="assertive"><div class="box" id="rizBox"></div></div>
 <script>
@@ -2286,7 +2326,8 @@ const E=[
   });
   homeBtn.classList.add("on");
 
-  resize();
+  var calmStart = document.documentElement.classList.contains("safe");
+  if (!calmStart) resize();
   x = Math.random() * Math.max(1, window.innerWidth - baseW);
   y = Math.random() * Math.max(1, window.innerHeight - baseH);
   var dir = Math.random() * Math.PI * 2;
@@ -2324,9 +2365,10 @@ const E=[
       introOn = true;
       spawned = false;
       document.body.classList.add("intro");
+      resize();
+      if (!raf) raf = requestAnimationFrame(frame);
     }
     revealAt = 0;
-    resize();
   };
   var veilEl = document.getElementById("veil");
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches || document.documentElement.classList.contains("safe");
@@ -2433,6 +2475,7 @@ const E=[
     if (veilEl) veilEl.style.opacity = "";
   }
   function frame(now) {
+    if (document.documentElement.classList.contains("safe")) { raf = 0; return; }
     if (window.drewHold) { raf = requestAnimationFrame(frame); return; }
     if (document.hidden) { raf = 0; return; }
     /* Safe mode repaints the background about 3 times a second so it cannot strobe. */
@@ -2556,7 +2599,7 @@ const E=[
   document.addEventListener("contextmenu", function (e) {
     if (!uiHit(e.target)) e.preventDefault();
   });
-  raf = requestAnimationFrame(frame);
+  if (!document.documentElement.classList.contains("safe")) raf = requestAnimationFrame(frame);
 })();
 </script>
 <script>
@@ -2595,11 +2638,9 @@ const E=[
     g.fillStyle = "#ececec";
     g.font = "700 " + Math.max(36, Math.min(W * 0.08, 88)) + "px ui-monospace, Menlo, Consolas, monospace";
     g.fillText("DREW.WTF", W / 2, H * 0.4);
-    g.fillStyle = "#8a8a8a";
-    g.font = "600 " + Math.max(14, Math.min(W * 0.028, 22)) + "px ui-monospace, Menlo, Consolas, monospace";
-    g.fillText("black   grey   still", W / 2, H * 0.4 + Math.max(44, H * 0.07));
-    g.fillStyle = "#5c5c5c";
-    g.fillText("tap the lower half to enter", W / 2, H * 0.4 + Math.max(78, H * 0.13));
+    g.fillStyle = "#9a9a9a";
+    g.font = "600 " + Math.max(16, Math.min(W * 0.04, 22)) + "px ui-monospace, Menlo, Consolas, monospace";
+    g.fillText("Tap to enter", W / 2, H * 0.4 + Math.max(56, H * 0.08));
     g.textAlign = "left";
     g.textBaseline = "top";
   }
@@ -2645,7 +2686,10 @@ const E=[
     if (window.drewSafe) paintSafe();
   }
   window.drewRefit = resize;
-  addEventListener("resize", resize); resize();
+  if (!window.drewSafe) {
+    addEventListener("resize", resize);
+    resize();
+  }
   function bk(h, L, S) {
     var hb = Math.floor(h / (360 / HB)) % HB; if (hb < 0) hb += HB;
     var lb = Math.floor((L - 18) / 12); lb = lb < 0 ? 0 : lb > LB - 1 ? LB - 1 : lb;
@@ -2756,7 +2800,6 @@ const E=[
     }
     if (!phone) gg.drawImage(cv, 0, 0, gl.width, gl.height);
   }
-  requestAnimationFrame(frame);
 
   var actx = null;
   var NOTES = [659.25, 659.25, 659.25, 523.25, 659.25, 783.99, 392];
@@ -2860,16 +2903,18 @@ const E=[
   setInterval(maybeRiz, 200);
   function onTap() {
     if (riz || left) return;
-    if (!window.drewSafe && taps < 7) tone(NOTES[taps], taps >= 5 ? 0.32 : 0.14, 0.2);
+    if (window.drewSafe) { enter(); return; }
+    if (taps < 7) tone(NOTES[taps], taps >= 5 ? 0.32 : 0.14, 0.2);
     taps++;
-    if (!window.drewSafe && taps >= 6 && performance.now() - born >= 10000) { startRiz(); return; }
+    if (taps >= 6 && performance.now() - born >= 10000) { startRiz(); return; }
     if (taps >= 7) enter();
   }
   trip.addEventListener("pointerdown", function (e) {
     if (e.button !== 0) return;
-    if (e.clientY < window.innerHeight * 0.5) return;
+    if (!window.drewSafe && e.clientY < window.innerHeight * 0.5) return;
     onTap();
   });
+  if (!window.drewSafe) requestAnimationFrame(frame);
 })();
 </script>
 </body>

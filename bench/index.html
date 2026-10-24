@@ -69,7 +69,33 @@
   .meter > div { height: 100%; width: 0; background: var(--ink); }
   #meterLabel { margin: 8px 0 0; font-variant-numeric: tabular-nums; }
   .ticks { list-style: none; margin: 8px 0 0; padding: 0; }
-  .ticks li { display: flex; justify-content: space-between; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .ticks li { display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+  .ticks li small { display: block; color: var(--muted); font-size: 13px; font-weight: 400; margin-top: 2px; }
+  .steps { margin: 0 0 12px; padding-left: 18px; }
+  .steps li { margin: 6px 0; }
+  #plain { margin: 0 0 10px; font-size: 16px; }
+  .why { display: block; color: var(--muted); font-size: 13px; font-weight: 400; }
+  @media (max-width: 899px) {
+    body { padding: 14px 14px 28px; }
+    h1 { font-size: 32px; }
+    .pitch { font-size: 17px; }
+    .budget b { font-size: 36px; }
+    .grid, body.phone .grid { grid-template-columns: 1fr !important; }
+    #app { display: flex; flex-direction: column; }
+    #app > header { order: 1; }
+    #app > .pitch { order: 2; }
+    #app > #railL { order: 3; }
+    #app > a.use { order: 4; }
+    #app > .budget { order: 5; }
+    #app > #jobs { order: 6; }
+    #app > #sell { order: 7; }
+    #app > #parts { order: 8; }
+    #app > #railR { order: 9; }
+    #app > header, #app > .pitch, #app > a.use, #app > .budget, #app > #jobs, #app > #sell, #app > #parts, #railL, #railR {
+      width: 100%; margin-left: 0; margin-right: 0;
+    }
+    #meterList { display: none; }
+  }
   .ticks .ok { color: var(--ink); }
   .ticks .no { color: var(--muted); }
   body.desk #app {
@@ -90,9 +116,12 @@
   body.desk #app > #railL { grid-column: 1; grid-row: 1 / span 8; position: sticky; top: 12px; width: auto; margin: 0; }
   body.desk #app > #railR { grid-column: 3; grid-row: 1 / span 8; position: sticky; top: 12px; width: auto; margin: 0; }
   body.phone #app { display: flex; flex-direction: column; }
-  body.phone #app > #railL { order: 6; }
-  body.phone #app > #railR { order: 7; }
+  body.phone #app > #railL { order: 3; }
+  body.phone #app > #railR { order: 9; }
   body.phone #app > #parts { order: 8; }
+  @media (max-width: 899px) {
+    body.desk #app, body.phone #app, #app { display: flex; flex-direction: column; width: 100%; }
+  }
   @media (prefers-reduced-motion: reduce) {
     .bay.go, .bay.drop.go { animation: none; }
   }
@@ -139,8 +168,14 @@
   </form>
 </div>
 <div id="app">
-<aside id="railL" aria-label="Build progress">
-  <p class="rail-kicker">In the box</p>
+<aside id="railL" aria-label="How to buy">
+  <p class="rail-kicker">How to buy</p>
+  <ol class="steps">
+    <li>Drag the budget.</li>
+    <li>Tap what the computer is for.</li>
+    <li>Read the parts. Tap one to change it.</li>
+  </ol>
+  <p id="plain"></p>
   <div class="meter" aria-hidden="true"><div id="meterFill"></div></div>
   <p id="meterLabel" class="muted">0 / 8</p>
   <ul class="ticks" id="meterList"></ul>
@@ -156,13 +191,15 @@
 <a class="use" href="use.html">For one game or program <span>→</span></a>
 <div class="budget">
   <div><span id="budgetWord">Budget</span> <b id="budgetLabel">$700</b></div>
-  <input id="budget" type="range" min="0" max="20000" step="50" value="700" />
+  <input id="budget" type="range" min="0" max="20000" step="50" value="700" aria-describedby="budgetHint" />
+  <p class="muted" id="budgetHint">Drag this. More money, stronger computer.</p>
   <div class="muted">$0 <span style="float:right">$20,000</span></div>
 </div>
 <div id="jobs" class="grid"></div>
 <p class="muted" id="sell"></p>
 <aside id="railR" aria-label="The computer so far">
-  <p class="rail-kicker">The box</p>
+  <p class="rail-kicker">In the computer</p>
+  <p class="muted">A filled line is a part you are buying. An empty line is still missing.</p>
   <pre class="art" id="art"></pre>
   <div class="machine" id="machine"></div>
   <p class="muted" id="story"></p>
@@ -203,6 +240,8 @@ const NEED = {
 const LANG = {
   en: { name:"English", title:"Build a computer", pitch:"I sell the computer that fits the job and the money. Not the biggest one on the wall. Move the budget. Pick the work. I put the parts in the box.", budget:"Budget", pass:"Password", open:"Open", bad:"Wrong password.", under:"This job does not need all of that money. I will sell this one.", over:"The cheapest honest computer for this job costs more than the slider. Here it is.", story:"Pick a job. I will fill the box.", elem:"Elementary school", high:"High school", col:"College", off:"Office", cad:"Drawings", vid:"Video", dj:"Music", stream:"Streaming",
     cpu:"Processor", motherboard:"Motherboard", memory:"Memory", gpu:"Graphics card", storage:"Storage", case:"Case", cooler:"Cooler", psu:"Power",
+    cpuWhy:"Runs the programs.", boardWhy:"Everything plugs into this.", ramWhy:"Keeps what you are doing open.", gpuWhy:"Draws games and video.", storageWhy:"Holds your files.", caseWhy:"The box the parts sit in.", coolWhy:"Keeps the processor cool.", psuWhy:"Feeds power to every part.",
+    forJob:"This computer is for", costs:"It costs", leftWord:"Still in the budget", overWord:"Over the budget by", tapPart:"Tap a part to swap it.",
     cpuLine:"The processor drops into the board.", ramLine:"The memory clicks down into the slots.", gpuLine:"The graphics card slides into the slot.", nvmeLine:"The NVMe drive slides into the board.", ssdLine:"The drive goes in the bay.", caseLine:"The case is the box.", psuLine:"The power supply sits at the bottom.", coolLine:"The cooler sits on the processor.", boardLine:"The motherboard goes in first." },
   fr: { name:"Français", title:"Monter un ordinateur", pitch:"Je vends l'ordinateur qui va au travail et au budget. Pas le plus cher. Bougez l'argent. Choisissez le travail.", budget:"Budget", pass:"Mot de passe", open:"Ouvrir", bad:"Mauvais mot de passe.", under:"Ce travail n'a pas besoin de tout cet argent.", over:"Le moins cher honnête coûte plus que le curseur.", story:"Choisissez un travail.", elem:"École primaire", high:"Secondaire", col:"Cégep / université", off:"Bureau", cad:"Dessin", vid:"Vidéo", dj:"Musique", stream:"Streaming" },
   zh: { name:"普通话", title:"组装电脑", pitch:"我按工作和预算卖电脑，不卖墙上最贵的。拖动预算，选用途，我来装零件。", budget:"预算", pass:"密码", open:"打开", bad:"密码不对。", under:"这个用途不需要花这么多。", over:"诚实的最低价比滑条高。", story:"选一个用途。", elem:"小学", high:"中学", col:"大学", off:"办公", cad:"画图", vid:"视频", dj:"音乐", stream:"直播" },
@@ -599,6 +638,10 @@ function render() {
     const name = document.createElement("b");
     name.textContent = catLabel(id);
     text.appendChild(name);
+    var why = document.createElement("span");
+    why.className = "why";
+    why.textContent = t({ cpu:"cpuWhy", motherboard:"boardWhy", memory:"ramWhy", gpu:"gpuWhy", storage:"storageWhy", case:"caseWhy", cooler:"coolWhy", psu:"psuWhy" }[id] || "story");
+    text.appendChild(why);
     text.appendChild(document.createTextNode(part ? " " + part.name : ""));
     if (part) {
       const tags = document.createElement("span");
@@ -631,11 +674,13 @@ function card(part, onclick) {
   return button;
 }
 function paintRails(parts, total) {
-  /* Left rail: 8 categories. A row is .ok once that part is in the build. */
+  /* Left card: plain sentence plus one row per part. Right card is the same list, drawn as the case. */
+  var WHY = { cpu:"cpuWhy", motherboard:"boardWhy", memory:"ramWhy", gpu:"gpuWhy", storage:"storageWhy", case:"caseWhy", cooler:"coolWhy", psu:"psuWhy" };
   var filled = 0;
   var list = document.getElementById("meterList");
   var fill = document.getElementById("meterFill");
   var label = document.getElementById("meterLabel");
+  var plain = document.getElementById("plain");
   if (list) list.replaceChildren();
   CATS.forEach(function (id) {
     var part = parts[id];
@@ -644,14 +689,23 @@ function paintRails(parts, total) {
     var li = document.createElement("li");
     li.className = part ? "ok" : "no";
     var name = document.createElement("span");
-    name.textContent = (part ? "● " : "○ ") + catLabel(id);
+    var b = document.createElement("b");
+    b.textContent = catLabel(id);
+    var small = document.createElement("small");
+    small.textContent = t(WHY[id] || "story") + (part ? " " + part.name : "");
+    name.append(b, small);
     var val = document.createElement("span");
     val.textContent = part ? money.format(part.price) : "—";
     li.append(name, val);
     list.appendChild(li);
   });
   if (fill) fill.style.width = Math.round((filled / CATS.length) * 100) + "%";
-  if (label) label.textContent = filled + " / " + CATS.length + "  ·  " + money.format(total || 0);
+  if (label) label.textContent = filled + " of 8 parts in the box · " + money.format(total || 0);
+  if (plain) {
+    var gap = (budget || 0) - (total || 0);
+    var tail = gap >= 0 ? t("leftWord") + " " + money.format(gap) : t("overWord") + " " + money.format(-gap);
+    plain.textContent = t("forJob") + " " + jobName(job) + ". " + t("costs") + " " + money.format(total || 0) + ". " + tail + ".";
+  }
 }
 let renderQueued = false;
 function scheduleRender() {
