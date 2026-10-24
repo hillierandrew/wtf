@@ -242,6 +242,73 @@
     return parseText(text);
   }
 
+  /* A .speccy snapshot starts with "SD", then a zlib blob of UTF-16 names.
+     snapshotText() turns the inflated bytes into the same summary the XML reader uses. */
+  function utf16Strings(buf) {
+    var strings = [];
+    var i = 0;
+    while (i < buf.length - 3) {
+      if (buf[i + 1] === 0 && buf[i] >= 32 && buf[i] < 127) {
+        var chars = [];
+        var j = i;
+        var ok = true;
+        while (j + 1 < buf.length) {
+          var c = buf[j] | (buf[j + 1] << 8);
+          if (c === 0) break;
+          if (c < 32 || c > 126 || chars.length > 180) { ok = false; break; }
+          chars.push(String.fromCharCode(c));
+          j += 2;
+        }
+        if (ok && chars.length && j + 1 < buf.length && buf[j] === 0 && buf[j + 1] === 0) {
+          strings.push(chars.join(""));
+          i = j + 2;
+          continue;
+        }
+      }
+      i += 1;
+    }
+    return strings;
+  }
+
+  function snapshotText(buf) {
+    var strings = utf16Strings(buf);
+    var headers = { CPU: 1, RAM: 1, Graphics: 1, Storage: 1 };
+    var section = "";
+    var lines = [];
+    var started = false;
+    for (var n = 0; n < strings.length; n++) {
+      var s = strings[n];
+      if (!started) {
+        if (s === "CPU" || s === "Summary") started = s === "CPU";
+        if (s !== "CPU") continue;
+      }
+      if (headers[s]) { section = s; lines.push(s); continue; }
+      if (s === "Optical Drives" || s === "Audio") break;
+      if (s === "Motherboard" || s === "Operating System" || s === "Summary" || s === "SLI Disabled") { section = ""; continue; }
+      if (section && s.length > 2) lines.push("  " + s);
+    }
+    for (n = 0; n < strings.length - 1; n++) {
+      if (strings[n] === "Cores" && /^\d+$/.test(strings[n + 1])) { lines.push("CPU", "  Cores " + strings[n + 1]); break; }
+    }
+    for (n = 0; n < strings.length - 1; n++) {
+      if (strings[n] === "Total memory slots" && /^\d+$/.test(strings[n + 1])) lines.push("RAM", "  Total memory slots " + strings[n + 1]);
+      if (strings[n] === "Used memory slots" && /^\d+$/.test(strings[n + 1])) lines.push("  Used memory slots " + strings[n + 1]);
+      if (strings[n] === "Free memory slots" && /^\d+$/.test(strings[n + 1])) lines.push("  Free memory slots " + strings[n + 1]);
+    }
+    if (strings.indexOf("Computer type: Notebook") !== -1) lines.push("Computer type: Notebook");
+    return lines.join("\n");
+  }
+
+  function inflateSpeccy(buf) {
+    var start = -1;
+    for (var i = 0; i < buf.length - 1; i++) {
+      if (buf[i] === 0x78 && (buf[i + 1] === 0xda || buf[i + 1] === 0x9c || buf[i + 1] === 0x01)) { start = i; break; }
+    }
+    if (start < 0 || typeof DecompressionStream !== "function") return Promise.reject(new Error("snapshot"));
+    var stream = new Blob([buf.subarray(start)]).stream().pipeThrough(new DecompressionStream("deflate"));
+    return new Response(stream).arrayBuffer().then(function (ab) { return snapshotText(new Uint8Array(ab)); });
+  }
+
   function gpuTier(name) {
     var n = String(name || "").toUpperCase();
     if (!n) return 0;
@@ -369,9 +436,9 @@
     h.textContent = "Your PC, from Speccy";
     var drop = document.createElement("div");
     drop.className = "speccy-drop";
-    drop.textContent = "Drop the Speccy file here";
+    drop.textContent = "Drop a Speccy file here";
     var p = document.createElement("p");
-    p.textContent = "Drop a Speccy file, or paste a specs list. Speccy: File, then Save as XML. The file stays on this device. Nothing is sent anywhere.";
+    p.textContent = "Drop Save as XML, Save Snapshot (.speccy), or paste a specs list. The file stays on this device. Nothing is sent anywhere.";
     var area = document.createElement("textarea");
     area.rows = 4;
     area.placeholder = "Or paste the specs here";
@@ -392,7 +459,7 @@
     guess.textContent = "Guess from this browser";
     var file = document.createElement("input");
     file.type = "file";
-    file.accept = ".txt,.xml,text/plain,text/xml,application/xml";
+    file.accept = ".txt,.xml,.speccy,text/plain,text/xml,application/xml";
     file.hidden = true;
     var out = document.createElement("div");
     out.className = "speccy-out";
@@ -411,12 +478,25 @@
       if (!f) return;
       var reader = new FileReader();
       reader.onload = function () {
-        status.textContent = "Read " + f.name + ". It stayed on this device.";
-        area.value = "";
-        run(String(reader.result || ""));
+        var buf = new Uint8Array(reader.result);
+        var snapshot = buf.length > 3 && buf[0] === 0x53 && buf[1] === 0x44;
+        if (!snapshot) {
+          status.textContent = "Read " + f.name + ". It stayed on this device.";
+          area.value = "";
+          run(new TextDecoder("utf-8").decode(buf));
+          return;
+        }
+        status.textContent = "Opening the snapshot…";
+        inflateSpeccy(buf).then(function (text) {
+          status.textContent = "Read " + f.name + ". It stayed on this device.";
+          area.value = "";
+          run(text);
+        }).catch(function () {
+          status.textContent = "This browser could not open that snapshot. In Speccy use File, then Save as XML.";
+        });
       };
       reader.onerror = function () { status.textContent = "That file could not be read."; };
-      reader.readAsText(f);
+      reader.readAsArrayBuffer(f);
     }
     go.addEventListener("click", function () { run(area.value); });
     fileBtn.addEventListener("click", function () { file.click(); });
@@ -470,5 +550,5 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();
 
-  root.drewSpeccy = { parse: parse, advice: advice, mount: mount };
+  root.drewSpeccy = { parse: parse, advice: advice, mount: mount, snapshotText: snapshotText };
 })(window);
