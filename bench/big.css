@@ -1,0 +1,13 @@
+/* Shared store type. Big enough to read on a phone from a few feet away. */
+button, .card, .choice, .go, .primary, .ghost, .dark, nav.top button, .langbtn {
+  min-height: 76px;
+  font-size: 22px;
+}
+h1 { font-size: clamp(36px, 8vw, 56px); line-height: 1.05; letter-spacing: -0.04em; }
+body { font-size: 22px; }
+nav.top { display: flex; flex-wrap: wrap; gap: 10px; }
+nav.top button { flex: 1 1 46%; }
+button:focus-visible, a:focus-visible { outline: 4px solid currentColor; outline-offset: 3px; }
+@media (forced-colors: active) {
+  button, .card { border: 3px solid ButtonText; }
+}

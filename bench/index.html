@@ -169,6 +169,51 @@
   body.detail .pill { display: inline-block; margin: 8px 6px 0 0; padding: 3px 9px; border-radius: 999px; background: #2563eb; color: #fff; font-size: 12px; font-weight: 700; letter-spacing: 0; }
   body.detail .pill.alt { background: #c2410c; }
   @media (max-width: 520px) { body.detail .srow { grid-template-columns: 84px 1fr; padding: 12px; } }
+  /* Order screen. One column, giant type, gaps so the next button is hard to miss. */
+  body { background: #fff; color: #111; font-size: 22px; padding: 12px 14px 40px; }
+  #app, body.desk #app, body.phone #app {
+    width: min(640px, 100%); margin: 0 auto; display: flex !important; flex-direction: column !important;
+    grid-template-columns: none !important;
+  }
+  #app > header h1 { font-size: 28px; line-height: 1; }
+  #railL, #railR, #app > .pitch, #app > .budget, #jobs, #sell, #app > a.use, .dock { display: none !important; }
+  #parts { display: none; }
+  body.detail #parts { display: block !important; order: 5; }
+  #app > header { order: 1; width: 100%; }
+  #ask { order: 2; margin: 8px 0 14px; font-size: clamp(40px, 10vw, 64px); font-weight: 800; letter-spacing: -0.045em; line-height: .95; }
+  #order { order: 3; }
+  #speccy { order: 6; margin-top: 28px; }
+  #langs { order: 7; }
+  .total { margin: 0 0 6px; font-size: clamp(64px, 16vw, 96px); font-weight: 800; letter-spacing: -0.055em; line-height: .9; }
+  .forwho { margin: 0 0 16px; font-size: 28px; font-weight: 700; }
+  .slot, .big, #order .more {
+    display: flex; align-items: center; gap: 14px;
+    width: 100%; min-height: 96px; margin: 0 0 14px; padding: 12px 14px;
+    border: 3px solid #111; border-radius: 20px; background: #fff; color: #111;
+    text-align: left; font: 700 22px/1.15 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    touch-action: manipulation;
+  }
+  .slot.on, .big.on { background: #111; color: #fff; }
+  .slot:focus-visible, .big:focus-visible, #order .more:focus-visible, .back:focus-visible, .icon:focus-visible {
+    outline: 4px solid #111; outline-offset: 3px;
+  }
+  .logo {
+    flex: 0 0 78px; width: 78px; height: 78px; border-radius: 16px;
+    display: grid; place-items: center; text-align: center;
+    font: 800 15px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    letter-spacing: -0.03em; padding: 4px;
+  }
+  .mid { flex: 1; min-width: 0; }
+  .mid .k { display: block; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 800; }
+  .mid .nm { display: block; margin-top: 2px; font-size: clamp(24px, 5vw, 32px); line-height: 1.05; letter-spacing: -0.03em; font-weight: 800; }
+  .mid .sub { display: block; margin-top: 4px; font-size: 18px; font-weight: 600; }
+  .slot .price, .big .price { font-size: clamp(26px, 6vw, 34px); font-weight: 800; letter-spacing: -0.04em; white-space: nowrap; }
+  .back { min-height: 56px; font-size: 22px; font-weight: 800; }
+  #gate form { font-size: 22px; }
+  #gate input, #gate .go { min-height: 72px; font-size: 24px; }
+  @media (forced-colors: active) {
+    .slot, .big, .logo { border: 3px solid ButtonText; }
+  }
 </style>
 </head>
 <body>
@@ -201,6 +246,8 @@
   <button class="icon" id="deskBtn" type="button" aria-label="Desktop layout">🖥️</button>
   <button class="icon" id="langBtn" type="button" aria-label="Language">🔤</button>
 </header>
+<p id="ask">What is this computer for?</p>
+<div id="order"></div>
 <p class="pitch" id="pitch"></p>
 <div id="speccy"></div>
 <a class="use" href="use.html">For one game or program <span>→</span></a>
@@ -572,6 +619,8 @@ function preferredLayout(){
   return window.matchMedia("(max-width: 820px)").matches ? "phone" : "desk";
 }
 let layout = preferredLayout();
+let stage = "job";
+let showAll = false;
 function setLayout(next){
   layout = next;
   try { sessionStorage.setItem("drew-layout", next); } catch (e) {}
@@ -581,6 +630,203 @@ function setLayout(next){
   const desk = document.getElementById("deskBtn");
   if (phone) phone.classList.toggle("on", layout === "phone");
   if (desk) desk.classList.toggle("on", layout === "desk");
+}
+const MARKS = [
+  ["NVIDIA", "NV", "#76b900", "#111"],
+  ["GIGABYTE", "GIGA", "#111", "#fff"],
+  ["CORSAIR", "CORSAIR", "#111", "#f5d76e"],
+  ["KINGSTON", "KINGSTON", "#c8102e", "#fff"],
+  ["SAMSUNG", "SAMSUNG", "#1428a0", "#fff"],
+  ["WESTERN", "WD", "#003d7a", "#fff"],
+  ["INTEL", "INTEL", "#0071c5", "#fff"],
+  ["ASUS", "ASUS", "#111", "#fff"],
+  ["AMD", "AMD", "#ed1c24", "#fff"],
+  ["MSI", "MSI", "#111", "#fff"],
+  ["CRUCIAL", "CRUCIAL", "#111", "#fff"],
+  ["SEAGATE", "SEAGATE", "#111", "#fff"],
+  ["DEEPCOOL", "DEEPCOOL", "#111", "#fff"],
+  ["ARCTIC", "ARCTIC", "#111", "#fff"],
+  ["ZOTAC", "ZOTAC", "#111", "#f5d76e"],
+  ["LEXAR", "LEXAR", "#111", "#fff"],
+  ["TEAMGROUP", "TEAM", "#c41230", "#fff"],
+  ["PNY", "PNY", "#111", "#fff"],
+  ["EVGA", "EVGA", "#111", "#fff"],
+  ["COOLER MASTER", "CM", "#111", "#fff"],
+  ["THERMALTAKE", "TT", "#111", "#fff"],
+  ["LIAN", "LIAN", "#111", "#fff"],
+  ["NZXT", "NZXT", "#111", "#fff"],
+  ["SK HYNIX", "SK", "#111", "#fff"],
+  ["PATRIOT", "PATRIOT", "#111", "#fff"]
+];
+function brandMark(part) {
+  var src = ((part && part.brand) || "") + " " + ((part && part.name) || "");
+  src = src.toUpperCase();
+  var hit = ["PART", "#111", "#fff"];
+  for (var i = 0; i < MARKS.length; i++) {
+    if (src.indexOf(MARKS[i][0]) !== -1) { hit = [MARKS[i][1], MARKS[i][2], MARKS[i][3]]; break; }
+  }
+  var el = document.createElement("span");
+  el.className = "logo";
+  el.style.background = hit[1];
+  el.style.color = hit[2];
+  el.textContent = hit[0];
+  el.setAttribute("aria-hidden", "true");
+  return el;
+}
+function shortName(part) {
+  var n = String(part.name || "").replace(/\s*\(open box\)/ig, "").replace(/\s+/g, " ").trim();
+  var brand = String(part.brand || "").trim();
+  if (brand && n.toLowerCase().indexOf(brand.toLowerCase()) === 0) n = n.slice(brand.length).replace(/^[\s,\-–]+/, "");
+  if (n.length > 48) n = n.slice(0, 46) + "…";
+  return n || part.name;
+}
+function factLine(part) {
+  return tagsOf(part).slice(0, 2).join(" · ");
+}
+function paintOrder(parts, total) {
+  var ask = document.getElementById("ask");
+  var box = document.getElementById("order");
+  var back = document.getElementById("back");
+  if (!ask || !box) return;
+  if (back) { back.textContent = stage === "job" ? "" : "Back"; back.hidden = stage === "job"; }
+  box.replaceChildren();
+  if (stage === "job") {
+    ask.textContent = "What is this computer for?";
+    JOBS.forEach(function (id) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "big" + (id === job ? " on" : "");
+      b.textContent = jobName(id);
+      b.onclick = function () { job = id; lock = false; swap = ""; seen = {}; stage = "money"; render(); };
+      box.appendChild(b);
+    });
+    return;
+  }
+  if (stage === "money") {
+    ask.textContent = "How much can you spend?";
+    [500, 800, 1200, 1800, 2500, 4000].forEach(function (n) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "big" + (budget === n ? " on" : "");
+      b.textContent = money.format(n);
+      b.onclick = function () {
+        budget = n;
+        var slider = document.getElementById("budget");
+        if (slider) slider.value = String(n);
+        lock = false;
+        swap = "";
+        stage = "order";
+        if (PARTS.length) applySuggestion();
+        render();
+      };
+      box.appendChild(b);
+    });
+    return;
+  }
+  if (stage === "pick" || swap) {
+    ask.textContent = "Pick the " + catLabel(swap || "cpu").toLowerCase();
+    var now = currentParts();
+    var pool = PARTS.filter(function (p) { return p.cat === swap && !junk(p) && !fitWhy(p, now); }).sort(function (a, b) { return a.price - b.price; });
+    var shown = showAll ? pool.slice(0, 24) : pool.slice(0, 6);
+    if (!shown.length) {
+      var empty = document.createElement("p");
+      empty.className = "forwho";
+      empty.textContent = "Nothing else fits this computer.";
+      box.appendChild(empty);
+      return;
+    }
+    shown.forEach(function (part, i) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "slot";
+      var mid = document.createElement("span");
+      mid.className = "mid";
+      var k = document.createElement("span");
+      k.className = "k";
+      k.textContent = i === 0 ? "Fits. Lowest price." : "Fits.";
+      var nm = document.createElement("span");
+      nm.className = "nm";
+      nm.textContent = shortName(part);
+      mid.append(k, nm);
+      var fact = factLine(part);
+      if (fact) {
+        var sub = document.createElement("span");
+        sub.className = "sub";
+        sub.textContent = fact;
+        mid.appendChild(sub);
+      }
+      var price = document.createElement("span");
+      price.className = "price";
+      price.textContent = money.format(part.price);
+      b.append(brandMark(part), mid, price);
+      b.onclick = function () {
+        if (fitWhy(part, currentParts())) return;
+        build[part.cat] = part.id;
+        lock = true;
+        swap = "";
+        showAll = false;
+        stage = "order";
+        render();
+      };
+      box.appendChild(b);
+    });
+    if (!showAll && pool.length > 6) {
+      var more = document.createElement("button");
+      more.type = "button";
+      more.className = "more";
+      more.textContent = "Show " + (pool.length - 6) + " more that fit";
+      more.onclick = function () { showAll = true; render(); };
+      box.appendChild(more);
+    }
+    return;
+  }
+  ask.textContent = "Your computer";
+  var totalEl = document.createElement("p");
+  totalEl.className = "total";
+  totalEl.setAttribute("aria-live", "polite");
+  totalEl.textContent = money.format(total || 0);
+  var who = document.createElement("p");
+  who.className = "forwho";
+  who.textContent = "For " + jobName(job) + ".";
+  box.append(totalEl, who);
+  CATS.forEach(function (id) {
+    var part = parts[id];
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "slot";
+    b.setAttribute("aria-label", catLabel(id) + (part ? ", " + part.name + ", " + money.format(part.price) : ", not chosen"));
+    var mid = document.createElement("span");
+    mid.className = "mid";
+    var k = document.createElement("span");
+    k.className = "k";
+    k.textContent = catLabel(id);
+    var nm = document.createElement("span");
+    nm.className = "nm";
+    nm.textContent = part ? shortName(part) : "Tap to add";
+    mid.append(k, nm);
+    if (part) {
+      var fact = factLine(part);
+      if (fact) {
+        var sub = document.createElement("span");
+        sub.className = "sub";
+        sub.textContent = fact;
+        mid.appendChild(sub);
+      }
+    }
+    var price = document.createElement("span");
+    price.className = "price";
+    price.textContent = part ? money.format(part.price) : "";
+    if (part) b.append(brandMark(part), mid, price);
+    else b.appendChild(mid);
+    b.onclick = function () { swap = id; showAll = false; stage = "pick"; render(); };
+    box.appendChild(b);
+  });
+  var again = document.createElement("button");
+  again.type = "button";
+  again.className = "big";
+  again.textContent = "Start with a different job";
+  again.onclick = function () { stage = "job"; lock = false; swap = ""; render(); };
+  box.appendChild(again);
 }
 function render() {
   setLayout(layout);
@@ -605,7 +851,7 @@ function render() {
     button.onclick = () => { job = id; swap = ""; lock = false; seen = {}; applySuggestion(); render(); };
     jobs.appendChild(button);
   });
-  if (PARTS.length && !lock) applySuggestion();
+  if (PARTS.length && !lock && stage !== "job" && stage !== "money") applySuggestion();
   const parts = currentParts();
   if (PARTS.length) writeCart(parts);
   try { parent.postMessage({ type: "drew-progress", n: CATS.filter(function (id) { return parts[id]; }).length, total: CATS.length }, "*"); } catch (e) {}
@@ -620,6 +866,7 @@ function render() {
   paintArt();
   paintMachine(parts);
   document.body.classList.toggle("detail", detailOn && !swap);
+  paintOrder(parts, total);
   const list = document.getElementById("parts");
   list.replaceChildren();
   if (swap) {
@@ -739,7 +986,12 @@ document.getElementById("budget").oninput = (event) => {
   document.getElementById("budgetLabel").textContent = money.format(budget);
   scheduleRender();
 };
-document.getElementById("back").onclick = () => { if (swap) { swap = ""; render(); } };
+document.getElementById("back").onclick = () => {
+  showAll = false;
+  if (stage === "pick" || swap) { stage = "order"; swap = ""; render(); return; }
+  if (stage === "order") { stage = "money"; render(); return; }
+  if (stage === "money") { stage = "job"; render(); return; }
+};
 document.getElementById("phoneBtn").onclick = () => { layout = "phone"; render(); };
 document.getElementById("deskBtn").onclick = () => { layout = "desk"; render(); };
 document.getElementById("langBtn").onclick = () => {
