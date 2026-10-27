@@ -3,6 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#ffffff" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="format-detection" content="telephone=no" />
 <title>Build a computer</title>
 <style>
   :root {
@@ -170,12 +175,15 @@
   body.detail .pill.alt { background: #c2410c; }
   @media (max-width: 520px) { body.detail .srow { grid-template-columns: 84px 1fr; padding: 12px; } }
   /* Order screen. One column, giant type, gaps so the next button is hard to miss. */
-  body { background: #fff; color: #111; font-size: 22px; padding: 12px 14px 40px; }
+  body { background: #fff; color: #111; font-size: 22px; padding: max(8px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(28px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); -webkit-text-size-adjust: 100%; }
   #app, body.desk #app, body.phone #app {
     width: min(640px, 100%); margin: 0 auto; display: flex !important; flex-direction: column !important;
     grid-template-columns: none !important;
   }
-  #app > header h1 { font-size: 28px; line-height: 1; }
+  body:not(.unlocked) #app { display: none !important; }
+  #gate { background: #fff; }
+  #app > header { position: sticky; top: 0; z-index: 4; background: #fff; padding: 6px 0 8px; }
+  #app > header h1 { font-size: 22px; line-height: 1; }
   #railL, #railR, #app > .pitch, #app > .budget, #jobs, #sell, #app > a.use, .dock { display: none !important; }
   #parts { display: none; }
   body.detail #parts { display: block !important; order: 5; }
@@ -206,7 +214,15 @@
   .mid { flex: 1; min-width: 0; }
   .mid .k { display: block; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 800; }
   .mid .nm { display: block; margin-top: 2px; font-size: clamp(24px, 5vw, 32px); line-height: 1.05; letter-spacing: -0.03em; font-weight: 800; }
-  .mid .sub { display: block; margin-top: 4px; font-size: 18px; font-weight: 600; }
+  .mid .sub { display: block; margin-top: 4px; font-size: 16px; font-weight: 650; line-height: 1.25; color: #333; }
+  @media (max-width: 430px) {
+    .ask { font-size: 34px; }
+    .total { font-size: 60px; }
+    .logo { flex-basis: 56px; width: 56px; height: 56px; font-size: 12px; }
+    .mid .nm { font-size: 22px; }
+    .slot .price, .big .price { font-size: 22px; }
+    .slot, .big, #order .more { min-height: 84px; }
+  }
   .slot .price, .big .price { font-size: clamp(26px, 6vw, 34px); font-weight: 800; letter-spacing: -0.04em; white-space: nowrap; }
   .back { min-height: 56px; font-size: 22px; font-weight: 800; }
   #gate form { font-size: 22px; }
@@ -680,8 +696,52 @@ function shortName(part) {
   if (n.length > 48) n = n.slice(0, 46) + "…";
   return n || part.name;
 }
-function factLine(part) {
-  return tagsOf(part).slice(0, 2).join(" · ");
+function factLine(part, parts) {
+  parts = parts || {};
+  var bits = [];
+  var seen = {};
+  function add(text) { if (!text || seen[text]) return; seen[text] = 1; bits.push(text); }
+  var name = ((part && part.name) || "") + " " + ((part && part.form) || "");
+  var upper = name.toUpperCase();
+  var form = formOf(part);
+  if (/SFF|SMALL FORM/.test(upper)) add("SFF");
+  if (form === "itx" || /MINI-?ITX|\bITX\b/.test(upper)) { add("Mini-ITX"); add("ITX"); add("SFF"); }
+  if (form === "matx" || /MINI-?ATX|MICRO-?ATX|M-ATX|\bMATX\b/.test(upper)) add("Mini-ATX");
+  var watts = 0;
+  if (part && part.cat === "psu") watts = wattOf(part);
+  else if (part && part.watt && (part.cat === "cpu" || part.cat === "gpu")) watts = part.watt;
+  else if (part && part.cat === "cpu") watts = 65;
+  else if (part && part.cat === "gpu") watts = [75, 75, 130, 170, 220, 320, 450][gpuTier(part)] || 75;
+  else if (part && part.cat === "motherboard") watts = 60;
+  else if (part && part.cat === "memory") watts = Math.max(5, Math.round((gbOf(part) || 8) / 8) * 3);
+  else if (part && part.cat === "storage") watts = /HDD|HARD DRIVE/.test(upper) ? 10 : 8;
+  else if (part && part.cat === "cooler") watts = /360|280|240/.test(upper) ? 12 : 6;
+  else if (part && part.cat === "case") watts = 10;
+  var board = parts.motherboard;
+  var cpu = parts.cpu;
+  if (part && part.cat === "psu") {
+    add((watts || 0) + "W supply");
+    add(needWatts(parts) + "W minimum for this computer");
+  } else if (watts) add(watts + "W minimum");
+  if (part && part.cat === "cpu") {
+    if (part.socket) add(part.socket);
+    if (board && part.socket) add(part.socket === board.socket ? "Fits this motherboard" : "Needs a " + part.socket + " motherboard");
+    else if (part.socket) add("Needs a " + part.socket + " motherboard");
+  } else if (part && part.cat === "motherboard") {
+    if (part.socket) add(part.socket);
+    if (ramKindOf(part)) add(ramKindOf(part));
+    if (cpu && part.socket) add(cpu.socket === part.socket ? "Fits this processor" : "Needs a " + part.socket + " processor");
+  } else if (part && part.cat === "memory") {
+    var kind = ramKindOf(part);
+    var want = ramKindOf(board) || ramKindOf(cpu);
+    if (kind) add(kind);
+    if (want) add(kind === want ? "Fits this motherboard" : "Does not fit this motherboard");
+  } else if (part && part.cat === "case" && board) {
+    add(fitsCase(part, board) ? "Fits this motherboard" : "Too small for this motherboard");
+  } else if (part && part.cat === "gpu") add("Plugs into the motherboard");
+  else if (part && part.cat === "storage") add(/NVME|M\.2/.test(upper) ? "Plugs into the motherboard" : "Fits in the case");
+  else if (part && part.cat === "cooler") add("Sits on the processor");
+  return bits.join(" · ");
 }
 function paintOrder(parts, total) {
   var ask = document.getElementById("ask");
@@ -748,7 +808,7 @@ function paintOrder(parts, total) {
       nm.className = "nm";
       nm.textContent = shortName(part);
       mid.append(k, nm);
-      var fact = factLine(part);
+      var fact = factLine(part, now);
       if (fact) {
         var sub = document.createElement("span");
         sub.className = "sub";
@@ -787,7 +847,7 @@ function paintOrder(parts, total) {
   totalEl.textContent = money.format(total || 0);
   var who = document.createElement("p");
   who.className = "forwho";
-  who.textContent = "For " + jobName(job) + ".";
+  who.textContent = "For " + jobName(job) + ". Needs " + needWatts(parts) + "W power.";
   box.append(totalEl, who);
   CATS.forEach(function (id) {
     var part = parts[id];
@@ -805,7 +865,7 @@ function paintOrder(parts, total) {
     nm.textContent = part ? shortName(part) : "Tap to add";
     mid.append(k, nm);
     if (part) {
-      var fact = factLine(part);
+      var fact = factLine(part, parts);
       if (fact) {
         var sub = document.createElement("span");
         sub.className = "sub";
@@ -1154,6 +1214,7 @@ function writeCart(parts) {
   try { localStorage.setItem("drew-cart", JSON.stringify(out)); } catch (e) {}
 }
 function boot() {
+  document.body.classList.add("unlocked");
   document.getElementById("gate").hidden = true;
   fetch("parts.json").then((res) => res.json()).then((data) => {
     PARTS = data; byId = {}; PARTS.forEach((p) => { byId[p.id] = p; });
