@@ -108,9 +108,9 @@ try { localStorage.setItem("drew-safe", "1"); } catch (e) {}
   #name b { font-weight: 600; color: #fff; margin-left: 6px; }
   #songTime { font-size: 11px; letter-spacing: 0; color: #9fffc4; font-variant-numeric: tabular-nums; padding: 0 4px; }
   #gate {
-    position: fixed; inset: 0; z-index: 8;
+    position: fixed; inset: 0; z-index: 40;
     display: none; place-items: center;
-    background: #000a;
+    background: #000;
     padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
     touch-action: auto;
   }
@@ -430,7 +430,7 @@ try { localStorage.setItem("drew-safe", "1"); } catch (e) {}
   });
   var shopFrameEl = document.getElementById("shopFrame");
   if (shopFrameEl) shopFrameEl.addEventListener("load", pushLayout);
-  /* Six taps anywhere on the black screen open the builder. Nothing on screen says so. */
+  /* Six taps on the black screen open the password page. Nothing on screen says so. */
   var screenTaps = 0;
   document.addEventListener("pointerdown", function (e) {
     if (e.button !== 0 || !window.drewHold) return;
@@ -438,8 +438,10 @@ try { localStorage.setItem("drew-safe", "1"); } catch (e) {}
     screenTaps += 1;
     if (screenTaps < 6) return;
     screenTaps = 0;
-    try { sessionStorage.setItem("drew-bench", "1"); } catch (err) {}
-    openShop("store");
+    gateMsg.textContent = "";
+    gatePass.value = "";
+    gate.classList.add("open");
+    gatePass.focus();
   }, true);
   function openRandomStore() {
     var i = Math.floor(Math.random() * STORES.length);
