@@ -188,22 +188,30 @@
   #parts { display: none; }
   body.detail #parts { display: block !important; order: 5; }
   #app > header { order: 1; width: 100%; }
-  #ask { order: 2; margin: 8px 0 14px; font-size: clamp(40px, 10vw, 64px); font-weight: 800; letter-spacing: -0.045em; line-height: .95; }
+  #ask { order: 2; margin: 18px 0 8px; font-size: clamp(40px, 10vw, 64px); font-weight: 600; letter-spacing: -0.04em; line-height: .95; color: #1d1d1f; }
+  .stepno { margin: 0 0 18px; color: #6e6e73; font-size: 19px; font-weight: 500; line-height: 1.3; }
   #order { order: 3; }
   #speccy { order: 6; margin-top: 28px; }
   #langs { order: 7; }
-  .total { margin: 0 0 6px; font-size: clamp(64px, 16vw, 96px); font-weight: 800; letter-spacing: -0.055em; line-height: .9; }
-  .forwho { margin: 0 0 16px; font-size: 28px; font-weight: 700; }
+  .total { margin: 0 0 6px; font-size: clamp(56px, 14vw, 84px); font-weight: 600; letter-spacing: -0.045em; line-height: .9; }
+  .forwho { margin: 0 0 18px; font-size: 22px; font-weight: 500; color: #6e6e73; }
   .slot, .big, #order .more {
     display: flex; align-items: center; gap: 14px;
-    width: 100%; min-height: 96px; margin: 0 0 14px; padding: 12px 14px;
-    border: 3px solid #111; border-radius: 20px; background: #fff; color: #111;
-    text-align: left; font: 700 22px/1.15 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    width: 100%; min-height: 88px; margin: 0 0 12px; padding: 14px 16px;
+    border: 0; border-radius: 18px; background: #f5f5f7; color: #1d1d1f;
+    text-align: left; font: 600 20px/1.15 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     touch-action: manipulation;
   }
-  .slot.on, .big.on { background: #111; color: #fff; }
-  .slot:focus-visible, .big:focus-visible, #order .more:focus-visible, .back:focus-visible, .icon:focus-visible {
-    outline: 4px solid #111; outline-offset: 3px;
+  .slot.on, .big.on { background: #fff; color: #1d1d1f; box-shadow: inset 0 0 0 2px #0071e3; }
+  .continue {
+    position: sticky; bottom: max(10px, env(safe-area-inset-bottom)); z-index: 3;
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; min-height: 56px; margin: 8px 0 20px;
+    border: 0; border-radius: 980px; background: #0071e3; color: #fff;
+    font: 600 21px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  .slot:focus-visible, .big:focus-visible, #order .more:focus-visible, .back:focus-visible, .icon:focus-visible, .continue:focus-visible {
+    outline: 4px solid #0071e3; outline-offset: 3px;
   }
   .logo {
     flex: 0 0 78px; width: 78px; height: 78px; border-radius: 16px;
@@ -212,8 +220,8 @@
     letter-spacing: -0.03em; padding: 4px;
   }
   .mid { flex: 1; min-width: 0; }
-  .mid .k { display: block; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 800; }
-  .mid .nm { display: block; margin-top: 2px; font-size: clamp(24px, 5vw, 32px); line-height: 1.05; letter-spacing: -0.03em; font-weight: 800; }
+  .mid .k { display: block; font-size: 15px; letter-spacing: 0; text-transform: none; font-weight: 600; color: #6e6e73; }
+  .mid .nm { display: block; margin-top: 2px; font-size: clamp(22px, 5vw, 28px); line-height: 1.05; letter-spacing: -0.03em; font-weight: 600; }
   .mid .sub { display: block; margin-top: 4px; font-size: 16px; font-weight: 650; line-height: 1.25; color: #333; }
   @media (max-width: 430px) {
     .ask { font-size: 34px; }
@@ -637,6 +645,18 @@ function preferredLayout(){
 let layout = preferredLayout();
 let stage = "job";
 let showAll = false;
+var SERIES = ["cpu", "motherboard", "memory", "gpu", "storage", "case", "cooler", "psu"];
+var STEP_WORD = { cpu:"Processor", motherboard:"Motherboard", memory:"Memory", gpu:"Graphics", storage:"Storage", case:"Case", cooler:"Fan", psu:"Power" };
+var STEP_LINE = {
+  cpu: "This runs the computer.",
+  motherboard: "The processor, memory, and graphics plug into this.",
+  memory: "This keeps what you are doing open.",
+  gpu: "This draws games and video.",
+  storage: "This holds your files.",
+  case: "This is the box the parts sit in.",
+  cooler: "This fan sits on the processor.",
+  psu: "This feeds power to every part."
+};
 function setLayout(next){
   layout = next;
   try { sessionStorage.setItem("drew-layout", next); } catch (e) {}
@@ -743,6 +763,79 @@ function factLine(part, parts) {
   else if (part && part.cat === "cooler") add("Sits on the processor");
   return bits.join(" · ");
 }
+function paintStep(parts, ask, box) {
+  var i = SERIES.indexOf(stage);
+  ask.textContent = STEP_WORD[stage] || "Part";
+  var note = document.createElement("p");
+  note.className = "stepno";
+  note.textContent = STEP_LINE[stage] + "  " + (i + 1) + " of " + SERIES.length;
+  box.appendChild(note);
+  var now = currentParts();
+  var chosen = now[stage];
+  if (stage === "gpu") {
+    var none = document.createElement("button");
+    none.type = "button";
+    none.className = "big" + (chosen ? "" : " on");
+    none.textContent = "No graphics card";
+    none.onclick = function () { delete build.gpu; lock = true; render(); };
+    box.appendChild(none);
+  }
+  var pool = PARTS.filter(function (p) { return p.cat === stage && !junk(p) && !fitWhy(p, now); });
+  pool.sort(function (a, b) { return a.price - b.price; });
+  if (chosen) pool = [chosen].concat(pool.filter(function (p) { return p.id !== chosen.id; }));
+  var shown = showAll ? pool.slice(0, 24) : pool.slice(0, 5);
+  shown.forEach(function (part) {
+    var on = chosen && chosen.id === part.id;
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "slot" + (on ? " on" : "");
+    var mid = document.createElement("span");
+    mid.className = "mid";
+    var k = document.createElement("span");
+    k.className = "k";
+    k.textContent = on ? "In this computer" : "Fits";
+    var nm = document.createElement("span");
+    nm.className = "nm";
+    nm.textContent = shortName(part);
+    mid.append(k, nm);
+    var fact = factLine(part, now);
+    if (fact) {
+      var sub = document.createElement("span");
+      sub.className = "sub";
+      sub.textContent = fact;
+      mid.appendChild(sub);
+    }
+    var price = document.createElement("span");
+    price.className = "price";
+    price.textContent = money.format(part.price);
+    b.append(brandMark(part), mid, price);
+    b.onclick = function () {
+      if (fitWhy(part, currentParts())) return;
+      build[part.cat] = part.id;
+      lock = true;
+      render();
+    };
+    box.appendChild(b);
+  });
+  if (!showAll && pool.length > 5) {
+    var more = document.createElement("button");
+    more.type = "button";
+    more.className = "more";
+    more.textContent = "More that fit";
+    more.onclick = function () { showAll = true; render(); };
+    box.appendChild(more);
+  }
+  var next = document.createElement("button");
+  next.type = "button";
+  next.className = "continue";
+  next.textContent = i === SERIES.length - 1 ? "See your computer" : "Continue";
+  next.onclick = function () {
+    showAll = false;
+    stage = i === SERIES.length - 1 ? "order" : SERIES[i + 1];
+    render();
+  };
+  box.appendChild(next);
+}
 function paintOrder(parts, total) {
   var ask = document.getElementById("ask");
   var box = document.getElementById("order");
@@ -775,7 +868,7 @@ function paintOrder(parts, total) {
         if (slider) slider.value = String(n);
         lock = false;
         swap = "";
-        stage = "order";
+        stage = "cpu";
         if (PARTS.length) applySuggestion();
         render();
       };
@@ -783,6 +876,7 @@ function paintOrder(parts, total) {
     });
     return;
   }
+  if (SERIES.indexOf(stage) >= 0) { paintStep(parts, ask, box); return; }
   if (stage === "pick" || swap) {
     ask.textContent = "Pick the " + catLabel(swap || "cpu").toLowerCase();
     var now = currentParts();
@@ -859,7 +953,7 @@ function paintOrder(parts, total) {
     mid.className = "mid";
     var k = document.createElement("span");
     k.className = "k";
-    k.textContent = catLabel(id);
+    k.textContent = id === "cooler" ? "Fan" : catLabel(id);
     var nm = document.createElement("span");
     nm.className = "nm";
     nm.textContent = part ? shortName(part) : "Tap to add";
@@ -1048,8 +1142,11 @@ document.getElementById("budget").oninput = (event) => {
 };
 document.getElementById("back").onclick = () => {
   showAll = false;
+  var step = SERIES.indexOf(stage);
   if (stage === "pick" || swap) { stage = "order"; swap = ""; render(); return; }
-  if (stage === "order") { stage = "money"; render(); return; }
+  if (step === 0) { stage = "money"; render(); return; }
+  if (step > 0) { stage = SERIES[step - 1]; render(); return; }
+  if (stage === "order") { stage = "psu"; render(); return; }
   if (stage === "money") { stage = "job"; render(); return; }
 };
 document.getElementById("phoneBtn").onclick = () => { layout = "phone"; render(); };

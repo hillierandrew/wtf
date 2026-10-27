@@ -142,7 +142,7 @@ try { localStorage.setItem("drew-safe", "1"); } catch (e) {}
   #shop {
     position: fixed; inset: 0; z-index: 12;
     display: none; flex-direction: column;
-    background: #000;
+    background: #fff;
   }
   #shop.open { display: flex; }
   body.building #shop { z-index: 40; }
@@ -157,28 +157,28 @@ try { localStorage.setItem("drew-safe", "1"); } catch (e) {}
     height: auto;
     min-height: 0;
     padding: 12px 16px 10px;
-    background: rgba(0,0,0,.92);
-    color: #f5f5f7;
+    background: rgba(255,255,255,.94);
+    color: #1d1d1f;
     font: 600 15px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    border-bottom: 1px solid rgba(255,255,255,.12);
+    border-bottom: 1px solid #d2d2d7;
   }
   #shopTitle { grid-area: title; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  #shopPct { grid-area: pct; font-variant-numeric: tabular-nums; color: #a1a1a6; }
-  #shopTrack { grid-area: track; height: 3px; border-radius: 99px; background: #2c2c2e; overflow: hidden; }
-  #shopFill { height: 100%; width: 0%; background: #f5f5f7; }
+  #shopPct { grid-area: pct; font-variant-numeric: tabular-nums; color: #6e6e73; }
+  #shopTrack { grid-area: track; height: 3px; border-radius: 99px; background: #e8e8ed; overflow: hidden; }
+  #shopFill { height: 100%; width: 0%; background: #1d1d1f; }
   #shopClose {
     grid-area: close;
-    min-height: 36px; padding: 0 14px; border-radius: 980px;
-    border: 0; background: #f5f5f7; color: #000; font: inherit; cursor: pointer;
+    min-height: 36px; padding: 0 14px; border: 0; border-radius: 980px;
+    background: #1d1d1f; color: #fff; font: inherit; cursor: pointer;
   }
   #shopPhone, #shopStore {
     min-width: 44px; min-height: 44px; border: 0; border-radius: 980px;
-    background: #2c2c2e; color: inherit; font-size: 22px; cursor: pointer;
+    background: #f5f5f7; color: #1d1d1f; font-size: 22px; cursor: pointer;
     flex: 0 0 auto;
   }
   #shopPhone { grid-area: phone; }
   #shopStore { grid-area: store; }
-  #shopFrame { flex: 1; width: 100%; border: 0; background: #000; min-height: 0; }
+  #shopFrame { flex: 1; width: 100%; border: 0; background: #fff; min-height: 0; }
 
   #sky {
     position: fixed; inset: 0; z-index: 3; pointer-events: none; overflow: hidden;
@@ -247,17 +247,22 @@ try { localStorage.setItem("drew-safe", "1"); } catch (e) {}
   }
   #saverTitle { display: none; }
   #dvd {
-    position: fixed; z-index: 22; left: 0; top: 0;
-    margin: 0; padding: 10px 16px;
-    font: 800 clamp(22px, 6vw, 48px)/1 Impact, "Arial Black", sans-serif;
-    letter-spacing: 0.06em;
-    color: #f2f2f2;
-    background: #111;
-    border: 3px solid #f2f2f2;
+    position: fixed; z-index: 22; left: 50%; top: 46%;
+    transform: translate(-50%, -50%);
+    margin: 0; padding: 12px 8px;
+    border: 0; background: transparent;
+    font: 600 clamp(44px, 12vw, 80px)/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    letter-spacing: -0.045em;
+    color: #f5f5f7;
+    text-shadow: 0 0 18px rgba(255,255,255,.55), 0 0 64px rgba(255,255,255,.28);
     cursor: pointer;
     user-select: none;
-    will-change: transform;
+    animation: drew-glow 3.6s ease-in-out infinite;
   }
+  @keyframes drew-glow {
+    50% { text-shadow: 0 0 10px rgba(255,255,255,.35), 0 0 36px rgba(255,255,255,.12); }
+  }
+  @media (prefers-reduced-motion: reduce) { #dvd { animation: none; } }
   body.entered #dvd, body.building #dvd { display: none; }
   #saverHint {
     top: calc(36% + clamp(64px, 14vw, 110px));
@@ -290,7 +295,7 @@ try { localStorage.setItem("drew-safe", "1"); } catch (e) {}
 <h1>DREW.WTF</h1>
 <canvas id="field"></canvas>
 <div id="saver" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-<button id="dvd" type="button" aria-label="Drew">DREW.WTF</button>
+<button id="dvd" type="button" aria-label="Drew.wtf">Drew.wtf</button>
 <div id="veil"></div>
 <div id="logo" aria-hidden="true"><canvas id="ink"></canvas></div>
 <div id="sky" hidden></div>
@@ -430,58 +435,29 @@ try { localStorage.setItem("drew-safe", "1"); } catch (e) {}
   });
   var shopFrameEl = document.getElementById("shopFrame");
   if (shopFrameEl) shopFrameEl.addEventListener("load", pushLayout);
-  /* Six taps on the black screen open the password page. Nothing on screen says so. */
-  var screenTaps = 0;
-  document.addEventListener("pointerdown", function (e) {
-    if (e.button !== 0 || !window.drewHold) return;
-    if (shop.classList.contains("open") || gate.classList.contains("open")) return;
-    screenTaps += 1;
-    if (screenTaps < 6) return;
-    screenTaps = 0;
-    gateMsg.textContent = "";
-    gatePass.value = "";
-    gate.classList.add("open");
-    gatePass.focus();
-  }, true);
+  function startDvd() {
+    var el = document.getElementById("dvd");
+    if (!el) return;
+    var taps = 0;
+    el.addEventListener("click", function (e) {
+      e.preventDefault();
+      if (!window.drewHold) return;
+      if (shop.classList.contains("open") || gate.classList.contains("open")) return;
+      taps += 1;
+      if (taps < 5) return;
+      taps = 0;
+      gateMsg.textContent = "";
+      gatePass.value = "";
+      gate.classList.add("open");
+      gatePass.focus();
+    });
+  }
   function openRandomStore() {
     var i = Math.floor(Math.random() * STORES.length);
     try { sessionStorage.setItem(STORES[i].key, "1"); } catch (e) {}
     if (window.drewEnter) window.drewEnter();
     openShop(STORES[i].id);
     pushLayout();
-  }
-  function startDvd() {
-    var el = document.getElementById("dvd");
-    if (!el) return;
-    var x = 24, y = 36, vx = 2.1, vy = 1.55, last = 0;
-    var shades = ["#f4f4f4", "#d0d0d0", "#a3a3a3", "#e6e6e6"];
-    var shade = 0;
-    el.addEventListener("click", function (e) {
-      e.preventDefault();
-    });
-    function tick(now) {
-      if (!window.drewHold) return;
-      var dt = last ? Math.min(34, now - last) : 16;
-      last = now;
-      var step = dt / 16.67;
-      x += vx * step;
-      y += vy * step;
-      var maxX = Math.max(0, innerWidth - el.offsetWidth);
-      var maxY = Math.max(0, innerHeight - el.offsetHeight);
-      var hit = false;
-      if (x <= 0) { x = 0; vx = Math.abs(vx); hit = true; }
-      else if (x >= maxX) { x = maxX; vx = -Math.abs(vx); hit = true; }
-      if (y <= 0) { y = 0; vy = Math.abs(vy); hit = true; }
-      else if (y >= maxY) { y = maxY; vy = -Math.abs(vy); hit = true; }
-      if (hit) {
-        shade = (shade + 1) % shades.length;
-        el.style.color = shades[shade];
-        el.style.borderColor = shades[shade];
-      }
-      el.style.transform = "translate3d(" + x.toFixed(1) + "px," + y.toFixed(1) + "px,0)";
-      requestAnimationFrame(tick);
-    }
-    requestAnimationFrame(tick);
   }
 
   var W = 0, H = 0, cols = 0, rows = 0, cellW = 0, cellH = 0, scale = 2, buf, data;
