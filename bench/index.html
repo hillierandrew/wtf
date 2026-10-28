@@ -182,8 +182,11 @@
   }
   body:not(.unlocked) #app { display: none !important; }
   #gate { background: #fff; }
-  #app > header { position: sticky; top: 0; z-index: 4; background: #fff; padding: 6px 0 8px; }
-  #app > header h1 { font-size: 22px; line-height: 1; }
+  #app > header {
+    position: sticky; top: 0; z-index: 4; background: #fff; padding: 6px 0 8px;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px; width: 100%;
+  }
+  #app > header h1 { flex: 1 1 100%; font-size: 34px; line-height: 1.05; white-space: normal; }
   #railL, #railR, #app > .pitch, #app > .budget, #jobs, #sell, #app > a.use, .dock { display: none !important; }
   #parts { display: none; }
   body.detail #parts { display: block !important; order: 5; }
@@ -231,7 +234,16 @@
     .slot .price, .big .price { font-size: 22px; }
     .slot, .big, #order .more { min-height: 84px; }
   }
-  .slot .price, .big .price { font-size: clamp(26px, 6vw, 34px); font-weight: 800; letter-spacing: -0.04em; white-space: nowrap; }
+  .slot { flex-wrap: wrap; align-items: flex-start; }
+  .slot .price, .big .price, .price { white-space: normal; }
+  .mid .nm, .mid .sub, .forwho, .stepno, .ask { overflow-wrap: anywhere; }
+  .pick { display: block; margin: 0 0 8px; color: #6e6e73; font-size: 17px; font-weight: 600; }
+  .menu {
+    display: block; width: 100%; max-width: 100%; box-sizing: border-box;
+    min-height: 56px; margin: 8px 0 16px; padding: 12px 14px;
+    border: 1px solid #d2d2d7; border-radius: 14px; background: #fff; color: #1d1d1f;
+    font: 16px/1.3 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
   .back { min-height: 56px; font-size: 22px; font-weight: 800; }
   #gate form { font-size: 22px; }
   #gate input, #gate .go { min-height: 72px; font-size: 24px; }
@@ -763,6 +775,34 @@ function factLine(part, parts) {
   else if (part && part.cat === "cooler") add("Sits on the processor");
   return bits.join(" · ");
 }
+function partChoices(cat, now) {
+  var chosen = now[cat];
+  var pool = PARTS.filter(function (p) { return p.cat === cat && !junk(p) && !fitWhy(p, now); });
+  pool.sort(function (a, b) { return a.price - b.price; });
+  if (chosen && !pool.some(function (p) { return p.id === chosen.id; })) pool.unshift(chosen);
+  return pool;
+}
+function menuName(part) {
+  return String(part.name || "").replace(/\s*\(open box\)/ig, "").replace(/\s+/g, " ").trim();
+}
+function addMenu(box, labelText, options, value, onchange) {
+  var label = document.createElement("label");
+  label.className = "pick";
+  label.textContent = labelText;
+  var select = document.createElement("select");
+  select.className = "menu";
+  options.forEach(function (item) {
+    var opt = document.createElement("option");
+    opt.value = item.value;
+    opt.textContent = item.text;
+    if (item.value === value) opt.selected = true;
+    select.appendChild(opt);
+  });
+  select.onchange = onchange;
+  label.appendChild(select);
+  box.appendChild(label);
+  return select;
+}
 function paintStep(parts, ask, box) {
   var i = SERIES.indexOf(stage);
   ask.textContent = STEP_WORD[stage] || "Part";
@@ -772,58 +812,28 @@ function paintStep(parts, ask, box) {
   box.appendChild(note);
   var now = currentParts();
   var chosen = now[stage];
-  if (stage === "gpu") {
-    var none = document.createElement("button");
-    none.type = "button";
-    none.className = "big" + (chosen ? "" : " on");
-    none.textContent = "No graphics card";
-    none.onclick = function () { delete build.gpu; lock = true; render(); };
-    box.appendChild(none);
-  }
-  var pool = PARTS.filter(function (p) { return p.cat === stage && !junk(p) && !fitWhy(p, now); });
-  pool.sort(function (a, b) { return a.price - b.price; });
-  if (chosen) pool = [chosen].concat(pool.filter(function (p) { return p.id !== chosen.id; }));
-  var shown = showAll ? pool.slice(0, 24) : pool.slice(0, 5);
-  shown.forEach(function (part) {
-    var on = chosen && chosen.id === part.id;
-    var b = document.createElement("button");
-    b.type = "button";
-    b.className = "slot" + (on ? " on" : "");
-    var mid = document.createElement("span");
-    mid.className = "mid";
-    var k = document.createElement("span");
-    k.className = "k";
-    k.textContent = on ? "In this computer" : "Fits";
-    var nm = document.createElement("span");
-    nm.className = "nm";
-    nm.textContent = shortName(part);
-    mid.append(k, nm);
-    var fact = factLine(part, now);
-    if (fact) {
-      var sub = document.createElement("span");
-      sub.className = "sub";
-      sub.textContent = fact;
-      mid.appendChild(sub);
-    }
-    var price = document.createElement("span");
-    price.className = "price";
-    price.textContent = money.format(part.price);
-    b.append(brandMark(part), mid, price);
-    b.onclick = function () {
-      if (fitWhy(part, currentParts())) return;
-      build[part.cat] = part.id;
-      lock = true;
-      render();
-    };
-    box.appendChild(b);
+  var pool = partChoices(stage, now);
+  var options = pool.map(function (part) {
+    return { value: part.id, text: menuName(part) + " — " + money.format(part.price) };
   });
-  if (!showAll && pool.length > 5) {
-    var more = document.createElement("button");
-    more.type = "button";
-    more.className = "more";
-    more.textContent = "More that fit";
-    more.onclick = function () { showAll = true; render(); };
-    box.appendChild(more);
+  if (stage === "gpu") options.unshift({ value: "", text: "No graphics card" });
+  addMenu(box, pool.length + " that fit. All of them are in this menu.", options, chosen ? chosen.id : "", function (event) {
+    var id = event.target.value;
+    if (!id) { delete build[stage]; lock = true; render(); return; }
+    var part = byId[id];
+    if (!part || fitWhy(part, currentParts())) return;
+    build[part.cat] = part.id;
+    lock = true;
+    render();
+  });
+  if (chosen) {
+    var price = document.createElement("p");
+    price.className = "total";
+    price.textContent = money.format(chosen.price);
+    var detail = document.createElement("p");
+    detail.className = "forwho";
+    detail.textContent = factLine(chosen, now);
+    box.append(price, detail);
   }
   var next = document.createElement("button");
   next.type = "button";
@@ -845,35 +855,38 @@ function paintOrder(parts, total) {
   box.replaceChildren();
   if (stage === "job") {
     ask.textContent = "What is this computer for?";
-    JOBS.forEach(function (id) {
-      var b = document.createElement("button");
-      b.type = "button";
-      b.className = "big" + (id === job ? " on" : "");
-      b.textContent = jobName(id);
-      b.onclick = function () { job = id; lock = false; swap = ""; seen = {}; stage = "money"; render(); };
-      box.appendChild(b);
+    addMenu(box, "Choose one", JOBS.map(function (id) { return { value: id, text: jobName(id) }; }), job, function (event) {
+      job = event.target.value;
     });
+    var go = document.createElement("button");
+    go.type = "button";
+    go.className = "continue";
+    go.textContent = "Continue";
+    go.onclick = function () { lock = false; swap = ""; seen = {}; stage = "money"; render(); };
+    box.appendChild(go);
     return;
   }
   if (stage === "money") {
     ask.textContent = "How much can you spend?";
-    [500, 800, 1200, 1800, 2500, 4000].forEach(function (n) {
-      var b = document.createElement("button");
-      b.type = "button";
-      b.className = "big" + (budget === n ? " on" : "");
-      b.textContent = money.format(n);
-      b.onclick = function () {
-        budget = n;
-        var slider = document.getElementById("budget");
-        if (slider) slider.value = String(n);
-        lock = false;
-        swap = "";
-        stage = "cpu";
-        if (PARTS.length) applySuggestion();
-        render();
-      };
-      box.appendChild(b);
+    var amounts = [500, 800, 1200, 1800, 2500, 4000];
+    if (amounts.indexOf(budget) < 0) amounts.push(budget);
+    addMenu(box, "Choose a budget", amounts.map(function (n) { return { value: String(n), text: money.format(n) }; }), String(budget), function (event) {
+      budget = +event.target.value;
+      var slider = document.getElementById("budget");
+      if (slider) slider.value = String(budget);
     });
+    var spend = document.createElement("button");
+    spend.type = "button";
+    spend.className = "continue";
+    spend.textContent = "Continue";
+    spend.onclick = function () {
+      lock = false;
+      swap = "";
+      stage = "cpu";
+      if (PARTS.length) applySuggestion();
+      render();
+    };
+    box.appendChild(spend);
     return;
   }
   if (SERIES.indexOf(stage) >= 0) { paintStep(parts, ask, box); return; }
@@ -972,7 +985,7 @@ function paintOrder(parts, total) {
     price.textContent = part ? money.format(part.price) : "";
     if (part) b.append(brandMark(part), mid, price);
     else b.appendChild(mid);
-    b.onclick = function () { swap = id; showAll = false; stage = "pick"; render(); };
+    b.onclick = function () { swap = ""; showAll = false; stage = id; render(); };
     box.appendChild(b);
   });
   var again = document.createElement("button");
