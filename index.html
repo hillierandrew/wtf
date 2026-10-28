@@ -19,6 +19,9 @@ document.documentElement.classList.add("safe");
 try { localStorage.setItem("drew-safe", "1"); } catch (e) {}
 </script>
 <title>DREW.WTF</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;800&display=swap" rel="stylesheet" />
 <style>
   html, body { margin: 0; height: 100%; height: 100dvh; background: #000; overflow: hidden; touch-action: none; }
   body.building { touch-action: auto; }
@@ -260,14 +263,18 @@ try { localStorage.setItem("drew-safe", "1"); } catch (e) {}
     transform: translate(-50%, -50%);
     margin: 0; padding: 12px 8px;
     border: 0; background: transparent;
-    font: 600 clamp(44px, 12vw, 80px)/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    letter-spacing: -0.045em;
+    font-family: Syne, "Arial Black", sans-serif;
+    font-weight: 800;
+    font-size: clamp(52px, 14vw, 96px);
+    line-height: 0.9;
+    letter-spacing: -0.07em;
     color: #f5f5f7;
     text-shadow: 0 0 18px rgba(255,255,255,.55), 0 0 64px rgba(255,255,255,.28);
     cursor: pointer;
     user-select: none;
     animation: drew-glow 3.6s ease-in-out infinite;
   }
+  #dvd span { font-weight: 500; letter-spacing: -0.04em; opacity: 0.8; }
   @keyframes drew-glow {
     50% { text-shadow: 0 0 10px rgba(255,255,255,.35), 0 0 36px rgba(255,255,255,.12); }
   }
@@ -304,7 +311,7 @@ try { localStorage.setItem("drew-safe", "1"); } catch (e) {}
 <h1>DREW.WTF</h1>
 <canvas id="field"></canvas>
 <div id="saver" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-<button id="dvd" type="button" aria-label="Drew.wtf">Drew.wtf</button>
+<button id="dvd" type="button" aria-label="Drew.wtf">Drew<span>.wtf</span></button>
 <div id="veil"></div>
 <div id="logo" aria-hidden="true"><canvas id="ink"></canvas></div>
 <div id="sky" hidden></div>
