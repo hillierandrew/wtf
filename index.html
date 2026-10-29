@@ -146,7 +146,7 @@ try { localStorage.setItem("drew-safe", "1"); } catch (e) {}
   #shop {
     position: fixed; inset: 0; z-index: 12;
     display: none; flex-direction: column;
-    background: #fff;
+    background: #f2f2f7;
   }
   #shop.open { display: flex; }
   #shop, #shopFrame { touch-action: auto; -webkit-overflow-scrolling: touch; }
@@ -154,43 +154,39 @@ try { localStorage.setItem("drew-safe", "1"); } catch (e) {}
   body.building #trip { display: none; }
   #shopBar {
     position: relative;
-    display: grid;
-    grid-template-columns: auto auto auto 1fr auto;
-    grid-template-areas: "close phone store title pct" "track track track track track";
-    gap: 8px 10px;
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    height: auto;
-    min-height: 0;
-    padding: 12px 16px 10px;
-    background: rgba(255,255,255,.94);
-    color: #1d1d1f;
-    font: 600 15px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    border-bottom: 1px solid #d2d2d7;
+    gap: 0;
+    min-height: 44px;
+    padding: max(4px, env(safe-area-inset-top)) 8px 0;
+    background: rgba(249,249,249,.94);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+    color: #000;
+    font: 17px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    border-bottom: 0.5px solid rgba(60,60,67,.29);
   }
-  #shopTitle { grid-area: title; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  #shopPct { grid-area: pct; font-variant-numeric: tabular-nums; color: #6e6e73; }
-  #shopTrack { grid-area: track; height: 3px; border-radius: 99px; background: #e8e8ed; overflow: hidden; }
-  #shopFill { height: 100%; width: 0%; background: #1d1d1f; }
-  #shopClose {
-    grid-area: close;
-    min-height: 36px; padding: 0 14px; border: 0; border-radius: 980px;
-    background: #1d1d1f; color: #fff; font: inherit; cursor: pointer;
+  #shopTitle {
+    position: absolute; left: 88px; right: 88px;
+    top: max(4px, env(safe-area-inset-top)); height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 17px; pointer-events: none;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  #shopPhone, #shopStore {
-    min-width: 44px; min-height: 44px; border: 0; border-radius: 980px;
-    background: #f5f5f7; color: #1d1d1f; font-size: 22px; cursor: pointer;
-    flex: 0 0 auto;
+  #shopPct { display: none; }
+  #shopTrack { flex: 1 0 100%; height: 2px; border-radius: 0; background: rgba(60,60,67,.12); overflow: hidden; }
+  #shopFill { height: 100%; width: 0%; background: #007AFF; }
+  #shopClose, #shopStore {
+    min-height: 44px; padding: 0 8px; border: 0; border-radius: 0;
+    background: transparent; color: #007AFF;
+    font: 17px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    cursor: pointer;
   }
-  @media (max-width: 430px) {
-    #shopBar {
-      grid-template-columns: auto auto auto 1fr;
-      grid-template-areas: "close phone store pct" "title title title title" "track track track track";
-    }
-    #shopTitle { white-space: normal; }
-  }
+  #shopPhone { display: none; }
   #shopPhone { grid-area: phone; }
   #shopStore { grid-area: store; }
-  #shopFrame { flex: 1; width: 100%; border: 0; background: #fff; min-height: 0; }
+  #shopFrame { flex: 1; width: 100%; border: 0; background: #f2f2f7; min-height: 0; }
 
   #sky {
     position: fixed; inset: 0; z-index: 3; pointer-events: none; overflow: hidden;
@@ -344,10 +340,10 @@ try { localStorage.setItem("drew-safe", "1"); } catch (e) {}
 <div id="shop">
   <div id="shopBar">
     <button id="shopClose" type="button">Close</button>
-    <button id="shopPhone" type="button" aria-label="Phone layout" aria-pressed="false">📱</button>
-    <button id="shopStore" type="button" aria-label="Change store">🏬</button>
-    <span id="shopTitle">Build a computer</span>
-    <span id="shopPct">0%</span>
+    <span id="shopTitle">Build</span>
+    <button id="shopStore" type="button" aria-label="Change store">Stores</button>
+    <button id="shopPhone" type="button" aria-label="Phone layout" aria-pressed="false" hidden>📱</button>
+    <span id="shopPct" hidden>0%</span>
     <div id="shopTrack"><div id="shopFill"></div></div>
   </div>
   <iframe id="shopFrame" title="Build a computer"></iframe>
@@ -405,7 +401,7 @@ try { localStorage.setItem("drew-safe", "1"); } catch (e) {}
     var frame = document.getElementById("shopFrame");
     var src = which === "dream" ? "bench/dream.html" : which === "easy" ? "bench/easy.html" : which === "apple" ? "bench/apple.html" : "bench/";
     var title = document.getElementById("shopTitle");
-    if (title) title.textContent = which === "dream" ? "Dream builder" : which === "easy" ? "Easy builder" : which === "apple" ? "Build" : "Build a computer";
+    if (title) title.textContent = which === "dream" ? "Dream" : which === "easy" ? "Easy" : which === "apple" ? "Build" : "Build";
     if (frame.getAttribute("src") !== src) frame.src = src;
     else pushLayout();
   }

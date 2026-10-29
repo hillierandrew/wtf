@@ -247,15 +247,48 @@
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8'><path d='M1 1l6 6 6-6' fill='none' stroke='%236e6e73' stroke-width='1.8' stroke-linecap='round'/></svg>");
     background-repeat: no-repeat; background-position: right 16px center; background-size: 14px 8px;
   }
-  html, body { background: #f5f5f7 !important; }
+  html, body { background: #f2f2f7 !important; color: #000 !important; }
+  body { padding: 0 0 max(24px, env(safe-area-inset-bottom)) 0 !important; font: 17px/1.35 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important; }
+  #ask { margin: 8px 20px 4px; font-size: 34px; font-weight: 700; letter-spacing: 0.013em; line-height: 1.15; color: #000; }
+  .stepno, .forwho { margin: 0 20px 14px; color: #8e8e93; font-size: 15px; font-weight: 400; line-height: 1.35; }
+  .total { margin: 4px 20px 2px; font-size: 34px; font-weight: 700; letter-spacing: 0.01em; }
+  .group { margin: 0 16px 22px; background: #fff; border-radius: 10px; overflow: hidden; }
+  .group .big, .group .slot, .group .more {
+    width: 100%; min-height: 44px; margin: 0; padding: 11px 16px;
+    border: 0; border-radius: 0; background: #fff; color: #000;
+    border-bottom: 0.5px solid rgba(60,60,67,.18);
+    box-shadow: none; font: 17px/1.25 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-weight: 400;
+    align-items: center;
+  }
+  .group .big:last-child, .group .slot:last-child, .group .more:last-child { border-bottom: 0; }
+  .big.on, .slot.on { background: #fff !important; color: #000 !important; box-shadow: none !important; }
+  .jump::after { content: "›"; margin-left: 6px; color: #c7c7cc; font-size: 22px; font-weight: 300; }
+  .big.on::after, .slot.on::after { content: "✓"; margin-left: 8px; color: #007AFF; font-weight: 600; font-size: 17px; }
+  .logo { flex: 0 0 28px; width: 28px; height: 28px; border-radius: 6px; font-size: 8px; letter-spacing: 0; }
+  .mid .k { font-size: 13px; font-weight: 400; color: #8e8e93; letter-spacing: 0; }
+  .mid .nm { margin-top: 1px; font-size: 17px; font-weight: 400; letter-spacing: 0; line-height: 1.2; }
+  .mid .sub { margin-top: 2px; font-size: 13px; font-weight: 400; color: #8e8e93; }
+  .slot .price, .big .price { font-size: 17px; font-weight: 400; color: #8e8e93; }
+  .find {
+    display: block; width: calc(100% - 32px); margin: 0 16px 10px; min-height: 36px; padding: 8px 12px;
+    border: 0; border-radius: 10px; background: rgba(118,118,128,.12); color: #000;
+    font: 17px/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  .continue, .linkbtn {
+    display: flex; align-items: center; justify-content: center;
+    width: calc(100% - 32px); min-height: 50px; margin: 6px 16px 24px;
+    border: 0; border-radius: 12px; background: #007AFF; color: #fff;
+    font: 600 17px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  .linkbtn { background: #fff; color: #007AFF; font-weight: 400; min-height: 44px; }
+  #back {
+    min-height: 44px; margin: 0 8px; padding: 0 8px; background: transparent; color: #007AFF;
+    font: 17px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-weight: 400;
+  }
+  #speccy { margin: 0 16px 24px; }
   #app > header h1, #phoneBtn, #deskBtn, #langBtn { display: none !important; }
   #app > header { position: static; background: transparent; padding: 0; min-height: 0; }
   #app > header:has(#back[hidden]) { display: none !important; }
-  #ask { font-size: clamp(34px, 9vw, 46px); margin: 4px 0 18px; }
-  #order, .pick, .menu, .continue, .big { width: 100%; max-width: 100%; }
-  .continue { display: flex; border-radius: 16px; min-height: 56px; }
-  .big { background: #fff; border-radius: 16px; min-height: 64px; margin-bottom: 10px; justify-content: space-between; }
-  .big.on::after { content: "✓"; color: #0071e3; font-size: 22px; }
   body:not(.showspec) #speccy { display: none !important; }
   .speccy-box { background: #fff; border: 0 !important; border-radius: 20px !important; padding: 16px !important; }
   .speccy-drop { background: #f5f5f7; border: 0 !important; border-radius: 14px !important; }
@@ -820,42 +853,93 @@ function addMenu(box, labelText, options, value, onchange) {
   box.appendChild(label);
   return select;
 }
+function iosGroup(box) {
+  var g = document.createElement("div");
+  g.className = "group";
+  box.appendChild(g);
+  return g;
+}
 function paintStep(parts, ask, box) {
   var i = SERIES.indexOf(stage);
   ask.textContent = STEP_WORD[stage] || "Part";
   var note = document.createElement("p");
   note.className = "stepno";
-  note.textContent = STEP_LINE[stage] + "  " + (i + 1) + " of " + SERIES.length;
+  note.textContent = STEP_LINE[stage];
   box.appendChild(note);
   var now = currentParts();
   var chosen = now[stage];
   var pool = partChoices(stage, now);
-  var options = pool.map(function (part) {
-    return { value: part.id, text: menuName(part) + " — " + money.format(part.price) };
-  });
-  if (stage === "gpu") options.unshift({ value: "", text: "No graphics card" });
-  addMenu(box, pool.length + " that fit. All of them are in this menu.", options, chosen ? chosen.id : "", function (event) {
-    var id = event.target.value;
-    if (!id) { delete build[stage]; lock = true; render(); return; }
-    var part = byId[id];
-    if (!part || fitWhy(part, currentParts())) return;
-    build[part.cat] = part.id;
-    lock = true;
-    render();
-  });
-  if (chosen) {
-    var price = document.createElement("p");
-    price.className = "total";
-    price.textContent = money.format(chosen.price);
-    var detail = document.createElement("p");
-    detail.className = "forwho";
-    detail.textContent = factLine(chosen, now);
-    box.append(price, detail);
+  var find = document.createElement("input");
+  find.className = "find";
+  find.type = "search";
+  find.placeholder = "Search";
+  find.setAttribute("aria-label", "Search " + (STEP_WORD[stage] || "parts"));
+  find.enterKeyHint = "search";
+  box.appendChild(find);
+  var g = iosGroup(box);
+  function row(part) {
+    var on = part ? !!(chosen && chosen.id === part.id) : !chosen;
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "slot" + (on ? " on" : "");
+    if (part) b.dataset.name = menuName(part).toLowerCase();
+    var mid = document.createElement("span");
+    mid.className = "mid";
+    var nm = document.createElement("span");
+    nm.className = "nm";
+    nm.textContent = part ? menuName(part) : "No graphics card";
+    mid.appendChild(nm);
+    if (part) {
+      var fact = factLine(part, now);
+      if (fact) {
+        var sub = document.createElement("span");
+        sub.className = "sub";
+        sub.textContent = fact;
+        mid.appendChild(sub);
+      }
+    }
+    var price = document.createElement("span");
+    price.className = "price";
+    price.textContent = part ? money.format(part.price) : "";
+    if (part) b.append(brandMark(part), mid, price);
+    else b.appendChild(mid);
+    b.onclick = function () {
+      if (!part) { delete build.gpu; lock = true; render(); return; }
+      if (fitWhy(part, currentParts())) return;
+      build[part.cat] = part.id;
+      lock = true;
+      render();
+    };
+    return b;
   }
+  function fill(q) {
+    g.replaceChildren();
+    if (stage === "gpu" && !q) g.appendChild(row(null));
+    var list = pool;
+    if (q) list = pool.filter(function (p) { return menuName(p).toLowerCase().indexOf(q) !== -1; });
+    else if (!showAll) list = pool.slice(0, 12);
+    list.forEach(function (part) { g.appendChild(row(part)); });
+    if (!q && !showAll && pool.length > 12) {
+      var more = document.createElement("button");
+      more.type = "button";
+      more.className = "more";
+      more.textContent = "All " + pool.length;
+      more.onclick = function () { showAll = true; fill(""); };
+      g.appendChild(more);
+    }
+    if (q && !list.length) {
+      var empty = document.createElement("p");
+      empty.className = "forwho";
+      empty.textContent = "Nothing matches.";
+      g.appendChild(empty);
+    }
+  }
+  fill("");
+  find.oninput = function () { showAll = false; fill(find.value.trim().toLowerCase()); };
   var next = document.createElement("button");
   next.type = "button";
   next.className = "continue";
-  next.textContent = i === SERIES.length - 1 ? "See your computer" : "Continue";
+  next.textContent = i === SERIES.length - 1 ? "See Your Computer" : "Continue";
   next.onclick = function () {
     showAll = false;
     stage = i === SERIES.length - 1 ? "order" : SERIES[i + 1];
@@ -868,23 +952,25 @@ function paintOrder(parts, total) {
   var box = document.getElementById("order");
   var back = document.getElementById("back");
   if (!ask || !box) return;
-  if (back) { back.textContent = stage === "job" ? "" : "Back"; back.hidden = stage === "job"; }
+  if (back) { back.textContent = stage === "job" ? "" : "‹ Back"; back.hidden = stage === "job"; }
   document.body.classList.toggle("showspec", stage === "order");
   box.replaceChildren();
   if (stage === "job") {
     ask.textContent = "What is this computer for?";
+    var g = iosGroup(box);
     JOBS.forEach(function (id) {
       var b = document.createElement("button");
       b.type = "button";
       b.className = "big" + (id === job ? " on" : "");
       b.textContent = jobName(id);
       b.onclick = function () { job = id; lock = false; swap = ""; seen = {}; stage = "money"; render(); };
-      box.appendChild(b);
+      g.appendChild(b);
     });
     return;
   }
   if (stage === "money") {
     ask.textContent = "How much can you spend?";
+    var g = iosGroup(box);
     [500, 800, 1200, 1800, 2500, 4000].forEach(function (n) {
       var b = document.createElement("button");
       b.type = "button";
@@ -900,7 +986,7 @@ function paintOrder(parts, total) {
         if (PARTS.length) applySuggestion();
         render();
       };
-      box.appendChild(b);
+      g.appendChild(b);
     });
     return;
   }
@@ -971,11 +1057,12 @@ function paintOrder(parts, total) {
   who.className = "forwho";
   who.textContent = "For " + jobName(job) + ". Needs " + needWatts(parts) + "W power.";
   box.append(totalEl, who);
+  var g = iosGroup(box);
   CATS.forEach(function (id) {
     var part = parts[id];
     var b = document.createElement("button");
     b.type = "button";
-    b.className = "slot";
+    b.className = "slot jump";
     b.setAttribute("aria-label", catLabel(id) + (part ? ", " + part.name + ", " + money.format(part.price) : ", not chosen"));
     var mid = document.createElement("span");
     mid.className = "mid";
@@ -1001,12 +1088,12 @@ function paintOrder(parts, total) {
     if (part) b.append(brandMark(part), mid, price);
     else b.appendChild(mid);
     b.onclick = function () { swap = ""; showAll = false; stage = id; render(); };
-    box.appendChild(b);
+    g.appendChild(b);
   });
   var again = document.createElement("button");
   again.type = "button";
-  again.className = "big";
-  again.textContent = "Start with a different job";
+  again.className = "linkbtn";
+  again.textContent = "Start Over";
   again.onclick = function () { stage = "job"; lock = false; swap = ""; render(); };
   box.appendChild(again);
 }
