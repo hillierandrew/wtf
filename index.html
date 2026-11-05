@@ -1,1 +1,489 @@
-PLACEHOLDER_TO_BE_REPLACED
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
+<title>DREWDLE · drew.wtf</title>
+<style>
+:root {
+  --bg: #0a0a0a;
+  --tile: #121212;
+  --border: #3a3a3a;
+  --text: #f5f5f7;
+  --green: #6aaa64;
+  --yellow: #c9b458;
+  --absent: #3a3a3c;
+  --present: #c9b458;
+  --correct: #6aaa64;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%;
+  background: #000;
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow: hidden;
+  touch-action: manipulation;
+}
+#ascii {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0.18;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 14px;
+  line-height: 1;
+  color: #7ee7ff;
+  white-space: pre;
+  user-select: none;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: env(safe-area-inset-top) 8px env(safe-area-inset-bottom);
+  position: relative;
+  z-index: 1;
+}
+header {
+  width: 100%;
+  max-width: 500px;
+  padding: 12px 0 8px;
+  text-align: center;
+  border-bottom: 1px solid #222;
+  background: rgba(10,10,10,0.75);
+  backdrop-filter: blur(4px);
+  border-radius: 0 0 12px 12px;
+}
+h1 {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  background: linear-gradient(90deg, #7ee7ff, #c6ff4a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.subtitle { font-size: 12px; opacity: 0.6; margin-top: 2px; letter-spacing: 0.2em; }
+#board {
+  display: grid;
+  grid-template-rows: repeat(6, 1fr);
+  gap: 5px;
+  width: min(350px, 92vw);
+  margin: 16px auto;
+  background: rgba(10,10,10,0.6);
+  padding: 8px;
+  border-radius: 12px;
+}
+.row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+}
+.tile {
+  aspect-ratio: 1;
+  border: 2px solid var(--border);
+  background: var(--tile);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(22px, 7vw, 32px);
+  font-weight: 700;
+  text-transform: uppercase;
+  transition: transform 0.1s, background 0.3s, border-color 0.3s;
+  user-select: none;
+}
+.tile.filled { border-color: #565656; }
+.tile.flip { animation: flip 0.5s ease; }
+@keyframes flip {
+  0% { transform: rotateX(0); }
+  50% { transform: rotateX(90deg); }
+  100% { transform: rotateX(0); }
+}
+.tile.correct { background: var(--correct); border-color: var(--correct); color: #fff; }
+.tile.present { background: var(--present); border-color: var(--present); color: #fff; }
+.tile.absent { background: var(--absent); border-color: var(--absent); color: #fff; }
+#keyboard {
+  width: min(500px, 100%);
+  padding: 8px 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  background: rgba(10,10,10,0.7);
+  border-radius: 16px 16px 0 0;
+  backdrop-filter: blur(6px);
+}
+.key-row {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  width: 100%;
+}
+.key {
+  min-width: 32px;
+  height: 52px;
+  border: 0;
+  border-radius: 4px;
+  background: #818384;
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  cursor: pointer;
+  flex: 1;
+  max-width: 44px;
+  touch-action: manipulation;
+}
+.key.wide { flex: 1.5; max-width: 66px; font-size: 11px; }
+.key.correct { background: var(--correct); }
+.key.present { background: var(--present); }
+.key.absent { background: #3a3a3c; }
+#message {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  color: #000;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: 700;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  z-index: 100;
+  text-align: center;
+}
+#message.show { opacity: 1; }
+#stats {
+  margin-top: 8px;
+  font-size: 13px;
+  opacity: 0.7;
+  text-align: center;
+}
+button#new {
+  margin-top: 12px;
+  padding: 10px 24px;
+  border: 0;
+  border-radius: 999px;
+  background: #7ee7ff;
+  color: #000;
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+}
+#shop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: none;
+  flex-direction: column;
+  background: #000;
+}
+#shop.open { display: flex; }
+#shopBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: max(8px, env(safe-area-inset-top)) 12px 8px;
+  background: #111;
+  color: #fff;
+  font-weight: 700;
+  font-size: 17px;
+}
+#shopClose {
+  background: transparent;
+  border: 0;
+  color: #7ee7ff;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 8px 12px;
+}
+#shopFrame {
+  flex: 1;
+  width: 100%;
+  border: 0;
+  background: #fff;
+}
+@media (max-height: 700px) {
+  .tile { font-size: 20px; }
+  .key { height: 44px; }
+}
+</style>
+</head>
+<body>
+<pre id="ascii"></pre>
+<header>
+  <h1>DREWDLE</h1>
+  <div class="subtitle">drew.wtf · for now</div>
+</header>
+<div id="board"></div>
+<div id="keyboard"></div>
+<div id="message"></div>
+<div id="stats"></div>
+<button id="new" type="button" style="display:none">New Game</button>
+<div id="shop">
+  <div id="shopBar">
+    <span>PC Builder</span>
+    <button id="shopClose" type="button">Close</button>
+  </div>
+  <iframe id="shopFrame" src="bench/" title="PC part picker"></iframe>
+</div>
+<script>
+const WORD_LIST = [
+"about","above","abuse","actor","acute","admit","adopt","adult","after","again","agent","agree","ahead","alarm","album","alert","alien","align","alive","allow","alone","along","alter","among","anger","angle","angry","apart","apple","apply","arena","argue","arise","array","aside","asset","audio","audit","avoid","await","awake","award","aware","awful","basic","beach","begin","being","below","bench","birth","black","blade","blame","blank","blast","bleed","bless","blind","block","blood","board","boost","booth","bound","brain","brand","brave","bread","break","breed","brief","bring","broad","brown","build","burst","buyer","cable","cache","carry","catch","cause","chain","chair","chart","chase","cheap","check","chest","chief","child","china","chose","civil","claim","class","clean","clear","click","climb","clock","close","cloud","coach","coast","could","count","court","cover","craft","crash","crazy","cream","crime","cross","crowd","crown","crude","crush","curve","cycle","daily","dance","dated","dealt","death","debut","delay","depth","doing","doubt","dozen","draft","drama","drank","dream","dress","drill","drink","drive","drove","dying","eager","early","earth","eight","elite","empty","enemy","enjoy","enter","entry","equal","error","event","every","exact","exist","extra","faith","false","fault","fiber","field","fifth","fifty","fight","final","first","fixed","flash","fleet","floor","fluid","focus","force","forth","forty","forum","found","frame","frank","fraud","fresh","front","fruit","fully","funny","giant","given","glass","globe","going","grace","grade","grand","grant","grass","grave","great","green","gross","group","grown","guard","guess","guest","guide","happy","heart","heavy","hence","horse","hotel","house","human","ideal","image","index","inner","input","issue","joint","judge","known","label","large","laser","later","laugh","layer","learn","lease","least","leave","legal","level","light","limit","links","lives","local","loose","lower","lucky","lunch","lying","magic","major","maker","march","match","maybe","meant","media","metal","might","minor","minus","mixed","model","money","month","moral","motor","mount","mouse","mouth","moved","movie","music","needs","never","newly","night","noise","north","noted","novel","nurse","occur","ocean","offer","often","order","other","ought","paint","panel","paper","party","peace","phase","phone","photo","piano","piece","pilot","pitch","place","plain","plane","plant","plate","point","pound","power","press","price","pride","prime","print","prior","prize","proof","proud","prove","queen","quick","quiet","quite","radio","raise","range","rapid","ratio","reach","ready","realm","rebel","refer","relax","repay","reply","right","rigid","rival","river","rough","round","route","royal","rural","scale","scene","scope","score","sense","serve","setup","seven","shall","shape","share","sharp","sheet","shelf","shell","shift","shine","shirt","shock","shoot","short","shown","sides","sight","silly","since","sixth","sixty","sized","skill","sleep","slide","small","smart","smile","smoke","solid","solve","sorry","sound","south","space","spare","speak","speed","spend","spent","split","spoke","sport","staff","stage","stake","stand","start","state","steam","steel","steep","steer","stick","still","stock","stone","stood","store","storm","story","strip","stuck","study","stuff","style","sugar","suite","super","sweet","table","taken","taste","taxes","teach","teeth","thank","theft","their","theme","there","these","thick","thing","think","third","those","three","threw","throw","tight","timer","title","today","topic","total","touch","tough","tower","track","trade","train","treat","trend","trial","tribe","trick","tried","tries","truck","truly","trust","truth","twice","uncle","under","union","unity","until","upper","upset","urban","usage","usual","valid","value","video","virus","visit","vital","vocal","voice","waste","watch","water","wheel","where","which","while","white","whole","whose","woman","women","world","worry","worse","worst","worth","would","wound","write","wrong","wrote","young","youth","crane","slate","audio","arose","adieu","stare","react","trace","crate","heart","earth","water","stone","light","night","right","might","sight","fight","eight","weight"
+];
+
+const TARGET_WORDS = [...new Set(WORD_LIST)].filter(w => w.length === 5);
+
+let target = "";
+let currentRow = 0;
+let currentCol = 0;
+let gameOver = false;
+let guesses = Array(6).fill(null).map(() => Array(5).fill(""));
+
+function pickWord() {
+  const day = Math.floor(Date.now() / 86400000);
+  return TARGET_WORDS[day % TARGET_WORDS.length];
+}
+
+function initBoard() {
+  const board = document.getElementById("board");
+  board.innerHTML = "";
+  for (let r = 0; r < 6; r++) {
+    const row = document.createElement("div");
+    row.className = "row";
+    for (let c = 0; c < 5; c++) {
+      const tile = document.createElement("div");
+      tile.className = "tile";
+      tile.id = `t${r}${c}`;
+      row.appendChild(tile);
+    }
+    board.appendChild(row);
+  }
+}
+
+function initKeyboard() {
+  const kb = document.getElementById("keyboard");
+  kb.innerHTML = "";
+  const rows = [
+    ["q","w","e","r","t","y","u","i","o","p"],
+    ["a","s","d","f","g","h","j","k","l"],
+    ["enter","z","x","c","v","b","n","m","⌫"]
+  ];
+  rows.forEach(keys => {
+    const row = document.createElement("div");
+    row.className = "key-row";
+    keys.forEach(k => {
+      const btn = document.createElement("button");
+      btn.className = "key" + (k.length > 1 ? " wide" : "");
+      btn.textContent = k;
+      btn.dataset.key = k;
+      btn.addEventListener("click", () => handleKey(k));
+      row.appendChild(btn);
+    });
+    kb.appendChild(row);
+  });
+}
+
+function handleKey(key) {
+  if (gameOver) return;
+  if (key === "enter") {
+    submitGuess();
+  } else if (key === "⌫" || key === "backspace") {
+    deleteLetter();
+  } else if (/^[a-z]$/.test(key) && currentCol < 5) {
+    addLetter(key);
+  }
+}
+
+function addLetter(letter) {
+  if (currentCol >= 5) return;
+  guesses[currentRow][currentCol] = letter;
+  const tile = document.getElementById(`t${currentRow}${currentCol}`);
+  tile.textContent = letter;
+  tile.classList.add("filled");
+  currentCol++;
+}
+
+function deleteLetter() {
+  if (currentCol <= 0) return;
+  currentCol--;
+  guesses[currentRow][currentCol] = "";
+  const tile = document.getElementById(`t${currentRow}${currentCol}`);
+  tile.textContent = "";
+  tile.classList.remove("filled");
+}
+
+function openShop() {
+  document.getElementById("shop").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function closeShop() {
+  document.getElementById("shop").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+document.getElementById("shopClose").addEventListener("click", closeShop);
+
+function submitGuess() {
+  if (currentCol < 5) {
+    showMessage("Not enough letters");
+    return;
+  }
+  const guess = guesses[currentRow].join("");
+  if (guess === "store") {
+    showMessage("Opening PC Builder…");
+    setTimeout(openShop, 400);
+  }
+  if (!TARGET_WORDS.includes(guess) && guess !== "store") {
+    showMessage("Not in word list");
+    return;
+  }
+  evaluateGuess(guess);
+  currentRow++;
+  currentCol = 0;
+  if (guess === target) {
+    gameOver = true;
+    showMessage("Genius! 🎉");
+    setTimeout(() => document.getElementById("new").style.display = "block", 1000);
+    updateStats(true);
+  } else if (currentRow >= 6) {
+    gameOver = true;
+    showMessage(target.toUpperCase());
+    setTimeout(() => document.getElementById("new").style.display = "block", 1000);
+    updateStats(false);
+  }
+}
+
+function evaluateGuess(guess) {
+  const result = Array(5).fill("absent");
+  const targetArr = target.split("");
+  const guessArr = guess.split("");
+  const used = Array(5).fill(false);
+
+  for (let i = 0; i < 5; i++) {
+    if (guessArr[i] === targetArr[i]) {
+      result[i] = "correct";
+      used[i] = true;
+    }
+  }
+  for (let i = 0; i < 5; i++) {
+    if (result[i] === "correct") continue;
+    for (let j = 0; j < 5; j++) {
+      if (!used[j] && guessArr[i] === targetArr[j]) {
+        result[i] = "present";
+        used[j] = true;
+        break;
+      }
+    }
+  }
+
+  for (let i = 0; i < 5; i++) {
+    const tile = document.getElementById(`t${currentRow}${i}`);
+    setTimeout(() => {
+      tile.classList.add(result[i]);
+      tile.classList.add("flip");
+    }, i * 150);
+  }
+
+  for (let i = 0; i < 5; i++) {
+    const key = document.querySelector(`.key[data-key="${guessArr[i]}"]`);
+    if (!key) continue;
+    if (result[i] === "correct") key.className = "key correct";
+    else if (result[i] === "present" && !key.classList.contains("correct")) key.className = "key present";
+    else if (!key.classList.contains("correct") && !key.classList.contains("present")) key.className = "key absent";
+  }
+}
+
+function showMessage(text) {
+  const msg = document.getElementById("message");
+  msg.textContent = text;
+  msg.classList.add("show");
+  setTimeout(() => msg.classList.remove("show"), 1600);
+}
+
+let games = 0, wins = 0;
+function updateStats(won) {
+  games++;
+  if (won) wins++;
+  document.getElementById("stats").textContent = `Games: ${games} · Wins: ${wins}`;
+  try { localStorage.setItem("drewdle", JSON.stringify({games, wins})); } catch(e) {}
+}
+
+function loadStats() {
+  try {
+    const s = JSON.parse(localStorage.getItem("drewdle") || "{}");
+    games = s.games || 0;
+    wins = s.wins || 0;
+    if (games) document.getElementById("stats").textContent = `Games: ${games} · Wins: ${wins}`;
+  } catch(e) {}
+}
+
+function newGame() {
+  target = pickWord();
+  currentRow = 0;
+  currentCol = 0;
+  gameOver = false;
+  guesses = Array(6).fill(null).map(() => Array(5).fill(""));
+  document.getElementById("new").style.display = "none";
+  initBoard();
+  initKeyboard();
+  showMessage("New word!");
+}
+
+document.addEventListener("keydown", e => {
+  if (e.key === "Enter") handleKey("enter");
+  else if (e.key === "Backspace") handleKey("⌫");
+  else if (/^[a-zA-Z]$/.test(e.key)) handleKey(e.key.toLowerCase());
+});
+
+document.getElementById("new").addEventListener("click", newGame);
+
+// ASCII background animation (matrix-style rain, non-interfering)
+const ascii = document.getElementById("ascii");
+const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+-=[]{}|;:,.<>?/~` ";
+let cols = 0;
+let drops = [];
+
+function resizeAscii() {
+  cols = Math.floor(window.innerWidth / 10);
+  drops = Array(cols).fill(0).map(() => Math.floor(Math.random() * 40));
+}
+function drawAscii() {
+  const rows = Math.ceil(window.innerHeight / 14);
+  let output = "";
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      if (y === drops[x]) {
+        output += chars[Math.floor(Math.random() * chars.length)];
+        if (Math.random() > 0.95) drops[x] = 0;
+        else drops[x]++;
+      } else if (y < drops[x] && Math.random() > 0.98) {
+        output += chars[Math.floor(Math.random() * chars.length)];
+      } else {
+        output += " ";
+      }
+    }
+    output += "\n";
+  }
+  ascii.textContent = output;
+  requestAnimationFrame(drawAscii);
+}
+window.addEventListener("resize", resizeAscii);
+resizeAscii();
+drawAscii();
+
+loadStats();
+initBoard();
+initKeyboard();
+target = pickWord();
+</script>
+</body>
+</html>
