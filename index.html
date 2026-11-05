@@ -235,19 +235,117 @@ button#new {
   <iframe id="shopFrame" src="bench/" title="PC part picker"></iframe>
 </div>
 <script>
-const SOLUTIONS = ["aback","abase","abate","abbey","abbot"]; // truncated for demo - full lists would be here
-const VALID_WORDS = ["aback","abase"]; // full list
-const TARGET_WORDS = SOLUTIONS;
-// ... rest of the original script with updated check
+let SOLUTIONS = [];
+let VALID_WORDS = [];
+let TARGET_WORDS = [];
+
+async function loadWords() {
+  try {
+    const [solRes, valRes] = await Promise.all([
+      fetch("solutions.json"),
+      fetch("valid.json")
+    ]);
+    SOLUTIONS = await solRes.json();
+    VALID_WORDS = await valRes.json();
+    TARGET_WORDS = SOLUTIONS;
+    startGame();
+  } catch (e) {
+    showMessage("Failed to load words");
+    console.error(e);
+  }
+}
+
 let target = "";
 let currentRow = 0;
 let currentCol = 0;
 let gameOver = false;
 let guesses = Array(6).fill(null).map(() => Array(5).fill(""));
+
 function pickWord() {
   const day = Math.floor(Date.now() / 86400000);
   return TARGET_WORDS[day % TARGET_WORDS.length];
 }
+
+function initBoard() {
+  const board = document.getElementById("board");
+  board.innerHTML = "";
+  for (let r = 0; r < 6; r++) {
+    const row = document.createElement("div");
+    row.className = "row";
+    for (let c = 0; c < 5; c++) {
+      const tile = document.createElement("div");
+      tile.className = "tile";
+      tile.id = `t${r}${c}`;
+      row.appendChild(tile);
+    }
+    board.appendChild(row);
+  }
+}
+
+function initKeyboard() {
+  const kb = document.getElementById("keyboard");
+  kb.innerHTML = "";
+  const rows = [
+    ["q","w","e","r","t","y","u","i","o","p"],
+    ["a","s","d","f","g","h","j","k","l"],
+    ["enter","z","x","c","v","b","n","m","⌫"]
+  ];
+  rows.forEach(keys => {
+    const row = document.createElement("div");
+    row.className = "key-row";
+    keys.forEach(k => {
+      const btn = document.createElement("button");
+      btn.className = "key" + (k.length > 1 ? " wide" : "");
+      btn.textContent = k;
+      btn.dataset.key = k;
+      btn.addEventListener("click", () => handleKey(k));
+      row.appendChild(btn);
+    });
+    kb.appendChild(row);
+  });
+}
+
+function handleKey(key) {
+  if (gameOver) return;
+  if (key === "enter") {
+    submitGuess();
+  } else if (key === "⌫" || key === "backspace") {
+    deleteLetter();
+  } else if (/^[a-z]$/.test(key) && currentCol < 5) {
+    addLetter(key);
+  }
+}
+
+function addLetter(letter) {
+  if (currentCol >= 5) return;
+  guesses[currentRow][currentCol] = letter;
+  const tile = document.getElementById(`t${currentRow}${currentCol}`);
+  tile.textContent = letter;
+  tile.classList.add("filled");
+  currentCol++;
+}
+
+function deleteLetter() {
+  if (currentCol <= 0) return;
+  currentCol--;
+  guesses[currentRow][currentCol] = "";
+  const tile = document.getElementById(`t${currentRow}${currentCol}`);
+  tile.textContent = "";
+  tile.classList.remove("filled");
+}
+
+function openShop() {
+  document.getElementById("shop").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function closeShop() {
+  document.getElementById("shop").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+document.getElementById("shopClose").addEventListener("click", closeShop);
+
 function submitGuess() {
   if (currentCol < 5) {
     showMessage("Not enough letters");
@@ -257,19 +355,151 @@ function submitGuess() {
   if (guess === "store") {
     showMessage("Opening PC Builder…");
     setTimeout(openShop, 400);
+    return;
   }
-  if (!VALID_WORDS.includes(guess) && guess !== "store") {
+  if (!VALID_WORDS.includes(guess)) {
     showMessage("Not in word list");
     return;
   }
   evaluateGuess(guess);
-  // rest of original functions
+  currentRow++;
+  currentCol = 0;
+  if (guess === target) {
+    gameOver = true;
+    showMessage("Genius! 🎉");
+    setTimeout(() => document.getElementById("new").style.display = "block", 1000);
+    updateStats(true);
+  } else if (currentRow >= 6) {
+    gameOver = true;
+    showMessage(target.toUpperCase());
+    setTimeout(() => document.getElementById("new").style.display = "block", 1000);
+    updateStats(false);
+  }
 }
-// full original script logic continues here including initBoard, keyboard, evaluateGuess, showMessage, stats, newGame, ASCII, etc.
-loadStats();
-initBoard();
-initKeyboard();
-target = pickWord();
+
+function evaluateGuess(guess) {
+  const result = Array(5).fill("absent");
+  const targetArr = target.split("");
+  const guessArr = guess.split("");
+  const used = Array(5).fill(false);
+
+  for (let i = 0; i < 5; i++) {
+    if (guessArr[i] === targetArr[i]) {
+      result[i] = "correct";
+      used[i] = true;
+    }
+  }
+  for (let i = 0; i < 5; i++) {
+    if (result[i] === "correct") continue;
+    for (let j = 0; j < 5; j++) {
+      if (!used[j] && guessArr[i] === targetArr[j]) {
+        result[i] = "present";
+        used[j] = true;
+        break;
+      }
+    }
+  }
+
+  for (let i = 0; i < 5; i++) {
+    const tile = document.getElementById(`t${currentRow}${i}`);
+    setTimeout(() => {
+      tile.classList.add(result[i]);
+      tile.classList.add("flip");
+    }, i * 150);
+  }
+
+  for (let i = 0; i < 5; i++) {
+    const key = document.querySelector(`.key[data-key="${guessArr[i]}"]`);
+    if (!key) continue;
+    if (result[i] === "correct") key.className = "key correct";
+    else if (result[i] === "present" && !key.classList.contains("correct")) key.className = "key present";
+    else if (!key.classList.contains("correct") && !key.classList.contains("present")) key.className = "key absent";
+  }
+}
+
+function showMessage(text) {
+  const msg = document.getElementById("message");
+  msg.textContent = text;
+  msg.classList.add("show");
+  setTimeout(() => msg.classList.remove("show"), 1600);
+}
+
+let games = 0, wins = 0;
+function updateStats(won) {
+  games++;
+  if (won) wins++;
+  document.getElementById("stats").textContent = `Games: ${games} · Wins: ${wins}`;
+  try { localStorage.setItem("drewdle", JSON.stringify({games, wins})); } catch(e) {}
+}
+
+function loadStats() {
+  try {
+    const s = JSON.parse(localStorage.getItem("drewdle") || "{}");
+    games = s.games || 0;
+    wins = s.wins || 0;
+    if (games) document.getElementById("stats").textContent = `Games: ${games} · Wins: ${wins}`;
+  } catch(e) {}
+}
+
+function newGame() {
+  target = pickWord();
+  currentRow = 0;
+  currentCol = 0;
+  gameOver = false;
+  guesses = Array(6).fill(null).map(() => Array(5).fill(""));
+  document.getElementById("new").style.display = "none";
+  initBoard();
+  initKeyboard();
+  showMessage("New word!");
+}
+
+function startGame() {
+  loadStats();
+  initBoard();
+  initKeyboard();
+  target = pickWord();
+  document.addEventListener("keydown", e => {
+    if (e.key === "Enter") handleKey("enter");
+    else if (e.key === "Backspace") handleKey("⌫");
+    else if (/^[a-zA-Z]$/.test(e.key)) handleKey(e.key.toLowerCase());
+  });
+  document.getElementById("new").addEventListener("click", newGame);
+}
+
+const ascii = document.getElementById("ascii");
+const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+-=[]{}|;:,.<>?/~` ";
+let cols = 0;
+let drops = [];
+
+function resizeAscii() {
+  cols = Math.floor(window.innerWidth / 10);
+  drops = Array(cols).fill(0).map(() => Math.floor(Math.random() * 40));
+}
+function drawAscii() {
+  const rows = Math.ceil(window.innerHeight / 14);
+  let output = "";
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      if (y === drops[x]) {
+        output += chars[Math.floor(Math.random() * chars.length)];
+        if (Math.random() > 0.95) drops[x] = 0;
+        else drops[x]++;
+      } else if (y < drops[x] && Math.random() > 0.98) {
+        output += chars[Math.floor(Math.random() * chars.length)];
+      } else {
+        output += " ";
+      }
+    }
+    output += "\n";
+  }
+  ascii.textContent = output;
+  requestAnimationFrame(drawAscii);
+}
+window.addEventListener("resize", resizeAscii);
+resizeAscii();
+drawAscii();
+
+loadWords();
 </script>
 </body>
 </html>
