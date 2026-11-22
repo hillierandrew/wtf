@@ -505,8 +505,8 @@ export function shelfNote(cat: Category, build: Build): string {
   if (cat === "storage") {
     if (build.motherboard) {
       const slots = m2Slots(build.motherboard);
-      bits.push(`Buy 1 drive. This board has ${slots} NVMe slots. Do not buy more`);
-    } else bits.push("Buy 1 drive. A second pick replaces it");
+      bits.push(`${slots} NVMe slots. Add a drive only while a slot is free`);
+    } else bits.push("Pick one drive first. Add more after the board is chosen");
   }
   if (cat === "monitor") bits.push("Optional");
   if (cat === "bundle") bits.push("Deal price replaces the parts inside");
@@ -543,14 +543,19 @@ export function warnings(build: Build): string[] {
   return notes;
 }
 
-export function spendOf(build: Build): number {
-  if (build.prebuilt) return build.prebuilt.price + (build.monitor?.price ?? 0);
+export function spendOf(build: Build, extras: Extras = emptyExtras()): number {
+  if (build.prebuilt) {
+    const screens = (build.monitor?.price ?? 0) + extras.monitor.reduce((sum, part) => sum + part.price, 0);
+    return build.prebuilt.price + screens;
+  }
   const covered = coveredByBundle(build);
-  return CATS.reduce((sum, cat) => {
+  const base = CATS.reduce((sum, cat) => {
     const part = build[cat];
     if (!part || (cat !== "bundle" && covered.has(cat))) return sum;
     return sum + part.price;
   }, 0);
+  const more = EXTRA_CATS.reduce((sum, cat) => sum + extras[cat].reduce((inner, part) => inner + part.price, 0), 0);
+  return Math.round((base + more) * 100) / 100;
 }
 
 export function scoreBuild(build: Build): {
@@ -1419,3 +1424,76 @@ export function extraFilters(cat: Category): { label: string; test: (part: Part)
 }
 
 export const AI_FILTERS = ["All", "League", "Valorant", "Fortnite", "Games", "Work", "Per frame", "Cheap", "College", "Value", "1080p", "1440p", "Newer socket", "NVIDIA", "No card", "Screen", "Top"] as const;
+
+export const EXTRA_CATS = ["memory", "storage", "monitor"] as const;
+export type ExtraCat = (typeof EXTRA_CATS)[number];
+export type Extras = Record<ExtraCat, Part[]>;
+
+export function emptyExtras(): Extras {
+  return { memory: [], storage: [], monitor: [] };
+}
+
+function countKind(parts: Part[], kinds: Array<ReturnType<typeof driveKind>>): number {
+  return parts.filter((part) => kinds.includes(driveKind(part))).length;
+}
+
+/** Empty string means this extra part still fits beside the build. */
+export function extraWhy(part: Part, build: Build, extras: Extras): string {
+  if (build.prebuilt && part.cat !== "monitor") return "A finished PC already has its parts. You can add a screen.";
+  if (part.cat !== "memory" && part.cat !== "storage" && part.cat !== "monitor") {
+    return "Only one of these. A new tap replaces the one you have.";
+  }
+  const fit = fitWhy(part, build);
+  if (fit) return fit;
+  if (part.cat === "memory") {
+    if (!build.memory) return "Choose the first memory kit. Then you can add more.";
+    const slots = dimmSlots(build.motherboard);
+    const used = sticksOf(build.memory) + extras.memory.reduce((sum, item) => sum + sticksOf(item), 0);
+    const add = sticksOf(part);
+    if (used + add > slots) return `${slots} memory slots. ${used} sticks are in. This kit needs ${add}.`;
+    return "";
+  }
+  if (part.cat === "storage") {
+    if (!build.storage) return "Choose the first drive. Then you can add more.";
+    const kind = driveKind(part);
+    const all = [build.storage, ...extras.storage];
+    if (kind === "nvme") {
+      const slots = m2Slots(build.motherboard);
+      const used = countKind(all, ["nvme"]);
+      if (used >= slots) return `${slots} NVMe slots, and they are full.`;
+      return "";
+    }
+    const used = countKind(all, ["sata", "hdd"]);
+    if (used >= 4) return "Four SATA plugs is the limit. A hard drive or SATA SSD needs one.";
+    return "";
+  }
+  if (!build.monitor) return "Choose the first screen. Then you can add another.";
+  if (extras.monitor.length >= 2) return "Three screens is the limit.";
+  return "";
+}
+
+export function trimExtras(build: Build, extras: Extras): Extras {
+  const next = emptyExtras();
+  for (const cat of EXTRA_CATS) {
+    for (const part of extras[cat]) {
+      if (extraWhy(part, build, next) === "") next[cat].push(part);
+    }
+  }
+  return next;
+}
+
+export function slotLine(cat: Category, build: Build, extras: Extras): string {
+  if (cat === "memory") {
+    const slots = dimmSlots(build.motherboard);
+    const used = (build.memory ? sticksOf(build.memory) : 0) + extras.memory.reduce((sum, part) => sum + sticksOf(part), 0);
+    return `${used} of ${slots} memory sticks used. Add another kit only if the sticks fit.`;
+  }
+  if (cat === "storage") {
+    const all = [...(build.storage ? [build.storage] : []), ...extras.storage];
+    const nvme = countKind(all, ["nvme"]);
+    const sata = countKind(all, ["sata", "hdd"]);
+    return `${nvme} of ${m2Slots(build.motherboard)} NVMe slots used. ${sata} of 4 hard-drive plugs used.`;
+  }
+  if (cat === "monitor") return "One screen is enough. You can add up to two more.";
+  return "Only one. A new tap replaces it. You cannot have two.";
+}

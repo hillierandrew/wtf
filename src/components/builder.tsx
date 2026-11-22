@@ -28,18 +28,23 @@ import {
   spendOf,
   suggest,
   tagsOf,
+  extraWhy,
+  slotLine,
   warnings,
   wattOf,
   type Category,
   type Part,
 } from "@/lib/catalog";
-import { partsFrom, useBench } from "@/lib/store";
+import { extrasFromIds, partsFrom, useBench } from "@/lib/store";
 import { ThemeToggle } from "@/lib/theme";
 
 const REVIEW = CATS.length;
 
 export function Builder({ onLeave }: { onLeave: () => void }) {
   const ids = useBench((state) => state.ids);
+  const extraIds = useBench((state) => state.extraIds);
+  const addExtra = useBench((state) => state.addExtra);
+  const removeExtra = useBench((state) => state.removeExtra);
   const openBox = useBench((state) => state.openBox);
   const notice = useBench((state) => state.notice);
   const saved = useBench((state) => state.saved);
@@ -54,6 +59,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
   const dismiss = useBench((state) => state.dismiss);
 
   const build = useMemo(() => partsFrom(ids), [ids]);
+  const extras = useMemo(() => extrasFromIds(extraIds), [extraIds]);
   const [step, setStep] = useState(0);
   const [panel, setPanel] = useState<"play" | "shelf" | "ai">("play");
   const [query, setQuery] = useState("");
@@ -127,10 +133,10 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
     return list;
   }, [blocked, rejected, fitting, brand, query, priceDesc, build, cat, tag, facet]);
 
-  const total = spendOf(build);
   const score = scoreBuild(build);
   const filled = CATS.filter((item) => build[item]).length;
   const shown = visible.slice(0, limit);
+  const total = spendOf(build, extras);
 
   function go(next: number) {
     setPanel("shelf");
@@ -159,6 +165,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
           build.monitor
             ? `Monitor: ${build.monitor.brand} ${shortName(build.monitor)} (${money(build.monitor.price)})`
             : "Monitor: —",
+          ...extras.monitor.map((part, index) => `Extra screen ${index + 1}: ${part.brand} ${shortName(part)} (${money(part.price)})`),
           `Total: ${money(total)} CAD`,
         ]
       : [
@@ -169,6 +176,9 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
             if (item !== "bundle" && covered.has(item)) return `${CAT_LABEL[item]}: ${part.brand} ${shortName(part)} (included)`;
             return `${CAT_LABEL[item]}: ${part.brand} ${shortName(part)} (${money(part.price)})`;
           }),
+          ...extras.memory.map((part, index) => `Extra memory ${index + 1}: ${part.brand} ${shortName(part)} (${money(part.price)})`),
+          ...extras.storage.map((part, index) => `Extra drive ${index + 1}: ${part.brand} ${shortName(part)} (${money(part.price)})`),
+          ...extras.monitor.map((part, index) => `Extra screen ${index + 1}: ${part.brand} ${shortName(part)} (${money(part.price)})`),
           `Total: ${money(total)} CAD`,
         ];
     try {
@@ -328,6 +338,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
             setName={setName}
             copied={copied}
             saved={saved}
+            extras={extras}
             onJump={go}
             onCopy={copy}
             onClear={() => {
@@ -360,15 +371,13 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
                 A bundle is a discount on parts, not a second computer. It fills the processor, board, or case it names.
               </p>
             ) : null}
-            {cat === "storage" ? (
-              <div className="rounded-xl border border-line bg-elevated p-3 text-sm">
-                <p className="font-medium">One drive.</p>
-                <p className="mt-1 text-muted">
-                  {build.motherboard
-                    ? `This board has ${m2Slots(build.motherboard)} NVMe slots. Buy 1. Picking another drive replaces this one. It does not add a second.`
-                    : "Pick the motherboard first if you can. Then buy one drive. A second pick replaces it."}
-                </p>
+            {cat === "memory" || cat === "storage" || cat === "monitor" ? (
+              <div className="rounded-2xl border border-line bg-elevated p-4 text-base">
+                <p className="font-medium">{cat === "memory" ? "You can add more memory." : cat === "storage" ? "You can add more drives." : "You can add more screens."}</p>
+                <p className="mt-1 text-muted">{slotLine(cat, build, extras)}</p>
               </div>
+            ) : build[cat] ? (
+              <p className="rounded-2xl border border-line bg-elevated p-4 text-base text-muted">{slotLine(cat, build, extras)}</p>
             ) : null}
             {cat === "cooler" && build.cpu && /with cooler|wraith/i.test(build.cpu.name) ? (
               <div className="rounded-xl border border-line bg-elevated p-3 text-sm">
@@ -520,41 +529,48 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
                   const selected = !blocked && build[cat]?.id === part.id;
                   const reason = blocked ? fitWhy(part, build) : "";
                   const tags = part.cat === "bundle" ? includedParts(part).map((item) => shortName(item)) : tagsOf(part);
+                  const addNote = !blocked && (part.cat === "memory" || part.cat === "storage" || part.cat === "monitor") ? extraWhy(part, build, extras) : "no";
+                  const canAdd = addNote === "";
                   return (
-                    <li key={part.id}>
+                    <li key={part.id} className={`overflow-hidden rounded-2xl border ${selected ? "border-accent bg-subtle" : "border-line bg-elevated"}`}>
                       <button
                         type="button"
                         onClick={() => choose(part)}
                         aria-pressed={selected}
-                        className={`press flex w-full items-start justify-between gap-3 rounded-lg border px-3 py-3 text-left ${selected ? "border-accent bg-subtle" : "border-line bg-elevated"}`}
+                        className="press flex w-full items-start justify-between gap-3 px-3 py-4 text-left"
                       >
                         <PartMark part={part} />
                         <span className="min-w-0">
-                          <span className="flex items-center gap-2 text-xs text-faint">
+                          <span className="flex items-center gap-2 text-sm text-muted">
                             {part.brand}
-                            {selected ? <Check className="size-3.5 text-accent" strokeWidth={2} /> : null}
+                            {selected ? <Check className="size-4 text-accent" strokeWidth={2} /> : null}
                           </span>
-                          <span className="mt-0.5 line-clamp-2 block text-sm font-medium leading-snug">{shortName(part)}</span>
-                          {reason ? <span className="mt-1 block text-xs text-danger">{reason}</span> : null}
+                          <span className="mt-1 line-clamp-2 block text-base font-medium leading-snug">{shortName(part)}</span>
+                          {reason ? <span className="mt-1 block text-sm text-danger">{reason}</span> : null}
                           {!reason && part.cat === "gpu" && buildSpeed({ gpu: part }) ? (
-                            <span className="mt-1 block text-xs text-muted">Roughly {buildSpeed({ gpu: part })}% of an RX 9070</span>
+                            <span className="mt-1 block text-sm text-muted">Roughly {buildSpeed({ gpu: part })}% of an RX 9070</span>
                           ) : null}
                           {!reason && tags.length ? (
-                            <span className={`mt-1 block text-xs text-muted ${part.cat === "bundle" ? "line-clamp-3" : ""}`}>
+                            <span className={`mt-1 block text-sm text-muted ${part.cat === "bundle" ? "line-clamp-3" : ""}`}>
                               {tags.join(part.cat === "bundle" ? " + " : " · ")}
                             </span>
                           ) : null}
                         </span>
                         <span className="shrink-0 text-right">
-                          <span className="tabular block text-sm font-medium">{money(part.price)}</span>
-                          <span className="block text-[11px] leading-tight text-faint">Updated {PRICE_CHECKED}</span>
+                          <span className="tabular block text-base font-medium">{money(part.price)}</span>
+                          <span className="mt-1 block text-sm leading-tight text-muted">Updated {PRICE_CHECKED}</span>
                           {priceChange(part) ? (
-                            <span className={`block text-[11px] leading-tight ${priceChange(part)!.kind === "down" ? "text-ok" : "text-danger"}`}>
-                              {priceChange(part)!.kind === "down" ? "Down" : "Up"} {money(priceChange(part)!.diff)} since {PRICE_CHECKED}
+                            <span className={`block text-sm leading-tight ${priceChange(part)!.kind === "down" ? "text-ok" : "text-danger"}`}>
+                              {priceChange(part)!.kind === "down" ? "Down" : "Up"} {money(priceChange(part)!.diff)}
                             </span>
                           ) : null}
                         </span>
                       </button>
+                      {canAdd ? (
+                        <button type="button" onClick={() => addExtra(part)} className="h-14 w-full border-t border-line text-base font-medium text-accent">
+                          Add another
+                        </button>
+                      ) : null}
                     </li>
                   );
                 })}
@@ -602,7 +618,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
       </footer>
       )}
       </div>
-      <Checkout build={build} wide={wide} onRemove={remove} />
+      <Checkout build={build} extras={extras} wide={wide} onRemove={remove} onRemoveExtra={removeExtra} />
       {badge ? (
         <div className="pointer-events-none fixed inset-x-0 top-4 z-40 mx-auto w-[min(100%,24rem)] px-4">
           <div className="rounded-2xl border border-accent bg-elevated px-4 py-4">
@@ -620,9 +636,9 @@ const LESSON: Record<Category, string> = {
   bundle: "A sale on a few parts. Skip it if you are picking one by one.",
   cpu: "The brain. The board has to match it.",
   motherboard: "Everything plugs into this. It must fit the processor.",
-  memory: "Space for what you have open. DDR4 and DDR5 are not the same.",
+  memory: "The first kit is the main one. Add another only if the sticks fit.",
   gpu: "This draws the games. Skip it only if the processor already has pictures.",
-  storage: "One drive. Tapping another one replaces it.",
+  storage: "The first drive is the main one. Add another only if a slot is free.",
   case: "The box. It has to be big enough for the board.",
   cooler: "Keeps the brain cool. Skip it if one came in the processor box.",
   psu: "Power for the whole PC. Too small and it will not turn on.",
@@ -826,7 +842,7 @@ function Quest({
 
   return (
     <div className="space-y-3 px-4 py-4">
-      <p className="text-base text-muted">Order a PC like lunch. Tap one. The parts that do not fit never show up.</p>
+      <p className="text-base text-muted">Order a PC like lunch. One processor. One board. More memory and drives only if they fit.</p>
       <button type="button" onClick={() => setScreen("games")} className="press min-h-20 w-full rounded-2xl bg-accent px-4 py-4 text-left text-accent-fg">
         <span className="block text-2xl font-medium">Games</span>
         <span className="mt-1 block text-base">Real names and the year they came out.</span>
@@ -859,14 +875,24 @@ function PartMark({ part }: { part: Part }) {
 
 function Checkout({
   build,
+  extras,
   wide,
   onRemove,
+  onRemoveExtra,
 }: {
   build: ReturnType<typeof partsFrom>;
+  extras: ReturnType<typeof extrasFromIds>;
   wide: boolean;
   onRemove: (cat: Category) => void;
+  onRemoveExtra: (cat: "memory" | "storage" | "monitor", index: number) => void;
 }) {
   const rows = CATS.filter((cat) => build[cat]);
+  const extraRows = [
+    ...extras.memory.map((part, index) => ({ cat: "memory" as const, part, index })),
+    ...extras.storage.map((part, index) => ({ cat: "storage" as const, part, index })),
+    ...extras.monitor.map((part, index) => ({ cat: "monitor" as const, part, index })),
+  ];
+  const count = rows.length + extraRows.length;
   const [open, setOpen] = useState(true);
   const [height, setHeight] = useState(360);
   const [width, setWidth] = useState(360);
@@ -955,7 +981,7 @@ function Checkout({
         <p className="min-w-0 flex-1">
           <span className="block text-xs text-faint">Checkout</span>
           <span className="tabular text-sm font-medium">
-            {rows.length} {rows.length === 1 ? "part" : "parts"} · {money(spendOf(build))}
+            {count} {count === 1 ? "part" : "parts"} · {money(spendOf(build, extras))}
           </span>
         </p>
         <button type="button" onClick={() => setOpen((value) => !value)} className="h-8 rounded-full border border-line px-3 text-xs text-muted">
@@ -964,7 +990,7 @@ function Checkout({
       </div>
       {open ? (
         <ul className="min-h-0 flex-1 space-y-2 overflow-y-auto px-3 pb-3">
-          {rows.length === 0 ? <li className="py-6 text-center text-sm text-muted">Nothing in checkout yet. Tap a part.</li> : null}
+          {rows.length === 0 && extraRows.length === 0 ? <li className="py-6 text-center text-base text-muted">Nothing in checkout yet. Tap a part.</li> : null}
           {rows.map((cat, index) => {
             const part = build[cat];
             if (!part) return null;
@@ -988,6 +1014,18 @@ function Checkout({
               </li>
             );
           })}
+          {extraRows.map(({ cat, part, index }) => (
+            <li key={`${cat}-extra-${index}`} className="flex items-center gap-2 rounded-lg border border-line px-2 py-2">
+              <PartMark part={part} />
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm text-muted">Extra {CAT_LABEL[cat].toLowerCase()}</span>
+                <span className="block truncate text-base">{shortName(part)}</span>
+              </span>
+              <button type="button" onClick={() => onRemoveExtra(cat, index)} aria-label={`Remove extra ${CAT_LABEL[cat]}`} className="flex size-11 shrink-0 items-center justify-center rounded-full border border-line text-muted">
+                <X className="size-4" />
+              </button>
+            </li>
+          ))}
         </ul>
       ) : null}
     </aside>
@@ -1118,6 +1156,7 @@ function Review({
   setName,
   copied,
   saved,
+  extras,
   onJump,
   onCopy,
   onClear,
@@ -1131,6 +1170,7 @@ function Review({
   setName: (value: string) => void;
   copied: boolean;
   saved: { id: string; name: string }[];
+  extras: ReturnType<typeof extrasFromIds>;
   onJump: (step: number) => void;
   onCopy: () => void;
   onClear: () => void;
@@ -1141,7 +1181,7 @@ function Review({
 }) {
   const ready = Boolean(build.prebuilt);
   const notes = warnings(build);
-  const total = spendOf(build);
+  const total = spendOf(build, extras);
   const score = scoreBuild(build);
   const need = needWatts(build);
   const supply = wattOf(build.psu);
@@ -1167,7 +1207,7 @@ function Review({
                 <span className="min-w-0">
                   <span className="block text-xs text-faint">{CAT_LABEL[cat]}</span>
                   <span className="block truncate text-sm">
-                    {part ? shortName(part) : cat === "storage" ? "One drive. Not five." : "Skip for now"}
+                    {part ? shortName(part) : cat === "storage" ? "Choose a drive" : "Skip for now"}
                   </span>
                   {part && priceChange(part) ? (
                     <span className={`block text-xs ${priceChange(part)!.kind === "down" ? "text-ok" : "text-danger"}`}>
@@ -1183,6 +1223,19 @@ function Review({
           );
         })}
       </ul>
+      {extras.memory.length + extras.storage.length + extras.monitor.length > 0 ? (
+        <div className="rounded-2xl border border-line bg-elevated p-4 text-base">
+          <p className="font-medium">Added on top</p>
+          <ul className="mt-2 space-y-2">
+            {[...extras.memory.map((part) => ({ label: "Memory", part })), ...extras.storage.map((part) => ({ label: "Drive", part })), ...extras.monitor.map((part) => ({ label: "Screen", part }))].map((item, index) => (
+              <li key={`${item.label}-${index}`} className="flex justify-between gap-3">
+                <span className="min-w-0">{item.label} · {shortName(item.part)}</span>
+                <span className="tabular shrink-0">{money(item.part.price)}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
 
       {ready ? (
         <div className="rounded-xl border border-line bg-elevated p-4">
