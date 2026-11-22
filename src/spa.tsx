@@ -5,6 +5,7 @@ import { Desktops } from "@/components/desktops";
 import { Laptops } from "@/components/laptops";
 import { Sim } from "@/components/sim";
 import { Desk } from "@/components/desk";
+import { Gate } from "@/components/lock";
 import { Welcome } from "@/components/welcome";
 import { useBench } from "@/lib/store";
 import "./styles.css";
@@ -30,7 +31,9 @@ const root = document.getElementById("root");
 if (root) {
   createRoot(root).render(
     <StrictMode>
-      <Home />
+      <Gate>
+        <Home />
+      </Gate>
     </StrictMode>,
   );
 }

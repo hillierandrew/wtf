@@ -86,8 +86,43 @@
   transform: scale(0.985);
 }
 
+@keyframes lock-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-8px);
+  }
+  50% {
+    transform: translateX(8px);
+  }
+  75% {
+    transform: translateX(-5px);
+  }
+}
+
+@keyframes lock-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.lock-shake {
+  animation: lock-shake 0.4s ease;
+}
+
+.lock-pulse {
+  animation: lock-pulse 1.4s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .press:active {
-    transform: none;
+  .lock-shake,
+  .lock-pulse {
+    animation: none;
   }
 }

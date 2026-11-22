@@ -5,6 +5,7 @@ import { Desktops } from "@/components/desktops";
 import { Laptops } from "@/components/laptops";
 import { Sim } from "@/components/sim";
 import { Desk } from "@/components/desk";
+import { Gate } from "@/components/lock";
 import { Welcome } from "@/components/welcome";
 import { useBench } from "@/lib/store";
 
@@ -19,10 +20,13 @@ function Home() {
     hydrate();
   }, [hydrate]);
 
-  if (!mode || !hydrated) return <Welcome onEnter={() => setMode("pc")} onDesk={() => setMode("desk")} onSim={() => setMode("sim")} onLaptop={() => setMode("laptop")} onDesktop={() => setMode("desktop")} />;
-  if (mode === "desk") return <Desk onLeave={() => setMode(null)} />;
-  if (mode === "sim") return <Sim onLeave={() => setMode(null)} />;
-  if (mode === "laptop") return <Laptops onLeave={() => setMode(null)} />;
-  if (mode === "desktop") return <Desktops onLeave={() => setMode(null)} />;
-  return <Builder onLeave={() => setMode(null)} />;
+  let screen = <Welcome onEnter={() => setMode("pc")} onDesk={() => setMode("desk")} onSim={() => setMode("sim")} onLaptop={() => setMode("laptop")} onDesktop={() => setMode("desktop")} />;
+  if (mode && hydrated) {
+    if (mode === "desk") screen = <Desk onLeave={() => setMode(null)} />;
+    else if (mode === "sim") screen = <Sim onLeave={() => setMode(null)} />;
+    else if (mode === "laptop") screen = <Laptops onLeave={() => setMode(null)} />;
+    else if (mode === "desktop") screen = <Desktops onLeave={() => setMode(null)} />;
+    else screen = <Builder onLeave={() => setMode(null)} />;
+  }
+  return <Gate>{screen}</Gate>;
 }
