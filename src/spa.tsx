@@ -1,6 +1,7 @@
 import { StrictMode, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Builder } from "@/components/builder";
+import { Laptops } from "@/components/laptops";
 import { Sim } from "@/components/sim";
 import { Desk } from "@/components/desk";
 import { Welcome } from "@/components/welcome";
@@ -10,15 +11,16 @@ import "./styles.css";
 function Home() {
   const hydrated = useBench((state) => state.hydrated);
   const hydrate = useBench((state) => state.hydrate);
-  const [mode, setMode] = useState<"pc" | "desk" | "sim" | null>(null);
+  const [mode, setMode] = useState<"pc" | "desk" | "sim" | "laptop" | null>(null);
 
   useEffect(() => {
     hydrate();
   }, [hydrate]);
 
-  if (!mode || !hydrated) return <Welcome onEnter={() => setMode("pc")} onDesk={() => setMode("desk")} onSim={() => setMode("sim")} />;
+  if (!mode || !hydrated) return <Welcome onEnter={() => setMode("pc")} onDesk={() => setMode("desk")} onSim={() => setMode("sim")} onLaptop={() => setMode("laptop")} />;
   if (mode === "desk") return <Desk onLeave={() => setMode(null)} />;
   if (mode === "sim") return <Sim onLeave={() => setMode(null)} />;
+  if (mode === "laptop") return <Laptops onLeave={() => setMode(null)} />;
   return <Builder onLeave={() => setMode(null)} />;
 }
 
