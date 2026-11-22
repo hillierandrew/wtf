@@ -3,7 +3,7 @@ import { Check, Search, X } from "lucide-react";
 import raw from "@/data/desk.json";
 import { ThemeToggle } from "@/lib/theme";
 
-type Kind = "keyboard" | "mouse" | "pad" | "combo" | "webcam" | "mic";
+type Kind = "keyboard" | "mouse" | "pad" | "combo" | "webcam" | "mic" | "headset";
 
 type DeskItem = {
   id: string;
@@ -24,7 +24,8 @@ const STEPS: { id: Kind; label: string; line: string }[] = [
   { id: "mouse", label: "Mouse", line: "One mouse. Skip this if the keyboard is a combo." },
   { id: "pad", label: "Mouse pad", line: "Optional. The mouse works without one." },
   { id: "webcam", label: "Camera", line: "One camera. Optional. The computer works without it." },
-  { id: "mic", label: "Microphone", line: "One microphone. Optional. A camera may already hear you." },
+  { id: "mic", label: "Microphone", line: "One microphone. Optional. A headset or camera may already hear you." },
+  { id: "headset", label: "Headset", line: "One headset. It has its own microphone. You do not need a second one." },
 ];
 
 function money(value: number) {
@@ -116,7 +117,7 @@ export function Desk({ onLeave }: { onLeave: () => void }) {
     });
   }
 
-  const rows = (["keyboard", "combo", "mouse", "pad", "webcam", "mic"] as Kind[]).map((kind) => picked[kind]).filter(Boolean) as DeskItem[];
+  const rows = (["keyboard", "combo", "mouse", "pad", "webcam", "mic", "headset"] as Kind[]).map((kind) => picked[kind]).filter(Boolean) as DeskItem[];
   const total = rows.reduce((sum, item) => sum + item.price, 0);
   const stepMeta = STEPS.find((item) => item.id === step)!;
 
@@ -130,7 +131,7 @@ export function Desk({ onLeave }: { onLeave: () => void }) {
           <ThemeToggle />
         </div>
         <h1 className="font-display mt-3 text-4xl font-medium leading-none tracking-tight">Build a keyboard</h1>
-        <p className="mt-2 text-base text-muted">Keyboard, mouse, pad, camera, and microphone. One of each.</p>
+        <p className="mt-2 text-base text-muted">Keyboard, mouse, pad, camera, microphone, and headset. One of each.</p>
       </header>
       <div className="flex shrink-0 gap-2 overflow-x-auto px-4 py-3">
         {STEPS.map((item) => (
@@ -162,6 +163,8 @@ export function Desk({ onLeave }: { onLeave: () => void }) {
             ? [["all", "All"], ["1080p", "1080p"], ["2K", "2K"], ["4K", "4K"]]
             : step === "mic"
               ? [["all", "All"], ["USB", "USB"]]
+              : step === "headset"
+                ? [["all", "All"], ["Gaming", "Gaming"], ["Office", "Office"], ["Wireless", "Wireless"], ["Wired", "Wired"]]
               : step === "pad"
                 ? [["all", "All"]]
                 : [
