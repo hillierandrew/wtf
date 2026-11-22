@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Check, Search, X } from "lucide-react";
 import { PARTS, machineScore, money, tagsOf, type Part } from "@/lib/catalog";
+import { RankBadge } from "@/components/rank";
 import { ThemeToggle } from "@/lib/theme";
 
 type Filter = "all" | "gaming" | "desk" | "mini" | "aio";
@@ -134,7 +135,10 @@ export function Desktops({ onLeave }: { onLeave: () => void }) {
                     </span>
                     <span className="mt-1 block text-base font-medium leading-snug">{part.name.replace(/\(Open Box\)/i, "").trim()}</span>
                     <span className="mt-1 block text-sm text-muted">{tagsOf(part).join(" · ")}</span>
-                    <span className="mt-1 block text-sm text-muted">Score {score}/100 · {money(part.price / score)} per point</span>
+                    <span className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted">
+                      <RankBadge score={score} />
+                      {money(part.price / score)} per point
+                    </span>
                   </span>
                   <span className="shrink-0 text-right">
                     <span className="tabular block text-2xl font-medium">{score}</span>

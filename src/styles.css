@@ -70,8 +70,10 @@
   }
 }
 
-.safe-top {
-  padding-top: env(safe-area-inset-top);
+.screen-slot > * {
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
 }
 
 .safe-bottom {

@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
-import { PARTS, CAT_LABEL, fitWhy, isJunk, money, shortName, spendOf, unitCost, type Category, type Part } from "@/lib/catalog";
+import { PARTS, CAT_LABEL, fitWhy, isJunk, money, partRank, shortName, spendOf, unitCost, type Category, type Part } from "@/lib/catalog";
 import { extrasFromIds, partsFrom, useBench } from "@/lib/store";
+import { RankBadge } from "@/components/rank";
 import { ThemeToggle } from "@/lib/theme";
 
 const STEPS: { cat: Category; title: string; line: string; scored: boolean }[] = [
@@ -150,7 +151,10 @@ export function Value({ onLeave, onBuild }: { onLeave: () => void; onBuild: () =
                   >
                     <span className="flex items-start justify-between gap-3">
                       <span>
-                        <span className="block text-sm tracking-wide text-muted">{index === 0 ? "Best price" : CAT_LABEL[part.cat]}</span>
+                        <span className="flex flex-wrap items-center gap-2 text-sm tracking-wide text-muted">
+                          {index === 0 ? "Best price" : CAT_LABEL[part.cat]}
+                          <RankBadge score={partRank(part).score} />
+                        </span>
                         <span className="font-display mt-1 block text-4xl leading-none tracking-tight">{deal ? deal.text : money(part.price)}</span>
                       </span>
                       <span className={`mt-1 shrink-0 rounded-full px-3 py-2 text-sm ${on ? "bg-accent text-accent-fg" : "bg-subtle text-fg"}`}>

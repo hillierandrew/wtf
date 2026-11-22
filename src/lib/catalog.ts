@@ -176,6 +176,90 @@ function cpuPoints(name: string): number {
   return 0;
 }
 
+export type Rank = { name: "Crystal" | "Gold" | "Silver" | "Bronze" | "Brown"; score: number; bg: string; fg: string };
+
+export function rankFrom(score: number): Rank {
+  const n = Math.max(0, Math.min(100, Math.round(score)));
+  if (n >= 90) return { name: "Crystal", score: n, bg: "#d7f6ff", fg: "#083844" };
+  if (n >= 75) return { name: "Gold", score: n, bg: "#f6d98a", fg: "#3a2804" };
+  if (n >= 55) return { name: "Silver", score: n, bg: "#e7e7e7", fg: "#242424" };
+  if (n >= 35) return { name: "Bronze", score: n, bg: "#e8b48a", fg: "#3a220f" };
+  return { name: "Brown", score: n, bg: "#c4a07a", fg: "#2a160c" };
+}
+
+/** 0 to 100 for this part. Crystal is the top. Brown is the bottom. */
+export function partScore(part: Part): number {
+  if (part.cat === "gpu") {
+    const speed = gpuIndex(part);
+    return speed ? Math.min(100, Math.round((speed / 180) * 100)) : 8;
+  }
+  if (part.cat === "cpu") {
+    const points = cpuPoints(part.name);
+    return points ? Math.min(100, Math.round((points / 96) * 100)) : 20;
+  }
+  if (part.cat === "prebuilt") return machineScore(part.name);
+  if (part.cat === "memory") {
+    const size = gbOf(part);
+    const name = part.name.toUpperCase();
+    let score = name.includes("DDR5") ? 42 : name.includes("DDR4") ? 28 : 14;
+    score += Math.min(38, Math.round((size / 64) * 38));
+    const mhz = name.match(/(\d{4})\s*MHZ/);
+    if (mhz) score += Number(mhz[1]) >= 6000 ? 20 : Number(mhz[1]) >= 3600 ? 12 : 6;
+    return Math.min(100, score);
+  }
+  if (part.cat === "storage") {
+    const name = part.name.toUpperCase();
+    const size = gbOf(part);
+    let score = /HDD|HARD DRIVE|RPM/.test(name) ? 22 : /GEN\s?5|PCIE\s?5/.test(name) ? 78 : /NVME|GEN\s?4|PCIE/.test(name) ? 62 : 40;
+    score += Math.min(18, Math.round(size / 400));
+    return Math.min(100, score);
+  }
+  if (part.cat === "psu") {
+    const watts = wattOf(part);
+    const name = part.name.toUpperCase();
+    let score = Math.min(70, Math.round(watts / 14));
+    if (/TITANIUM/.test(name)) score += 24;
+    else if (/PLATINUM/.test(name)) score += 18;
+    else if (/GOLD/.test(name)) score += 12;
+    else if (/BRONZE/.test(name)) score += 4;
+    return Math.min(100, score || 20);
+  }
+  if (part.cat === "monitor") {
+    const name = part.name.toUpperCase();
+    let score = /4K|3840|UHD/.test(name) ? 70 : /1440|QHD/.test(name) ? 55 : 36;
+    const hz = name.match(/(\d{2,3})\s*HZ/);
+    if (hz) score += Number(hz[1]) >= 240 ? 25 : Number(hz[1]) >= 144 ? 16 : 6;
+    return Math.min(100, score);
+  }
+  if (part.cat === "motherboard") {
+    const name = part.name.toUpperCase();
+    if (/X870|Z890|X670/.test(name)) return 90;
+    if (/B850|B650|Z790/.test(name)) return 74;
+    if (/B550|B760/.test(name)) return 58;
+    if (/A620|H610|A520|H510/.test(name)) return 36;
+    return 48;
+  }
+  if (part.cat === "cooler") {
+    const name = part.name.toUpperCase();
+    if (/420|360/.test(name)) return 88;
+    if (/280|240|AIO|LIQUID/.test(name)) return 72;
+    return 52;
+  }
+  if (part.cat === "case") {
+    const form = formOf(part);
+    if (form === "full" || form === "eatx") return 78;
+    if (form === "atx") return 66;
+    if (form === "matx") return 54;
+    if (form === "itx") return 60;
+    return 50;
+  }
+  return 45;
+}
+
+export function partRank(part: Part): Rank {
+  return rankFrom(partScore(part));
+}
+
 export function ramKindOf(part: Part | undefined): string {
   if (!part) return "";
   if (part.ram) return part.ram;
@@ -1497,7 +1581,7 @@ export function extraFilters(cat: Category): { label: string; test: (part: Part)
   return table[cat] ?? [];
 }
 
-export const AI_FILTERS = ["All", "League", "Valorant", "Fortnite", "Games", "Work", "Per frame", "Cheap", "College", "Value", "1080p", "1440p", "Newer socket", "NVIDIA", "No card", "Screen", "Top"] as const;
+export const AI_FILTERS = ["All", "League", "Valorant", "Fortnite", "Call of Duty", "Battlefield", "Skyrim", "Harry Potter", "Minecraft", "Office", "Games", "Work", "Per frame", "Cheap", "College", "Value", "1080p", "1440p", "Newer socket", "NVIDIA", "No card", "Screen", "Top"] as const;
 
 export const EXTRA_CATS = ["memory", "storage", "monitor"] as const;
 export type ExtraCat = (typeof EXTRA_CATS)[number];

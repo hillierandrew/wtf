@@ -21,6 +21,7 @@ import {
   m2Slots,
   needWatts,
   partImage,
+  partRank,
   priceChange,
   PRICE_CHECKED,
   machineScore,
@@ -40,6 +41,7 @@ import {
   type Part,
 } from "@/lib/catalog";
 import { extrasFromIds, partsFrom, useBench } from "@/lib/store";
+import { RankBadge } from "@/components/rank";
 import { ThemeToggle } from "@/lib/theme";
 
 const REVIEW = CATS.length;
@@ -576,8 +578,9 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
                       >
                         <PartMark part={part} />
                         <span className="min-w-0">
-                          <span className="flex items-center gap-2 text-sm text-muted">
+                          <span className="flex flex-wrap items-center gap-2 text-sm text-muted">
                             {part.brand}
+                            <RankBadge score={partRank(part).score} />
                             {selected ? <Check className="size-4 text-accent" strokeWidth={2} /> : null}
                           </span>
                           <span className="mt-1 line-clamp-2 block text-base font-medium leading-snug">{shortName(part)}</span>
@@ -1088,6 +1091,12 @@ function AiPanel({ onUse }: { onUse: (pick: ReturnType<typeof aiPicks>[number]) 
       League: "league",
       Valorant: "valorant",
       Fortnite: "fortnite",
+      "Call of Duty": "cod",
+      Battlefield: "battlefield",
+      Skyrim: "skyrim",
+      "Harry Potter": "potter",
+      Minecraft: "minecraft",
+      Office: "office",
       Work: "work",
       Cheap: "cheap",
       College: "college",
@@ -1100,7 +1109,7 @@ function AiPanel({ onUse }: { onUse: (pick: ReturnType<typeof aiPicks>[number]) 
   return (
     <div className="space-y-3 px-4 py-3">
       <p className="text-sm text-muted">
-        {picks.length} full PCs from this shelf, ranked by what the money buys. A few include a screen. The rest do not.
+        {picks.length} full PCs. Crystal is the strongest, then gold, silver, bronze, and brown. A lower price per point is more computer for the money.
       </p>
       <div className="flex gap-2 overflow-x-auto">
         {AI_FILTERS.map((item) => (
@@ -1118,17 +1127,26 @@ function AiPanel({ onUse }: { onUse: (pick: ReturnType<typeof aiPicks>[number]) 
       <ul className="flex flex-col gap-3">
         {shown.map((pick) => {
           const covered = coveredByBundle(pick.build);
+          const score = aiScore(pick.build);
+          const spend = spendOf(pick.build);
+          const drive = pick.build.storage ? unitCost(pick.build.storage) : null;
+          const memory = pick.build.memory ? unitCost(pick.build.memory) : null;
           return (
             <li key={pick.id} className={`rounded-xl border p-3 ${pick.best ? "border-accent bg-subtle" : "border-line bg-elevated"}`}>
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-xs text-faint">{pick.kicker}</p>
                   <h2 className="font-display text-2xl font-medium leading-none tracking-tight">{pick.name}</h2>
+                  <div className="mt-2">
+                    <RankBadge score={score} />
+                  </div>
                 </div>
                 <p className="tabular shrink-0 text-right text-sm font-medium">
-                  <span className="block">{aiScore(pick.build)}/100</span>
-                  <span className="block">{money(spendOf(pick.build))}</span>
-                  <span className="block text-muted">{money(spendOf(pick.build) / aiScore(pick.build))}/point</span>
+                  <span className="block">{score}/100</span>
+                  <span className="block">{money(spend)}</span>
+                  <span className="block text-muted">{money(spend / score)}/point</span>
+                  {drive ? <span className="block text-muted">Drive {drive.text}</span> : null}
+                  {memory ? <span className="block text-muted">Memory {memory.text}</span> : null}
                 </p>
               </div>
               <p className="mt-2 text-sm text-muted">{pick.why}</p>

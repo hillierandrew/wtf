@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Check, Search, X } from "lucide-react";
 import raw from "@/data/laptops.json";
+import { RankBadge } from "@/components/rank";
 import { ThemeToggle } from "@/lib/theme";
 
 type Kind = "game" | "home" | "work" | "tablet" | "chrome";
@@ -310,7 +311,10 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
                     <span className="mt-1 block text-sm text-muted">{item.specs}</span>
                     {game ? <span className="mt-1 block text-sm text-muted">{game.label} at {qualityLabel}</span> : null}
                     {course ? <span className="mt-1 block text-sm text-muted">Runs {course.program}</span> : null}
-                    <span className="mt-1 block text-sm text-muted">Score {hundred(item)}/100 · {money(item.price / hundred(item))} per point</span>
+                    <span className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted">
+                      <RankBadge score={hundred(item)} />
+                      {money(item.price / hundred(item))} per point
+                    </span>
                   </span>
                   <span className="shrink-0 text-right">
                     <span className="tabular block text-base font-medium">{money(item.price)}</span>

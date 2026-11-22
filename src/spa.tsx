@@ -6,6 +6,7 @@ import { Laptops } from "@/components/laptops";
 import { Sim } from "@/components/sim";
 import { Desk } from "@/components/desk";
 import { Gate } from "@/components/lock";
+import { ScreenBar, type Screen } from "@/components/nav";
 import { Value } from "@/components/value";
 import { Welcome } from "@/components/welcome";
 import { useBench } from "@/lib/store";
@@ -14,19 +15,46 @@ import "./styles.css";
 function Home() {
   const hydrated = useBench((state) => state.hydrated);
   const hydrate = useBench((state) => state.hydrate);
-  const [mode, setMode] = useState<"pc" | "desk" | "sim" | "laptop" | "desktop" | "value" | null>(null);
+  const [stack, setStack] = useState<Array<Screen | null>>([null]);
+  const mode = stack[stack.length - 1] ?? null;
+
+  function go(next: Screen) {
+    setStack((current) => (current[current.length - 1] === next ? current : [...current, next]));
+  }
+
+  function back() {
+    setStack((current) => (current.length > 1 ? current.slice(0, -1) : [null]));
+  }
+
+  function home() {
+    setStack([null]);
+  }
 
   useEffect(() => {
     hydrate();
   }, [hydrate]);
 
-  if (!mode || !hydrated) return <Welcome onEnter={() => setMode("pc")} onDesk={() => setMode("desk")} onSim={() => setMode("sim")} onLaptop={() => setMode("laptop")} onDesktop={() => setMode("desktop")} onValue={() => setMode("value")} />;
-  if (mode === "value") return <Value onLeave={() => setMode(null)} onBuild={() => setMode("pc")} />;
-  if (mode === "desk") return <Desk onLeave={() => setMode(null)} />;
-  if (mode === "sim") return <Sim onLeave={() => setMode(null)} />;
-  if (mode === "laptop") return <Laptops onLeave={() => setMode(null)} />;
-  if (mode === "desktop") return <Desktops onLeave={() => setMode(null)} />;
-  return <Builder onLeave={() => setMode(null)} />;
+  if (!mode || !hydrated) return <Welcome onEnter={() => go("pc")} onDesk={() => go("desk")} onSim={() => go("sim")} onLaptop={() => go("laptop")} onDesktop={() => go("desktop")} onValue={() => go("value")} />;
+  const screen =
+    mode === "value" ? (
+      <Value onLeave={home} onBuild={() => go("pc")} />
+    ) : mode === "desk" ? (
+      <Desk onLeave={home} />
+    ) : mode === "sim" ? (
+      <Sim onLeave={home} />
+    ) : mode === "laptop" ? (
+      <Laptops onLeave={home} />
+    ) : mode === "desktop" ? (
+      <Desktops onLeave={home} />
+    ) : (
+      <Builder onLeave={home} />
+    );
+  return (
+    <div className="flex h-dvh flex-col bg-bg">
+      <ScreenBar mode={mode} onBack={back} onGo={go} />
+      <div className="screen-slot min-h-0 flex-1">{screen}</div>
+    </div>
+  );
 }
 
 const root = document.getElementById("root");
