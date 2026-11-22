@@ -131,13 +131,48 @@ export function sticksOf(part: Part): number {
 
 export function gbOf(part: Part): number {
   const upper = part.name.toUpperCase();
-  const tb = upper.match(/\b(\d+(?:\.\d+)?)\s*TB\b/);
-  if (tb && (part.cat === "storage" || part.cat === "memory")) return Math.round(Number(tb[1]) * 1000);
-  const m = upper.match(/\b(\d+)\s*GB\b/);
-  if (!m) return 0;
-  const n = Number(m[1]);
-  if (part.cat === "storage" && n >= 120 && n <= 8000) return n;
-  if (n >= 4 && n <= 256) return n;
+  const tb = upper.match(/(\d+(?:\.\d+)?)\s*TB\b/);
+  if (tb && (part.cat === "storage" || part.cat === "memory" || part.cat === "prebuilt")) return Math.round(Number(tb[1]) * 1000);
+  const gb = upper.match(/(\d+)\s*GB\b/);
+  if (gb) {
+    const n = Number(gb[1]);
+    if (part.cat === "storage" && n >= 120 && n <= 8000) return n;
+    if (part.cat === "memory" && n >= 4 && n <= 256) return n;
+    if (n >= 4 && n <= 256 && part.cat !== "gpu") return n;
+  }
+  const short = upper.match(/(\d+)\s*G\b/);
+  if (short && part.cat === "storage") {
+    const n = Number(short[1]);
+    if (n >= 120 && n <= 8000) return n;
+  }
+  return 0;
+}
+
+/** Lower is a better price. Null when this part has no size or speed to divide by. */
+export function unitCost(part: Part): { text: string; amount: number } | null {
+  if (part.cat === "storage" || part.cat === "memory") {
+    const size = gbOf(part);
+    if (!size) return null;
+    const amount = part.price / size;
+    return { text: `${money(amount)}/GB`, amount };
+  }
+  const points = part.cat === "gpu" ? gpuIndex(part) : part.cat === "cpu" ? cpuPoints(part.name) : part.cat === "prebuilt" ? machineScore(part.name) : part.cat === "psu" ? wattOf(part) : 0;
+  if (!points) return null;
+  const amount = part.price / points;
+  const unit = part.cat === "psu" ? "W" : "point";
+  return { text: `${money(amount)}/${unit}`, amount };
+}
+
+function cpuPoints(name: string): number {
+  const n = name.toUpperCase();
+  if (/9800X3D|9850X3D|9950X3D/.test(n)) return 96;
+  if (/7800X3D|9700X|9900X/.test(n)) return 84;
+  if (/X3D/.test(n)) return 88;
+  if (/ULTRA\s?9|7950|9950|I9-/.test(n)) return 78;
+  if (/ULTRA\s?7|7700|9700|I7-/.test(n)) return 62;
+  if (/ULTRA\s?5|7600|9600|I5-/.test(n)) return 46;
+  if (/RYZEN\s?5|I3-/.test(n)) return 32;
+  if (/RYZEN|INTEL|CORE/.test(n)) return 24;
   return 0;
 }
 
@@ -268,7 +303,7 @@ export function driveKind(part: Part): "nvme" | "sata" | "hdd" | "2230" | "" {
   return "";
 }
 
-export const PRICE_CHECKED = "Nov 21, 2026";
+export const PRICE_CHECKED = "Nov 22, 2026";
 
 export function priceChange(part: Part): { kind: "down" | "up"; diff: number } | null {
   if (part.was == null || part.was === part.price) return null;

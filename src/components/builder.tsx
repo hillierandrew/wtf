@@ -14,6 +14,7 @@ import {
   fitWhy,
   formLabel,
   formOf,
+  gbOf,
   includedParts,
   isJunk,
   money,
@@ -30,6 +31,7 @@ import {
   spendOf,
   suggest,
   tagsOf,
+  unitCost,
   extraWhy,
   slotLine,
   warnings,
@@ -66,7 +68,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
   const [panel, setPanel] = useState<"play" | "shelf" | "ai">("play");
   const [query, setQuery] = useState("");
   const [brand, setBrand] = useState("all");
-  const [priceDesc, setPriceDesc] = useState(false);
+  const [sortBy, setSortBy] = useState<"low" | "high" | "gig" | "value">("low");
   const [limit, setLimit] = useState(36);
   const [blocked, setBlocked] = useState(false);
   const [tag, setTag] = useState("all");
@@ -127,13 +129,31 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
       if (!q) return true;
       return `${part.brand} ${part.name}`.toLowerCase().includes(q);
     });
-    list.sort((a, b) => (priceDesc ? b.price - a.price : a.price - b.price));
+    list.sort((a, b) => {
+      if (sortBy === "high") return b.price - a.price;
+      if (sortBy === "gig") {
+        const cost = (part: Part) => {
+          if (part.cat !== "storage" && part.cat !== "memory") return Number.POSITIVE_INFINITY;
+          const size = gbOf(part);
+          return size ? part.price / size : Number.POSITIVE_INFINITY;
+        };
+        const left = cost(a);
+        const right = cost(b);
+        if (left !== right) return left - right;
+      }
+      if (sortBy === "value") {
+        const left = unitCost(a)?.amount ?? Number.POSITIVE_INFINITY;
+        const right = unitCost(b)?.amount ?? Number.POSITIVE_INFINITY;
+        if (left !== right) return left - right;
+      }
+      return a.price - b.price;
+    });
     const chosen = build[cat];
     if (!blocked && chosen && list.some((part) => part.id === chosen.id)) {
       return [chosen, ...list.filter((part) => part.id !== chosen.id)];
     }
     return list;
-  }, [blocked, rejected, fitting, brand, query, priceDesc, build, cat, tag, facet]);
+  }, [blocked, rejected, fitting, brand, query, sortBy, build, cat, tag, facet]);
 
   const score = scoreBuild(build);
   const filled = CATS.filter((item) => build[item]).length;
@@ -421,13 +441,26 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
               />
             </label>
             <div className="flex gap-2 overflow-x-auto">
-              <button
-                type="button"
-                onClick={() => setPriceDesc((value) => !value)}
-                className="h-10 shrink-0 rounded-lg border border-line bg-elevated px-3 text-sm text-muted"
-              >
-                {priceDesc ? "Price high" : "Price low"}
-              </button>
+              {(
+                [
+                  ["low", "Price low"],
+                  ["high", "Price high"],
+                  ["gig", "$ per GB"],
+                  ["value", "Price per performance"],
+                ] as const
+              ).map(([id, label]) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => {
+                    setSortBy(id);
+                    setLimit(36);
+                  }}
+                  className={`h-10 shrink-0 rounded-lg border px-3 text-sm ${sortBy === id ? "border-accent bg-subtle text-fg" : "border-line bg-elevated text-muted"}`}
+                >
+                  {label}
+                </button>
+              ))}
               <button
                 type="button"
                 aria-pressed={openBox}
@@ -567,6 +600,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
                               {priceChange(part)!.kind === "down" ? "Down" : "Up"} {money(priceChange(part)!.diff)}
                             </span>
                           ) : null}
+                          {unitCost(part) ? <span className="mt-1 block text-sm leading-tight text-muted">{unitCost(part)!.text}</span> : null}
                         </span>
                       </button>
                       {canAdd ? (
@@ -1094,6 +1128,7 @@ function AiPanel({ onUse }: { onUse: (pick: ReturnType<typeof aiPicks>[number]) 
                 <p className="tabular shrink-0 text-right text-sm font-medium">
                   <span className="block">{aiScore(pick.build)}/100</span>
                   <span className="block">{money(spendOf(pick.build))}</span>
+                  <span className="block text-muted">{money(spendOf(pick.build) / aiScore(pick.build))}/point</span>
                 </p>
               </div>
               <p className="mt-2 text-sm text-muted">{pick.why}</p>

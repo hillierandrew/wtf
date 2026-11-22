@@ -310,7 +310,7 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
                     <span className="mt-1 block text-sm text-muted">{item.specs}</span>
                     {game ? <span className="mt-1 block text-sm text-muted">{game.label} at {qualityLabel}</span> : null}
                     {course ? <span className="mt-1 block text-sm text-muted">Runs {course.program}</span> : null}
-                    <span className="mt-1 block text-sm text-muted">Score {hundred(item)}/100</span>
+                    <span className="mt-1 block text-sm text-muted">Score {hundred(item)}/100 · {money(item.price / hundred(item))} per point</span>
                   </span>
                   <span className="shrink-0 text-right">
                     <span className="tabular block text-base font-medium">{money(item.price)}</span>

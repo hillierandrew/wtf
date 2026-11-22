@@ -134,7 +134,7 @@ export function Desktops({ onLeave }: { onLeave: () => void }) {
                     </span>
                     <span className="mt-1 block text-base font-medium leading-snug">{part.name.replace(/\(Open Box\)/i, "").trim()}</span>
                     <span className="mt-1 block text-sm text-muted">{tagsOf(part).join(" · ")}</span>
-                    <span className="mt-1 block text-sm text-muted">Score {score}/100</span>
+                    <span className="mt-1 block text-sm text-muted">Score {score}/100 · {money(part.price / score)} per point</span>
                   </span>
                   <span className="shrink-0 text-right">
                     <span className="tabular block text-2xl font-medium">{score}</span>
