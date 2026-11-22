@@ -54,7 +54,6 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
   const [query, setQuery] = useState("");
   const [brand, setBrand] = useState("all");
   const [openBox, setOpenBox] = useState(false);
-  const [renewed, setRenewed] = useState(false);
 
   useEffect(() => {
     try {
@@ -79,7 +78,6 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
     return ITEMS.filter((item) => {
       if (!fits(item, filter)) return false;
       if (!openBox && item.open) return false;
-      if (!renewed && item.renewed) return false;
       if (brand !== "all" && item.brand !== brand) return false;
       if (q && !`${item.brand} ${item.name}`.toLowerCase().includes(q)) return false;
       return true;
@@ -89,7 +87,7 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
       }
       return b.deal - a.deal || b.score - a.score;
     });
-  }, [filter, query, brand, openBox, renewed]);
+  }, [filter, query, brand, openBox]);
 
   const choice = ITEMS.find((item) => item.id === picked);
   const meta = FILTERS.find((item) => item.id === filter)!;
@@ -104,7 +102,7 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
           <ThemeToggle />
         </div>
         <h1 className="font-display mt-3 text-4xl font-medium leading-none tracking-tight">Pick a laptop</h1>
-        <p className="mt-2 text-base text-muted">One laptop. Games, work, or the best price.</p>
+        <p className="mt-2 text-base text-muted">One laptop. Renewed ones are included and marked.</p>
       </header>
       <div className="flex shrink-0 gap-2 overflow-x-auto px-4 py-3">
         {FILTERS.map((item) => (
@@ -131,9 +129,6 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
         <div className="flex flex-wrap gap-2">
           <button type="button" onClick={() => setOpenBox((value) => !value)} className={`h-11 rounded-full border px-4 text-base ${openBox ? "border-accent bg-subtle" : "border-line"}`}>
             {openBox ? "Open box on" : "Open box off"}
-          </button>
-          <button type="button" onClick={() => setRenewed((value) => !value)} className={`h-11 rounded-full border px-4 text-base ${renewed ? "border-accent bg-subtle" : "border-line"}`}>
-            {renewed ? "Renewed on" : "Renewed off"}
           </button>
         </div>
         <select value={brand} onChange={(event) => setBrand(event.target.value)} className="h-12 w-full rounded-2xl border border-line bg-elevated px-3 text-base">

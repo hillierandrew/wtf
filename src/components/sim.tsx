@@ -4,6 +4,7 @@ import raw from "@/data/sim.json";
 import { ThemeToggle } from "@/lib/theme";
 
 type Game = "racing" | "flight" | "farm";
+type Level = "all" | "entry" | "novice" | "mid" | "pro" | "real";
 type Slot = "seat" | "wheel" | "rim" | "pedals" | "shifter" | "brake" | "controls" | "throttle" | "rudder" | "farm";
 
 type SimItem = {
@@ -22,6 +23,51 @@ type SimItem = {
 const ITEMS = raw as SimItem[];
 const KEY = "drew-sim";
 const byId = Object.fromEntries(ITEMS.map((item) => [item.id, item]));
+
+const LEVELS: { id: Level; label: string; line: string; target: number }[] = [
+  { id: "all", label: "All", line: "Every part for this step.", target: 0.5 },
+  { id: "entry", label: "Entry", line: "The cheap start. It works.", target: 0 },
+  { id: "novice", label: "Novice", line: "A step up from the cheapest.", target: 0.25 },
+  { id: "mid", label: "Mid", line: "The normal pick.", target: 0.5 },
+  { id: "pro", label: "Pro", line: "Serious gear.", target: 0.75 },
+  { id: "real", label: "Real deal", line: "The top. It costs the most.", target: 1 },
+];
+
+const peersOf = new Map<string, number[]>();
+for (const item of ITEMS) {
+  const key = `${item.game}:${item.slot}`;
+  const list = peersOf.get(key) ?? [];
+  list.push(item.price);
+  peersOf.set(key, list);
+}
+for (const list of peersOf.values()) list.sort((a, b) => a - b);
+
+function rankOf(item: SimItem) {
+  const list = peersOf.get(`${item.game}:${item.slot}`) ?? [item.price];
+  if (list.length <= 1) return 0.5;
+  const index = list.indexOf(item.price);
+  return index / (list.length - 1);
+}
+
+function levelName(item: SimItem) {
+  const rank = rankOf(item);
+  if (rank <= 0.15) return "Entry";
+  if (rank <= 0.35) return "Novice";
+  if (rank <= 0.6) return "Mid";
+  if (rank <= 0.82) return "Pro";
+  return "Real deal";
+}
+
+function fitsLevel(item: SimItem, level: Level) {
+  if (level === "all") return true;
+  const rank = rankOf(item);
+  const target = LEVELS.find((entry) => entry.id === level)?.target ?? 0.5;
+  const list = peersOf.get(`${item.game}:${item.slot}`) ?? [item.price];
+  const width = list.length <= 2 ? 0.51 : 0.3;
+  if (level === "entry" && rank === 0) return true;
+  if (level === "real" && rank === 1) return true;
+  return Math.abs(rank - target) <= width;
+}
 
 const GAMES: { id: Game; label: string; line: string }[] = [
   { id: "racing", label: "Racing", line: "A seat, a wheel, and pedals. A shifter is optional." },
@@ -62,6 +108,7 @@ export function Sim({ onLeave }: { onLeave: () => void }) {
   const [query, setQuery] = useState("");
   const [brand, setBrand] = useState("all");
   const [openBox, setOpenBox] = useState(false);
+  const [level, setLevel] = useState<Level>("all");
   const [notice, setNotice] = useState("");
 
   useEffect(() => {
@@ -110,11 +157,12 @@ export function Sim({ onLeave }: { onLeave: () => void }) {
         if (step === "farm" && item.game !== "farm") return false;
       } else if (item.game !== game) return false;
       if (!openBox && item.open) return false;
+      if (!fitsLevel(item, level)) return false;
       if (brand !== "all" && item.brand !== brand) return false;
       if (q && !`${item.brand} ${item.name}`.toLowerCase().includes(q)) return false;
       return true;
     }).sort((a, b) => a.price - b.price);
-  }, [game, step, query, brand, openBox]);
+  }, [game, step, query, brand, openBox, level]);
 
   function choose(item: SimItem) {
     if (item.base === false && item.slot === "rim") {
@@ -181,7 +229,7 @@ export function Sim({ onLeave }: { onLeave: () => void }) {
           <ThemeToggle />
         </div>
         <h1 className="font-display mt-3 text-4xl font-medium leading-none tracking-tight">Build a sim</h1>
-        <p className="mt-2 text-base text-muted">Racing, flying, or farming. One of each part.</p>
+        <p className="mt-2 text-base text-muted">Racing, flying, or farming. Pick a level.</p>
       </header>
       {!game ? (
         <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-4">
@@ -219,7 +267,7 @@ export function Sim({ onLeave }: { onLeave: () => void }) {
             ))}
           </div>
           <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 pb-4">
-            <p className="text-base text-muted">{stepMeta?.line}</p>
+            <p className="text-base text-muted">{LEVELS.find((item) => item.id === level)?.line} {stepMeta?.line}</p>
             {notice ? <p className="rounded-2xl border border-line bg-elevated px-4 py-3 text-base">{notice}</p> : null}
             {blocked ? (
               <p className="rounded-2xl border border-line bg-subtle px-4 py-4 text-base">Included with {included?.name}. You do not buy it twice.</p>
@@ -230,6 +278,11 @@ export function Sim({ onLeave }: { onLeave: () => void }) {
                   <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search" className="h-full w-full bg-transparent text-base outline-none" />
                 </label>
                 <div className="flex flex-wrap gap-2">
+                  {LEVELS.map((item) => (
+                    <button key={item.id} type="button" onClick={() => setLevel(item.id)} className={`h-11 rounded-full border px-4 text-base ${level === item.id ? "border-accent bg-subtle" : "border-line"}`}>
+                      {item.label}
+                    </button>
+                  ))}
                   <button type="button" onClick={() => setOpenBox((value) => !value)} className={`h-11 rounded-full border px-4 text-base ${openBox ? "border-accent bg-subtle" : "border-line"}`}>
                     {openBox ? "Open box on" : "Open box off"}
                   </button>
@@ -243,6 +296,7 @@ export function Sim({ onLeave }: { onLeave: () => void }) {
                   ))}
                 </select>
                 <ul className="flex flex-col gap-2">
+                  {shown.length === 0 ? <li className="rounded-2xl border border-line px-4 py-4 text-base">Nothing at this level. Try All.</li> : null}
                   {shown.map((item) => {
                     const selected = ids[item.slot] === item.id;
                     return (
@@ -255,6 +309,7 @@ export function Sim({ onLeave }: { onLeave: () => void }) {
                             </span>
                             <span className="mt-1 block text-base font-medium leading-snug">{item.name}</span>
                             {item.also.length ? <span className="mt-1 block text-sm text-muted">Includes {item.also.join(", ")}</span> : null}
+                            <span className="mt-1 block text-sm text-muted">{levelName(item)}</span>
                           </span>
                           <span className="shrink-0 text-right">
                             <span className="tabular block text-base font-medium">{money(item.price)}</span>
