@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { AlertTriangle, Check, Search, X } from "lucide-react";
 import {
   BUDGETS,
@@ -64,7 +64,6 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
   const [tag, setTag] = useState("all");
   const [facet, setFacet] = useState("all");
   const [wide, setWide] = useState(false);
-  const [tray, setTray] = useState<"shut" | "half" | "full">("half");
   const [name, setName] = useState("");
   const [copied, setCopied] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
@@ -573,7 +572,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
         )}
       </footer>
       </div>
-      <Checkout build={build} wide={wide} tray={tray} setTray={setTray} onRemove={remove} />
+      <Checkout build={build} wide={wide} onRemove={remove} />
     </div>
   );
 }
@@ -585,44 +584,109 @@ function PartMark({ part }: { part: Part }) {
 function Checkout({
   build,
   wide,
-  tray,
-  setTray,
   onRemove,
 }: {
   build: ReturnType<typeof partsFrom>;
   wide: boolean;
-  tray: "shut" | "half" | "full";
-  setTray: (next: "shut" | "half" | "full") => void;
   onRemove: (cat: Category) => void;
 }) {
   const rows = CATS.filter((cat) => build[cat]);
-  const shut = !wide && tray === "shut";
+  const [open, setOpen] = useState(true);
+  const [height, setHeight] = useState(360);
+  const [width, setWidth] = useState(360);
+  const [side, setSide] = useState(false);
+  const drag = useRef<{ axis: "x" | "y"; start: number; size: number } | null>(null);
+
+  useEffect(() => {
+    const savedH = Number(localStorage.getItem("drew-checkout-h"));
+    const savedW = Number(localStorage.getItem("drew-checkout-w"));
+    if (savedH >= 120) setHeight(savedH);
+    else setHeight(Math.round(window.innerHeight * 0.42));
+    if (savedW >= 220) setWidth(savedW);
+    const media = window.matchMedia("(min-width: 768px)");
+    const apply = () => setSide(media.matches);
+    apply();
+    media.addEventListener("change", apply);
+    return () => media.removeEventListener("change", apply);
+  }, []);
+
+  const heightRef = useRef(height);
+  const widthRef = useRef(width);
+  heightRef.current = height;
+  widthRef.current = width;
+
+  function onPointerDown(event: PointerEvent<HTMLButtonElement>) {
+    const axis = wide && side ? "x" : "y";
+    drag.current = { axis, start: axis === "y" ? event.clientY : event.clientX, size: axis === "y" ? height : width };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  }
+
+  function onPointerMove(event: PointerEvent<HTMLButtonElement>) {
+    if (!drag.current) return;
+    if (drag.current.axis === "y") {
+      const next = drag.current.size + (drag.current.start - event.clientY);
+      const max = Math.max(160, window.innerHeight - 88);
+      if (next < 96) {
+        setOpen(false);
+        return;
+      }
+      setOpen(true);
+      setHeight(Math.min(max, next));
+      heightRef.current = Math.min(max, next);
+    } else {
+      const next = drag.current.size + (drag.current.start - event.clientX);
+      const sized = Math.max(220, Math.min(window.innerWidth - 240, next));
+      setWidth(sized);
+      widthRef.current = sized;
+    }
+  }
+
+  function onPointerUp() {
+    if (!drag.current) return;
+    const axis = drag.current.axis;
+    drag.current = null;
+    if (axis === "y") localStorage.setItem("drew-checkout-h", String(heightRef.current));
+    else localStorage.setItem("drew-checkout-w", String(widthRef.current));
+  }
+
+  const docked = wide && side;
   return (
     <aside
-      className={`flex min-h-0 flex-col border-line bg-elevated ${
-        wide
-          ? "h-[46dvh] w-full shrink-0 border-t md:h-full md:w-[22rem] md:border-l md:border-t-0"
-          : `shrink-0 border-t ${tray === "shut" ? "h-14" : tray === "half" ? "h-[46dvh]" : "h-[82dvh]"}`
-      }`}
+      className={`relative flex min-h-0 flex-col border-line bg-elevated ${docked ? "h-full shrink-0 border-l" : "shrink-0 border-t"}`}
+      style={docked ? { width } : { height: open ? height : 76 }}
     >
-      <div className="flex items-center gap-2 px-3 py-2">
-        <button type="button" onClick={() => setTray(shut ? "half" : "shut")} className="min-w-0 flex-1 text-left">
+      <button
+        type="button"
+        aria-label="Drag to resize checkout"
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        className={`flex h-3 w-full touch-none items-center justify-center ${docked ? "md:hidden" : ""}`}
+      >
+        <span className="h-1 w-10 rounded-full bg-line" />
+      </button>
+      {docked ? (
+        <button
+          type="button"
+          aria-label="Drag to resize checkout"
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          className="absolute hidden h-full w-3 -translate-x-1/2 cursor-ew-resize touch-none md:block"
+        />
+      ) : null}
+      <div className="flex items-center gap-2 px-3 pb-2">
+        <p className="min-w-0 flex-1">
           <span className="block text-xs text-faint">Checkout</span>
           <span className="tabular text-sm font-medium">
             {rows.length} {rows.length === 1 ? "part" : "parts"} · {money(spendOf(build))}
           </span>
-        </button>
-        <button type="button" onClick={() => setTray("half")} className="h-8 rounded-full border border-line px-2 text-xs text-muted">
-          Half
-        </button>
-        <button type="button" onClick={() => setTray(tray === "full" ? "half" : "full")} className="h-8 rounded-full border border-line px-2 text-xs text-muted">
-          {tray === "full" ? "Smaller" : "Expand"}
-        </button>
-        <button type="button" onClick={() => setTray("shut")} className="h-8 rounded-full border border-line px-2 text-xs text-muted">
-          Close
+        </p>
+        <button type="button" onClick={() => setOpen((value) => !value)} className="h-8 rounded-full border border-line px-3 text-xs text-muted">
+          {open ? "Close" : "Open"}
         </button>
       </div>
-      {shut ? null : (
+      {open ? (
         <ul className="min-h-0 flex-1 space-y-2 overflow-y-auto px-3 pb-3">
           {rows.length === 0 ? <li className="py-6 text-center text-sm text-muted">Nothing in checkout yet. Tap a part.</li> : null}
           {rows.map((cat, index) => {
@@ -649,7 +713,7 @@ function Checkout({
             );
           })}
         </ul>
-      )}
+      ) : null}
     </aside>
   );
 }
