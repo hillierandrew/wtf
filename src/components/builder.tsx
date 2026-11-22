@@ -67,6 +67,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
   const [showTabs, setShowTabs] = useState(false);
   const [name, setName] = useState("");
   const [copied, setCopied] = useState(false);
+  const [badge, setBadge] = useState("");
   const scroller = useRef<HTMLDivElement>(null);
 
   const reviewing = panel === "shelf" && step === REVIEW;
@@ -304,6 +305,8 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
               apply(pick.build, `${pick.name}. You can change a part later.`);
               setPanel("shelf");
               go(REVIEW);
+              setBadge(pick.kicker || pick.name);
+              window.setTimeout(() => setBadge(""), 3200);
             }}
             onManual={() => {
               setPanel("shelf");
@@ -403,7 +406,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
                   setLimit(36);
                 }}
                 placeholder={`Search ${CAT_LABEL[cat].toLowerCase()}`}
-                className="h-full w-full bg-transparent text-sm outline-none placeholder:text-faint"
+                className="h-full w-full bg-transparent text-base outline-none placeholder:text-faint"
               />
             </label>
             <div className="flex gap-2 overflow-x-auto">
@@ -575,23 +578,23 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
         <button
           type="button"
           onClick={() => (ai ? setPanel("shelf") : step === 0 ? onLeave() : go(step - 1))}
-          className="h-12 flex-1 rounded-lg border border-line text-sm"
+          className="h-14 flex-1 rounded-2xl border border-line text-base"
         >
           Back
         </button>
         {ai ? (
-          <button type="button" onClick={() => go(REVIEW)} className="h-12 flex-[2] rounded-lg bg-accent text-sm font-medium text-accent-fg">
+          <button type="button" onClick={() => go(REVIEW)} className="h-14 flex-[2] rounded-2xl bg-accent text-base font-medium text-accent-fg">
             Review
           </button>
         ) : reviewing ? (
-          <button type="button" onClick={copy} className="h-12 flex-[2] rounded-lg bg-accent text-sm font-medium text-accent-fg">
+          <button type="button" onClick={copy} className="h-14 flex-[2] rounded-2xl bg-accent text-base font-medium text-accent-fg">
             {copied ? "Copied" : "Copy list"}
           </button>
         ) : (
           <button
             type="button"
             onClick={() => go(step + 1)}
-            className="h-12 flex-[2] rounded-lg bg-accent text-sm font-medium text-accent-fg"
+            className="h-14 flex-[2] rounded-2xl bg-accent text-base font-medium text-accent-fg"
           >
             {step === CATS.length - 1 ? "Review" : "Next"}
           </button>
@@ -600,6 +603,14 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
       )}
       </div>
       <Checkout build={build} wide={wide} onRemove={remove} />
+      {badge ? (
+        <div className="pointer-events-none fixed inset-x-0 top-4 z-40 mx-auto w-[min(100%,24rem)] px-4">
+          <div className="rounded-2xl border border-accent bg-elevated px-4 py-4">
+            <p className="text-base font-medium text-accent">Achievement unlocked</p>
+            <p className="font-display mt-1 text-2xl leading-none">{badge}</p>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -618,27 +629,23 @@ const LESSON: Record<Category, string> = {
   monitor: "The screen. The computer still works if you skip this.",
 };
 
-const GOALS: { id: string; title: string; line: string; cards: { id: string; title: string; line: string }[] }[] = [
-  {
-    id: "games",
-    title: "Play games",
-    line: "Fortnite, Valorant, League. These three already fit.",
-    cards: [
-      { id: "fn-low", title: "Cheap", line: "1080p. Fine on low settings." },
-      { id: "fn-med", title: "Just right", line: "The one most people should take." },
-      { id: "fn-ultra", title: "The nice one", line: "High settings. You do not need this to have fun." },
-    ],
-  },
-  {
-    id: "school",
-    title: "School and work",
-    line: "Class, writing, and light video. No extra parts.",
-    cards: [
-      { id: "college", title: "Class", line: "Browser, notes, and Word. No graphics card." },
-      { id: "code", title: "Projects", line: "More memory for tabs and homework." },
-      { id: "edit", title: "Photos and video", line: "For cutting clips and Photoshop." },
-    ],
-  },
+const GAMES = ["Call of Duty", "Battlefield", "Fortnite", "Valorant", "League", "Skyrim", "Harry Potter"];
+const SIZES = [
+  { id: "basic", label: "Basic" },
+  { id: "low", label: "Low" },
+  { id: "normal", label: "Normal" },
+  { id: "medium", label: "Medium" },
+  { id: "ultra", label: "Ultra" },
+];
+const JOBS = [
+  { id: "office", title: "Office", line: "Email and a calendar." },
+  { id: "zoom", title: "Zoom", line: "Video calls." },
+  { id: "meet", title: "Conference", line: "A meeting-room PC." },
+  { id: "podcast", title: "Podcast", line: "Quiet, with room for episodes." },
+  { id: "radio", title: "Radio", line: "A long show, without a hot graphics card." },
+  { id: "vlog", title: "Vlog", line: "Phone clips and titles." },
+  { id: "edit", title: "Video editing", line: "The bigger editing PC." },
+  { id: "college", title: "School", line: "Class, notes, and a browser." },
 ];
 
 function Quest({
@@ -651,60 +658,135 @@ function Quest({
   onMore: () => void;
 }) {
   const picks = aiPicks();
-  const [goal, setGoal] = useState<string | null>(null);
-  const chosen = GOALS.find((item) => item.id === goal);
+  const [screen, setScreen] = useState<"menu" | "games" | "jobs" | "sizes">("menu");
+  const [game, setGame] = useState("");
+  const [cooking, setCooking] = useState("");
+  const [pct, setPct] = useState(0);
 
-  if (!chosen) {
+  function order(pick: ReturnType<typeof aiPicks>[number]) {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+      onUse(pick);
+      return;
+    }
+    setCooking(pick.kicker || pick.name);
+    setPct(6);
+    const start = performance.now();
+    const tick = () => {
+      const next = Math.min(100, ((performance.now() - start) / 1500) * 100);
+      setPct(next);
+      if (next < 100) requestAnimationFrame(tick);
+      else onUse(pick);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  if (cooking) {
+    return (
+      <div className="flex min-h-full flex-col justify-center px-6 py-10">
+        <p className="text-base text-muted">Building</p>
+        <h2 className="font-display mt-2 text-4xl font-medium leading-none tracking-tight">{cooking}</h2>
+        <div className="mt-6 h-4 overflow-hidden rounded-full bg-subtle">
+          <div className="h-full bg-accent" style={{ width: `${pct}%` }} />
+        </div>
+        <p className="mt-4 text-base text-muted">Putting the parts in the box. Wrong sizes stay out.</p>
+      </div>
+    );
+  }
+
+  if (screen === "sizes") {
+    const cards = SIZES.map((size) => picks.find((item) => item.kicker === game && item.tags.includes(size.id))).filter(Boolean);
     return (
       <div className="space-y-3 px-4 py-4">
-        <p className="text-sm text-muted">You have never built a PC. Pick what it is for. The parts that do not fit stay locked.</p>
-        {GOALS.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => setGoal(item.id)}
-            className="press block w-full rounded-xl border border-line bg-elevated p-4 text-left"
-          >
-            <span className="font-display block text-3xl font-medium leading-none tracking-tight">{item.title}</span>
-            <span className="mt-2 block text-sm text-muted">{item.line}</span>
-          </button>
-        ))}
-        <button type="button" onClick={onManual} className="h-12 w-full rounded-lg border border-line text-sm">
-          I want to pick every part
+        <button type="button" onClick={() => setScreen("games")} className="h-11 text-base text-muted">
+          Back
         </button>
-        <button type="button" onClick={onMore} className="w-full text-center text-sm text-muted">
-          More ready builds
+        <h2 className="font-display text-4xl font-medium leading-none tracking-tight">{game}</h2>
+        <p className="text-base text-muted">Pick a size. Basic is the smallest. Ultra is the fancy one.</p>
+        {cards.map((pick) => {
+          if (!pick) return null;
+          const size = SIZES.find((item) => pick.tags.includes(item.id));
+          return (
+            <button key={pick.id} type="button" onClick={() => order(pick)} className="press flex min-h-16 w-full items-center justify-between gap-3 rounded-2xl border border-line bg-elevated px-4 py-4 text-left">
+              <span>
+                <span className="block text-xl font-medium">{size?.label ?? pick.name}</span>
+                <span className="mt-1 block text-base text-muted">{pick.why}</span>
+              </span>
+              <span className="tabular shrink-0 text-lg font-medium">{money(spendOf(pick.build))}</span>
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
+
+  if (screen === "games") {
+    return (
+      <div className="space-y-3 px-4 py-4">
+        <button type="button" onClick={() => setScreen("menu")} className="h-11 text-base text-muted">
+          Back
         </button>
+        <h2 className="font-display text-4xl font-medium leading-none tracking-tight">Games</h2>
+        <div className="grid grid-cols-1 gap-3">
+          {GAMES.map((title) => (
+            <button
+              key={title}
+              type="button"
+              onClick={() => {
+                setGame(title);
+                setScreen("sizes");
+              }}
+              className="press min-h-16 rounded-2xl border border-line bg-elevated px-4 text-left text-xl font-medium"
+            >
+              {title}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (screen === "jobs") {
+    return (
+      <div className="space-y-3 px-4 py-4">
+        <button type="button" onClick={() => setScreen("menu")} className="h-11 text-base text-muted">
+          Back
+        </button>
+        <h2 className="font-display text-4xl font-medium leading-none tracking-tight">Work</h2>
+        {JOBS.map((job) => {
+          const pick = picks.find((item) => item.id === job.id);
+          if (!pick) return null;
+          return (
+            <button key={job.id} type="button" onClick={() => order(pick)} className="press flex min-h-16 w-full items-center justify-between gap-3 rounded-2xl border border-line bg-elevated px-4 py-4 text-left">
+              <span>
+                <span className="block text-xl font-medium">{job.title}</span>
+                <span className="mt-1 block text-base text-muted">{job.line}</span>
+              </span>
+              <span className="tabular shrink-0 text-lg font-medium">{money(spendOf(pick.build))}</span>
+            </button>
+          );
+        })}
       </div>
     );
   }
 
   return (
     <div className="space-y-3 px-4 py-4">
-      <button type="button" onClick={() => setGoal(null)} className="text-sm text-muted">
-        Back
+      <p className="text-base text-muted">Order a PC like lunch. Tap one. The parts that do not fit never show up.</p>
+      <button type="button" onClick={() => setScreen("games")} className="press min-h-20 w-full rounded-2xl bg-accent px-4 py-4 text-left text-accent-fg">
+        <span className="block text-2xl font-medium">Games</span>
+        <span className="mt-1 block text-base">Call of Duty, Fortnite, Skyrim, and more.</span>
       </button>
-      <h2 className="font-display text-3xl font-medium leading-none tracking-tight">{chosen.title}</h2>
-      <p className="text-sm text-muted">{chosen.line}</p>
-      {chosen.cards.map((card) => {
-        const pick = picks.find((item) => item.id === card.id);
-        if (!pick) return null;
-        return (
-          <article key={card.id} className="rounded-xl border border-line bg-elevated p-4">
-            <div className="flex items-end justify-between gap-3">
-              <h3 className="font-display text-2xl font-medium leading-none">{card.title}</h3>
-              <p className="tabular text-sm font-medium">{money(spendOf(pick.build))}</p>
-            </div>
-            <p className="mt-2 text-sm text-muted">{card.line}</p>
-            <p className="mt-1 text-xs text-faint">
-              {buildSpeed(pick.build) ? `${buildSpeed(pick.build)}% of an RX 9070` : "No graphics card"} · {scoreBuild(pick.build).points}/100
-            </p>
-            <button type="button" onClick={() => onUse(pick)} className="mt-3 h-11 w-full rounded-lg bg-accent text-sm font-medium text-accent-fg">
-              Use this PC
-            </button>
-          </article>
-        );
-      })}
+      <button type="button" onClick={() => setScreen("jobs")} className="press min-h-20 w-full rounded-2xl border border-line bg-elevated px-4 py-4 text-left">
+        <span className="block text-2xl font-medium">School and work</span>
+        <span className="mt-1 block text-base text-muted">Zoom, office mail, podcasts, radio, video.</span>
+      </button>
+      <button type="button" onClick={onManual} className="press min-h-16 w-full rounded-2xl border border-line px-4 text-left text-xl font-medium">
+        I will pick every part
+      </button>
+      <button type="button" onClick={onMore} className="h-12 w-full text-base text-muted">
+        See the long list
+      </button>
     </div>
   );
 }

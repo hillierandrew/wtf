@@ -1143,6 +1143,109 @@ export function aiPicks(): AiPick[] {
       why: "3D wants an NVIDIA card and 32GB. This is a class machine, not a studio farm.",
       build: buildFrom(["5b8cc605f2", "bfed39ecdd", DDR4_32, GPU_5070, SSD2, CASE, PSU750, AIR]),
     },
+    ...menuPicks(),
+  ];
+}
+
+function menuPicks(): AiPick[] {
+  const basic = ["2dfbcfdbfb", GPU_9060, SSD1, CASE, PSU650];
+  const low = ["61d2f9663c", BOARD_AM4, DDR4_16, GPU_9060, SSD1, CASE, PSU650, AIR];
+  const normal = ["61d2f9663c", BOARD_AM4, DDR4_32, GPU_9060, SSD1, CASE, PSU650, AIR];
+  const medium = ["61d2f9663c", BOARD_AM4, DDR4_32, GPU_9070, SSD1, CASE, PSU750, AIR];
+  const ultra = ["0abb21ae33", BOARD_B850, DDR5_32, GPU_9070XT, SSD2, CASE, PSU850, AIR];
+  const desk = ["ae65baf2c4", BOARD_AM4, DDR4_16, "222da28bfa", CASE, PSU550];
+  const row = (id: string, game: string, tag: string, level: string, why: string, ids: string[], extra: string[] = []): AiPick => ({
+    id,
+    name: `${game}, ${level}`,
+    kicker: game,
+    tags: ["games", tag, level, ...extra],
+    why,
+    build: buildFrom(ids),
+  });
+  return [
+    row("cod-basic", "Call of Duty", "cod", "basic", "The cheapest PC here that can open Call of Duty. 1080p, low settings. One drive.", basic, ["1080"]),
+    row("cod-low", "Call of Duty", "cod", "low", "Low settings at 1080p, with a bit more processor.", low, ["1080"]),
+    row("cod-normal", "Call of Duty", "cod", "normal", "Normal settings. 32GB so the game and a call can both stay open.", normal, ["1080"]),
+    row("cod-medium", "Call of Duty", "cod", "medium", "The sensible Call of Duty order. 1440p.", medium, ["1440"]),
+    row("cod-ultra", "Call of Duty", "cod", "ultra", "Ultra. Fast chip, big card. You do not need this to play.", ultra, ["am5"]),
+    row("bf-basic", "Battlefield", "battlefield", "basic", "Battlefield wants a graphics card even on low. This is the small one.", basic, ["1080"]),
+    row("bf-low", "Battlefield", "battlefield", "low", "Low settings, 1080p, 16GB of memory.", low, ["1080"]),
+    row("bf-normal", "Battlefield", "battlefield", "normal", "Normal settings. 32GB, because big maps use it.", normal, ["1080"]),
+    row("bf-medium", "Battlefield", "battlefield", "medium", "Medium settings at 1440p.", medium, ["1440"]),
+    row("bf-ultra", "Battlefield", "battlefield", "ultra", "Ultra. The most this shelf should spend on Battlefield.", ultra, ["am5"]),
+    row("skyrim-basic", "Skyrim", "skyrim", "basic", "Old Skyrim runs without a graphics card.", desk, ["desk"]),
+    row("skyrim-low", "Skyrim", "skyrim", "low", "Low settings and a small card, if you want a few mods.", basic, ["1080"]),
+    row("skyrim-normal", "Skyrim", "skyrim", "normal", "Normal settings and 32GB, which mods like.", normal, ["1080"]),
+    row("skyrim-medium", "Skyrim", "skyrim", "medium", "More card than Skyrim needs. Fine if you also play newer games.", medium, ["1440"]),
+    row("skyrim-ultra", "Skyrim", "skyrim", "ultra", "For a huge mod list, not for plain Skyrim.", ultra, ["am5"]),
+    row("hp-basic", "Harry Potter", "potter", "basic", "Hogwarts Legacy needs a graphics card. This is the smallest one that should open it.", basic, ["1080"]),
+    row("hp-low", "Harry Potter", "potter", "low", "Low settings at 1080p. It will not look fancy.", low, ["1080"]),
+    row("hp-normal", "Harry Potter", "potter", "normal", "Normal settings. 32GB helps the open world.", normal, ["1080"]),
+    row("hp-medium", "Harry Potter", "potter", "medium", "The Harry Potter order most people should take.", medium, ["1440"]),
+    row("hp-ultra", "Harry Potter", "potter", "ultra", "Ultra. Pretty, and more money than the game needs.", ultra, ["am5"]),
+    row("fn-basic", "Fortnite", "fortnite", "basic", "Basic Fortnite. 1080p, performance mode.", basic, ["1080"]),
+    row("fn-size-low", "Fortnite", "fortnite", "low", "Low settings. A small card is enough.", low, ["1080"]),
+    row("fn-size-normal", "Fortnite", "fortnite", "normal", "Normal settings and 32GB.", normal, ["1080"]),
+    row("fn-size-medium", "Fortnite", "fortnite", "medium", "Medium settings at 1440p.", medium, ["1440"]),
+    row("fn-size-ultra", "Fortnite", "fortnite", "ultra", "Ultra. The pretty one. Costs more.", ultra, ["am5"]),
+    row("val-basic", "Valorant", "valorant", "basic", "Valorant runs on a small card. This is the cheap order.", basic, ["1080"]),
+    row("val-size-low", "Valorant", "valorant", "low", "Low settings, smooth for the money.", low, ["1080"]),
+    row("val-size-normal", "Valorant", "valorant", "normal", "Normal settings. The processor matters more than the card.", normal, ["1080"]),
+    row("val-size-medium", "Valorant", "valorant", "medium", "Medium. A stronger card, still not the expensive one.", medium, ["1440"]),
+    row("val-size-ultra", "Valorant", "valorant", "ultra", "Ultra frame rates. The fast chip does the work.", ultra, ["am5"]),
+    row("league-basic", "League", "league", "basic", "League does not need a big card. This is the small order.", basic, ["1080"]),
+    row("league-size-low", "League", "league", "low", "Low settings. Easy to run.", low, ["1080"]),
+    row("league-size-normal", "League", "league", "normal", "Normal settings. Plenty for League.", normal, ["1080"]),
+    row("league-size-medium", "League", "league", "medium", "More than League needs, if you play other games too.", medium, ["1440"]),
+    row("league-size-ultra", "League", "league", "ultra", "Ultra. The chip holds very high frame rates.", ultra, ["am5"]),
+    {
+      id: "office",
+      name: "Office mail and calendar",
+      kicker: "Office",
+      tags: ["work", "office", "desk"],
+      why: "Email, a calendar, and a browser. No graphics card. Nothing extra.",
+      build: buildFrom(["ae65baf2c4", BOARD_AM4, DDR4_16, SSD1, CASE, PSU550]),
+    },
+    {
+      id: "zoom",
+      name: "Zoom calls",
+      kicker: "Zoom",
+      tags: ["work", "zoom", "desk", "screen"],
+      why: "For calls. 32GB so a meeting and your notes can both stay open.",
+      build: buildFrom(["ae65baf2c4", BOARD_AM4, DDR4_32, SSD1, CASE, PSU550, SCREEN_1080]),
+    },
+    {
+      id: "meet",
+      name: "Conference PC",
+      kicker: "Conference",
+      tags: ["work", "conference", "desk", "screen"],
+      why: "One PC and one screen for a meeting room. Quiet. No extra parts.",
+      build: buildFrom(["ae65baf2c4", BOARD_AM4, DDR4_32, SSD1, CASE, PSU550, SCREEN_1080]),
+    },
+    {
+      id: "podcast",
+      name: "Podcasting",
+      kicker: "Podcast",
+      tags: ["work", "podcast", "desk"],
+      why: "Quiet parts and a 2TB drive for episodes. One drive.",
+      build: buildFrom(["ae65baf2c4", BOARD_AM4, DDR4_32, SSD2, CASE, PSU550]),
+    },
+    {
+      id: "radio",
+      name: "Radio broadcasting",
+      kicker: "Radio",
+      tags: ["work", "radio"],
+      why: "For a long show. Eight cores, 32GB, a 2TB drive, and a small card so the screen turns on.",
+      build: buildFrom(["61d2f9663c", BOARD_AM4, DDR4_32, GPU_9060, SSD2, CASE, PSU650, AIR]),
+    },
+    {
+      id: "vlog",
+      name: "Vlogging",
+      kicker: "Vlog",
+      tags: ["work", "vlog"],
+      why: "Phone clips, titles, and upload. An NVIDIA card and one 2TB drive.",
+      build: buildFrom(["61d2f9663c", BOARD_AM4, DDR4_32, GPU_5060, SSD2, CASE, PSU650, AIR]),
+    },
   ];
 }
 

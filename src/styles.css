@@ -27,6 +27,9 @@
     background: var(--color-bg);
     color: var(--color-fg);
     font-family: var(--font-sans);
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
     -webkit-font-smoothing: antialiased;
   }
 
@@ -50,9 +53,10 @@
     --color-ok: #8dceb0;
   }
 
-  button:not(:disabled),
-  [role="button"]:not(:disabled) {
-    cursor: pointer;
+  input,
+  select,
+  textarea {
+    font-size: 16px;
   }
 
   ::selection {
