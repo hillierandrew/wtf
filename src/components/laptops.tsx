@@ -105,6 +105,19 @@ function money(value: number) {
   return value.toLocaleString("en-CA", { style: "currency", currency: "CAD" });
 }
 
+function hundred(item: Laptop) {
+  const ram = ramOf(item);
+  const disk = item.specs.match(/(\d+(?:\.\d+)?)(TB|GB) storage/i);
+  let diskPts = 0;
+  if (disk) {
+    const size = disk[2].toUpperCase() === "TB" ? Number(disk[1]) : Number(disk[1]) / 1000;
+    diskPts = size >= 2 ? 6 : size >= 1 ? 4 : size >= 0.5 ? 2 : 0;
+  }
+  const ramPts = ram >= 64 ? 16 : ram >= 32 ? 12 : ram >= 16 ? 6 : 0;
+  const gpu = item.gpu >= 100 ? 88 : item.gpu >= 90 ? 80 : item.gpu >= 80 ? 72 : item.gpu >= 72 ? 64 : item.gpu >= 60 ? 52 : item.gpu >= 45 ? 40 : item.gpu >= 28 ? 30 : ram >= 16 ? 14 : 8;
+  return Math.max(1, Math.min(100, gpu + ramPts + diskPts));
+}
+
 function ramOf(item: Laptop) {
   const match = item.specs.match(/(\d+)GB memory/);
   return match ? Number(match[1]) : 0;
@@ -297,7 +310,7 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
                     <span className="mt-1 block text-sm text-muted">{item.specs}</span>
                     {game ? <span className="mt-1 block text-sm text-muted">{game.label} at {qualityLabel}</span> : null}
                     {course ? <span className="mt-1 block text-sm text-muted">Runs {course.program}</span> : null}
-                    <span className="mt-1 block text-sm text-muted">Deal {item.deal} · higher is more for the money</span>
+                    <span className="mt-1 block text-sm text-muted">Score {hundred(item)}/100</span>
                   </span>
                   <span className="shrink-0 text-right">
                     <span className="tabular block text-base font-medium">{money(item.price)}</span>

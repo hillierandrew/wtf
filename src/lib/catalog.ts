@@ -95,7 +95,7 @@ export function isJunk(part: Part, allowOpenBox: boolean): boolean {
   const blob = `${part.name} ${part.brand}`;
   if (/sodimm|so-dimm|laptop|\becc\b|surveillance|\bpurple\b|(^|\s)ican\b/i.test(blob)) return true;
   if (part.price < 12) return true;
-  if (!allowOpenBox && /open\s?box|\[openbox\]|renewed|recertified|refurbished/i.test(blob)) return true;
+  if (!allowOpenBox && /open\s?box|\[openbox\]/i.test(blob)) return true;
   return false;
 }
 
@@ -197,6 +197,45 @@ export function gpuIndex(part: Part): number {
   if (/3050/.test(n)) return 32;
   const tier = gpuTier(part);
   return [0, 20, 40, 60, 85, 120, 170][tier] ?? 0;
+}
+
+/** 0 to 100. A 5090 is the top. An old office PC is near the bottom. */
+export function machineScore(name: string): number {
+  const n = name.toUpperCase();
+  let gpu = 8;
+  if (/5090/.test(n)) gpu = 88;
+  else if (/5080/.test(n)) gpu = 80;
+  else if (/5070\s?TI/.test(n)) gpu = 72;
+  else if (/9070\s?XT/.test(n)) gpu = 70;
+  else if (/\b9070\b/.test(n)) gpu = 62;
+  else if (/\b5070\b/.test(n)) gpu = 64;
+  else if (/5060\s?TI/.test(n)) gpu = 56;
+  else if (/9060/.test(n)) gpu = 52;
+  else if (/\b5060\b/.test(n)) gpu = 50;
+  else if (/3050/.test(n)) gpu = 28;
+  else if (/ULTRA\s?9|RYZEN\s?AI|780M|890M/.test(n)) gpu = 24;
+  else if (/ULTRA\s?[57]|RYZEN\s?[57]\s?(2|7|8|9)\d{3}/.test(n)) gpu = 16;
+  else if (/I[57]-1[34]\d{3}|RYZEN\s?[57]\s?5\d{3}/.test(n)) gpu = 12;
+  const ramMatch = n.match(/(\d+)\s*GB(?!\s*SSD)/);
+  const ram = ramMatch ? Number(ramMatch[1]) : 0;
+  const ramPts = ram >= 64 ? 16 : ram >= 32 ? 12 : ram >= 16 ? 6 : 0;
+  const tb = n.match(/(\d+(?:\.\d+)?)\s*TB\s*SSD/);
+  const gb = n.match(/(\d+)\s*GB\s*SSD/);
+  const disk = tb ? Number(tb[1]) : gb ? Number(gb[1]) / 1000 : 0;
+  const diskPts = disk >= 4 ? 8 : disk >= 2 ? 6 : disk >= 1 ? 4 : disk >= 0.5 ? 2 : 0;
+  const cpuPts = /X3D/.test(n) ? 6 : 0;
+  return Math.max(1, Math.min(100, gpu + ramPts + diskPts + cpuPts));
+}
+
+export function aiScore(build: Build): number {
+  const gpu = build.gpu ? gpuIndex(build.gpu) : 0;
+  const base = gpu ? Math.round((gpu / 180) * 82) : 12;
+  const ram = build.memory ? gbOf(build.memory) : 0;
+  const disk = build.storage ? gbOf(build.storage) : 0;
+  const ramPts = ram >= 64 ? 10 : ram >= 32 ? 6 : ram >= 16 ? 3 : 0;
+  const diskPts = disk >= 2000 ? 4 : disk >= 1000 ? 2 : 0;
+  const cpuPts = /X3D/.test(build.cpu?.name.toUpperCase() ?? "") ? 4 : 0;
+  return Math.max(1, Math.min(100, base + ramPts + diskPts + cpuPts));
 }
 
 export function buildSpeed(build: Build): number {

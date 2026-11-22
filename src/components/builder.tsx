@@ -22,6 +22,8 @@ import {
   partImage,
   priceChange,
   PRICE_CHECKED,
+  machineScore,
+  aiScore,
   scoreBuild,
   shelfNote,
   shortName,
@@ -547,6 +549,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
                           </span>
                           <span className="mt-1 line-clamp-2 block text-base font-medium leading-snug">{shortName(part)}</span>
                           {reason ? <span className="mt-1 block text-sm text-danger">{reason}</span> : null}
+                          {!reason && part.cat === "prebuilt" ? <span className="mt-1 block text-sm text-muted">Score {machineScore(part.name)}/100</span> : null}
                           {!reason && part.cat === "gpu" && buildSpeed({ gpu: part }) ? (
                             <span className="mt-1 block text-sm text-muted">Roughly {buildSpeed({ gpu: part })}% of an RX 9070</span>
                           ) : null}
@@ -955,17 +958,18 @@ function Checkout({
   return (
     <aside
       className={`relative flex min-h-0 flex-col border-line bg-elevated ${docked ? "h-full shrink-0 border-l" : "shrink-0 border-t"}`}
-      style={docked ? { width } : { height: open ? height : 76 }}
+      style={docked ? { width } : { height: open ? height : 108 }}
     >
       <button
         type="button"
-        aria-label="Drag to resize checkout"
+        aria-label="Drag to resize"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
-        className={`flex h-3 w-full touch-none items-center justify-center ${docked ? "md:hidden" : ""}`}
+        className={`flex h-11 w-full touch-none items-center justify-center gap-2 text-sm text-muted ${docked ? "md:hidden" : ""}`}
       >
-        <span className="h-1 w-10 rounded-full bg-line" />
+        <span className="h-1 w-8 rounded-full bg-line" />
+        Drag
       </button>
       {docked ? (
         <button
@@ -974,8 +978,10 @@ function Checkout({
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
-          className="absolute hidden h-full w-3 -translate-x-1/2 cursor-ew-resize touch-none md:block"
-        />
+          className="absolute top-12 hidden -translate-x-1/2 cursor-ew-resize touch-none px-1 text-xs text-muted md:block"
+        >
+          Drag
+        </button>
       ) : null}
       <div className="flex items-center gap-2 px-3 pb-2">
         <p className="min-w-0 flex-1">
@@ -1085,7 +1091,10 @@ function AiPanel({ onUse }: { onUse: (pick: ReturnType<typeof aiPicks>[number]) 
                   <p className="text-xs text-faint">{pick.kicker}</p>
                   <h2 className="font-display text-2xl font-medium leading-none tracking-tight">{pick.name}</h2>
                 </div>
-                <p className="tabular shrink-0 text-sm font-medium">{money(spendOf(pick.build))}</p>
+                <p className="tabular shrink-0 text-right text-sm font-medium">
+                  <span className="block">{aiScore(pick.build)}/100</span>
+                  <span className="block">{money(spendOf(pick.build))}</span>
+                </p>
               </div>
               <p className="mt-2 text-sm text-muted">{pick.why}</p>
               <BuildStats build={pick.build} />
@@ -1241,7 +1250,7 @@ function Review({
         <div className="rounded-xl border border-line bg-elevated p-4">
           <p className="text-xs text-faint">Total</p>
           <p className="tabular text-lg font-medium">{money(total)}</p>
-          <p className="mt-2 text-sm text-muted">{tagsOf(build.prebuilt!).join(" · ") || "Finished PC."}</p>
+          <p className="mt-2 text-sm text-muted">Score {machineScore(build.prebuilt!.name)}/100. {tagsOf(build.prebuilt!).join(" · ") || "Finished PC."}</p>
         </div>
       ) : (
       <dl className="grid grid-cols-2 gap-3 rounded-xl border border-line bg-elevated p-4 text-sm">
