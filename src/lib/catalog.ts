@@ -554,9 +554,35 @@ export type AiPick = {
   name: string;
   kicker: string;
   why: string;
+  tags: string[];
   best?: boolean;
   build: Build;
 };
+
+const CASE = "f97b3798ee";
+const CASE_SMALL = "0059866cda";
+const SSD1 = "0d6d289946";
+const SSD2 = "e9ea0e8f1a";
+const AIR = "7bb68f4649";
+const PSU550 = "5d5b11a54a";
+const PSU650 = "b13774ecd6";
+const PSU750 = "33363adcbb";
+const PSU850 = "abfe37bd5d";
+const BOARD_AM4 = "b80a188b37";
+const BOARD_AM5 = "5f5a90664b";
+const BOARD_B850 = "34be25cc1f";
+const DDR4_16 = "e06fc91f29";
+const DDR4_32 = "dae600f39a";
+const DDR5_16 = "47f243a92b";
+const DDR5_32 = "d95a523fa2";
+const GPU_9060 = "a94d77ee17";
+const GPU_5060 = "0b368adbd0";
+const GPU_9070 = "a7729c89db";
+const GPU_9070XT = "c2af03954d";
+const GPU_5070 = "f79f7e3de0";
+const GPU_5070TI = "e5407756e1";
+const SCREEN_1080 = "4aa181b957";
+const SCREEN_1440 = "83d46c6e5d";
 
 function buildFrom(ids: string[]): Build {
   const map: Build = {};
@@ -569,11 +595,7 @@ function buildFrom(ids: string[]): Build {
   return reconcile(priority, map);
 }
 
-/**
- * Ranked from the current shelf. The RX 9070 16GB is the last card that
- * still gets cheaper per frame. DDR5 kits are expensive, so the winner
- * stays on AM4 and spends the difference on that card.
- */
+/** Full PCs from this shelf, ranked by what the money buys. */
 export function aiPicks(): AiPick[] {
   return [
     {
@@ -581,62 +603,171 @@ export function aiPicks(): AiPick[] {
       name: "Most frames per dollar",
       kicker: "Best",
       best: true,
+      tags: ["value", "1440"],
       why: "The Radeon RX 9070 16GB beats the more expensive 5060 Ti and 5070 on this shelf. DDR4 leaves the money in the graphics card.",
-      build: buildFrom([
-        "61d2f9663c",
-        "b80a188b37",
-        "dae600f39a",
-        "a7729c89db",
-        "0d6d289946",
-        "f97b3798ee",
-        "33363adcbb",
-        "7bb68f4649",
-      ]),
+      build: buildFrom(["61d2f9663c", BOARD_AM4, DDR4_32, GPU_9070, SSD1, CASE, PSU750, AIR]),
+    },
+    {
+      id: "frames-16",
+      name: "Same card, 16GB memory",
+      kicker: "Tighter",
+      tags: ["value", "1440"],
+      why: "Drops to 16GB so the platform is a deal price. Close other apps while you play.",
+      build: buildFrom(["2201e3c4ca", GPU_9070, SSD1, CASE, PSU750, AIR]),
+    },
+    {
+      id: "frames-2tb",
+      name: "Best build, 2TB drive",
+      kicker: "More space",
+      tags: ["value", "1440"],
+      why: "The same frames-per-dollar PC with a 2TB drive, so games do not fill it immediately.",
+      build: buildFrom(["61d2f9663c", BOARD_AM4, DDR4_32, GPU_9070, SSD2, CASE, PSU750, AIR]),
+    },
+    {
+      id: "small",
+      name: "Best build, smaller case",
+      kicker: "Smaller",
+      tags: ["value", "1440"],
+      why: "Same parts as the best build, in a micro-ATX case that still fits the board.",
+      build: buildFrom(["61d2f9663c", BOARD_AM4, DDR4_32, GPU_9070, SSD1, CASE_SMALL, PSU750, AIR]),
+    },
+    {
+      id: "screen-1440",
+      name: "Best build plus a 1440p screen",
+      kicker: "With screen",
+      tags: ["value", "1440", "screen"],
+      why: "The value PC and a 27 inch 1440p 180Hz monitor. That screen matches the card.",
+      build: buildFrom(["61d2f9663c", BOARD_AM4, DDR4_32, GPU_9070, SSD1, CASE, PSU750, AIR, SCREEN_1440]),
     },
     {
       id: "starter",
       name: "1080p, still a real card",
       kicker: "Start here",
+      tags: ["value", "1080"],
       why: "Cheapest PC here that is not stuck on a low-end card. The 8GB RX 9060 XT is the ceiling, and the processor already includes a cooler.",
-      build: buildFrom([
-        "2dfbcfdbfb",
-        "a94d77ee17",
-        "0d6d289946",
-        "f97b3798ee",
-        "b13774ecd6",
-      ]),
+      build: buildFrom(["2dfbcfdbfb", GPU_9060, SSD1, CASE, PSU650]),
+    },
+    {
+      id: "starter-2tb",
+      name: "1080p with room for games",
+      kicker: "1080p",
+      tags: ["1080"],
+      why: "The cheap 1080p PC with a 2TB drive instead of 1TB.",
+      build: buildFrom(["2dfbcfdbfb", GPU_9060, SSD2, CASE, PSU650]),
+    },
+    {
+      id: "screen-1080",
+      name: "1080p PC and a 144Hz screen",
+      kicker: "With screen",
+      tags: ["1080", "screen"],
+      why: "The starter PC plus a 24.5 inch 144Hz monitor. Enough for that graphics card.",
+      build: buildFrom(["2dfbcfdbfb", GPU_9060, SSD1, CASE, PSU650, SCREEN_1080]),
+    },
+    {
+      id: "nvidia-1080",
+      name: "1080p, if you want NVIDIA",
+      kicker: "NVIDIA",
+      tags: ["nvidia", "1080"],
+      why: "The cheapest RTX 5060 on the shelf. The Radeon 1080p build next to it gets you more for the same money.",
+      build: buildFrom(["2dfbcfdbfb", GPU_5060, SSD1, CASE, PSU650]),
+    },
+    {
+      id: "desk",
+      name: "Desk PC, no graphics card",
+      kicker: "No card",
+      tags: ["desk"],
+      why: "For a desk, not new games. The 5500GT has graphics and a cooler in the box, so you are not paying for a card you will not use.",
+      build: buildFrom(["ae65baf2c4", BOARD_AM4, DDR4_16, SSD1, CASE, PSU550]),
+    },
+    {
+      id: "desk-32",
+      name: "Desk PC, 32GB",
+      kicker: "No card",
+      tags: ["desk"],
+      why: "Same office PC with 32GB, for a lot of browser tabs and light work.",
+      build: buildFrom(["ae65baf2c4", BOARD_AM4, DDR4_32, SSD1, CASE, PSU550]),
+    },
+    {
+      id: "light",
+      name: "Light games, still no card",
+      kicker: "No card",
+      tags: ["desk"],
+      why: "The 5600GT has the stronger built-in graphics on this cheap platform. It is still not a gaming PC.",
+      build: buildFrom(["ebfe91bdf2", BOARD_AM4, DDR4_16, SSD1, CASE, PSU550]),
+    },
+    {
+      id: "intel",
+      name: "Intel, same value card",
+      kicker: "Intel",
+      tags: ["1440"],
+      why: "A 10-core i5, board, and 16GB as a deal, then the same RX 9070. Pick this if you want Intel. The Ryzen build is the better frames buy.",
+      build: buildFrom(["b6694fcce5", GPU_9070, SSD1, CASE, PSU750, AIR]),
+    },
+    {
+      id: "work",
+      name: "Work and play",
+      kicker: "Cores",
+      tags: ["work", "1440"],
+      why: "20 cores and 32GB from a deal, plus the value graphics card and a 2TB drive. For edits and compiles, not just games.",
+      build: buildFrom(["aeb7922d24", GPU_9070, SSD2, CASE, PSU750, AIR]),
+    },
+    {
+      id: "am5-1080",
+      name: "1080p on a new socket",
+      kicker: "Newer socket",
+      tags: ["am5", "1080"],
+      why: "A Ryzen 5 7600X you can replace later, 16GB of DDR5, and the RX 9060 XT. Memory is why this costs more than the AM4 starter.",
+      build: buildFrom(["84d819ea71", BOARD_AM5, DDR5_16, GPU_9060, SSD1, CASE, PSU650, AIR]),
+    },
+    {
+      id: "am5-value",
+      name: "1440p on a new socket",
+      kicker: "Newer socket",
+      tags: ["am5", "1440", "value"],
+      why: "The cheap AM5 processor, 32GB, and the RX 9070. You pay the DDR5 tax and keep a socket you can upgrade.",
+      build: buildFrom(["84d819ea71", BOARD_AM5, DDR5_32, GPU_9070, SSD1, CASE, PSU750, AIR]),
     },
     {
       id: "keep",
-      name: "Same card, newer socket",
-      kicker: "Keep longer",
-      why: "Same RX 9070, but on AM5 so the processor can be swapped later. The extra cost is the DDR5 memory, not a faster graphics card.",
-      build: buildFrom([
-        "9ab94a8d13",
-        "5f5a90664b",
-        "d95a523fa2",
-        "a7729c89db",
-        "0d6d289946",
-        "f97b3798ee",
-        "33363adcbb",
-        "7bb68f4649",
-      ]),
+      name: "Newer chip, same card",
+      kicker: "Newer socket",
+      tags: ["am5", "1440"],
+      why: "A Ryzen 5 9600X instead of the 7600X. The card does not get faster. You are paying for the newer processor.",
+      build: buildFrom(["9ab94a8d13", BOARD_AM5, DDR5_32, GPU_9070, SSD1, CASE, PSU750, AIR]),
+    },
+    {
+      id: "esports",
+      name: "High frame rates",
+      kicker: "Competitive",
+      tags: ["am5", "1440"],
+      why: "The 9800X3D is the gaming processor. The RX 9070 is enough card, so the extra money stays in the chip.",
+      build: buildFrom(["0abb21ae33", BOARD_B850, DDR5_32, GPU_9070, SSD1, CASE, PSU750, AIR]),
     },
     {
       id: "stop",
       name: "Stop before it gets silly",
       kicker: "High",
+      tags: ["am5", "1440"],
       why: "The 9800X3D is only a little more than the 9700X and is the better gaming chip. The RX 9070 XT is the last step up before the 5070 Ti and 5080 cost more for each frame.",
-      build: buildFrom([
-        "0abb21ae33",
-        "34be25cc1f",
-        "d95a523fa2",
-        "c2af03954d",
-        "e9ea0e8f1a",
-        "f97b3798ee",
-        "abfe37bd5d",
-        "7bb68f4649",
-      ]),
+      build: buildFrom(["0abb21ae33", BOARD_B850, DDR5_32, GPU_9070XT, SSD2, CASE, PSU850, AIR]),
+    },
+    {
+      id: "nvidia-1440",
+      name: "1440p, if you want NVIDIA",
+      kicker: "NVIDIA",
+      tags: ["nvidia", "1440"],
+      why: "The cheapest RTX 5070. It costs more than the RX 9070 and has 12GB. Only pick it if you want NVIDIA.",
+      build: buildFrom(["61d2f9663c", BOARD_AM4, DDR4_32, GPU_5070, SSD1, CASE, PSU750, AIR]),
+    },
+    {
+      id: "nvidia-high",
+      name: "NVIDIA, last sensible step",
+      kicker: "NVIDIA",
+      tags: ["nvidia", "am5"],
+      why: "An RTX 5070 Ti 16GB with the 9800X3D. It is the NVIDIA card that still has 16GB. The Radeon 9070 XT build is the better price.",
+      build: buildFrom(["0abb21ae33", BOARD_B850, DDR5_32, GPU_5070TI, SSD2, CASE, PSU850, AIR]),
     },
   ];
 }
+
+export const AI_FILTERS = ["All", "Value", "1080p", "1440p", "Newer socket", "NVIDIA", "No card", "Screen", "Work"] as const;

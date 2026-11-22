@@ -6,6 +6,7 @@ import {
   CAT_LABEL,
   CAT_TAB,
   PARTS,
+  AI_FILTERS,
   aiPicks,
   coveredByBundle,
   fitWhy,
@@ -446,11 +447,38 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
 
 function AiPanel({ onUse }: { onUse: (pick: ReturnType<typeof aiPicks>[number]) => void }) {
   const picks = aiPicks();
+  const [filter, setFilter] = useState<(typeof AI_FILTERS)[number]>("All");
+  const shown = picks.filter((pick) => {
+    if (filter === "All") return true;
+    if (filter === "Value") return pick.tags.includes("value");
+    if (filter === "1080p") return pick.tags.includes("1080");
+    if (filter === "1440p") return pick.tags.includes("1440");
+    if (filter === "Newer socket") return pick.tags.includes("am5");
+    if (filter === "NVIDIA") return pick.tags.includes("nvidia");
+    if (filter === "No card") return pick.tags.includes("desk");
+    if (filter === "Screen") return pick.tags.includes("screen");
+    return pick.tags.includes("work");
+  });
   return (
     <div className="space-y-3 px-4 py-3">
-      <p className="text-sm text-muted">Ranked from this shelf by what you get for the money. Each one is a full PC. A monitor is separate.</p>
+      <p className="text-sm text-muted">
+        {picks.length} full PCs from this shelf, ranked by what the money buys. A few include a screen. The rest do not.
+      </p>
+      <div className="flex gap-2 overflow-x-auto">
+        {AI_FILTERS.map((item) => (
+          <button
+            key={item}
+            type="button"
+            aria-pressed={filter === item}
+            onClick={() => setFilter(item)}
+            className={`h-10 shrink-0 rounded-lg border px-3 text-sm ${filter === item ? "border-accent bg-subtle text-fg" : "border-line bg-elevated text-muted"}`}
+          >
+            {item}
+          </button>
+        ))}
+      </div>
       <ul className="flex flex-col gap-3">
-        {picks.map((pick) => {
+        {shown.map((pick) => {
           const covered = coveredByBundle(pick.build);
           return (
             <li key={pick.id} className={`rounded-xl border p-3 ${pick.best ? "border-accent bg-subtle" : "border-line bg-elevated"}`}>
