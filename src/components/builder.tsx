@@ -159,6 +159,10 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
   const filled = CATS.filter((item) => build[item]).length;
   const shown = visible.slice(0, limit);
   const total = spendOf(build, extras);
+  const ready = Boolean(build.prebuilt) || NEED.every((item) => build[item]);
+  const xp = filled * 10 + (ready ? 30 : 0);
+  const level = xp >= 100 ? "Legend" : xp >= 70 ? "Engineer" : xp >= 40 ? "Builder" : xp >= 10 ? "Apprentice" : "Recruit";
+  const seen = useRef(new Set<string>());
 
   function go(next: number) {
     setPanel("shelf");
@@ -172,7 +176,16 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
       return;
     }
     if (part.cat !== "bundle") {
-      go(nextIndex(partsFrom(useBench.getState().ids), part.cat));
+      const next = partsFrom(useBench.getState().ids);
+      const count = CATS.filter((item) => next[item]).length;
+      const online = Boolean(next.prebuilt) || NEED.every((item) => next[item]);
+      const prize = online ? "PC online" : count === 1 ? "First part" : count === 3 ? "Combo x3" : count === 6 ? "Halfway" : "";
+      if (prize && !seen.current.has(prize)) {
+        seen.current.add(prize);
+        setBadge(prize);
+        window.setTimeout(() => setBadge(""), 2200);
+      }
+      go(nextIndex(next, part.cat));
       return;
     }
     const next = partsFrom(useBench.getState().ids);
@@ -265,6 +278,9 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
             <div className="h-full bg-accent" style={{ width: `${score.points}%` }} />
           </div>
           <p className="mt-1 text-xs text-muted">{score.next}</p>
+          <p className="mt-1 text-xs text-faint">
+            {level} · {xp} XP
+          </p>
         </div>
         <div className="mt-3 flex gap-1" aria-hidden>
           {CATS.map((item, index) => {
@@ -654,6 +670,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
           <div className="rounded-2xl border border-accent bg-elevated px-4 py-4">
             <p className="text-base font-medium text-accent">Achievement unlocked</p>
             <p className="font-display mt-1 text-2xl leading-none">{badge}</p>
+            <p className="mt-1 text-sm text-muted">{badge === "PC online" ? "The computer can turn on." : badge === "Combo x3" ? "Three parts in a row." : "Keep going."}</p>
           </div>
         </div>
       ) : null}
@@ -699,6 +716,31 @@ const GAME_LIST: { kicker: string; title: string; year: string }[] = [
   { kicker: "Rocket League", title: "Rocket League", year: "2015" },
   { kicker: "Minecraft", title: "Minecraft", year: "2011" },
   { kicker: "Roblox", title: "Roblox", year: "2006" },
+  { kicker: "Palworld", title: "Palworld", year: "2024" },
+  { kicker: "Diablo IV", title: "Diablo IV", year: "2023" },
+  { kicker: "Rust", title: "Rust", year: "2018" },
+  { kicker: "Destiny 2", title: "Destiny 2", year: "2017" },
+  { kicker: "Starfield", title: "Starfield", year: "2023" },
+  { kicker: "Flight Simulator", title: "Microsoft Flight Simulator", year: "2020" },
+  { kicker: "Farming Simulator", title: "Farming Simulator 25", year: "2024" },
+  { kicker: "Euro Truck", title: "Euro Truck Simulator 2", year: "2012" },
+  { kicker: "Cities Skylines 2", title: "Cities: Skylines II", year: "2023" },
+  { kicker: "The Finals", title: "The Finals", year: "2023" },
+  { kicker: "Lethal Company", title: "Lethal Company", year: "2023" },
+  { kicker: "Stardew Valley", title: "Stardew Valley", year: "2016" },
+  { kicker: "World of Warcraft", title: "World of Warcraft", year: "2004" },
+  { kicker: "Final Fantasy XIV", title: "Final Fantasy XIV", year: "2013" },
+  { kicker: "Spider-Man", title: "Marvel's Spider-Man", year: "2022" },
+  { kicker: "God of War", title: "God of War", year: "2022" },
+  { kicker: "Alan Wake 2", title: "Alan Wake 2", year: "2023" },
+  { kicker: "Sea of Thieves", title: "Sea of Thieves", year: "2018" },
+  { kicker: "No Man's Sky", title: "No Man's Sky", year: "2016" },
+  { kicker: "Tarkov", title: "Escape from Tarkov", year: "2017" },
+  { kicker: "Forza", title: "Forza Horizon 5", year: "2021" },
+  { kicker: "Sims", title: "The Sims 4", year: "2014" },
+  { kicker: "Warframe", title: "Warframe", year: "2013" },
+  { kicker: "Path of Exile 2", title: "Path of Exile 2", year: "2024" },
+  { kicker: "Marvel Rivals", title: "Marvel Rivals", year: "2024" },
 ];
 const SIZES = [
   { id: "basic", label: "Basic" },
@@ -716,6 +758,18 @@ const JOBS = [
   { id: "vlog", title: "Vlog", line: "Phone clips and titles." },
   { id: "edit", title: "Video editing", line: "The bigger editing PC." },
   { id: "college", title: "School", line: "Class, notes, and a browser." },
+  { id: "photo", title: "Photoshop", line: "Pictures and class projects." },
+  { id: "cad", title: "AutoCAD", line: "Drawings for class." },
+  { id: "blender", title: "Blender", line: "3D models." },
+  { id: "code", title: "Programming", line: "Code, tabs, and a browser." },
+  { id: "music", title: "Music", line: "A quiet desk for tracks." },
+  { id: "stream", title: "Streaming", line: "A game and a camera." },
+  { id: "excel", title: "Spreadsheets", line: "Excel, numbers, and mail." },
+  { id: "davinci", title: "DaVinci", line: "Color and a finished cut." },
+  { id: "unity", title: "Unity", line: "A small game you are making." },
+  { id: "unreal", title: "Unreal", line: "A heavier game engine." },
+  { id: "obs", title: "OBS", line: "Record the screen." },
+  { id: "ableton", title: "Ableton", line: "Music software and plugins." },
 ];
 
 function Quest({

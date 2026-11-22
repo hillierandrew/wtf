@@ -52,6 +52,16 @@ export function Gate({ children }: { children: React.ReactNode }) {
   return children;
 }
 
+function fromKey(event: KeyboardEvent): string | null {
+  if (event.repeat) return null;
+  if (/^Numpad[0-9]$/.test(event.code)) return event.code.slice(6);
+  if (/^Digit[0-9]$/.test(event.code)) return event.code.slice(5);
+  if (event.key >= "0" && event.key <= "9") return event.key;
+  if (event.code === "NumpadEnter" || event.key === "Enter" || event.key === "#") return "#";
+  if (event.key === "Backspace" || event.key === "Escape" || event.code === "NumpadDecimal") return "C";
+  return null;
+}
+
 function Lock({ onOpen }: { onOpen: () => void }) {
   const [digits, setDigits] = useState("");
   const [state, setState] = useState<"armed" | "denied" | "open">("armed");
@@ -97,11 +107,18 @@ function Lock({ onOpen }: { onOpen: () => void }) {
     if (next.length === 4) window.setTimeout(() => decide(next), 140);
   }
 
+  const field = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    field.current?.focus();
+  }, []);
+
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
-      if (event.key >= "0" && event.key <= "9") press(event.key);
-      else if (event.key === "Backspace" || event.key === "Escape") press("C");
-      else if (event.key === "Enter" || event.key === "#") press("#");
+      const key = fromKey(event);
+      if (!key) return;
+      event.preventDefault();
+      press(key);
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -140,7 +157,17 @@ function Lock({ onOpen }: { onOpen: () => void }) {
             </button>
           ))}
         </div>
-        <p className="mt-4 text-center text-sm text-[#8f867b]">Enter the code. The site opens.</p>
+        <p className="mt-4 text-center text-sm text-[#8f867b]">Type 1234 on the number pad, or tap the keys.</p>
+        <input
+          ref={field}
+          autoFocus
+          inputMode="numeric"
+          autoComplete="off"
+          aria-label="Type the code"
+          value=""
+          onChange={() => field.current?.focus()}
+          className="sr-only"
+        />
       </div>
     </div>
   );
