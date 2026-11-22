@@ -7,6 +7,7 @@ export function Welcome({
   onLaptop,
   onDesktop,
   onValue,
+  onSteam,
 }: {
   onEnter: () => void;
   onDesk: () => void;
@@ -14,9 +15,11 @@ export function Welcome({
   onLaptop: () => void;
   onDesktop: () => void;
   onValue: () => void;
+  onSteam: () => void;
 }) {
   const buttons = [
     { label: "BUILD A PC", line: "Pick each part. The wrong ones stay out.", onClick: onEnter },
+    { label: "STEAM MACHINE", line: "A tiny living-room PC. Small parts I put together, or a mini PC that is already built.", onClick: onSteam },
     { label: "PRICE CHECK", line: "Cost per gigabyte, or per point of speed. Tap to add it.", onClick: onValue },
     { label: "PREBUILDS", line: "A finished PC. Scored 0 to 100.", onClick: onDesktop },
     { label: "LAPTOPS", line: "Games, a college class, or the best price.", onClick: onLaptop },

@@ -7,6 +7,7 @@ import { Sim } from "@/components/sim";
 import { Desk } from "@/components/desk";
 import { Gate } from "@/components/lock";
 import { ScreenBar, type Screen } from "@/components/nav";
+import { Steam } from "@/components/steam";
 import { Value } from "@/components/value";
 import { Welcome } from "@/components/welcome";
 import { useBench } from "@/lib/store";
@@ -17,9 +18,11 @@ function Home() {
   const hydrated = useBench((state) => state.hydrated);
   const hydrate = useBench((state) => state.hydrate);
   const [stack, setStack] = useState<Array<Screen | null>>([null]);
+  const [boot, setBoot] = useState<"play" | "review">("play");
   const mode = stack[stack.length - 1] ?? null;
 
   function go(next: Screen) {
+    if (next === "pc") setBoot("play");
     setStack((current) => (current[current.length - 1] === next ? current : [...current, next]));
   }
 
@@ -35,10 +38,19 @@ function Home() {
     hydrate();
   }, [hydrate]);
 
-  let screen = <Welcome onEnter={() => go("pc")} onDesk={() => go("desk")} onSim={() => go("sim")} onLaptop={() => go("laptop")} onDesktop={() => go("desktop")} onValue={() => go("value")} />;
+  let screen = <Welcome onEnter={() => go("pc")} onDesk={() => go("desk")} onSim={() => go("sim")} onLaptop={() => go("laptop")} onDesktop={() => go("desktop")} onValue={() => go("value")} onSteam={() => go("steam")} />;
   if (mode && hydrated) {
     const page =
-      mode === "value" ? (
+      mode === "steam" ? (
+        <Steam
+          onLeave={home}
+          onUse={(pick) => {
+            useBench.getState().apply(pick.build, `${pick.name}. A tiny PC. Change a part if you want.`);
+            setBoot("review");
+            setStack((current) => [...current, "pc"]);
+          }}
+        />
+      ) : mode === "value" ? (
         <Value onLeave={home} onBuild={() => go("pc")} />
       ) : mode === "desk" ? (
         <Desk onLeave={home} />
@@ -49,7 +61,7 @@ function Home() {
       ) : mode === "desktop" ? (
         <Desktops onLeave={home} />
       ) : (
-        <Builder onLeave={home} />
+        <Builder onLeave={home} start={boot} />
       );
     screen = (
       <div className="flex h-dvh flex-col bg-bg">

@@ -1080,9 +1080,96 @@ function buildFrom(ids: string[]): Build {
   return reconcile(priority, map);
 }
 
+/** Tiny living-room PCs. Every part is on the shelf. */
+export function steamPicks(): AiPick[] {
+  const ch160 = "081c74c5ae";
+  const ridge = "d2d055d637";
+  const terra = "e61417e310";
+  const qube = "c09842a8af";
+  const board = "1e94317e88";
+  const cpuG = "12f0a4d78a";
+  const cpuF = "7e2a9c25b9";
+  const cpu8600 = "0414cd70dc";
+  const sfx = "930a8b0f42";
+  const low = "7abfe8da82";
+  const solo = "0b368adbd0";
+  return [
+    {
+      id: "steam-couch",
+      name: "Couch box, no graphics card",
+      kicker: "Steam Machine",
+      tags: ["steam", "tiny", "desk"],
+      why: "A Ryzen 5 8500G already has graphics and a cooler. Mini-ITX board, 16GB, one drive, and a small power supply in a CH160.",
+      build: buildFrom([cpuG, board, DDR5_16, SSD1, ch160, sfx]),
+    },
+    {
+      id: "steam-lp",
+      name: "Tiny box, low-profile card",
+      kicker: "Steam Machine",
+      tags: ["steam", "tiny", "1080"],
+      why: "The RTX 3050 low-profile is short enough for a small case. 1080p in the living room. The processor includes its cooler.",
+      build: buildFrom([cpuF, board, DDR5_16, low, SSD1, ch160, sfx]),
+    },
+    {
+      id: "steam-1080",
+      name: "Steam Machine, 1080p",
+      kicker: "Steam Machine",
+      tags: ["steam", "tiny", "1080", "games"],
+      why: "A single-fan RTX 5060 in the CH160. 32GB and a 2TB drive so a Steam library fits.",
+      build: buildFrom([cpuF, board, DDR5_32, solo, SSD2, ch160, sfx]),
+    },
+    {
+      id: "steam-ridge",
+      name: "Living-room console shape",
+      kicker: "Steam Machine",
+      tags: ["steam", "tiny", "1080"],
+      why: "Fractal Ridge sits under a TV like a console. Same small card and a 2TB drive.",
+      build: buildFrom([cpu8600, board, DDR5_32, solo, SSD2, ridge, sfx]),
+    },
+    {
+      id: "steam-terra",
+      name: "Pretty tiny PC",
+      kicker: "Steam Machine",
+      tags: ["steam", "tiny", "1080"],
+      why: "Fractal Terra is the small metal box. The 8600G includes a cooler, so nothing tall is sticking out.",
+      build: buildFrom([cpu8600, board, DDR5_32, solo, SSD2, terra, sfx]),
+    },
+    {
+      id: "steam-cube",
+      name: "Cube on the desk",
+      kicker: "Steam Machine",
+      tags: ["steam", "tiny", "desk"],
+      why: "Cooler Master Qube. Built-in graphics, 32GB, one drive. For a desk, not a new AAA game.",
+      build: buildFrom([cpu8600, board, DDR5_32, SSD1, qube, sfx]),
+    },
+    {
+      id: "steam-strong",
+      name: "Small case, stronger card",
+      kicker: "Steam Machine",
+      tags: ["steam", "tiny", "1440"],
+      why: "The RX 9060 XT in the CH160, which has more room than the Ridge. Still one cooler in the processor box.",
+      build: buildFrom([cpuF, board, DDR5_32, GPU_9060, SSD2, ch160, sfx]),
+    },
+  ];
+}
+
+export function microPicks(): AiPick[] {
+  return PARTS.filter((part) => part.cat === "prebuilt" && part.form === "mini" && !isJunk(part, false))
+    .sort((a, b) => a.price - b.price)
+    .map((part) => ({
+      id: `micro-${part.id}`,
+      name: shortName(part),
+      kicker: "Micro PC",
+      tags: ["steam", "micro"],
+      why: "Already built. A small box. You do not match a board or a case.",
+      build: { prebuilt: part } as Build,
+    }));
+}
+
 /** Full PCs from this shelf, ranked by what the money buys. */
 export function aiPicks(): AiPick[] {
   return [
+    ...steamPicks(),
     {
       id: "frames",
       name: "Price per performance, medium",
@@ -1768,7 +1855,7 @@ export function extraFilters(cat: Category): { label: string; test: (part: Part)
   return table[cat] ?? [];
 }
 
-export const AI_FILTERS = ["All", "League", "Valorant", "Fortnite", "Call of Duty", "Battlefield", "Skyrim", "Harry Potter", "Minecraft", "Office", "Games", "Work", "Per frame", "Cheap", "College", "Value", "1080p", "1440p", "Newer socket", "NVIDIA", "No card", "Screen", "Top"] as const;
+export const AI_FILTERS = ["All", "Steam", "League", "Valorant", "Fortnite", "Call of Duty", "Battlefield", "Skyrim", "Harry Potter", "Minecraft", "Office", "Games", "Work", "Per frame", "Cheap", "College", "Value", "1080p", "1440p", "Newer socket", "NVIDIA", "No card", "Screen", "Top"] as const;
 
 export const EXTRA_CATS = ["memory", "storage", "monitor"] as const;
 export type ExtraCat = (typeof EXTRA_CATS)[number];

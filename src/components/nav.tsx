@@ -1,7 +1,8 @@
-export type Screen = "pc" | "desk" | "sim" | "laptop" | "desktop" | "value";
+export type Screen = "pc" | "desk" | "sim" | "laptop" | "desktop" | "value" | "steam";
 
 const LINKS: { id: Screen; label: string }[] = [
   { id: "pc", label: "PC" },
+  { id: "steam", label: "Steam" },
   { id: "value", label: "Price" },
   { id: "desktop", label: "Prebuilds" },
   { id: "laptop", label: "Laptops" },

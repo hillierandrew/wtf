@@ -62,7 +62,7 @@ function nextIndex(build: ReturnType<typeof partsFrom>, from: Category): number 
   return REVIEW;
 }
 
-export function Builder({ onLeave }: { onLeave: () => void }) {
+export function Builder({ onLeave, start = "play" }: { onLeave: () => void; start?: "play" | "review" }) {
   const ids = useBench((state) => state.ids);
   const extraIds = useBench((state) => state.extraIds);
   const addExtra = useBench((state) => state.addExtra);
@@ -82,8 +82,8 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
 
   const build = useMemo(() => partsFrom(ids), [ids]);
   const extras = useMemo(() => extrasFromIds(extraIds), [extraIds]);
-  const [step, setStep] = useState(0);
-  const [panel, setPanel] = useState<"play" | "shelf" | "ai">("play");
+  const [step, setStep] = useState(start === "review" ? REVIEW : 0);
+  const [panel, setPanel] = useState<"play" | "shelf" | "ai">(start === "review" ? "shelf" : "play");
   const [query, setQuery] = useState("");
   const [brand, setBrand] = useState("all");
   const [sortBy, setSortBy] = useState<ShelfSort>("price-asc");
@@ -1155,6 +1155,7 @@ function AiPanel({ onUse }: { onUse: (pick: ReturnType<typeof aiPicks>[number]) 
     if (filter === "All") return true;
     const tag = {
       Value: "value",
+      Steam: "steam",
       "1080p": "1080",
       "1440p": "1440",
       "Newer socket": "am5",
