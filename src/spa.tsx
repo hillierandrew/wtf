@@ -57,13 +57,20 @@ function Home() {
     ) : mode === "laptop" ? (
       <Laptops onLeave={home} />
     ) : mode === "desktop" ? (
-      <Desktops onLeave={home} />
+      <Desktops
+        onLeave={home}
+        onUse={(pick) => {
+          useBench.getState().apply(pick.build, `${pick.name}. Change a part if you want.`);
+          setBoot("review");
+          setStack((current) => [...current, "pc"]);
+        }}
+      />
     ) : (
       <Builder onLeave={home} start={boot} />
     );
   return (
     <div className="flex h-dvh flex-col bg-bg">
-      <ScreenBar mode={mode} onBack={back} onGo={go} />
+      <ScreenBar mode={mode} trail={stack} onBack={back} onFull={home} onJump={(index) => setStack((current) => current.slice(0, index + 1))} onGo={go} />
       <div className="screen-slot min-h-0 flex-1">{screen}</div>
     </div>
   );

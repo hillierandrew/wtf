@@ -1,15 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { Check, Search, X } from "lucide-react";
-import { PARTS, explainPart, machineScore, money, tagsOf, type Part, type ShelfSort } from "@/lib/catalog";
+import { PARTS, careerPicks, explainBuild, explainPart, machineScore, money, spendOf, tagsOf, aiScore, type AiPick, type Part, type ShelfSort } from "@/lib/catalog";
 import { RankBadge } from "@/components/rank";
 import { SortRow } from "@/components/sorts";
-import { ThemeToggle } from "@/lib/theme";
+import { ThemeToggle, useWide } from "@/lib/theme";
 
-type Filter = "all" | "gaming" | "desk" | "mini" | "aio";
+type Filter = "all" | "gaming" | "desk" | "mini" | "aio" | "college" | "career" | "programs";
 
 const FILTERS: { id: Filter; label: string; line: string }[] = [
-  { id: "all", label: "All", line: "Every finished PC. Score is 0 to 100. Higher is a stronger computer." },
-  { id: "gaming", label: "Gaming", line: "These have a graphics card. Score is 0 to 100." },
+  { id: "all", label: "All", line: "Every finished PC. Score is 0 to 100." },
+  { id: "gaming", label: "Games", line: "These have a graphics card." },
+  { id: "programs", label: "Programs", line: "Strong enough for class software and creative work." },
+  { id: "college", label: "College", line: "A desk PC for notes, class, and a browser." },
+  { id: "career", label: "Careers", line: "Office, teaching, nursing, law, and the job builds below." },
   { id: "desk", label: "Desk", line: "Office and home. No big graphics card." },
   { id: "mini", label: "Mini", line: "A small box. Easy to hide." },
   { id: "aio", label: "All-in-one", line: "The screen is built in." },
@@ -22,10 +25,13 @@ function fits(part: Part, filter: Filter) {
   if (filter === "mini") return part.form === "mini";
   if (filter === "aio") return part.form === "aio";
   if (filter === "desk") return part.form === "desk" || part.form === "aio";
+  if (filter === "college") return part.form === "desk" || part.form === "aio" || part.form === "mini";
+  if (filter === "career") return part.form !== "gaming";
+  if (filter === "programs") return machineScore(part.name) >= 45;
   return true;
 }
 
-export function Desktops({ onLeave }: { onLeave: () => void }) {
+export function Desktops({ onLeave, onUse }: { onLeave: () => void; onUse?: (pick: AiPick) => void }) {
   const items = useMemo(() => PARTS.filter((part) => part.cat === "prebuilt"), []);
   const [filter, setFilter] = useState<Filter>("all");
   const [picked, setPicked] = useState("");
@@ -79,9 +85,12 @@ export function Desktops({ onLeave }: { onLeave: () => void }) {
 
   const choice = items.find((part) => part.id === picked);
   const meta = FILTERS.find((item) => item.id === filter)!;
+  const wide = useWide();
+  const jobs = filter === "career" || filter === "college" || filter === "programs" ? careerPicks() : [];
 
   return (
-    <div className="mx-auto flex h-dvh w-full max-w-xl flex-col overflow-hidden bg-bg text-fg">
+    <div className={`mx-auto flex h-dvh w-full overflow-hidden bg-bg text-fg ${wide ? "max-w-6xl flex-row" : "max-w-xl flex-col"}`}>
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
       <header className="safe-top shrink-0 border-b border-line px-4 py-3">
         <div className="flex items-center justify-between">
           <button type="button" onClick={onLeave} className="text-base text-muted">
@@ -90,8 +99,14 @@ export function Desktops({ onLeave }: { onLeave: () => void }) {
           <ThemeToggle />
         </div>
         <h1 className="font-display mt-3 text-4xl font-medium leading-none tracking-tight">Prebuilds</h1>
-        <p className="mt-2 text-base text-muted">One finished PC. Score is 0 to 100. Renewed ones are included.</p>
+        <p className="mt-2 text-base text-muted">Games, a program, college, or a career. Tap a big button.</p>
       </header>
+      <div className="grid shrink-0 grid-cols-2 gap-2 px-4 pt-3">
+        <button type="button" onClick={() => setFilter("gaming")} className={`h-14 rounded-2xl border text-lg ${filter === "gaming" ? "border-accent bg-subtle" : "border-line"}`}>Games</button>
+        <button type="button" onClick={() => setFilter("programs")} className={`h-14 rounded-2xl border text-lg ${filter === "programs" ? "border-accent bg-subtle" : "border-line"}`}>Programs</button>
+        <button type="button" onClick={() => setFilter("college")} className={`h-14 rounded-2xl border text-lg ${filter === "college" ? "border-accent bg-subtle" : "border-line"}`}>College</button>
+        <button type="button" onClick={() => setFilter("career")} className={`h-14 rounded-2xl border text-lg ${filter === "career" ? "border-accent bg-subtle" : "border-line"}`}>Careers</button>
+      </div>
       <div className="flex shrink-0 gap-2 overflow-x-auto px-4 py-3">
         {FILTERS.map((item) => (
           <button
@@ -114,6 +129,28 @@ export function Desktops({ onLeave }: { onLeave: () => void }) {
           <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search" className="h-full w-full bg-transparent text-base outline-none" />
         </label>
         <SortRow value={sort} onChange={setSort} />
+        {jobs.length ? (
+          <div className="space-y-2">
+            <p className="text-base font-medium">Built for that job</p>
+            {jobs.map((pick) => (
+              <div key={pick.id} className="rounded-2xl border border-line bg-elevated px-3 py-3">
+                <div className="flex items-start justify-between gap-3">
+                  <span>
+                    <span className="block text-lg font-medium">{pick.name}</span>
+                    <span className="mt-1 block text-sm text-muted">{pick.why}</span>
+                  </span>
+                  <span className="tabular shrink-0 text-base font-medium">{money(spendOf(pick.build))}</span>
+                </div>
+                <div className="mt-2">
+                  <RankBadge score={aiScore(pick.build)} lines={explainBuild(pick.build)} />
+                </div>
+                <button type="button" onClick={() => onUse?.(pick)} className="mt-3 h-12 w-full rounded-xl bg-accent text-base text-accent-fg">
+                  Use this build
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : null}
         <div className="flex flex-wrap gap-2">
           <button type="button" onClick={() => setOpenBox((value) => !value)} className={`h-11 rounded-full border px-4 text-base ${openBox ? "border-accent bg-subtle" : "border-line"}`}>
             {openBox ? "Open box on" : "Open box off"}
@@ -157,7 +194,8 @@ export function Desktops({ onLeave }: { onLeave: () => void }) {
           })}
         </ul>
       </div>
-      <aside className="safe-bottom shrink-0 border-t border-line bg-elevated px-4 py-3">
+      </div>
+      <aside className={`shrink-0 bg-elevated px-4 py-4 ${wide ? "flex w-80 flex-col border-l border-line" : "safe-bottom border-t border-line"}`}>
         <p className="text-base font-medium">{choice ? `${money(choice.price)} · Score ${machineScore(choice.name)}/100` : "No PC yet"}</p>
         <div className="mt-2 flex items-center gap-2">
           <span className="min-w-0 flex-1 truncate text-base">{choice ? choice.name.replace(/\(Open Box\)/i, "").trim() : "Tap one PC."}</span>

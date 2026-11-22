@@ -1153,6 +1153,59 @@ export function steamPicks(): AiPick[] {
   ];
 }
 
+export function careerPicks(): AiPick[] {
+  return [
+    {
+      id: "teach",
+      name: "Teaching",
+      kicker: "Career",
+      tags: ["work", "college", "desk"],
+      why: "Lessons, slides, and a browser. No graphics card.",
+      build: buildFrom(["ae65baf2c4", BOARD_AM4, DDR4_16, SSD1, CASE, PSU550]),
+    },
+    {
+      id: "nurse",
+      name: "Nursing",
+      kicker: "Career",
+      tags: ["work", "college", "desk"],
+      why: "Charts, notes, and video class. 16GB is enough.",
+      build: buildFrom(["ae65baf2c4", BOARD_AM4, DDR4_16, SSD1, CASE, PSU550, SCREEN_1080]),
+    },
+    {
+      id: "accounts",
+      name: "Accounting",
+      kicker: "Career",
+      tags: ["work", "college", "desk"],
+      why: "Spreadsheets and tax software. Quiet. No graphics card.",
+      build: buildFrom(["ae65baf2c4", BOARD_AM4, DDR4_32, SSD1, CASE, PSU550]),
+    },
+    {
+      id: "cyber",
+      name: "Cybersecurity",
+      kicker: "Career",
+      tags: ["work", "college", "code"],
+      why: "Labs, virtual machines, and a lot of browser tabs. 32GB.",
+      build: buildFrom(["61d2f9663c", BOARD_AM4, DDR4_32, SSD2, CASE, PSU650, AIR]),
+    },
+    {
+      id: "analyst",
+      name: "Data analysis",
+      kicker: "Career",
+      tags: ["work", "college"],
+      why: "Python and spreadsheets. 32GB and a 2TB drive.",
+      build: buildFrom(["61d2f9663c", BOARD_AM4, DDR4_32, SSD2, CASE, PSU650]),
+    },
+    {
+      id: "law",
+      name: "Law",
+      kicker: "Career",
+      tags: ["work", "college", "desk"],
+      why: "Writing and research. A screen is included. No graphics card.",
+      build: buildFrom(["ae65baf2c4", BOARD_AM4, DDR4_16, SSD1, CASE, PSU550, SCREEN_1080]),
+    },
+  ];
+}
+
 export function microPicks(): AiPick[] {
   return PARTS.filter((part) => part.cat === "prebuilt" && part.form === "mini" && !isJunk(part, false))
     .sort((a, b) => a.price - b.price)
@@ -1170,6 +1223,7 @@ export function microPicks(): AiPick[] {
 export function aiPicks(): AiPick[] {
   return [
     ...steamPicks(),
+    ...careerPicks(),
     {
       id: "frames",
       name: "Price per performance, medium",

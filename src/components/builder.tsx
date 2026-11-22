@@ -47,7 +47,7 @@ import {
 import { extrasFromIds, partsFrom, useBench } from "@/lib/store";
 import { RankBadge } from "@/components/rank";
 import { SortRow } from "@/components/sorts";
-import { ThemeToggle } from "@/lib/theme";
+import { ThemeToggle, useWide } from "@/lib/theme";
 
 const REVIEW = CATS.length;
 const ORDER: Category[] = ["cpu", "motherboard", "memory", "gpu", "storage", "psu", "case", "cooler", "monitor"];
@@ -91,7 +91,7 @@ export function Builder({ onLeave, start = "play" }: { onLeave: () => void; star
   const [blocked, setBlocked] = useState(false);
   const [tag, setTag] = useState("all");
   const [facet, setFacet] = useState("all");
-  const [wide, setWide] = useState(false);
+  const wide = useWide();
   const [showTabs, setShowTabs] = useState(false);
   const [name, setName] = useState("");
   const [copied, setCopied] = useState(false);
@@ -237,14 +237,6 @@ export function Builder({ onLeave, start = "play" }: { onLeave: () => void; star
             Welcome
           </button>
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              aria-pressed={wide}
-              onClick={() => setWide((value) => !value)}
-              className={`h-8 rounded-full border px-3 text-xs ${wide ? "border-accent bg-subtle text-fg" : "border-line text-muted"}`}
-            >
-              {wide ? "Phone" : "Desktop"}
-            </button>
             <ThemeToggle />
             <p className="tabular text-sm font-medium">{money(total)}</p>
           </div>

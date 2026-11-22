@@ -4,7 +4,7 @@ import raw from "@/data/laptops.json";
 import { rankFrom, type ShelfSort } from "@/lib/catalog";
 import { RankBadge } from "@/components/rank";
 import { SortRow } from "@/components/sorts";
-import { ThemeToggle } from "@/lib/theme";
+import { ThemeToggle, useWide } from "@/lib/theme";
 
 type Kind = "game" | "home" | "work" | "tablet" | "chrome";
 type Filter = "deal" | "games" | "work" | "school" | "create" | "tablet" | "chrome";
@@ -129,6 +129,10 @@ const COURSES: Course[] = [
   { id: "after", label: "Motion graphics", program: "After Effects", gpu: 45, ram: 32, windows: true },
   { id: "zoom", label: "Online class", program: "Zoom", gpu: 0, ram: 8, windows: false },
   { id: "law", label: "Law and writing", program: "Word and a browser", gpu: 0, ram: 8, windows: true },
+  { id: "teach", label: "Teaching", program: "slides and a browser", gpu: 0, ram: 8, windows: true },
+  { id: "account", label: "Accounting", program: "Excel", gpu: 0, ram: 8, windows: true },
+  { id: "cyber", label: "Cybersecurity", program: "labs and a browser", gpu: 0, ram: 16, windows: true },
+  { id: "med", label: "Pre-med", program: "notes and video class", gpu: 0, ram: 8, windows: true },
 ];
 
 function money(value: number) {
@@ -256,6 +260,7 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
   const choice = ITEMS.find((item) => item.id === picked);
   const meta = FILTERS.find((item) => item.id === filter)!;
   const qualityLabel = QUALITIES.find((item) => item.id === quality)?.label ?? "Normal";
+  const wide = useWide();
 
   function pickGame(id: string) {
     setGameId(id);
@@ -272,7 +277,8 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
   }
 
   return (
-    <div className="mx-auto flex h-dvh w-full max-w-xl flex-col overflow-hidden bg-bg text-fg">
+    <div className={`mx-auto flex h-dvh w-full overflow-hidden bg-bg text-fg ${wide ? "max-w-6xl flex-row" : "max-w-xl flex-col"}`}>
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
       <header className="safe-top shrink-0 border-b border-line px-4 py-3">
         <div className="flex items-center justify-between">
           <button type="button" onClick={onLeave} className="text-base text-muted">
@@ -281,8 +287,14 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
           <ThemeToggle />
         </div>
         <h1 className="font-display mt-3 text-4xl font-medium leading-none tracking-tight">Pick a laptop</h1>
-        <p className="mt-2 text-base text-muted">One laptop. Pick a game or a class. Renewed ones are included.</p>
+        <p className="mt-2 text-base text-muted">One laptop. Games, a program, a college class, or a career.</p>
       </header>
+      <div className="grid shrink-0 grid-cols-2 gap-2 px-4 pt-3">
+        <button type="button" onClick={() => { setFilter("games"); setCourseId("any"); }} className={`h-14 rounded-2xl border text-lg ${filter === "games" ? "border-accent bg-subtle" : "border-line"}`}>Games</button>
+        <button type="button" onClick={() => { setFilter("create"); setGameId("any"); }} className={`h-14 rounded-2xl border text-lg ${filter === "create" ? "border-accent bg-subtle" : "border-line"}`}>Programs</button>
+        <button type="button" onClick={() => { setFilter("school"); setGameId("any"); }} className={`h-14 rounded-2xl border text-lg ${filter === "school" ? "border-accent bg-subtle" : "border-line"}`}>College</button>
+        <button type="button" onClick={() => { setFilter("work"); setGameId("any"); }} className={`h-14 rounded-2xl border text-lg ${filter === "work" ? "border-accent bg-subtle" : "border-line"}`}>Careers</button>
+      </div>
       <div className="flex shrink-0 gap-2 overflow-x-auto px-4 py-3">
         {FILTERS.map((item) => (
           <button
@@ -378,7 +390,8 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
           })}
         </ul>
       </div>
-      <aside className="safe-bottom shrink-0 border-t border-line bg-elevated px-4 py-3">
+      </div>
+      <aside className={`shrink-0 bg-elevated px-4 py-4 ${wide ? "flex w-80 flex-col border-l border-line" : "safe-bottom border-t border-line"}`}>
         <p className="text-base font-medium">{choice ? money(choice.price) : "No laptop yet"}</p>
         <div className="mt-2 flex items-center gap-2">
           <span className="min-w-0 flex-1 truncate text-base">{choice ? choice.name.replace(" (Open box)", "") : "Tap one laptop."}</span>
