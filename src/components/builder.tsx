@@ -10,6 +10,7 @@ import {
   aiPicks,
   buildSpeed,
   coveredByBundle,
+  extraFilters,
   fitWhy,
   formLabel,
   formOf,
@@ -41,6 +42,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
   const notice = useBench((state) => state.notice);
   const saved = useBench((state) => state.saved);
   const pick = useBench((state) => state.pick);
+  const remove = useBench((state) => state.remove);
   const clear = useBench((state) => state.clear);
   const apply = useBench((state) => state.apply);
   const save = useBench((state) => state.save);
@@ -58,6 +60,9 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
   const [limit, setLimit] = useState(36);
   const [blocked, setBlocked] = useState(false);
   const [tag, setTag] = useState("all");
+  const [facet, setFacet] = useState("all");
+  const [wide, setWide] = useState(false);
+  const [tray, setTray] = useState<"shut" | "half" | "full">("half");
   const [name, setName] = useState("");
   const [copied, setCopied] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
@@ -72,6 +77,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
     setLimit(36);
     setBlocked(false);
     setTag("all");
+    setFacet("all");
     scroller.current?.scrollTo(0, 0);
   }, [step]);
 
@@ -82,7 +88,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
   const brands = useMemo(() => {
     const counts = new Map<string, number>();
     for (const part of fitting) counts.set(part.brand, (counts.get(part.brand) ?? 0) + 1);
-    return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+    return [...counts.entries()].sort((a, b) => a[0].localeCompare(b[0]));
   }, [fitting]);
 
   const tagChoices = useMemo(() => {
@@ -102,6 +108,10 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
     const list = source.filter((part) => {
       if (!blocked && brand !== "all" && part.brand !== brand) return false;
       if (!blocked && tag !== "all" && !tagsOf(part).includes(tag)) return false;
+      if (!blocked && facet !== "all") {
+        const rule = extraFilters(cat).find((item) => item.label === facet);
+        if (rule && !rule.test(part)) return false;
+      }
       if (!q) return true;
       return `${part.brand} ${part.name}`.toLowerCase().includes(q);
     });
@@ -111,7 +121,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
       return [chosen, ...list.filter((part) => part.id !== chosen.id)];
     }
     return list;
-  }, [blocked, rejected, fitting, brand, query, priceDesc, build, cat, tag]);
+  }, [blocked, rejected, fitting, brand, query, priceDesc, build, cat, tag, facet]);
 
   const total = spendOf(build);
   const score = scoreBuild(build);
@@ -167,13 +177,22 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
   }
 
   return (
-    <div className="mx-auto flex h-dvh w-full max-w-xl min-w-0 flex-col overflow-x-hidden bg-bg text-fg">
+    <div className={`mx-auto flex h-dvh w-full min-w-0 overflow-hidden bg-bg text-fg ${wide ? "max-w-6xl flex-col md:flex-row" : "max-w-xl flex-col"}`}>
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
       <header className="safe-top min-w-0 shrink-0 border-b border-line px-4 pb-3 pt-3">
         <div className="flex items-center justify-between gap-3">
           <button type="button" onClick={onLeave} className="text-sm text-muted">
             Welcome
           </button>
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              aria-pressed={wide}
+              onClick={() => setWide((value) => !value)}
+              className={`h-8 rounded-full border px-3 text-xs ${wide ? "border-accent bg-subtle text-fg" : "border-line text-muted"}`}
+            >
+              {wide ? "Phone" : "Desktop"}
+            </button>
             <ThemeToggle />
             <p className="tabular text-sm font-medium">{money(total)}</p>
           </div>
@@ -302,6 +321,16 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
           />
         ) : (
           <div className="space-y-3 px-4 py-3">
+            {cat === "prebuilt" ? (
+              <p className="rounded-xl border border-line bg-elevated p-3 text-sm text-muted">
+                Finished computers. Pick one and you are done. You do not add parts after this, except a screen.
+              </p>
+            ) : null}
+            {cat === "bundle" ? (
+              <p className="rounded-xl border border-line bg-elevated p-3 text-sm text-muted">
+                A bundle is a discount on parts, not a second computer. It fills the processor, board, or case it names.
+              </p>
+            ) : null}
             {cat === "storage" ? (
               <div className="rounded-xl border border-line bg-elevated p-3 text-sm">
                 <p className="font-medium">One drive.</p>
@@ -367,6 +396,20 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
               >
                 Open box
               </button>
+              {extraFilters(cat).map((item) => (
+                <button
+                  key={item.label}
+                  type="button"
+                  aria-pressed={facet === item.label}
+                  onClick={() => {
+                    setFacet(facet === item.label ? "all" : item.label);
+                    setLimit(36);
+                  }}
+                  className={`h-10 shrink-0 rounded-lg border px-3 text-sm ${facet === item.label ? "border-accent bg-subtle text-fg" : "border-line bg-elevated text-muted"} ${blocked ? "hidden" : ""}`}
+                >
+                  {item.label}
+                </button>
+              ))}
               <button
                 type="button"
                 aria-pressed={blocked}
@@ -456,6 +499,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
                         aria-pressed={selected}
                         className={`press flex w-full items-start justify-between gap-3 rounded-lg border px-3 py-3 text-left ${selected ? "border-accent bg-subtle" : "border-line bg-elevated"}`}
                       >
+                        <PartMark cat={part.cat} />
                         <span className="min-w-0">
                           <span className="flex items-center gap-2 text-xs text-faint">
                             {part.brand}
@@ -526,7 +570,101 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
           </button>
         )}
       </footer>
+      </div>
+      <Checkout build={build} wide={wide} tray={tray} setTray={setTray} onRemove={remove} />
     </div>
+  );
+}
+
+function PartMark({ cat }: { cat: Category }) {
+  return (
+    <span className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-subtle text-accent" aria-hidden>
+      <svg viewBox="0 0 32 32" className="size-7" fill="none" stroke="currentColor" strokeWidth="1.6">
+        {cat === "cpu" ? <rect x="8" y="8" width="16" height="16" rx="2" /> : null}
+        {cat === "motherboard" ? <path d="M6 8h20v16H6zM10 12h6M10 16h8M10 20h4" /> : null}
+        {cat === "memory" ? <path d="M9 8h4v16H9zM19 8h4v16h-4z" /> : null}
+        {cat === "gpu" ? <path d="M5 12h16v8H5zM21 15h6M8 20v3M14 20v3" /> : null}
+        {cat === "storage" ? <rect x="6" y="11" width="20" height="10" rx="2" /> : null}
+        {cat === "case" ? <path d="M10 5h12v22H10zM13 9h6" /> : null}
+        {cat === "cooler" ? <circle cx="16" cy="16" r="7" /> : null}
+        {cat === "psu" ? <path d="M7 10h18v12H7zM11 14h4M18 16h3" /> : null}
+        {cat === "monitor" ? <path d="M6 7h20v13H6zM16 20v4M12 24h8" /> : null}
+        {cat === "prebuilt" ? <path d="M8 6h16v20H8zM12 10h8M12 14h8" /> : null}
+        {cat === "bundle" ? <path d="M8 13l8-6 8 6v11H8z" /> : null}
+      </svg>
+    </span>
+  );
+}
+
+function Checkout({
+  build,
+  wide,
+  tray,
+  setTray,
+  onRemove,
+}: {
+  build: ReturnType<typeof partsFrom>;
+  wide: boolean;
+  tray: "shut" | "half" | "full";
+  setTray: (next: "shut" | "half" | "full") => void;
+  onRemove: (cat: Category) => void;
+}) {
+  const rows = CATS.filter((cat) => build[cat]);
+  const shut = !wide && tray === "shut";
+  return (
+    <aside
+      className={`flex min-h-0 flex-col border-line bg-elevated ${
+        wide
+          ? "h-[46dvh] w-full shrink-0 border-t md:h-full md:w-[22rem] md:border-l md:border-t-0"
+          : `shrink-0 border-t ${tray === "shut" ? "h-14" : tray === "half" ? "h-[46dvh]" : "h-[82dvh]"}`
+      }`}
+    >
+      <div className="flex items-center gap-2 px-3 py-2">
+        <button type="button" onClick={() => setTray(shut ? "half" : "shut")} className="min-w-0 flex-1 text-left">
+          <span className="block text-xs text-faint">Checkout</span>
+          <span className="tabular text-sm font-medium">
+            {rows.length} {rows.length === 1 ? "part" : "parts"} · {money(spendOf(build))}
+          </span>
+        </button>
+        <button type="button" onClick={() => setTray("half")} className="h-8 rounded-full border border-line px-2 text-xs text-muted">
+          Half
+        </button>
+        <button type="button" onClick={() => setTray(tray === "full" ? "half" : "full")} className="h-8 rounded-full border border-line px-2 text-xs text-muted">
+          {tray === "full" ? "Smaller" : "Expand"}
+        </button>
+        <button type="button" onClick={() => setTray("shut")} className="h-8 rounded-full border border-line px-2 text-xs text-muted">
+          Close
+        </button>
+      </div>
+      {shut ? null : (
+        <ul className="min-h-0 flex-1 space-y-2 overflow-y-auto px-3 pb-3">
+          {rows.length === 0 ? <li className="py-6 text-center text-sm text-muted">Nothing in checkout yet. Tap a part.</li> : null}
+          {rows.map((cat, index) => {
+            const part = build[cat];
+            if (!part) return null;
+            const others: ReturnType<typeof partsFrom> = { ...build };
+            delete others[cat];
+            const ok = fitWhy(part, others) === "";
+            return (
+              <li key={cat} className="flex items-center gap-2 rounded-lg border border-line px-2 py-2">
+                <span className="tabular w-5 shrink-0 text-center text-xs text-faint">{index + 1}</span>
+                <PartMark cat={cat} />
+                <span className="min-w-0 flex-1">
+                  <span className="block text-xs text-faint">{CAT_LABEL[cat]}</span>
+                  <span className="block truncate text-sm">{shortName(part)}</span>
+                </span>
+                <span className={`flex size-8 shrink-0 items-center justify-center rounded-full text-sm ${ok ? "bg-subtle text-ok" : "bg-subtle text-danger"}`} title={ok ? "Fits the other parts" : fitWhy(part, others)}>
+                  {ok ? "✓" : "✕"}
+                </span>
+                <button type="button" onClick={() => onRemove(cat)} aria-label={`Remove ${CAT_LABEL[cat]}`} className="flex size-8 shrink-0 items-center justify-center rounded-full border border-line text-muted">
+                  <X className="size-3.5" />
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </aside>
   );
 }
 
@@ -543,6 +681,9 @@ function AiPanel({ onUse }: { onUse: (pick: ReturnType<typeof aiPicks>[number]) 
       NVIDIA: "nvidia",
       "No card": "desk",
       Screen: "screen",
+      League: "league",
+      Valorant: "valorant",
+      Fortnite: "fortnite",
       Work: "work",
       Cheap: "cheap",
       College: "college",

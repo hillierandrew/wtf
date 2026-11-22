@@ -1014,7 +1014,201 @@ export function aiPicks(): AiPick[] {
       why: "An RTX 5070 Ti 16GB with the 9800X3D. It is the NVIDIA card that still has 16GB. The Radeon 9070 XT build is the better price.",
       build: buildFrom(["0abb21ae33", BOARD_B850, DDR5_32, GPU_5070TI, SSD2, CASE, PSU850, AIR]),
     },
+    {
+      id: "league-low",
+      name: "League, low",
+      kicker: "League",
+      tags: ["games", "league", "1080"],
+      why: "League does not need a big card. This is 1080p with a real graphics card and nothing extra.",
+      build: buildFrom(["2dfbcfdbfb", GPU_9060, SSD1, CASE, PSU650]),
+    },
+    {
+      id: "league-med",
+      name: "League, medium",
+      kicker: "League",
+      tags: ["games", "league", "am5"],
+      why: "A newer socket and the same light card. High settings at 1080p, with room to swap the chip later.",
+      build: buildFrom(["84d819ea71", BOARD_AM5, DDR5_16, GPU_9060, SSD1, CASE, PSU650, AIR]),
+    },
+    {
+      id: "league-ultra",
+      name: "League, ultra",
+      kicker: "League",
+      tags: ["games", "league", "am5"],
+      why: "League is limited by the processor. The 9800X3D holds very high frame rates. The card stays modest.",
+      build: buildFrom(["0abb21ae33", BOARD_B850, DDR5_32, GPU_9060, SSD1, CASE, PSU650, AIR]),
+    },
+    {
+      id: "val-low",
+      name: "Valorant, low",
+      kicker: "Valorant",
+      tags: ["games", "valorant", "1080"],
+      why: "Valorant runs on a small card. This is the cheap 1080p PC.",
+      build: buildFrom(["2dfbcfdbfb", GPU_9060, SSD1, CASE, PSU650]),
+    },
+    {
+      id: "val-med",
+      name: "Valorant, medium",
+      kicker: "Valorant",
+      tags: ["games", "valorant", "1440"],
+      why: "A stronger processor and the RX 9070, so 1440p stays smooth.",
+      build: buildFrom(["61d2f9663c", BOARD_AM4, DDR4_32, GPU_9070, SSD1, CASE, PSU750, AIR]),
+    },
+    {
+      id: "val-ultra",
+      name: "Valorant, ultra",
+      kicker: "Valorant",
+      tags: ["games", "valorant", "am5"],
+      why: "Highest frame rates. The 9800X3D does the work. 32GB so nothing else is hitching.",
+      build: buildFrom(["0abb21ae33", BOARD_B850, DDR5_32, GPU_9070, SSD1, CASE, PSU750, AIR]),
+    },
+    {
+      id: "fn-low",
+      name: "Fortnite, low",
+      kicker: "Fortnite",
+      tags: ["games", "fortnite", "1080"],
+      why: "Performance mode and 1080p. The 8GB card is the ceiling.",
+      build: buildFrom(["2dfbcfdbfb", GPU_9060, SSD1, CASE, PSU650]),
+    },
+    {
+      id: "fn-med",
+      name: "Fortnite, medium",
+      kicker: "Fortnite",
+      tags: ["games", "fortnite", "1440"],
+      why: "16GB of video memory and the value card. Enough for high settings at 1440p.",
+      build: buildFrom(["61d2f9663c", BOARD_AM4, DDR4_32, GPU_9070, SSD1, CASE, PSU750, AIR]),
+    },
+    {
+      id: "fn-ultra",
+      name: "Fortnite, ultra",
+      kicker: "Fortnite",
+      tags: ["games", "fortnite", "am5"],
+      why: "The RX 9070 XT and the 9800X3D. This is the last step before the money stops buying frames.",
+      build: buildFrom(["0abb21ae33", BOARD_B850, DDR5_32, GPU_9070XT, SSD2, CASE, PSU850, AIR]),
+    },
+    {
+      id: "stream",
+      name: "Streaming",
+      kicker: "Stream",
+      tags: ["work", "stream"],
+      why: "Eight cores and an NVIDIA card, which is the easy one for streaming. One drive.",
+      build: buildFrom(["61d2f9663c", BOARD_AM4, DDR4_32, GPU_5060, SSD1, CASE, PSU650, AIR]),
+    },
+    {
+      id: "edit",
+      name: "Video editing",
+      kicker: "Edit",
+      tags: ["work", "edit"],
+      why: "20 cores, 32GB, a 2TB drive, and an NVIDIA card. For cutting video, not for the cheapest frames.",
+      build: buildFrom(["aeb7922d24", GPU_5070, SSD2, CASE, PSU750, AIR]),
+    },
+    {
+      id: "music",
+      name: "Music",
+      kicker: "Music",
+      tags: ["work", "music", "desk"],
+      why: "Quiet parts. Built-in graphics, 32GB, one drive. No big card heating the room.",
+      build: buildFrom(["ae65baf2c4", BOARD_AM4, DDR4_32, SSD1, CASE, PSU550]),
+    },
+    {
+      id: "code",
+      name: "Programming",
+      kicker: "Code",
+      tags: ["work", "code", "college"],
+      why: "32GB and a 1TB drive for projects and browser tabs. A graphics card is not required.",
+      build: buildFrom(["ae65baf2c4", BOARD_AM4, DDR4_32, SSD2, CASE, PSU550]),
+    },
+    {
+      id: "blender",
+      name: "Blender and 3D",
+      kicker: "3D",
+      tags: ["work", "blender"],
+      why: "3D wants an NVIDIA card and 32GB. This is a class machine, not a studio farm.",
+      build: buildFrom(["5b8cc605f2", "bfed39ecdd", DDR4_32, GPU_5070, SSD2, CASE, PSU750, AIR]),
+    },
   ];
 }
 
-export const AI_FILTERS = ["All", "Per frame", "Cheap", "College", "Games", "Value", "1080p", "1440p", "Newer socket", "NVIDIA", "No card", "Screen", "Work", "Top"] as const;
+export function extraFilters(cat: Category): { label: string; test: (part: Part) => boolean }[] {
+  const blob = (part: Part) => `${part.name} ${part.brand} ${part.socket ?? ""} ${part.ram ?? ""} ${part.form ?? ""}`.toUpperCase();
+  const has = (re: RegExp) => (part: Part) => re.test(blob(part));
+  const table: Partial<Record<Category, { label: string; test: (part: Part) => boolean }[]>> = {
+    cpu: [
+      { label: "AMD", test: has(/\bAMD\b|RYZEN/) },
+      { label: "Intel", test: has(/\bINTEL\b|\bCORE\b/) },
+      { label: "AM5", test: (part) => part.socket === "AM5" },
+      { label: "AM4", test: (part) => part.socket === "AM4" },
+      { label: "6 cores", test: has(/6[-\s]?CORE/) },
+      { label: "8 cores", test: has(/8[-\s]?CORE/) },
+      { label: "Has graphics", test: has(/RADEON|GRAPHICS/) },
+      { label: "3D cache", test: has(/X3D/) },
+    ],
+    motherboard: [
+      { label: "Mini-ITX", test: (part) => formOf(part) === "itx" },
+      { label: "Micro-ATX", test: (part) => formOf(part) === "matx" },
+      { label: "ATX", test: (part) => formOf(part) === "atx" },
+      { label: "DDR4", test: (part) => ramKindOf(part) === "DDR4" },
+      { label: "DDR5", test: (part) => ramKindOf(part) === "DDR5" },
+      { label: "Wi-Fi", test: has(/WI-?FI/) },
+    ],
+    memory: [
+      { label: "DDR4", test: (part) => ramKindOf(part) === "DDR4" },
+      { label: "DDR5", test: (part) => ramKindOf(part) === "DDR5" },
+      { label: "16GB", test: has(/\b16GB\b/) },
+      { label: "32GB", test: has(/\b32GB\b/) },
+      { label: "64GB", test: has(/\b64GB\b/) },
+      { label: "2 sticks", test: (part) => sticksOf(part) === 2 },
+    ],
+    gpu: [
+      { label: "NVIDIA", test: has(/NVIDIA|GEFORCE|RTX/) },
+      { label: "AMD", test: has(/\bAMD\b|RADEON/) },
+      { label: "8GB", test: has(/\b8GB\b|\b8G\b/) },
+      { label: "12GB", test: has(/\b12GB\b|\b12G\b/) },
+      { label: "16GB", test: has(/\b16GB\b|\b16G\b/) },
+    ],
+    storage: [
+      { label: "NVMe", test: has(/NVME|M\.2/) },
+      { label: "SATA", test: has(/SATA/) },
+      { label: "HDD", test: has(/HDD|HARD DRIVE|RPM/) },
+      { label: "1TB", test: has(/\b1TB\b/) },
+      { label: "2TB", test: has(/\b2TB\b/) },
+    ],
+    case: [
+      { label: "Mini-ITX", test: (part) => formOf(part) === "itx" },
+      { label: "Micro-ATX", test: (part) => formOf(part) === "matx" },
+      { label: "ATX", test: (part) => formOf(part) === "atx" },
+      { label: "Mesh", test: has(/MESH/) },
+      { label: "White", test: has(/\bWHITE\b/) },
+    ],
+    cooler: [
+      { label: "Air", test: (part) => !/LIQUID|AIO|240|280|360|420/.test(part.name.toUpperCase()) },
+      { label: "Liquid", test: has(/LIQUID|AIO/) },
+      { label: "240mm", test: has(/240/) },
+      { label: "360mm", test: has(/360/) },
+    ],
+    psu: [
+      { label: "650W", test: (part) => wattOf(part) === 650 },
+      { label: "750W", test: (part) => wattOf(part) === 750 },
+      { label: "850W", test: (part) => wattOf(part) === 850 },
+      { label: "Gold", test: has(/GOLD/) },
+      { label: "Modular", test: has(/MODULAR/) },
+    ],
+    monitor: [
+      { label: "1080p", test: has(/1080|FHD/) },
+      { label: "1440p", test: has(/1440|QHD/) },
+      { label: "4K", test: has(/\b4K\b|3840|UHD/) },
+      { label: "144Hz+", test: (part) => {
+        const hz = part.name.match(/(\d{2,3})\s*Hz/i);
+        return Boolean(hz && Number(hz[1]) >= 144);
+      } },
+    ],
+    prebuilt: [
+      { label: "Gaming", test: (part) => part.form === "gaming" || /RTX|RX\s?\d|GEFORCE|RADEON/i.test(part.name) },
+      { label: "Mini", test: (part) => part.form === "mini" },
+      { label: "Desk", test: (part) => part.form === "desk" || part.form === "aio" },
+    ],
+  };
+  return table[cat] ?? [];
+}
+
+export const AI_FILTERS = ["All", "League", "Valorant", "Fortnite", "Games", "Work", "Per frame", "Cheap", "College", "Value", "1080p", "1440p", "Newer socket", "NVIDIA", "No card", "Screen", "Top"] as const;
