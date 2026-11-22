@@ -434,7 +434,30 @@ export function tagsOf(part: Part): string[] {
   }
   if (/TRIPLE FAN|3X|3 X/.test(n) && part.cat === "gpu") tags.push("Triple fan");
   else if (/DUAL|DOUBLE FAN|2X/.test(n) && part.cat === "gpu") tags.push("Dual fan");
-  return [...new Set(tags)].slice(0, 8);
+  if (/X3D|3D V-CACHE/.test(n)) tags.push("3D cache");
+  if (/\bARGB\b/.test(n)) tags.push("ARGB");
+  else if (/\bRGB\b/.test(n)) tags.push("RGB");
+  if (/LOW PROFILE|\bLP\b|SFF/.test(n)) tags.push("Low profile");
+  if (/MESH/.test(n)) tags.push("Mesh");
+  if (/TEMPERED GLASS|\bTG\b/.test(n)) tags.push("Glass side");
+  if (/BLUETOOTH/.test(n)) tags.push("Bluetooth");
+  if (/USB-?C/.test(n)) tags.push("USB-C");
+  if (/FREESYNC/.test(n)) tags.push("FreeSync");
+  if (/G-SYNC/.test(n)) tags.push("G-Sync");
+  if (/CURVED/.test(n)) tags.push("Curved");
+  if (part.cat === "memory") {
+    const cl = n.match(/\bCL\s?(\d{2})\b/);
+    if (cl) tags.push(`CL${cl[1]}`);
+    const mhz = n.match(/\b(\d{4})\s?MHZ\b/);
+    if (mhz) tags.push(`${mhz[1]}MHz`);
+  }
+  if (part.cat === "case" || part.cat === "cooler" || part.cat === "gpu") {
+    if (/\bWHITE\b/.test(n)) tags.push("White");
+    else if (/\bBLACK\b/.test(n)) tags.push("Black");
+  }
+  if (part.cat === "cpu" && /\dF\b|KF\b|8400F/.test(n)) tags.push("No graphics");
+  else if (part.cat === "cpu" && /RADEON|GRAPHICS/.test(n)) tags.push("Has graphics");
+  return [...new Set(tags)].slice(0, 10);
 }
 
 export function shelfNote(cat: Category, build: Build): string {
@@ -511,6 +534,67 @@ export function spendOf(build: Build): number {
     if (!part || (cat !== "bundle" && covered.has(cat))) return sum;
     return sum + part.price;
   }, 0);
+}
+
+export function scoreBuild(build: Build): {
+  points: number;
+  rank: string;
+  next: string;
+  badges: { name: string; detail: string }[];
+} {
+  if (build.prebuilt) {
+    return {
+      points: 100,
+      rank: "Ready PC",
+      next: build.monitor ? "Copy the list." : "Add a screen if you need one.",
+      badges: [{ name: "Finished", detail: "One price for the whole PC." }],
+    };
+  }
+  const stock = Boolean(build.cpu && /with cooler|wraith/i.test(build.cpu.name));
+  const graphics = Boolean(
+    build.gpu || (build.cpu && /RADEON|GRAPHICS|GT\b/i.test(build.cpu.name) && !/\dF\b|KF\b/i.test(build.cpu.name)),
+  );
+  const checks = [
+    Boolean(build.cpu),
+    Boolean(build.motherboard),
+    Boolean(build.memory),
+    Boolean(build.storage),
+    Boolean(build.case),
+    Boolean(build.psu),
+    graphics,
+    Boolean(build.cooler) || stock,
+  ];
+  const points = Math.round((checks.filter(Boolean).length / checks.length) * 100);
+  const badges: { name: string; detail: string }[] = [];
+  if (build.storage) badges.push({ name: "One drive", detail: "No extra drives." });
+  if (stock && !build.cooler) badges.push({ name: "Cooler in the box", detail: "You skipped the extra cooler." });
+  if (points === 100 && warnings(build).length === 0) badges.push({ name: "It fits", detail: "Every required part is in, and they go together." });
+  const speed = buildSpeed(build);
+  const spend = spendOf(build);
+  if (speed >= 100 && spend > 0 && spend / speed <= 22) badges.push({ name: "Worth the money", detail: "Close to the best frames per dollar." });
+  if (speed >= 140) badges.push({ name: "Top shelf", detail: "Faster than the value card." });
+  if (formOf(build.case) === "itx" || formOf(build.motherboard) === "itx") badges.push({ name: "Tiny", detail: "Mini-ITX." });
+  if (build.monitor) badges.push({ name: "Has a screen", detail: "A monitor is in the list." });
+  const rank =
+    points >= 100 ? "Bench complete" : points >= 75 ? "It plays" : points >= 50 ? "It posts" : points >= 25 ? "On the bench" : "Empty case";
+  const next = !build.cpu
+    ? "Pick a processor."
+    : !build.motherboard
+      ? "Pick a board with the same socket."
+      : !build.memory
+        ? "Pick memory that matches the board."
+        : !build.storage
+          ? "Pick one drive."
+          : !build.case
+            ? "Pick a case that fits the board."
+            : !build.psu
+              ? "Pick a power supply."
+              : !graphics
+                ? "This chip needs a graphics card."
+                : !build.cooler && !stock
+                  ? "Pick one cooler."
+                  : "Copy the list, or add a screen.";
+  return { points, rank, next, badges };
 }
 
 export function shortName(part: Part): string {

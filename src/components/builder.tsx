@@ -20,6 +20,7 @@ import {
   needWatts,
   priceChange,
   PRICE_CHECKED,
+  scoreBuild,
   shelfNote,
   shortName,
   spendOf,
@@ -56,6 +57,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
   const [priceDesc, setPriceDesc] = useState(false);
   const [limit, setLimit] = useState(36);
   const [blocked, setBlocked] = useState(false);
+  const [tag, setTag] = useState("all");
   const [name, setName] = useState("");
   const [copied, setCopied] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
@@ -69,6 +71,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
     setBrand("all");
     setLimit(36);
     setBlocked(false);
+    setTag("all");
     scroller.current?.scrollTo(0, 0);
   }, [step]);
 
@@ -82,11 +85,23 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
     return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
   }, [fitting]);
 
+  const tagChoices = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const part of fitting) {
+      for (const label of tagsOf(part)) counts.set(label, (counts.get(label) ?? 0) + 1);
+    }
+    return [...counts.entries()]
+      .filter(([, count]) => count > 1)
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+      .slice(0, 14);
+  }, [fitting]);
+
   const visible = useMemo(() => {
     const source = blocked ? rejected : fitting;
     const q = query.trim().toLowerCase();
     const list = source.filter((part) => {
       if (!blocked && brand !== "all" && part.brand !== brand) return false;
+      if (!blocked && tag !== "all" && !tagsOf(part).includes(tag)) return false;
       if (!q) return true;
       return `${part.brand} ${part.name}`.toLowerCase().includes(q);
     });
@@ -96,9 +111,10 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
       return [chosen, ...list.filter((part) => part.id !== chosen.id)];
     }
     return list;
-  }, [blocked, rejected, fitting, brand, query, priceDesc, build, cat]);
+  }, [blocked, rejected, fitting, brand, query, priceDesc, build, cat, tag]);
 
   const total = spendOf(build);
+  const score = scoreBuild(build);
   const filled = CATS.filter((item) => build[item]).length;
   const shown = visible.slice(0, limit);
 
@@ -179,6 +195,16 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
               </>
             )}
           </p>
+        </div>
+        <div className="mt-3">
+          <div className="flex items-center justify-between gap-3 text-xs">
+            <p className="font-medium">{score.rank}</p>
+            <p className="tabular text-faint">{score.points}/100</p>
+          </div>
+          <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-subtle">
+            <div className="h-full bg-accent" style={{ width: `${score.points}%` }} />
+          </div>
+          <p className="mt-1 text-xs text-muted">{score.next}</p>
         </div>
         <div className="mt-3 flex gap-1" aria-hidden>
           {CATS.map((item, index) => {
@@ -373,6 +399,32 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
                 </label>
               ) : null}
             </div>
+            {!blocked && tagChoices.length ? (
+              <div className="flex gap-1.5 overflow-x-auto">
+                <button
+                  type="button"
+                  aria-pressed={tag === "all"}
+                  onClick={() => setTag("all")}
+                  className={`h-8 shrink-0 rounded-full border px-3 text-xs ${tag === "all" ? "border-accent bg-subtle text-fg" : "border-line text-muted"}`}
+                >
+                  Any tag
+                </button>
+                {tagChoices.map(([label]) => (
+                  <button
+                    key={label}
+                    type="button"
+                    aria-pressed={tag === label}
+                    onClick={() => {
+                      setTag(label);
+                      setLimit(36);
+                    }}
+                    className={`h-8 shrink-0 rounded-full border px-3 text-xs ${tag === label ? "border-accent bg-subtle text-fg" : "border-line text-muted"}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            ) : null}
             <p className="text-xs text-faint">
               {blocked ? (
                 <>
@@ -623,6 +675,7 @@ function Review({
   const ready = Boolean(build.prebuilt);
   const notes = warnings(build);
   const total = spendOf(build);
+  const score = scoreBuild(build);
   const need = needWatts(build);
   const supply = wattOf(build.psu);
   const board = formOf(build.motherboard);
@@ -724,10 +777,22 @@ function Review({
           Finished PC. The price is the whole system.
         </p>
       ) : filled ? (
-        <p className="flex items-center gap-2 text-sm text-ok">
-          <Check className="size-4" strokeWidth={1.75} />
-          These parts fit each other.
-        </p>
+        <div className="space-y-3">
+          <p className="flex items-center gap-2 text-sm text-ok">
+            <Check className="size-4" strokeWidth={1.75} />
+            {score.rank}. {score.points}/100. {score.next}
+          </p>
+          {score.badges.length ? (
+            <ul className="flex flex-wrap gap-2">
+              {score.badges.map((badge) => (
+                <li key={badge.name} className="rounded-full border border-line bg-elevated px-3 py-1 text-xs">
+                  <span className="font-medium">{badge.name}</span>
+                  <span className="text-muted"> · {badge.detail}</span>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
       ) : (
         <p className="text-sm text-muted">Nothing picked yet. Open Build by AI, or start with a prebuilt.</p>
       )}
