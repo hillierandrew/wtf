@@ -629,7 +629,31 @@ const LESSON: Record<Category, string> = {
   monitor: "The screen. The computer still works if you skip this.",
 };
 
-const GAMES = ["Call of Duty", "Battlefield", "Fortnite", "Valorant", "League", "Skyrim", "Harry Potter"];
+const GAME_LIST: { kicker: string; title: string; year: string }[] = [
+  { kicker: "Call of Duty", title: "Call of Duty: Modern Warfare 4", year: "2026" },
+  { kicker: "Battlefield", title: "Battlefield 6", year: "2025" },
+  { kicker: "Fortnite", title: "Fortnite", year: "2017" },
+  { kicker: "Valorant", title: "Valorant", year: "2020" },
+  { kicker: "League", title: "League of Legends", year: "2009" },
+  { kicker: "GTA VI", title: "Grand Theft Auto VI", year: "2026" },
+  { kicker: "GTA V", title: "Grand Theft Auto V", year: "2013" },
+  { kicker: "Counter-Strike 2", title: "Counter-Strike 2", year: "2023" },
+  { kicker: "Elden Ring", title: "Elden Ring", year: "2022" },
+  { kicker: "Cyberpunk 2077", title: "Cyberpunk 2077", year: "2020" },
+  { kicker: "Helldivers 2", title: "Helldivers 2", year: "2024" },
+  { kicker: "Monster Hunter Wilds", title: "Monster Hunter Wilds", year: "2025" },
+  { kicker: "Black Myth: Wukong", title: "Black Myth: Wukong", year: "2024" },
+  { kicker: "Baldur's Gate 3", title: "Baldur's Gate 3", year: "2023" },
+  { kicker: "Red Dead Redemption 2", title: "Red Dead Redemption 2", year: "2018" },
+  { kicker: "The Witcher 3", title: "The Witcher 3: Wild Hunt", year: "2015" },
+  { kicker: "Harry Potter", title: "Hogwarts Legacy", year: "2023" },
+  { kicker: "Skyrim", title: "The Elder Scrolls V: Skyrim", year: "2011" },
+  { kicker: "Apex Legends", title: "Apex Legends", year: "2019" },
+  { kicker: "Overwatch 2", title: "Overwatch 2", year: "2022" },
+  { kicker: "Rocket League", title: "Rocket League", year: "2015" },
+  { kicker: "Minecraft", title: "Minecraft", year: "2011" },
+  { kicker: "Roblox", title: "Roblox", year: "2006" },
+];
 const SIZES = [
   { id: "basic", label: "Basic" },
   { id: "low", label: "Low" },
@@ -658,7 +682,7 @@ function Quest({
   onMore: () => void;
 }) {
   const picks = aiPicks();
-  const [screen, setScreen] = useState<"menu" | "games" | "jobs" | "sizes">("menu");
+  const [screen, setScreen] = useState<"menu" | "games" | "jobs" | "sizes" | "consoles" | "emu">("menu");
   const [game, setGame] = useState("");
   const [cooking, setCooking] = useState("");
   const [pct, setPct] = useState(0);
@@ -701,8 +725,8 @@ function Quest({
         <button type="button" onClick={() => setScreen("games")} className="h-11 text-base text-muted">
           Back
         </button>
-        <h2 className="font-display text-4xl font-medium leading-none tracking-tight">{game}</h2>
-        <p className="text-base text-muted">Pick a size. Basic is the smallest. Ultra is the fancy one.</p>
+        <h2 className="font-display text-4xl font-medium leading-none tracking-tight">{GAME_LIST.find((item) => item.kicker === game)?.title ?? game}</h2>
+        <p className="text-base text-muted">{GAME_LIST.find((item) => item.kicker === game)?.year}. Pick a size. Basic is the smallest. Ultra is the fancy one.</p>
         {cards.map((pick) => {
           if (!pick) return null;
           const size = SIZES.find((item) => pick.tags.includes(item.id));
@@ -728,20 +752,50 @@ function Quest({
         </button>
         <h2 className="font-display text-4xl font-medium leading-none tracking-tight">Games</h2>
         <div className="grid grid-cols-1 gap-3">
-          {GAMES.map((title) => (
+          {GAME_LIST.map((item) => (
             <button
-              key={title}
+              key={item.kicker}
               type="button"
               onClick={() => {
-                setGame(title);
+                setGame(item.kicker);
                 setScreen("sizes");
               }}
-              className="press min-h-16 rounded-2xl border border-line bg-elevated px-4 text-left text-xl font-medium"
+              className="press min-h-16 rounded-2xl border border-line bg-elevated px-4 py-3 text-left"
             >
-              {title}
+              <span className="block text-xl font-medium">{item.title}</span>
+              <span className="mt-1 block text-base text-muted">{item.year}</span>
             </button>
           ))}
         </div>
+      </div>
+    );
+  }
+
+  if (screen === "consoles" || screen === "emu") {
+    const ids = screen === "consoles" ? ["xss", "xsx", "ps5", "ps5pro"] : ["emu-old", "emu-switch", "emu-ps3", "emu-all"];
+    const heading = screen === "consoles" ? "Like a console" : "Old consoles";
+    return (
+      <div className="space-y-3 px-4 py-4">
+        <button type="button" onClick={() => setScreen("menu")} className="h-11 text-base text-muted">
+          Back
+        </button>
+        <h2 className="font-display text-4xl font-medium leading-none tracking-tight">{heading}</h2>
+        <p className="text-base text-muted">
+          {screen === "emu" ? "These play games you already own. They do not come with those games." : "About as strong as the console. Not the same box."}
+        </p>
+        {ids.map((id) => {
+          const pick = picks.find((item) => item.id === id);
+          if (!pick) return null;
+          return (
+            <button key={id} type="button" onClick={() => order(pick)} className="press flex min-h-16 w-full items-center justify-between gap-3 rounded-2xl border border-line bg-elevated px-4 py-4 text-left">
+              <span>
+                <span className="block text-xl font-medium">{pick.kicker}</span>
+                <span className="mt-1 block text-base text-muted">{pick.why}</span>
+              </span>
+              <span className="tabular shrink-0 text-lg font-medium">{money(spendOf(pick.build))}</span>
+            </button>
+          );
+        })}
       </div>
     );
   }
@@ -775,7 +829,15 @@ function Quest({
       <p className="text-base text-muted">Order a PC like lunch. Tap one. The parts that do not fit never show up.</p>
       <button type="button" onClick={() => setScreen("games")} className="press min-h-20 w-full rounded-2xl bg-accent px-4 py-4 text-left text-accent-fg">
         <span className="block text-2xl font-medium">Games</span>
-        <span className="mt-1 block text-base">Call of Duty, Fortnite, Skyrim, and more.</span>
+        <span className="mt-1 block text-base">Real names and the year they came out.</span>
+      </button>
+      <button type="button" onClick={() => setScreen("consoles")} className="press min-h-20 w-full rounded-2xl border border-line bg-elevated px-4 py-4 text-left">
+        <span className="block text-2xl font-medium">Like a console</span>
+        <span className="mt-1 block text-base text-muted">PS5, PS5 Pro, Xbox Series X, Xbox Series S.</span>
+      </button>
+      <button type="button" onClick={() => setScreen("emu")} className="press min-h-20 w-full rounded-2xl border border-line bg-elevated px-4 py-4 text-left">
+        <span className="block text-2xl font-medium">Old consoles</span>
+        <span className="mt-1 block text-base text-muted">Switch, PS3, Xbox 360, and older. Games you already own.</span>
       </button>
       <button type="button" onClick={() => setScreen("jobs")} className="press min-h-20 w-full rounded-2xl border border-line bg-elevated px-4 py-4 text-left">
         <span className="block text-2xl font-medium">School and work</span>
