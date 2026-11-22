@@ -99,6 +99,10 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
 
   function choose(part: (typeof PARTS)[number]) {
     pick(part);
+    if (part.cat === "prebuilt") {
+      go(REVIEW);
+      return;
+    }
     if (part.cat !== "bundle") return;
     const next = partsFrom(useBench.getState().ids);
     if (!next.bundle) return;
@@ -108,16 +112,25 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
 
   async function copy() {
     const covered = coveredByBundle(build);
-    const lines = [
-      "drew.wtf build",
-      ...CATS.map((item) => {
-        const part = build[item];
-        if (!part) return `${CAT_LABEL[item]}: —`;
-        if (item !== "bundle" && covered.has(item)) return `${CAT_LABEL[item]}: ${part.brand} ${shortName(part)} (included)`;
-        return `${CAT_LABEL[item]}: ${part.brand} ${shortName(part)} (${money(part.price)})`;
-      }),
-      `Total: ${money(total)} CAD`,
-    ];
+    const lines = build.prebuilt
+      ? [
+          "drew.wtf build",
+          `Prebuilt: ${build.prebuilt.brand} ${shortName(build.prebuilt)} (${money(build.prebuilt.price)})`,
+          build.monitor
+            ? `Monitor: ${build.monitor.brand} ${shortName(build.monitor)} (${money(build.monitor.price)})`
+            : "Monitor: —",
+          `Total: ${money(total)} CAD`,
+        ]
+      : [
+          "drew.wtf build",
+          ...CATS.map((item) => {
+            const part = build[item];
+            if (!part) return `${CAT_LABEL[item]}: —`;
+            if (item !== "bundle" && covered.has(item)) return `${CAT_LABEL[item]}: ${part.brand} ${shortName(part)} (included)`;
+            return `${CAT_LABEL[item]}: ${part.brand} ${shortName(part)} (${money(part.price)})`;
+          }),
+          `Total: ${money(total)} CAD`,
+        ];
     try {
       await navigator.clipboard.writeText(lines.join("\n"));
       setCopied(true);
@@ -287,7 +300,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
                   setBlocked((value) => !value);
                   setLimit(36);
                 }}
-                className={`h-10 shrink-0 rounded-lg border px-3 text-sm ${blocked ? "border-danger text-danger" : "border-line bg-elevated text-muted"} ${cat === "bundle" || cat === "monitor" ? "hidden" : ""}`}
+                className={`h-10 shrink-0 rounded-lg border px-3 text-sm ${blocked ? "border-danger text-danger" : "border-line bg-elevated text-muted"} ${cat === "bundle" || cat === "monitor" || cat === "prebuilt" ? "hidden" : ""}`}
               >
                 Won't fit ({rejected.length})
               </button>
@@ -322,7 +335,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
                   <span className="tabular">{visible.length}</span> fit · {shelfNote(cat, build)}
                 </>
               )}
-              {(cat === "bundle" || cat === "cpu" || cat === "motherboard" || cat === "memory" || cat === "gpu" || cat === "storage" || cat === "case" || cat === "psu" || cat === "cooler" || cat === "monitor") ? " · Prices checked Nov 21, 2026" : ""}
+              {" · Prices checked Nov 21, 2026"}
             </p>
             {shown.length === 0 ? (
               <p className="py-12 text-center text-sm text-muted">
@@ -431,6 +444,7 @@ function Review({
   onLoad: (id: string) => void;
   onDelete: (id: string) => void;
 }) {
+  const ready = Boolean(build.prebuilt);
   const notes = warnings(build);
   const total = spendOf(build);
   const need = needWatts(build);
@@ -438,11 +452,13 @@ function Review({
   const board = formOf(build.motherboard);
   const filled = CATS.some((cat) => build[cat]);
   const covered = coveredByBundle(build);
+  const rows = ready ? CATS.filter((cat) => cat === "prebuilt" || cat === "monitor") : CATS;
 
   return (
     <div className="space-y-5 px-4 py-4">
       <ul className="flex flex-col gap-2">
-        {CATS.map((cat, index) => {
+        {rows.map((cat) => {
+          const index = CATS.indexOf(cat);
           const part = build[cat];
           const included = part && cat !== "bundle" && covered.has(cat);
           return (
@@ -465,6 +481,13 @@ function Review({
         })}
       </ul>
 
+      {ready ? (
+        <div className="rounded-xl border border-line bg-elevated p-4">
+          <p className="text-xs text-faint">Total</p>
+          <p className="tabular text-lg font-medium">{money(total)}</p>
+          <p className="mt-2 text-sm text-muted">{tagsOf(build.prebuilt!).join(" · ") || "Finished PC."}</p>
+        </div>
+      ) : (
       <dl className="grid grid-cols-2 gap-3 rounded-xl border border-line bg-elevated p-4 text-sm">
         <div>
           <dt className="text-xs text-faint">Total</dt>
@@ -484,6 +507,7 @@ function Review({
           <dd>{board ? formLabel(board) : "—"}</dd>
         </div>
       </dl>
+      )}
 
       {notes.length ? (
         <ul className="space-y-2">
@@ -494,15 +518,25 @@ function Review({
             </li>
           ))}
         </ul>
+      ) : ready ? (
+        <p className="flex items-center gap-2 text-sm text-ok">
+          <Check className="size-4" strokeWidth={1.75} />
+          Finished PC. The price is the whole system.
+        </p>
       ) : filled ? (
         <p className="flex items-center gap-2 text-sm text-ok">
           <Check className="size-4" strokeWidth={1.75} />
           These parts fit each other.
         </p>
       ) : (
-        <p className="text-sm text-muted">Nothing picked yet. Use a budget or a bundle, or pick each part.</p>
+        <p className="text-sm text-muted">Nothing picked yet. Start with a prebuilt, a budget, or a bundle.</p>
       )}
-      {!build.monitor && (build.cpu || build.gpu || build.bundle) ? (
+      {!build.monitor && ready && build.prebuilt?.form !== "aio" ? (
+        <button type="button" onClick={() => onJump(CATS.indexOf("monitor"))} className="text-left text-sm text-muted">
+          No monitor yet. Add a screen if you need one.
+        </button>
+      ) : null}
+      {!build.monitor && !ready && (build.cpu || build.gpu || build.bundle) ? (
         <button type="button" onClick={() => onJump(CATS.indexOf("monitor"))} className="text-left text-sm text-muted">
           No monitor yet. Add a screen if you need one.
         </button>

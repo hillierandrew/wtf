@@ -98,16 +98,23 @@ export const useBench = create<State>((set, get) => ({
   pick: (part) => {
     const { ids, openBox, saved } = get();
     const current = buildOf(ids);
-    const next = part.cat === "bundle" ? applyBundle(part, current) : reconcile(part.cat, { ...current, [part.cat]: part });
+    const next =
+      part.cat === "prebuilt"
+        ? { prebuilt: part }
+        : part.cat === "bundle"
+          ? applyBundle(part, current)
+          : reconcile(part.cat, { ...current, [part.cat]: part });
     const nextIds = idsOf(next);
     writeLocal(nextIds, openBox, saved);
     const dropped = droppedNote(ids, nextIds);
     const note =
-      part.cat === "bundle" && next.bundle
-        ? dropped
-          ? `Bundle applied. ${dropped}`
-          : "Bundle applied. The deal price replaces those parts."
-        : dropped;
+      part.cat === "prebuilt" && next.prebuilt
+        ? "Finished PC. That price is the whole system."
+        : part.cat === "bundle" && next.bundle
+          ? dropped
+            ? `Bundle applied. ${dropped}`
+            : "Bundle applied. The deal price replaces those parts."
+          : dropped;
     set({ ids: nextIds, notice: note });
   },
   remove: (cat) => {

@@ -1,6 +1,7 @@
 import raw from "@/data/parts.json";
 
 export const CATS = [
+  "prebuilt",
   "bundle",
   "cpu",
   "motherboard",
@@ -32,6 +33,7 @@ export type Part = {
 export type Build = Partial<Record<Category, Part>>;
 
 export const CAT_LABEL: Record<Category, string> = {
+  prebuilt: "Prebuilt",
   bundle: "Bundle",
   cpu: "Processor",
   motherboard: "Motherboard",
@@ -45,6 +47,7 @@ export const CAT_LABEL: Record<Category, string> = {
 };
 
 export const CAT_TAB: Record<Category, string> = {
+  prebuilt: "Ready",
   bundle: "Bundle",
   cpu: "CPU",
   motherboard: "Board",
@@ -75,7 +78,7 @@ export function isJunk(part: Part, allowOpenBox: boolean): boolean {
   const blob = `${part.name} ${part.brand}`;
   if (/sodimm|so-dimm|laptop|\becc\b|surveillance|\bpurple\b|(^|\s)ican\b/i.test(blob)) return true;
   if (part.price < 12) return true;
-  if (!allowOpenBox && /open\s?box|\[openbox\]|renewed|recertified/i.test(blob)) return true;
+  if (!allowOpenBox && /open\s?box|\[openbox\]|renewed|recertified|refurbished/i.test(blob)) return true;
   return false;
 }
 
@@ -172,7 +175,13 @@ function coolerSockets(part: Part): string[] {
 
 /** Empty string means the part fits the rest of the build. */
 export function fitWhy(part: Part, others: Build): string {
+  if (part.cat === "prebuilt") {
+    const mixed = CATS.some((cat) => cat !== "prebuilt" && cat !== "monitor" && others[cat]);
+    if (mixed) return "A finished PC replaces a custom build.";
+    return "";
+  }
   if (part.cat === "bundle" || part.cat === "monitor") return "";
+  if (others.prebuilt) return "Clear the finished PC before picking parts.";
   if (part.cat === "cpu" && others.motherboard?.socket && part.socket && part.socket !== others.motherboard.socket) {
     return `${part.socket} processor, ${others.motherboard.socket} motherboard.`;
   }
@@ -293,7 +302,7 @@ export function tagsOf(part: Part): string[] {
   const ram = ramKindOf(part);
   if (ram && part.cat !== "cpu") tags.push(ram);
   const form = formOf(part);
-  if (form) tags.push(formLabel(form));
+  if (form && part.cat !== "prebuilt") tags.push(formLabel(form));
   if (part.cat === "psu" || part.cat === "cpu") {
     const w = wattOf(part);
     if (w) tags.push(`${w}W`);
@@ -317,6 +326,17 @@ export function tagsOf(part: Part): string[] {
     if (hz) tags.push(`${hz[1]}Hz`);
   }
   if (part.cat === "bundle" && part.includes?.length) tags.push(`${part.includes.length} parts`);
+  if (part.cat === "prebuilt") {
+    const ram = part.name.match(/(\d+)\s*GB(?!\s*SSD)/i);
+    const disk = part.name.match(/(\d+(?:\.\d+)?)\s*(TB|GB)\s*SSD/i);
+    const gpu = part.name.match(/RTX\s?\d{3,4}(?:\s?Ti)?|RX\s?\d{3,4}(?:\s?XT)?|UHD Graphics|HD Graphics|Intel Graphics/i);
+    if (ram) tags.push(`${ram[1]}GB RAM`);
+    if (disk) tags.push(`${disk[1]}${disk[2].toUpperCase()} SSD`);
+    if (gpu) tags.push(gpu[0].replace(/\s+/g, " "));
+    if (part.form === "aio") tags.push("All-in-one");
+    else if (part.form === "mini") tags.push("Mini");
+    else if (part.form === "gaming") tags.push("Gaming");
+  }
   return tags.slice(0, 4);
 }
 
@@ -344,10 +364,12 @@ export function shelfNote(cat: Category, build: Build): string {
   if (cat === "cooler" && build.cpu?.socket) bits.push(build.cpu.socket);
   if (cat === "monitor") bits.push("Optional");
   if (cat === "bundle") bits.push("Deal price replaces the parts inside");
+  if (cat === "prebuilt") bits.push("Finished PCs. One price for the whole system");
   return bits.length ? bits.join(" · ") : "Full shelf";
 }
 
 export function warnings(build: Build): string[] {
+  if (build.prebuilt) return [];
   const notes: string[] = [];
   const cpu = build.cpu;
   const gpu = build.gpu;
@@ -375,6 +397,7 @@ export function warnings(build: Build): string[] {
 }
 
 export function spendOf(build: Build): number {
+  if (build.prebuilt) return build.prebuilt.price + (build.monitor?.price ?? 0);
   const covered = coveredByBundle(build);
   return CATS.reduce((sum, cat) => {
     const part = build[cat];
