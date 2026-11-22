@@ -19,6 +19,7 @@ import {
   money,
   m2Slots,
   needWatts,
+  partImage,
   priceChange,
   PRICE_CHECKED,
   scoreBuild,
@@ -30,6 +31,7 @@ import {
   warnings,
   wattOf,
   type Category,
+  type Part,
 } from "@/lib/catalog";
 import { partsFrom, useBench } from "@/lib/store";
 import { ThemeToggle } from "@/lib/theme";
@@ -499,7 +501,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
                         aria-pressed={selected}
                         className={`press flex w-full items-start justify-between gap-3 rounded-lg border px-3 py-3 text-left ${selected ? "border-accent bg-subtle" : "border-line bg-elevated"}`}
                       >
-                        <PartMark cat={part.cat} />
+                        <PartMark part={part} />
                         <span className="min-w-0">
                           <span className="flex items-center gap-2 text-xs text-faint">
                             {part.brand}
@@ -576,24 +578,8 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
   );
 }
 
-function PartMark({ cat }: { cat: Category }) {
-  return (
-    <span className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-subtle text-accent" aria-hidden>
-      <svg viewBox="0 0 32 32" className="size-7" fill="none" stroke="currentColor" strokeWidth="1.6">
-        {cat === "cpu" ? <rect x="8" y="8" width="16" height="16" rx="2" /> : null}
-        {cat === "motherboard" ? <path d="M6 8h20v16H6zM10 12h6M10 16h8M10 20h4" /> : null}
-        {cat === "memory" ? <path d="M9 8h4v16H9zM19 8h4v16h-4z" /> : null}
-        {cat === "gpu" ? <path d="M5 12h16v8H5zM21 15h6M8 20v3M14 20v3" /> : null}
-        {cat === "storage" ? <rect x="6" y="11" width="20" height="10" rx="2" /> : null}
-        {cat === "case" ? <path d="M10 5h12v22H10zM13 9h6" /> : null}
-        {cat === "cooler" ? <circle cx="16" cy="16" r="7" /> : null}
-        {cat === "psu" ? <path d="M7 10h18v12H7zM11 14h4M18 16h3" /> : null}
-        {cat === "monitor" ? <path d="M6 7h20v13H6zM16 20v4M12 24h8" /> : null}
-        {cat === "prebuilt" ? <path d="M8 6h16v20H8zM12 10h8M12 14h8" /> : null}
-        {cat === "bundle" ? <path d="M8 13l8-6 8 6v11H8z" /> : null}
-      </svg>
-    </span>
-  );
+function PartMark({ part }: { part: Part }) {
+  return <img src={partImage(part)} alt="" className="size-14 shrink-0 rounded-lg bg-subtle object-cover" />;
 }
 
 function Checkout({
@@ -648,7 +634,7 @@ function Checkout({
             return (
               <li key={cat} className="flex items-center gap-2 rounded-lg border border-line px-2 py-2">
                 <span className="tabular w-5 shrink-0 text-center text-xs text-faint">{index + 1}</span>
-                <PartMark cat={cat} />
+                <PartMark part={part} />
                 <span className="min-w-0 flex-1">
                   <span className="block text-xs text-faint">{CAT_LABEL[cat]}</span>
                   <span className="block truncate text-sm">{shortName(part)}</span>

@@ -66,6 +66,23 @@ export const byId = new Map(PARTS.map((p) => [p.id, p]));
 
 const FORM_RANK: Record<string, number> = { itx: 1, matx: 2, atx: 3, eatx: 4, full: 4 };
 
+export function partImage(part: Part): string {
+  const base = import.meta.env.BASE_URL;
+  const n = part.name.toUpperCase();
+  let file = "cpu.jpg";
+  if (part.cat === "motherboard") file = "board.jpg";
+  else if (part.cat === "memory") file = "ram.jpg";
+  else if (part.cat === "gpu") file = "gpu.jpg";
+  else if (part.cat === "storage") file = /HDD|HARD DRIVE|\d+\s?RPM/.test(n) ? "hdd.jpg" : "nvme.jpg";
+  else if (part.cat === "case") file = "case.jpg";
+  else if (part.cat === "cooler") file = /LIQUID|AIO|240|280|360|420/.test(n) ? "aio.jpg" : "air.jpg";
+  else if (part.cat === "psu") file = "psu.jpg";
+  else if (part.cat === "monitor") file = "monitor.jpg";
+  else if (part.cat === "prebuilt") file = "tower.jpg";
+  else if (part.cat === "bundle") file = /RX|RTX|GEFORCE|RADEON/.test(n) ? "gpu.jpg" : /CASE|D32|4000D|DY460/.test(n) ? "case.jpg" : "cpu.jpg";
+  return `${base}parts/${file}`;
+}
+
 export function money(n: number): string {
   return new Intl.NumberFormat("en-CA", {
     style: "currency",
