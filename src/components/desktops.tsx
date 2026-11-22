@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Check, Search, X } from "lucide-react";
-import { PARTS, machineScore, money, tagsOf, type Part } from "@/lib/catalog";
+import { PARTS, explainPart, machineScore, money, tagsOf, type Part, type ShelfSort } from "@/lib/catalog";
 import { RankBadge } from "@/components/rank";
+import { SortRow } from "@/components/sorts";
 import { ThemeToggle } from "@/lib/theme";
 
 type Filter = "all" | "gaming" | "desk" | "mini" | "aio";
@@ -31,7 +32,7 @@ export function Desktops({ onLeave }: { onLeave: () => void }) {
   const [query, setQuery] = useState("");
   const [brand, setBrand] = useState("all");
   const [openBox, setOpenBox] = useState(false);
-  const [byDeal, setByDeal] = useState(false);
+  const [sort, setSort] = useState<ShelfSort>("score-desc");
 
   useEffect(() => {
     try {
@@ -62,12 +63,19 @@ export function Desktops({ onLeave }: { onLeave: () => void }) {
         return true;
       })
       .sort((a, b) => {
-        const aScore = machineScore(a.name);
-        const bScore = machineScore(b.name);
-        if (byDeal) return bScore / b.price - aScore / a.price || bScore - aScore;
+        const aScore = machineScore(a.name) || 1;
+        const bScore = machineScore(b.name) || 1;
+        const aDeal = a.price / aScore;
+        const bDeal = b.price / bScore;
+        if (sort === "price-desc") return b.price - a.price;
+        if (sort === "score-asc") return aScore - bScore;
+        if (sort === "deal-asc") return aDeal - bDeal;
+        if (sort === "deal-desc") return bDeal - aDeal;
+        if (sort === "price-asc") return a.price - b.price;
+        if (sort === "gig-asc" || sort === "gig-desc") return sort === "gig-desc" ? b.price - a.price : a.price - b.price;
         return bScore - aScore || a.price - b.price;
       });
-  }, [items, filter, query, brand, openBox, byDeal]);
+  }, [items, filter, query, brand, openBox, sort]);
 
   const choice = items.find((part) => part.id === picked);
   const meta = FILTERS.find((item) => item.id === filter)!;
@@ -105,10 +113,8 @@ export function Desktops({ onLeave }: { onLeave: () => void }) {
           <Search className="size-4 text-muted" strokeWidth={1.75} />
           <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search" className="h-full w-full bg-transparent text-base outline-none" />
         </label>
+        <SortRow value={sort} onChange={setSort} />
         <div className="flex flex-wrap gap-2">
-          <button type="button" onClick={() => setByDeal((value) => !value)} className={`h-11 rounded-full border px-4 text-base ${byDeal ? "border-accent bg-subtle" : "border-line"}`}>
-            {byDeal ? "Best deal" : "Best score"}
-          </button>
           <button type="button" onClick={() => setOpenBox((value) => !value)} className={`h-11 rounded-full border px-4 text-base ${openBox ? "border-accent bg-subtle" : "border-line"}`}>
             {openBox ? "Open box on" : "Open box off"}
           </button>
@@ -126,8 +132,8 @@ export function Desktops({ onLeave }: { onLeave: () => void }) {
             const selected = picked === part.id;
             const score = machineScore(part.name);
             return (
-              <li key={part.id}>
-                <button type="button" onClick={() => setPicked(part.id)} className={`press flex w-full items-start justify-between gap-3 rounded-2xl border px-3 py-4 text-left ${selected ? "border-accent bg-subtle" : "border-line bg-elevated"}`}>
+              <li key={part.id} className={`overflow-hidden rounded-2xl border ${selected ? "border-accent bg-subtle" : "border-line bg-elevated"}`}>
+                <button type="button" onClick={() => setPicked(part.id)} className="press flex w-full items-start justify-between gap-3 px-3 py-4 text-left">
                   <span className="min-w-0">
                     <span className="flex items-center gap-2 text-sm text-muted">
                       {part.brand}
@@ -135,10 +141,7 @@ export function Desktops({ onLeave }: { onLeave: () => void }) {
                     </span>
                     <span className="mt-1 block text-base font-medium leading-snug">{part.name.replace(/\(Open Box\)/i, "").trim()}</span>
                     <span className="mt-1 block text-sm text-muted">{tagsOf(part).join(" · ")}</span>
-                    <span className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted">
-                      <RankBadge score={score} />
-                      {money(part.price / score)} per point
-                    </span>
+                    <span className="mt-1 block text-sm text-muted">{money(part.price / score)} per point</span>
                   </span>
                   <span className="shrink-0 text-right">
                     <span className="tabular block text-2xl font-medium">{score}</span>
@@ -146,6 +149,9 @@ export function Desktops({ onLeave }: { onLeave: () => void }) {
                     {part.was ? <span className="block text-sm text-ok">Down {money(part.was - part.price)}</span> : null}
                   </span>
                 </button>
+                <div className="px-3 pb-3">
+                  <RankBadge score={score} lines={explainPart({ ...part, cat: "prebuilt" })} />
+                </div>
               </li>
             );
           })}

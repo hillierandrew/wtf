@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Check, Search, X } from "lucide-react";
 import raw from "@/data/laptops.json";
+import { rankFrom, type ShelfSort } from "@/lib/catalog";
 import { RankBadge } from "@/components/rank";
+import { SortRow } from "@/components/sorts";
 import { ThemeToggle } from "@/lib/theme";
 
 type Kind = "game" | "home" | "work" | "tablet" | "chrome";
@@ -85,6 +87,28 @@ const GAMES: GameNeed[] = [
   { id: "tarkov", label: "Escape from Tarkov", year: 2017, need: { low: 45, medium: 60, normal: 72, ultra: 90 }, ram: { low: 16, medium: 16, normal: 32, ultra: 32 } },
   { id: "rivals", label: "Marvel Rivals", year: 2024, need: { low: 45, medium: 60, normal: 72, ultra: 90 }, ram: { low: 16, medium: 16, normal: 16, ultra: 16 } },
   { id: "gta6", label: "GTA 6 ready", year: 2026, note: "Not out yet. This is a guess for when it ships.", need: { low: 60, medium: 72, normal: 90, ultra: 100 }, ram: { low: 16, medium: 32, normal: 32, ultra: 32 } },
+  { id: "palworld", label: "Palworld", year: 2024, need: { low: 28, medium: 45, normal: 60, ultra: 80 }, ram: { low: 16, medium: 16, normal: 16, ultra: 32 } },
+  { id: "diablo", label: "Diablo IV", year: 2023, need: { low: 45, medium: 60, normal: 72, ultra: 90 }, ram: { low: 16, medium: 16, normal: 16, ultra: 32 } },
+  { id: "rust", label: "Rust", year: 2018, need: { low: 45, medium: 60, normal: 72, ultra: 90 }, ram: { low: 16, medium: 16, normal: 16, ultra: 32 } },
+  { id: "destiny", label: "Destiny 2", year: 2017, need: { low: 28, medium: 45, normal: 60, ultra: 80 }, ram: { low: 8, medium: 16, normal: 16, ultra: 16 } },
+  { id: "starfield", label: "Starfield", year: 2023, need: { low: 60, medium: 72, normal: 90, ultra: 100 }, ram: { low: 16, medium: 16, normal: 32, ultra: 32 } },
+  { id: "helldivers", label: "Helldivers 2", year: 2024, need: { low: 45, medium: 60, normal: 72, ultra: 90 }, ram: { low: 16, medium: 16, normal: 16, ultra: 32 } },
+  { id: "wilds", label: "Monster Hunter Wilds", year: 2025, need: { low: 60, medium: 72, normal: 90, ultra: 100 }, ram: { low: 16, medium: 16, normal: 32, ultra: 32 } },
+  { id: "wukong", label: "Black Myth: Wukong", year: 2024, need: { low: 45, medium: 60, normal: 80, ultra: 100 }, ram: { low: 16, medium: 16, normal: 16, ultra: 32 } },
+  { id: "flight", label: "Flight Simulator", year: 2020, need: { low: 45, medium: 60, normal: 80, ultra: 100 }, ram: { low: 16, medium: 16, normal: 32, ultra: 32 } },
+  { id: "farm", label: "Farming Simulator 25", year: 2024, need: { low: 28, medium: 45, normal: 60, ultra: 80 }, ram: { low: 8, medium: 16, normal: 16, ultra: 16 } },
+  { id: "truck", label: "Euro Truck Simulator 2", year: 2012, need: { low: 0, medium: 28, normal: 45, ultra: 60 }, ram: { low: 8, medium: 8, normal: 16, ultra: 16 } },
+  { id: "cities", label: "Cities: Skylines 2", year: 2023, need: { low: 45, medium: 60, normal: 80, ultra: 100 }, ram: { low: 16, medium: 16, normal: 32, ultra: 32 } },
+  { id: "finals", label: "The Finals", year: 2023, need: { low: 45, medium: 60, normal: 72, ultra: 90 }, ram: { low: 16, medium: 16, normal: 16, ultra: 16 } },
+  { id: "lethal", label: "Lethal Company", year: 2023, need: { low: 0, medium: 28, normal: 45, ultra: 60 }, ram: { low: 8, medium: 8, normal: 16, ultra: 16 } },
+  { id: "stardew", label: "Stardew Valley", year: 2016, need: { low: 0, medium: 0, normal: 0, ultra: 28 }, ram: { low: 4, medium: 8, normal: 8, ultra: 8 } },
+  { id: "wow", label: "World of Warcraft", year: 2004, need: { low: 0, medium: 28, normal: 45, ultra: 60 }, ram: { low: 8, medium: 8, normal: 16, ultra: 16 } },
+  { id: "ff14", label: "Final Fantasy XIV", year: 2013, need: { low: 28, medium: 45, normal: 60, ultra: 72 }, ram: { low: 8, medium: 16, normal: 16, ultra: 16 } },
+  { id: "spiderman", label: "Marvel's Spider-Man", year: 2022, need: { low: 45, medium: 60, normal: 80, ultra: 100 }, ram: { low: 16, medium: 16, normal: 16, ultra: 32 } },
+  { id: "gow", label: "God of War", year: 2022, need: { low: 45, medium: 60, normal: 80, ultra: 100 }, ram: { low: 16, medium: 16, normal: 16, ultra: 32 } },
+  { id: "alan", label: "Alan Wake 2", year: 2023, need: { low: 60, medium: 72, normal: 90, ultra: 100 }, ram: { low: 16, medium: 16, normal: 16, ultra: 32 } },
+  { id: "sea", label: "Sea of Thieves", year: 2018, need: { low: 28, medium: 45, normal: 60, ultra: 80 }, ram: { low: 8, medium: 16, normal: 16, ultra: 16 } },
+  { id: "nms", label: "No Man's Sky", year: 2016, need: { low: 28, medium: 45, normal: 60, ultra: 80 }, ram: { low: 8, medium: 16, normal: 16, ultra: 16 } },
 ];
 
 const COURSES: Course[] = [
@@ -100,6 +124,11 @@ const COURSES: Course[] = [
   { id: "cad", label: "AutoCAD", program: "AutoCAD", gpu: 45, ram: 16, windows: true },
   { id: "arch", label: "Architecture", program: "Revit", gpu: 60, ram: 32, windows: true },
   { id: "blender", label: "3D class", program: "Blender", gpu: 60, ram: 16, windows: true },
+  { id: "matlab", label: "Engineering", program: "MATLAB", gpu: 0, ram: 16, windows: true },
+  { id: "solid", label: "SolidWorks", program: "SolidWorks", gpu: 60, ram: 32, windows: true },
+  { id: "after", label: "Motion graphics", program: "After Effects", gpu: 45, ram: 32, windows: true },
+  { id: "zoom", label: "Online class", program: "Zoom", gpu: 0, ram: 8, windows: false },
+  { id: "law", label: "Law and writing", program: "Word and a browser", gpu: 0, ram: 8, windows: true },
 ];
 
 function money(value: number) {
@@ -140,6 +169,19 @@ function plays(item: Laptop, game: GameNeed, quality: Quality) {
   return item.gpu >= game.need[quality];
 }
 
+function laptopMath(item: Laptop) {
+  const score = hundred(item);
+  const ram = ramOf(item);
+  const rank = rankFrom(score);
+  return [
+    `${rank.name} ${rank.score}. Crystal is 90 to 100. Gold is 75 to 89. Silver is 55 to 74. Bronze is 35 to 54. Brown is under 35.`,
+    `The graphics chip is most of the score. Memory is ${ram || "not listed"} GB and adds a few points. A bigger drive adds a little more.`,
+    `Those parts add up, then the score stops at 100. This one landed on ${score}.`,
+    `${money(item.price)} ÷ ${score} = ${money(item.price / score)} per point.`,
+    "Lower dollars per point means more laptop for the money.",
+  ];
+}
+
 function studies(item: Laptop, course: Course) {
   if (item.kind === "tablet") return false;
   if (course.windows && item.kind === "chrome") return false;
@@ -156,6 +198,7 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
   const [gameId, setGameId] = useState("any");
   const [quality, setQuality] = useState<Quality>("normal");
   const [courseId, setCourseId] = useState("any");
+  const [sort, setSort] = useState<ShelfSort>("deal-asc");
 
   useEffect(() => {
     try {
@@ -196,13 +239,19 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
       if (q && !`${item.brand} ${item.name}`.toLowerCase().includes(q)) return false;
       return true;
     }).sort((a, b) => {
-      if (game || course) return b.deal - a.deal || b.score - a.score;
-      if (filter === "games" || filter === "work" || filter === "create") {
-        return b.score - a.score || b.deal - a.deal;
-      }
-      return b.deal - a.deal || b.score - a.score;
+      const aScore = hundred(a);
+      const bScore = hundred(b);
+      const aDeal = a.price / aScore;
+      const bDeal = b.price / bScore;
+      if (sort === "price-desc") return b.price - a.price;
+      if (sort === "score-desc") return bScore - aScore;
+      if (sort === "score-asc") return aScore - bScore;
+      if (sort === "deal-desc") return bDeal - aDeal;
+      if (sort === "gig-asc" || sort === "gig-desc") return sort === "gig-desc" ? b.price - a.price : a.price - b.price;
+      if (sort === "price-asc") return a.price - b.price;
+      return aDeal - bDeal;
     });
-  }, [filter, query, brand, openBox, game, course, quality]);
+  }, [filter, query, brand, openBox, game, course, quality, sort]);
 
   const choice = ITEMS.find((item) => item.id === picked);
   const meta = FILTERS.find((item) => item.id === filter)!;
@@ -278,6 +327,9 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
             </button>
           ))}
         </div>
+        <div className="px-0">
+          <SortRow value={sort} onChange={setSort} />
+        </div>
         <label className="flex h-12 items-center gap-2 rounded-2xl border border-line bg-elevated px-3">
           <Search className="size-4 text-muted" strokeWidth={1.75} />
           <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search" className="h-full w-full bg-transparent text-base outline-none" />
@@ -300,8 +352,8 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
           {shown.map((item) => {
             const selected = picked === item.id;
             return (
-              <li key={item.id}>
-                <button type="button" onClick={() => setPicked(item.id)} className={`press flex w-full items-start justify-between gap-3 rounded-2xl border px-3 py-4 text-left ${selected ? "border-accent bg-subtle" : "border-line bg-elevated"}`}>
+              <li key={item.id} className={`overflow-hidden rounded-2xl border ${selected ? "border-accent bg-subtle" : "border-line bg-elevated"}`}>
+                <button type="button" onClick={() => setPicked(item.id)} className="press flex w-full items-start justify-between gap-3 px-3 py-4 text-left">
                   <span className="min-w-0">
                     <span className="flex items-center gap-2 text-sm text-muted">
                       {item.brand}
@@ -311,16 +363,16 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
                     <span className="mt-1 block text-sm text-muted">{item.specs}</span>
                     {game ? <span className="mt-1 block text-sm text-muted">{game.label} at {qualityLabel}</span> : null}
                     {course ? <span className="mt-1 block text-sm text-muted">Runs {course.program}</span> : null}
-                    <span className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted">
-                      <RankBadge score={hundred(item)} />
-                      {money(item.price / hundred(item))} per point
-                    </span>
+                    <span className="mt-1 block text-sm text-muted">{money(item.price / hundred(item))} per point</span>
                   </span>
                   <span className="shrink-0 text-right">
                     <span className="tabular block text-base font-medium">{money(item.price)}</span>
                     {item.was ? <span className="block text-sm text-ok">Down {money(item.was - item.price)}</span> : null}
                   </span>
                 </button>
+                <div className="px-3 pb-3">
+                  <RankBadge score={hundred(item)} lines={laptopMath(item)} />
+                </div>
               </li>
             );
           })}

@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
-import { PARTS, CAT_LABEL, fitWhy, isJunk, money, partRank, shortName, spendOf, unitCost, type Category, type Part } from "@/lib/catalog";
+import { PARTS, CAT_LABEL, compareShelf, explainPart, fitWhy, isJunk, money, partRank, shortName, spendOf, unitCost, type Category, type Part, type ShelfSort } from "@/lib/catalog";
 import { extrasFromIds, partsFrom, useBench } from "@/lib/store";
 import { RankBadge } from "@/components/rank";
+import { SortRow } from "@/components/sorts";
 import { ThemeToggle } from "@/lib/theme";
 
 const STEPS: { cat: Category; title: string; line: string; scored: boolean }[] = [
@@ -26,6 +27,7 @@ export function Value({ onLeave, onBuild }: { onLeave: () => void; onBuild: () =
   const clear = useBench((state) => state.clear);
   const [cat, setCat] = useState<Category>("cpu");
   const [query, setQuery] = useState("");
+  const [sort, setSort] = useState<ShelfSort>("deal-asc");
   const [confirmClear, setConfirmClear] = useState(false);
 
   const build = partsFrom(ids);
@@ -45,14 +47,9 @@ export function Value({ onLeave, onBuild }: { onLeave: () => void; onBuild: () =
       if (q && !`${part.brand} ${part.name}`.toLowerCase().includes(q)) return false;
       return true;
     })
-      .sort((a, b) => {
-        const left = unitCost(a)?.amount ?? Number.POSITIVE_INFINITY;
-        const right = unitCost(b)?.amount ?? Number.POSITIVE_INFINITY;
-        if (left !== right) return left - right;
-        return a.price - b.price;
-      })
+      .sort((a, b) => compareShelf(a, b, sort))
       .slice(0, 16);
-  }, [cat, query, build, step.scored]);
+  }, [cat, query, build, step.scored, sort]);
 
   const blocked = useMemo(() => {
     if (shown.length) return "";
@@ -132,6 +129,10 @@ export function Value({ onLeave, onBuild }: { onLeave: () => void; onBuild: () =
         />
       </label>
 
+      <div className="px-4 pb-3">
+        <SortRow value={sort} onChange={setSort} />
+      </div>
+
       <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
         {shown.length === 0 ? (
           <p className="rounded-2xl border border-line bg-elevated px-4 py-6 text-lg leading-snug text-muted">
@@ -143,18 +144,15 @@ export function Value({ onLeave, onBuild }: { onLeave: () => void; onBuild: () =
               const deal = unitCost(part);
               const on = chosen?.id === part.id;
               return (
-                <li key={part.id}>
+                <li key={part.id} className={`overflow-hidden rounded-3xl border ${on ? "border-accent bg-subtle" : "border-line bg-elevated"}`}>
                   <button
                     type="button"
                     onClick={() => (on ? remove(part.cat) : add(part))}
-                    className={`press w-full rounded-3xl border px-4 py-4 text-left ${on ? "border-accent bg-subtle" : "border-line bg-elevated"}`}
+                    className="press w-full px-4 py-4 text-left"
                   >
                     <span className="flex items-start justify-between gap-3">
                       <span>
-                        <span className="flex flex-wrap items-center gap-2 text-sm tracking-wide text-muted">
-                          {index === 0 ? "Best price" : CAT_LABEL[part.cat]}
-                          <RankBadge score={partRank(part).score} />
-                        </span>
+                        <span className="block text-sm tracking-wide text-muted">{index === 0 ? "Best price" : CAT_LABEL[part.cat]}</span>
                         <span className="font-display mt-1 block text-4xl leading-none tracking-tight">{deal ? deal.text : money(part.price)}</span>
                       </span>
                       <span className={`mt-1 shrink-0 rounded-full px-3 py-2 text-sm ${on ? "bg-accent text-accent-fg" : "bg-subtle text-fg"}`}>
@@ -164,6 +162,9 @@ export function Value({ onLeave, onBuild }: { onLeave: () => void; onBuild: () =
                     <span className="mt-3 block text-lg leading-snug">{part.brand} {shortName(part)}</span>
                     <span className="mt-1 block text-base text-muted">{deal ? `${money(part.price)} total` : "No speed score. Sorted by price."}</span>
                   </button>
+                  <div className="px-4 pb-4">
+                    <RankBadge score={partRank(part).score} lines={explainPart(part)} />
+                  </div>
                 </li>
               );
             })}

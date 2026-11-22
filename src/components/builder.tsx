@@ -9,6 +9,7 @@ import {
   AI_FILTERS,
   aiPicks,
   buildSpeed,
+  compareShelf,
   coveredByBundle,
   extraFilters,
   fitWhy,
@@ -28,11 +29,14 @@ import {
   aiScore,
   scoreBuild,
   shelfNote,
+  type ShelfSort,
   shortName,
   spendOf,
   suggest,
   tagsOf,
   unitCost,
+  explainBuild,
+  explainPart,
   extraWhy,
   slotLine,
   warnings,
@@ -42,6 +46,7 @@ import {
 } from "@/lib/catalog";
 import { extrasFromIds, partsFrom, useBench } from "@/lib/store";
 import { RankBadge } from "@/components/rank";
+import { SortRow } from "@/components/sorts";
 import { ThemeToggle } from "@/lib/theme";
 
 const REVIEW = CATS.length;
@@ -70,7 +75,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
   const [panel, setPanel] = useState<"play" | "shelf" | "ai">("play");
   const [query, setQuery] = useState("");
   const [brand, setBrand] = useState("all");
-  const [sortBy, setSortBy] = useState<"low" | "high" | "gig" | "value">("low");
+  const [sortBy, setSortBy] = useState<ShelfSort>("price-asc");
   const [limit, setLimit] = useState(36);
   const [blocked, setBlocked] = useState(false);
   const [tag, setTag] = useState("all");
@@ -131,25 +136,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
       if (!q) return true;
       return `${part.brand} ${part.name}`.toLowerCase().includes(q);
     });
-    list.sort((a, b) => {
-      if (sortBy === "high") return b.price - a.price;
-      if (sortBy === "gig") {
-        const cost = (part: Part) => {
-          if (part.cat !== "storage" && part.cat !== "memory") return Number.POSITIVE_INFINITY;
-          const size = gbOf(part);
-          return size ? part.price / size : Number.POSITIVE_INFINITY;
-        };
-        const left = cost(a);
-        const right = cost(b);
-        if (left !== right) return left - right;
-      }
-      if (sortBy === "value") {
-        const left = unitCost(a)?.amount ?? Number.POSITIVE_INFINITY;
-        const right = unitCost(b)?.amount ?? Number.POSITIVE_INFINITY;
-        if (left !== right) return left - right;
-      }
-      return a.price - b.price;
-    });
+    list.sort((a, b) => compareShelf(a, b, sortBy));
     const chosen = build[cat];
     if (!blocked && chosen && list.some((part) => part.id === chosen.id)) {
       return [chosen, ...list.filter((part) => part.id !== chosen.id)];
@@ -442,27 +429,14 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
                 className="h-full w-full bg-transparent text-base outline-none placeholder:text-faint"
               />
             </label>
+            <SortRow
+              value={sortBy}
+              onChange={(next) => {
+                setSortBy(next);
+                setLimit(36);
+              }}
+            />
             <div className="flex gap-2 overflow-x-auto">
-              {(
-                [
-                  ["low", "Price low"],
-                  ["high", "Price high"],
-                  ["gig", "$ per GB"],
-                  ["value", "Price per performance"],
-                ] as const
-              ).map(([id, label]) => (
-                <button
-                  key={id}
-                  type="button"
-                  onClick={() => {
-                    setSortBy(id);
-                    setLimit(36);
-                  }}
-                  className={`h-10 shrink-0 rounded-lg border px-3 text-sm ${sortBy === id ? "border-accent bg-subtle text-fg" : "border-line bg-elevated text-muted"}`}
-                >
-                  {label}
-                </button>
-              ))}
               <button
                 type="button"
                 aria-pressed={openBox}
@@ -578,9 +552,8 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
                       >
                         <PartMark part={part} />
                         <span className="min-w-0">
-                          <span className="flex flex-wrap items-center gap-2 text-sm text-muted">
+                          <span className="flex items-center gap-2 text-sm text-muted">
                             {part.brand}
-                            <RankBadge score={partRank(part).score} />
                             {selected ? <Check className="size-4 text-accent" strokeWidth={2} /> : null}
                           </span>
                           <span className="mt-1 line-clamp-2 block text-base font-medium leading-snug">{shortName(part)}</span>
@@ -606,6 +579,9 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
                           {unitCost(part) ? <span className="mt-1 block text-sm leading-tight text-muted">{unitCost(part)!.text}</span> : null}
                         </span>
                       </button>
+                      <div className="px-3 pb-3">
+                        <RankBadge score={partRank(part).score} lines={explainPart(part)} />
+                      </div>
                       {canAdd ? (
                         <button type="button" onClick={() => addExtra(part)} className="h-14 w-full border-t border-line text-base font-medium text-accent">
                           Add another
@@ -1078,7 +1054,11 @@ function Checkout({
 function AiPanel({ onUse }: { onUse: (pick: ReturnType<typeof aiPicks>[number]) => void }) {
   const picks = aiPicks();
   const [filter, setFilter] = useState<(typeof AI_FILTERS)[number]>("All");
+  const [sort, setSort] = useState<ShelfSort>("deal-asc");
+  const [query, setQuery] = useState("");
   const shown = picks.filter((pick) => {
+    const q = query.trim().toLowerCase();
+    if (q && !`${pick.name} ${pick.kicker} ${pick.why}`.toLowerCase().includes(q)) return false;
     if (filter === "All") return true;
     const tag = {
       Value: "value",
@@ -1106,6 +1086,24 @@ function AiPanel({ onUse }: { onUse: (pick: ReturnType<typeof aiPicks>[number]) 
     }[filter];
     return tag ? pick.tags.includes(tag) : false;
   });
+  const ranked = [...shown].sort((a, b) => {
+    const aScore = aiScore(a.build) || 1;
+    const bScore = aiScore(b.build) || 1;
+    const aSpend = spendOf(a.build);
+    const bSpend = spendOf(b.build);
+    const aDeal = aSpend / aScore;
+    const bDeal = bSpend / bScore;
+    const aGig = a.build.storage ? (unitCost(a.build.storage)?.amount ?? Number.POSITIVE_INFINITY) : Number.POSITIVE_INFINITY;
+    const bGig = b.build.storage ? (unitCost(b.build.storage)?.amount ?? Number.POSITIVE_INFINITY) : Number.POSITIVE_INFINITY;
+    if (sort === "price-desc") return bSpend - aSpend;
+    if (sort === "score-desc") return bScore - aScore;
+    if (sort === "score-asc") return aScore - bScore;
+    if (sort === "deal-desc") return bDeal - aDeal;
+    if (sort === "deal-asc") return aDeal - bDeal;
+    if (sort === "gig-asc") return aGig - bGig;
+    if (sort === "gig-desc") return bGig - aGig;
+    return aSpend - bSpend;
+  });
   return (
     <div className="space-y-3 px-4 py-3">
       <p className="text-sm text-muted">
@@ -1124,8 +1122,13 @@ function AiPanel({ onUse }: { onUse: (pick: ReturnType<typeof aiPicks>[number]) 
           </button>
         ))}
       </div>
+      <SortRow value={sort} onChange={setSort} />
+      <label className="flex h-11 items-center gap-2 rounded-lg border border-line bg-elevated px-3">
+        <Search className="size-4 shrink-0 text-faint" strokeWidth={1.75} />
+        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search a game or a job" className="h-full w-full bg-transparent text-base outline-none placeholder:text-faint" />
+      </label>
       <ul className="flex flex-col gap-3">
-        {shown.map((pick) => {
+        {ranked.map((pick) => {
           const covered = coveredByBundle(pick.build);
           const score = aiScore(pick.build);
           const spend = spendOf(pick.build);
@@ -1138,7 +1141,7 @@ function AiPanel({ onUse }: { onUse: (pick: ReturnType<typeof aiPicks>[number]) 
                   <p className="text-xs text-faint">{pick.kicker}</p>
                   <h2 className="font-display text-2xl font-medium leading-none tracking-tight">{pick.name}</h2>
                   <div className="mt-2">
-                    <RankBadge score={score} />
+                    <RankBadge score={score} lines={explainBuild(pick.build)} />
                   </div>
                 </div>
                 <p className="tabular shrink-0 text-right text-sm font-medium">

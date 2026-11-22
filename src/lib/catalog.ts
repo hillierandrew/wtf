@@ -260,6 +260,120 @@ export function partRank(part: Part): Rank {
   return rankFrom(partScore(part));
 }
 
+export type ShelfSort = "price-asc" | "price-desc" | "score-desc" | "score-asc" | "deal-asc" | "deal-desc" | "gig-asc" | "gig-desc";
+
+export const SHELF_SORTS: { id: ShelfSort; label: string }[] = [
+  { id: "price-asc", label: "Price low" },
+  { id: "price-desc", label: "Price high" },
+  { id: "score-desc", label: "Score high" },
+  { id: "score-asc", label: "Score low" },
+  { id: "deal-asc", label: "Best $/point" },
+  { id: "deal-desc", label: "Worst $/point" },
+  { id: "gig-asc", label: "Best $/GB" },
+  { id: "gig-desc", label: "Worst $/GB" },
+];
+
+function finite(value: number, desc: boolean, other: number): number {
+  const missing = !Number.isFinite(value);
+  const otherMissing = !Number.isFinite(other);
+  if (missing && otherMissing) return 0;
+  if (missing) return 1;
+  if (otherMissing) return -1;
+  return desc ? other - value : value - other;
+}
+
+export function compareShelf(a: Part, b: Part, sort: ShelfSort): number {
+  const score = (part: Part) => partScore(part);
+  const deal = (part: Part) => unitCost(part)?.amount ?? Number.POSITIVE_INFINITY;
+  const gig = (part: Part) => {
+    if (part.cat !== "storage" && part.cat !== "memory") return Number.POSITIVE_INFINITY;
+    const size = gbOf(part);
+    return size ? part.price / size : Number.POSITIVE_INFINITY;
+  };
+  if (sort === "price-desc") return b.price - a.price;
+  if (sort === "score-desc" || sort === "score-asc") return finite(score(a), sort === "score-desc", score(b)) || a.price - b.price;
+  if (sort === "deal-desc" || sort === "deal-asc") return finite(deal(a), sort === "deal-desc", deal(b)) || a.price - b.price;
+  if (sort === "gig-desc" || sort === "gig-asc") return finite(gig(a), sort === "gig-desc", gig(b)) || a.price - b.price;
+  return a.price - b.price;
+}
+
+const BANDS = "Crystal is 90 to 100. Gold is 75 to 89. Silver is 55 to 74. Bronze is 35 to 54. Brown is under 35.";
+
+export function explainPart(part: Part): string[] {
+  const score = partScore(part);
+  const rank = rankFrom(score);
+  const lines = [`${rank.name} ${rank.score}. ${BANDS}`];
+  const name = part.name.toUpperCase();
+  if (part.cat === "gpu") {
+    const speed = gpuIndex(part) || 0;
+    lines.push(`Speed points are ${speed}. An RX 9070 is 100. A 5090 is 180.`);
+    lines.push(`Score is ${speed} ÷ 180 × 100 = ${speed ? Math.min(100, Math.round((speed / 180) * 100)) : 8}.`);
+    if (speed) lines.push(`${money(part.price)} ÷ ${speed} speed points = ${money(part.price / speed)} per point.`);
+  } else if (part.cat === "cpu") {
+    const points = cpuPoints(part.name);
+    lines.push(`Chip points are ${points || 0} out of 96. A 9800X3D is 96. An older chip is lower.`);
+    lines.push(`Score is ${points || 0} ÷ 96 × 100 = ${points ? Math.min(100, Math.round((points / 96) * 100)) : 20}.`);
+    if (points) lines.push(`${money(part.price)} ÷ ${points} chip points = ${money(part.price / points)} per point.`);
+  } else if (part.cat === "memory") {
+    const size = gbOf(part);
+    const ddr = name.includes("DDR5") ? "DDR5 starts at 42" : name.includes("DDR4") ? "DDR4 starts at 28" : "Older memory starts at 14";
+    const sizePts = Math.min(38, Math.round((size / 64) * 38));
+    const mhz = name.match(/(\d{4})\s*MHZ/);
+    const speedPts = mhz ? (Number(mhz[1]) >= 6000 ? 20 : Number(mhz[1]) >= 3600 ? 12 : 6) : 0;
+    lines.push(`${ddr}. ${size || "Unknown"} GB adds ${sizePts}. ${mhz ? `${mhz[1]} MHz adds ${speedPts}` : "No speed listed"}.`);
+    lines.push(`Those add up to ${score}, then stop at 100.`);
+    if (size) lines.push(`${money(part.price)} ÷ ${size} GB = ${money(part.price / size)} per GB.`);
+  } else if (part.cat === "storage") {
+    const size = gbOf(part);
+    const base = /HDD|HARD DRIVE|RPM/.test(name) ? "A hard drive starts at 22" : /GEN\s?5|PCIE\s?5/.test(name) ? "A Gen5 drive starts at 78" : /NVME|GEN\s?4|PCIE/.test(name) ? "A Gen4 NVMe starts at 62" : "A SATA SSD starts at 40";
+    lines.push(`${base}. Size adds up to 18 more points (${size || 0} GB).`);
+    lines.push(`That total is ${score}.`);
+    if (size) lines.push(`${money(part.price)} ÷ ${size} GB = ${money(part.price / size)} per GB.`);
+  } else if (part.cat === "psu") {
+    const watts = wattOf(part);
+    lines.push(`${watts || "Unknown"} watts. Score is about watts ÷ 14, plus extra for Gold, Platinum, or Titanium.`);
+    lines.push(`That total is ${score}.`);
+    if (watts) lines.push(`${money(part.price)} ÷ ${watts} W = ${money(part.price / watts)} per watt.`);
+  } else if (part.cat === "prebuilt") {
+    lines.push("The graphics card in the name is most of the score. Memory and the SSD add a little. A 3D-cache chip adds 6. The total stops at 100.");
+    lines.push(`${money(part.price)} ÷ ${score} = ${money(part.price / score)} per point.`);
+  } else if (part.cat === "monitor") {
+    lines.push("1080p starts at 36, 1440p at 55, 4K at 70. 144Hz adds 16. 240Hz adds 25.");
+  } else if (part.cat === "motherboard") {
+    lines.push("A top chipset is about 90. A mid board is about 70. A basic board is about 36 to 58.");
+  } else if (part.cat === "cooler") {
+    lines.push("A 360mm liquid cooler is 88. A smaller liquid cooler is 72. An air cooler is 52.");
+  } else if (part.cat === "case") {
+    lines.push("This is a size rank, not a speed score. A bigger case scores higher because more boards fit.");
+  }
+  lines.push("Lower dollars per point, or per gigabyte, is the better price.");
+  return lines;
+}
+
+export function explainBuild(build: Build): string[] {
+  const score = aiScore(build);
+  const spend = spendOf(build);
+  const rank = rankFrom(score);
+  const gpu = build.gpu ? gpuIndex(build.gpu) : 0;
+  const base = gpu ? Math.round((gpu / 180) * 82) : 12;
+  const ram = build.memory ? gbOf(build.memory) : 0;
+  const disk = build.storage ? gbOf(build.storage) : 0;
+  const ramPts = ram >= 64 ? 10 : ram >= 32 ? 6 : ram >= 16 ? 3 : 0;
+  const diskPts = disk >= 2000 ? 4 : disk >= 1000 ? 2 : 0;
+  const cpuPts = /X3D/.test(build.cpu?.name.toUpperCase() ?? "") ? 4 : 0;
+  const lines = [
+    `${rank.name} ${rank.score}. ${BANDS}`,
+    gpu ? `Graphics speed is ${gpu}. ${gpu} ÷ 180 × 82 = ${base}.` : "No graphics card, so the base is 12.",
+    `Memory adds ${ramPts}. The drive adds ${diskPts}. A 3D-cache chip adds ${cpuPts}.`,
+    `${base} + ${ramPts} + ${diskPts} + ${cpuPts} = ${score}.`,
+    `${money(spend)} ÷ ${score} = ${money(spend / score)} per point.`,
+  ];
+  if (build.storage && disk) lines.push(`Drive: ${money(build.storage.price)} ÷ ${disk} GB = ${money(build.storage.price / disk)} per GB.`);
+  if (build.memory && ram) lines.push(`Memory: ${money(build.memory.price)} ÷ ${ram} GB = ${money(build.memory.price / ram)} per GB.`);
+  lines.push("Lower dollars per point is more computer for the money.");
+  return lines;
+}
+
 export function ramKindOf(part: Part | undefined): string {
   if (!part) return "";
   if (part.ram) return part.ram;
@@ -1430,6 +1544,25 @@ function menuPicks(): AiPick[] {
     ...ladder("wukong", "Black Myth: Wukong", "wukong", true, "Black Myth: Wukong (2024)."),
     ...ladder("apex", "Apex Legends", "apex", true, "Apex Legends (2019)."),
     ...ladder("ow2", "Overwatch 2", "ow2", true, "Overwatch 2 (2022)."),
+    ...ladder("pal", "Palworld", "palworld", true, "Palworld (2024)."),
+    ...ladder("diablo", "Diablo IV", "diablo", true, "Diablo IV (2023)."),
+    ...ladder("rust", "Rust", "rust", true, "Rust (2018)."),
+    ...ladder("destiny", "Destiny 2", "destiny", true, "Destiny 2 (2017)."),
+    ...ladder("starfield", "Starfield", "starfield", true, "Starfield (2023)."),
+    ...ladder("flight", "Flight Simulator", "flight", true, "Microsoft Flight Simulator (2020)."),
+    ...ladder("farm", "Farming Simulator", "farm", true, "Farming Simulator 25 (2024)."),
+    ...ladder("truck", "Euro Truck", "truck", false, "Euro Truck Simulator 2 (2012)."),
+    ...ladder("cities", "Cities Skylines 2", "cities", true, "Cities: Skylines II (2023)."),
+    ...ladder("finals", "The Finals", "finals", true, "The Finals (2023)."),
+    ...ladder("lethal", "Lethal Company", "lethal", false, "Lethal Company (2023)."),
+    ...ladder("stardew", "Stardew Valley", "stardew", false, "Stardew Valley (2016)."),
+    ...ladder("wow", "World of Warcraft", "wow", false, "World of Warcraft (2004)."),
+    ...ladder("ff14", "Final Fantasy XIV", "ff14", true, "Final Fantasy XIV (2013)."),
+    ...ladder("spider", "Spider-Man", "spider", true, "Marvel's Spider-Man Remastered (2022)."),
+    ...ladder("gow", "God of War", "gow", true, "God of War (PC 2022)."),
+    ...ladder("alan", "Alan Wake 2", "alan", true, "Alan Wake 2 (2023)."),
+    ...ladder("sea", "Sea of Thieves", "sea", true, "Sea of Thieves (2018)."),
+    ...ladder("nms", "No Man's Sky", "nms", true, "No Man's Sky (2016)."),
     ...ladder("rl", "Rocket League", "rocket", false, "Rocket League (2015)."),
     ...ladder("roblox", "Roblox", "roblox", false, "Roblox (2006)."),
     {
