@@ -3,7 +3,7 @@ import { Check, Search, X } from "lucide-react";
 import raw from "@/data/desk.json";
 import { ThemeToggle } from "@/lib/theme";
 
-type Kind = "keyboard" | "mouse" | "pad" | "combo";
+type Kind = "keyboard" | "mouse" | "pad" | "combo" | "webcam" | "mic";
 
 type DeskItem = {
   id: string;
@@ -23,6 +23,8 @@ const STEPS: { id: Kind; label: string; line: string }[] = [
   { id: "keyboard", label: "Keyboard", line: "One keyboard. A combo is a keyboard and a mouse together." },
   { id: "mouse", label: "Mouse", line: "One mouse. Skip this if the keyboard is a combo." },
   { id: "pad", label: "Mouse pad", line: "Optional. The mouse works without one." },
+  { id: "webcam", label: "Camera", line: "One camera. Optional. The computer works without it." },
+  { id: "mic", label: "Microphone", line: "One microphone. Optional. A camera may already hear you." },
 ];
 
 function money(value: number) {
@@ -81,11 +83,7 @@ export function Desk({ onLeave }: { onLeave: () => void }) {
       } else if (item.kind !== step) return false;
       if (!openBox && item.open) return false;
       if (brand !== "all" && item.brand !== brand) return false;
-      if (filter === "gaming" && !item.tags.includes("Gaming")) return false;
-      if (filter === "office" && !item.tags.includes("Office")) return false;
-      if (filter === "wireless" && !item.tags.includes("Wireless")) return false;
-      if (filter === "small" && !item.tags.includes("Small")) return false;
-      if (filter === "full" && !item.tags.includes("Full size")) return false;
+      if (filter !== "all" && !item.tags.includes(filter)) return false;
       if (q && !`${item.brand} ${item.name}`.toLowerCase().includes(q)) return false;
       return true;
     }).sort((a, b) => a.price - b.price);
@@ -104,7 +102,7 @@ export function Desk({ onLeave }: { onLeave: () => void }) {
       } else if (item.kind === "mouse") {
         delete next.combo;
         next.mouse = item.id;
-      } else next.pad = item.id;
+      } else next[item.kind] = item.id;
       return next;
     });
     setNotice(item.kind === "combo" ? "Combo added. That is the keyboard and the mouse." : "Added. You still have one.");
@@ -118,7 +116,7 @@ export function Desk({ onLeave }: { onLeave: () => void }) {
     });
   }
 
-  const rows = (["keyboard", "combo", "mouse", "pad"] as Kind[]).map((kind) => picked[kind]).filter(Boolean) as DeskItem[];
+  const rows = (["keyboard", "combo", "mouse", "pad", "webcam", "mic"] as Kind[]).map((kind) => picked[kind]).filter(Boolean) as DeskItem[];
   const total = rows.reduce((sum, item) => sum + item.price, 0);
   const stepMeta = STEPS.find((item) => item.id === step)!;
 
@@ -132,7 +130,7 @@ export function Desk({ onLeave }: { onLeave: () => void }) {
           <ThemeToggle />
         </div>
         <h1 className="font-display mt-3 text-4xl font-medium leading-none tracking-tight">Build a keyboard</h1>
-        <p className="mt-2 text-base text-muted">These work with any PC. You cannot pick two keyboards.</p>
+        <p className="mt-2 text-base text-muted">Keyboard, mouse, pad, camera, and microphone. One of each.</p>
       </header>
       <div className="flex shrink-0 gap-2 overflow-x-auto px-4 py-3">
         {STEPS.map((item) => (
@@ -160,14 +158,21 @@ export function Desk({ onLeave }: { onLeave: () => void }) {
           <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search" className="h-full w-full bg-transparent text-base outline-none" />
         </label>
         <div className="flex flex-wrap gap-2">
-          {[
-            ["all", "All"],
-            ["gaming", "Gaming"],
-            ["office", "Office"],
-            ["wireless", "Wireless"],
-            ["small", "Small"],
-            ["full", "Full size"],
-          ].map(([id, label]) => (
+          {(step === "webcam"
+            ? [["all", "All"], ["1080p", "1080p"], ["2K", "2K"], ["4K", "4K"]]
+            : step === "mic"
+              ? [["all", "All"], ["USB", "USB"]]
+              : step === "pad"
+                ? [["all", "All"]]
+                : [
+                    ["all", "All"],
+                    ["Gaming", "Gaming"],
+                    ["Office", "Office"],
+                    ["Wireless", "Wireless"],
+                    ["Small", "Small"],
+                    ["Full size", "Full size"],
+                  ]
+          ).map(([id, label]) => (
             <button key={id} type="button" onClick={() => setFilter(id)} className={`h-11 rounded-full border px-4 text-base ${filter === id ? "border-accent bg-subtle" : "border-line"}`}>
               {label}
             </button>
