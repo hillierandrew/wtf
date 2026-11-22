@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #f3efe6;
+  --color-elevated: #fffdf8;
+  --color-subtle: #e8e1d4;
+  --color-fg: #1a1714;
+  --color-muted: #5c564c;
+  --color-faint: #8a8378;
+  --color-line: #d9d1c3;
+  --color-accent: #b8431f;
+  --color-accent-fg: #fffdf8;
+  --color-danger: #9b3a32;
+  --color-ok: #2f6b4f;
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.5rem;
+}
+
+@layer base {
+  html,
+  body {
+    height: 100%;
+    background: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-accent) 28%, transparent);
+    color: var(--color-fg);
+  }
+}
+
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-bottom {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.press:active {
+  transform: scale(0.985);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .press:active {
+    transform: none;
+  }
+}
