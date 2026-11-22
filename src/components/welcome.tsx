@@ -6,15 +6,18 @@ export function Welcome({
   onSim,
   onLaptop,
   onDesktop,
+  onValue,
 }: {
   onEnter: () => void;
   onDesk: () => void;
   onSim: () => void;
   onLaptop: () => void;
   onDesktop: () => void;
+  onValue: () => void;
 }) {
   const buttons = [
     { label: "BUILD A PC", line: "Pick each part. The wrong ones stay out.", onClick: onEnter },
+    { label: "PRICE CHECK", line: "Cost per gigabyte, or per point of speed. Tap to add it.", onClick: onValue },
     { label: "PREBUILDS", line: "A finished PC. Scored 0 to 100.", onClick: onDesktop },
     { label: "LAPTOPS", line: "Games, a college class, or the best price.", onClick: onLaptop },
     { label: "SIMULATORS", line: "Racing, flying, or farming.", onClick: onSim },
