@@ -55,7 +55,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
 
   const build = useMemo(() => partsFrom(ids), [ids]);
   const [step, setStep] = useState(0);
-  const [panel, setPanel] = useState<"shelf" | "ai">("shelf");
+  const [panel, setPanel] = useState<"play" | "shelf" | "ai">("play");
   const [query, setQuery] = useState("");
   const [brand, setBrand] = useState("all");
   const [priceDesc, setPriceDesc] = useState(false);
@@ -64,12 +64,14 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
   const [tag, setTag] = useState("all");
   const [facet, setFacet] = useState("all");
   const [wide, setWide] = useState(false);
+  const [showTabs, setShowTabs] = useState(false);
   const [name, setName] = useState("");
   const [copied, setCopied] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
 
   const reviewing = panel === "shelf" && step === REVIEW;
   const ai = panel === "ai";
+  const play = panel === "play";
   const cat: Category = CATS[Math.min(step, CATS.length - 1)] ?? "cpu";
 
   useEffect(() => {
@@ -200,8 +202,9 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
         </div>
         <div className="mt-3 flex items-end justify-between gap-3">
           <h1 className="font-display text-3xl font-medium leading-none tracking-tight">
-            {ai ? "Build by AI" : reviewing ? "Your build" : CAT_LABEL[cat]}
+            {play ? "New PC" : ai ? "Build by AI" : reviewing ? "Your build" : CAT_LABEL[cat]}
           </h1>
+          {play ? null : (
           <p className="shrink-0 text-xs text-faint">
             {ai ? (
               "Ready builds"
@@ -215,6 +218,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
               </>
             )}
           </p>
+          )}
         </div>
         <div className="mt-3">
           <div className="flex items-center justify-between gap-3 text-xs">
@@ -242,6 +246,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
             return <span key={item} className={`h-1 flex-1 rounded-full ${tone}`} />;
           })}
         </div>
+        {showTabs && !play ? (
         <div className="mt-3 flex w-full min-w-0 gap-1.5 overflow-x-auto pb-1">
           <button
             type="button"
@@ -275,6 +280,12 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
             Review
           </button>
         </div>
+        ) : null}
+        {!play ? (
+          <button type="button" onClick={() => setShowTabs((value) => !value)} className="mt-2 text-xs text-muted">
+            {showTabs ? "Hide the part list" : "See every part"}
+          </button>
+        ) : null}
       </header>
 
       {notice ? (
@@ -287,7 +298,20 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
       ) : null}
 
       <div ref={scroller} className="min-h-0 flex-1 overflow-y-auto">
-        {ai ? (
+        {play ? (
+          <Quest
+            onUse={(pick) => {
+              apply(pick.build, `${pick.name}. You can change a part later.`);
+              setPanel("shelf");
+              go(REVIEW);
+            }}
+            onManual={() => {
+              setPanel("shelf");
+              go(CATS.indexOf("cpu"));
+            }}
+            onMore={() => setPanel("ai")}
+          />
+        ) : ai ? (
           <AiPanel
             onUse={(pick) => {
               apply(pick.build, `${pick.name}. Change any part after.`);
@@ -322,6 +346,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
           />
         ) : (
           <div className="space-y-3 px-4 py-3">
+            <p className="text-sm text-muted">{LESSON[cat]}</p>
             {cat === "prebuilt" ? (
               <p className="rounded-xl border border-line bg-elevated p-3 text-sm text-muted">
                 Finished computers. Pick one and you are done. You do not add parts after this, except a screen.
@@ -545,6 +570,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
         )}
       </div>
 
+      {play ? null : (
       <footer className="safe-bottom shrink-0 flex gap-2 border-t border-line px-4 pt-3">
         <button
           type="button"
@@ -571,8 +597,114 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
           </button>
         )}
       </footer>
+      )}
       </div>
       <Checkout build={build} wide={wide} onRemove={remove} />
+    </div>
+  );
+}
+
+const LESSON: Record<Category, string> = {
+  prebuilt: "A finished computer. You do not put this one together.",
+  bundle: "A sale on a few parts. Skip it if you are picking one by one.",
+  cpu: "The brain. The board has to match it.",
+  motherboard: "Everything plugs into this. It must fit the processor.",
+  memory: "Space for what you have open. DDR4 and DDR5 are not the same.",
+  gpu: "This draws the games. Skip it only if the processor already has pictures.",
+  storage: "One drive. Tapping another one replaces it.",
+  case: "The box. It has to be big enough for the board.",
+  cooler: "Keeps the brain cool. Skip it if one came in the processor box.",
+  psu: "Power for the whole PC. Too small and it will not turn on.",
+  monitor: "The screen. The computer still works if you skip this.",
+};
+
+const GOALS: { id: string; title: string; line: string; cards: { id: string; title: string; line: string }[] }[] = [
+  {
+    id: "games",
+    title: "Play games",
+    line: "Fortnite, Valorant, League. These three already fit.",
+    cards: [
+      { id: "fn-low", title: "Cheap", line: "1080p. Fine on low settings." },
+      { id: "fn-med", title: "Just right", line: "The one most people should take." },
+      { id: "fn-ultra", title: "The nice one", line: "High settings. You do not need this to have fun." },
+    ],
+  },
+  {
+    id: "school",
+    title: "School and work",
+    line: "Class, writing, and light video. No extra parts.",
+    cards: [
+      { id: "college", title: "Class", line: "Browser, notes, and Word. No graphics card." },
+      { id: "code", title: "Projects", line: "More memory for tabs and homework." },
+      { id: "edit", title: "Photos and video", line: "For cutting clips and Photoshop." },
+    ],
+  },
+];
+
+function Quest({
+  onUse,
+  onManual,
+  onMore,
+}: {
+  onUse: (pick: ReturnType<typeof aiPicks>[number]) => void;
+  onManual: () => void;
+  onMore: () => void;
+}) {
+  const picks = aiPicks();
+  const [goal, setGoal] = useState<string | null>(null);
+  const chosen = GOALS.find((item) => item.id === goal);
+
+  if (!chosen) {
+    return (
+      <div className="space-y-3 px-4 py-4">
+        <p className="text-sm text-muted">You have never built a PC. Pick what it is for. The parts that do not fit stay locked.</p>
+        {GOALS.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => setGoal(item.id)}
+            className="press block w-full rounded-xl border border-line bg-elevated p-4 text-left"
+          >
+            <span className="font-display block text-3xl font-medium leading-none tracking-tight">{item.title}</span>
+            <span className="mt-2 block text-sm text-muted">{item.line}</span>
+          </button>
+        ))}
+        <button type="button" onClick={onManual} className="h-12 w-full rounded-lg border border-line text-sm">
+          I want to pick every part
+        </button>
+        <button type="button" onClick={onMore} className="w-full text-center text-sm text-muted">
+          More ready builds
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3 px-4 py-4">
+      <button type="button" onClick={() => setGoal(null)} className="text-sm text-muted">
+        Back
+      </button>
+      <h2 className="font-display text-3xl font-medium leading-none tracking-tight">{chosen.title}</h2>
+      <p className="text-sm text-muted">{chosen.line}</p>
+      {chosen.cards.map((card) => {
+        const pick = picks.find((item) => item.id === card.id);
+        if (!pick) return null;
+        return (
+          <article key={card.id} className="rounded-xl border border-line bg-elevated p-4">
+            <div className="flex items-end justify-between gap-3">
+              <h3 className="font-display text-2xl font-medium leading-none">{card.title}</h3>
+              <p className="tabular text-sm font-medium">{money(spendOf(pick.build))}</p>
+            </div>
+            <p className="mt-2 text-sm text-muted">{card.line}</p>
+            <p className="mt-1 text-xs text-faint">
+              {buildSpeed(pick.build) ? `${buildSpeed(pick.build)}% of an RX 9070` : "No graphics card"} · {scoreBuild(pick.build).points}/100
+            </p>
+            <button type="button" onClick={() => onUse(pick)} className="mt-3 h-11 w-full rounded-lg bg-accent text-sm font-medium text-accent-fg">
+              Use this PC
+            </button>
+          </article>
+        );
+      })}
     </div>
   );
 }
@@ -971,7 +1103,7 @@ function Review({
         <div className="space-y-3">
           <p className="flex items-center gap-2 text-sm text-ok">
             <Check className="size-4" strokeWidth={1.75} />
-            {score.rank}. {score.points}/100. {score.next}
+            {score.points === 100 ? "It turns on." : score.rank} {score.points}/100. {score.next}
           </p>
           {score.badges.length ? (
             <ul className="flex flex-wrap gap-2">

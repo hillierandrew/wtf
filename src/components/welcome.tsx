@@ -16,7 +16,7 @@ export function Welcome({ onEnter }: { onEnter: () => void }) {
         <span className="font-display max-w-xs text-5xl font-medium leading-[0.92] tracking-tight text-fg sm:max-w-lg sm:text-7xl">
           CLICK TO BUILD A PC
         </span>
-        <span className="mt-6 max-w-xs text-sm text-muted">One part at a time. Wrong sizes stay out.</span>
+        <span className="mt-6 max-w-xs text-sm text-muted">Never built one? It starts with one question.</span>
       </button>
     </div>
   );
