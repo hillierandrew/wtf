@@ -6,6 +6,7 @@ import {
   CAT_LABEL,
   CAT_TAB,
   PARTS,
+  aiPicks,
   coveredByBundle,
   fitWhy,
   formLabel,
@@ -43,6 +44,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
 
   const build = useMemo(() => partsFrom(ids), [ids]);
   const [step, setStep] = useState(0);
+  const [panel, setPanel] = useState<"shelf" | "ai">("shelf");
   const [query, setQuery] = useState("");
   const [brand, setBrand] = useState("all");
   const [priceDesc, setPriceDesc] = useState(false);
@@ -52,7 +54,8 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
   const [copied, setCopied] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
 
-  const reviewing = step === REVIEW;
+  const reviewing = panel === "shelf" && step === REVIEW;
+  const ai = panel === "ai";
   const cat: Category = CATS[Math.min(step, CATS.length - 1)] ?? "cpu";
 
   useEffect(() => {
@@ -94,6 +97,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
   const shown = visible.slice(0, limit);
 
   function go(next: number) {
+    setPanel("shelf");
     setStep(Math.max(0, Math.min(REVIEW, next)));
   }
 
@@ -151,10 +155,12 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
         </div>
         <div className="mt-3 flex items-end justify-between gap-3">
           <h1 className="font-display text-3xl font-medium leading-none tracking-tight">
-            {reviewing ? "Your build" : CAT_LABEL[cat]}
+            {ai ? "Build by AI" : reviewing ? "Your build" : CAT_LABEL[cat]}
           </h1>
           <p className="shrink-0 text-xs text-faint">
-            {reviewing ? (
+            {ai ? (
+              "Ready builds"
+            ) : reviewing ? (
               <>
                 <span className="tabular">{filled}</span> of {CATS.length}
               </>
@@ -167,7 +173,9 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
         </div>
         <div className="mt-3 flex gap-1" aria-hidden>
           {CATS.map((item, index) => {
-            const tone = reviewing
+            const tone = ai
+              ? "bg-subtle"
+              : reviewing
               ? build[item]
                 ? "bg-fg"
                 : "bg-subtle"
@@ -180,6 +188,14 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
           })}
         </div>
         <div className="mt-3 flex w-full min-w-0 gap-1.5 overflow-x-auto pb-1">
+          <button
+            type="button"
+            onClick={() => setPanel("ai")}
+            aria-pressed={ai}
+            className={`h-8 shrink-0 rounded-full px-3 text-xs ${ai ? "bg-fg text-bg" : "border border-line text-muted"}`}
+          >
+            BUILD BY AI
+          </button>
           {CATS.map((item, index) => {
             const on = !reviewing && index === step;
             const picked = Boolean(build[item]);
@@ -216,7 +232,14 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
       ) : null}
 
       <div ref={scroller} className="min-h-0 flex-1 overflow-y-auto">
-        {reviewing ? (
+        {ai ? (
+          <AiPanel
+            onUse={(pick) => {
+              apply(pick.build, `${pick.name}. Change any part after.`);
+              go(REVIEW);
+            }}
+          />
+        ) : reviewing ? (
           <Review
             build={build}
             name={name}
@@ -394,12 +417,16 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
       <footer className="safe-bottom shrink-0 flex gap-2 border-t border-line px-4 pt-3">
         <button
           type="button"
-          onClick={() => (step === 0 ? onLeave() : go(step - 1))}
+          onClick={() => (ai ? setPanel("shelf") : step === 0 ? onLeave() : go(step - 1))}
           className="h-12 flex-1 rounded-lg border border-line text-sm"
         >
           Back
         </button>
-        {reviewing ? (
+        {ai ? (
+          <button type="button" onClick={() => go(REVIEW)} className="h-12 flex-[2] rounded-lg bg-accent text-sm font-medium text-accent-fg">
+            Review
+          </button>
+        ) : reviewing ? (
           <button type="button" onClick={copy} className="h-12 flex-[2] rounded-lg bg-accent text-sm font-medium text-accent-fg">
             {copied ? "Copied" : "Copy list"}
           </button>
@@ -413,6 +440,54 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
           </button>
         )}
       </footer>
+    </div>
+  );
+}
+
+function AiPanel({ onUse }: { onUse: (pick: ReturnType<typeof aiPicks>[number]) => void }) {
+  const picks = aiPicks();
+  return (
+    <div className="space-y-3 px-4 py-3">
+      <p className="text-sm text-muted">Ranked from this shelf by what you get for the money. Each one is a full PC. A monitor is separate.</p>
+      <ul className="flex flex-col gap-3">
+        {picks.map((pick) => {
+          const covered = coveredByBundle(pick.build);
+          return (
+            <li key={pick.id} className={`rounded-xl border p-3 ${pick.best ? "border-accent bg-subtle" : "border-line bg-elevated"}`}>
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-xs text-faint">{pick.kicker}</p>
+                  <h2 className="font-display text-2xl font-medium leading-none tracking-tight">{pick.name}</h2>
+                </div>
+                <p className="tabular shrink-0 text-sm font-medium">{money(spendOf(pick.build))}</p>
+              </div>
+              <p className="mt-2 text-sm text-muted">{pick.why}</p>
+              <ul className="mt-3 space-y-1">
+                {CATS.map((cat) => {
+                  const part = pick.build[cat];
+                  if (!part || cat === "bundle") return null;
+                  const included = covered.has(cat);
+                  return (
+                    <li key={cat} className="flex justify-between gap-3 text-xs text-muted">
+                      <span className="min-w-0 truncate">
+                        {CAT_LABEL[cat]} · {shortName(part)}
+                      </span>
+                      <span className="shrink-0">{included ? "In deal" : money(part.price)}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+              <button
+                type="button"
+                onClick={() => onUse(pick)}
+                className="mt-3 h-11 w-full rounded-lg bg-accent text-sm font-medium text-accent-fg"
+              >
+                Use this build
+              </button>
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }
@@ -529,7 +604,7 @@ function Review({
           These parts fit each other.
         </p>
       ) : (
-        <p className="text-sm text-muted">Nothing picked yet. Start with a prebuilt, a budget, or a bundle.</p>
+        <p className="text-sm text-muted">Nothing picked yet. Open Build by AI, or start with a prebuilt.</p>
       )}
       {!build.monitor && ready && build.prebuilt?.form !== "aio" ? (
         <button type="button" onClick={() => onJump(CATS.indexOf("monitor"))} className="text-left text-sm text-muted">

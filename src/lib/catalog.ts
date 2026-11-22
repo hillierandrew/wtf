@@ -548,3 +548,95 @@ export const BUDGETS = [
   { label: "Under $2,200", value: 2200 },
   { label: "Under $3,600", value: 3600 },
 ] as const;
+
+export type AiPick = {
+  id: string;
+  name: string;
+  kicker: string;
+  why: string;
+  best?: boolean;
+  build: Build;
+};
+
+function buildFrom(ids: string[]): Build {
+  const map: Build = {};
+  for (const id of ids) {
+    const part = byId.get(id);
+    if (part) map[part.cat] = part;
+  }
+  if (map.bundle) return applyBundle(map.bundle, map);
+  const priority = map.cpu ? "cpu" : map.motherboard ? "motherboard" : "gpu";
+  return reconcile(priority, map);
+}
+
+/**
+ * Ranked from the current shelf. The RX 9070 16GB is the last card that
+ * still gets cheaper per frame. DDR5 kits are expensive, so the winner
+ * stays on AM4 and spends the difference on that card.
+ */
+export function aiPicks(): AiPick[] {
+  return [
+    {
+      id: "frames",
+      name: "Most frames per dollar",
+      kicker: "Best",
+      best: true,
+      why: "The Radeon RX 9070 16GB beats the more expensive 5060 Ti and 5070 on this shelf. DDR4 leaves the money in the graphics card.",
+      build: buildFrom([
+        "61d2f9663c",
+        "b80a188b37",
+        "dae600f39a",
+        "a7729c89db",
+        "0d6d289946",
+        "f97b3798ee",
+        "33363adcbb",
+        "7bb68f4649",
+      ]),
+    },
+    {
+      id: "starter",
+      name: "1080p, still a real card",
+      kicker: "Start here",
+      why: "Cheapest PC here that is not stuck on a low-end card. The 8GB RX 9060 XT is the ceiling, and the processor already includes a cooler.",
+      build: buildFrom([
+        "2dfbcfdbfb",
+        "a94d77ee17",
+        "0d6d289946",
+        "f97b3798ee",
+        "b13774ecd6",
+      ]),
+    },
+    {
+      id: "keep",
+      name: "Same card, newer socket",
+      kicker: "Keep longer",
+      why: "Same RX 9070, but on AM5 so the processor can be swapped later. The extra cost is the DDR5 memory, not a faster graphics card.",
+      build: buildFrom([
+        "9ab94a8d13",
+        "5f5a90664b",
+        "d95a523fa2",
+        "a7729c89db",
+        "0d6d289946",
+        "f97b3798ee",
+        "33363adcbb",
+        "7bb68f4649",
+      ]),
+    },
+    {
+      id: "stop",
+      name: "Stop before it gets silly",
+      kicker: "High",
+      why: "The 9800X3D is only a little more than the 9700X and is the better gaming chip. The RX 9070 XT is the last step up before the 5070 Ti and 5080 cost more for each frame.",
+      build: buildFrom([
+        "0abb21ae33",
+        "34be25cc1f",
+        "d95a523fa2",
+        "c2af03954d",
+        "e9ea0e8f1a",
+        "f97b3798ee",
+        "abfe37bd5d",
+        "7bb68f4649",
+      ]),
+    },
+  ];
+}
