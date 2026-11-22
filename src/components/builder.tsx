@@ -50,6 +50,17 @@ import { SortRow } from "@/components/sorts";
 import { ThemeToggle } from "@/lib/theme";
 
 const REVIEW = CATS.length;
+const ORDER: Category[] = ["cpu", "motherboard", "memory", "gpu", "storage", "psu", "case", "cooler", "monitor"];
+const NEED: Category[] = ["cpu", "motherboard", "memory", "storage", "case", "psu"];
+
+function nextIndex(build: ReturnType<typeof partsFrom>, from: Category): number {
+  const start = Math.max(0, ORDER.indexOf(from));
+  const later = ORDER.slice(start + 1).find((item) => !build[item]);
+  if (later) return CATS.indexOf(later);
+  const earlier = ORDER.find((item) => !build[item]);
+  if (earlier) return CATS.indexOf(earlier);
+  return REVIEW;
+}
 
 export function Builder({ onLeave }: { onLeave: () => void }) {
   const ids = useBench((state) => state.ids);
@@ -160,7 +171,10 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
       go(REVIEW);
       return;
     }
-    if (part.cat !== "bundle") return;
+    if (part.cat !== "bundle") {
+      go(nextIndex(partsFrom(useBench.getState().ids), part.cat));
+      return;
+    }
     const next = partsFrom(useBench.getState().ids);
     if (!next.bundle) return;
     const idx = CATS.findIndex((item) => item !== "bundle" && !next[item]);
@@ -224,7 +238,7 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
         </div>
         <div className="mt-3 flex items-end justify-between gap-3">
           <h1 className="font-display text-3xl font-medium leading-none tracking-tight">
-            {play ? "New PC" : ai ? "Build by AI" : reviewing ? "Your build" : CAT_LABEL[cat]}
+            {play ? "Pick a PC" : ai ? "Build by AI" : reviewing ? "Chosen parts" : CAT_LABEL[cat]}
           </h1>
           {play ? null : (
           <p className="shrink-0 text-xs text-faint">
@@ -614,27 +628,27 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
         >
           Back
         </button>
-        {ai ? (
-          <button type="button" onClick={() => go(REVIEW)} className="h-14 flex-[2] rounded-2xl bg-accent text-base font-medium text-accent-fg">
-            Review
-          </button>
-        ) : reviewing ? (
-          <button type="button" onClick={copy} className="h-14 flex-[2] rounded-2xl bg-accent text-base font-medium text-accent-fg">
-            {copied ? "Copied" : "Copy list"}
-          </button>
-        ) : (
           <button
             type="button"
-            onClick={() => go(step + 1)}
+            onClick={() => (reviewing ? copy() : go(ai ? REVIEW : nextIndex(build, cat)))}
             className="h-14 flex-[2] rounded-2xl bg-accent text-base font-medium text-accent-fg"
           >
-            {step === CATS.length - 1 ? "Review" : "Next"}
+            {reviewing ? (copied ? "Copied" : "Copy the list") : ai || nextIndex(build, cat) === REVIEW ? "See chosen parts" : `Next: ${CAT_TAB[CATS[nextIndex(build, cat)] ?? "cpu"]}`}
           </button>
-        )}
       </footer>
       )}
       </div>
-      <Checkout build={build} extras={extras} wide={wide} onRemove={remove} onRemoveExtra={removeExtra} />
+      <Checkout
+        build={build}
+        extras={extras}
+        wide={wide}
+        onRemove={remove}
+        onRemoveExtra={removeExtra}
+        onOpen={(item) => {
+          setPanel("shelf");
+          go(CATS.indexOf(item));
+        }}
+      />
       {badge ? (
         <div className="pointer-events-none fixed inset-x-0 top-4 z-40 mx-auto w-[min(100%,24rem)] px-4">
           <div className="rounded-2xl border border-accent bg-elevated px-4 py-4">
@@ -858,10 +872,20 @@ function Quest({
 
   return (
     <div className="space-y-3 px-4 py-4">
-      <p className="text-base text-muted">Order a PC like lunch. One processor. One board. More memory and drives only if they fit.</p>
-      <button type="button" onClick={() => setScreen("games")} className="press min-h-20 w-full rounded-2xl bg-accent px-4 py-4 text-left text-accent-fg">
+      <p className="text-base text-muted">One tap fills a whole computer. Or pick a game. The chosen parts stay at the bottom.</p>
+      {(() => {
+        const best = picks.find((item) => item.best) ?? picks[0];
+        return best ? (
+          <button type="button" onClick={() => order(best)} className="press min-h-24 w-full rounded-2xl bg-accent px-4 py-4 text-left text-accent-fg">
+            <span className="block text-sm">Fastest way</span>
+            <span className="mt-1 block text-3xl font-medium leading-none">Give me a PC</span>
+            <span className="mt-2 block text-base">{best.name} · {money(spendOf(best.build))}</span>
+          </button>
+        ) : null;
+      })()}
+      <button type="button" onClick={() => setScreen("games")} className="press min-h-20 w-full rounded-2xl border border-line bg-elevated px-4 py-4 text-left">
         <span className="block text-2xl font-medium">Games</span>
-        <span className="mt-1 block text-base">Real names and the year they came out.</span>
+        <span className="mt-1 block text-base text-muted">Real names and the year they came out.</span>
       </button>
       <button type="button" onClick={() => setScreen("consoles")} className="press min-h-20 w-full rounded-2xl border border-line bg-elevated px-4 py-4 text-left">
         <span className="block text-2xl font-medium">Like a console</span>
@@ -876,7 +900,7 @@ function Quest({
         <span className="mt-1 block text-base text-muted">Zoom, office mail, podcasts, radio, video.</span>
       </button>
       <button type="button" onClick={onManual} className="press min-h-16 w-full rounded-2xl border border-line px-4 text-left text-xl font-medium">
-        I will pick every part
+        Pick the parts myself
       </button>
       <button type="button" onClick={onMore} className="h-12 w-full text-base text-muted">
         See the long list
@@ -895,12 +919,14 @@ function Checkout({
   wide,
   onRemove,
   onRemoveExtra,
+  onOpen,
 }: {
   build: ReturnType<typeof partsFrom>;
   extras: ReturnType<typeof extrasFromIds>;
   wide: boolean;
   onRemove: (cat: Category) => void;
   onRemoveExtra: (cat: "memory" | "storage" | "monitor", index: number) => void;
+  onOpen: (cat: Category) => void;
 }) {
   const rows = CATS.filter((cat) => build[cat]);
   const extraRows = [
@@ -909,6 +935,8 @@ function Checkout({
     ...extras.monitor.map((part, index) => ({ cat: "monitor" as const, part, index })),
   ];
   const count = rows.length + extraRows.length;
+  const ready = Boolean(build.prebuilt) || NEED.every((item) => build[item]);
+  const missing = build.prebuilt ? ORDER.filter((item) => item === "monitor" && !build.monitor) : ORDER.filter((item) => !build[item]);
   const [open, setOpen] = useState(true);
   const [height, setHeight] = useState(360);
   const [width, setWidth] = useState(360);
@@ -987,7 +1015,7 @@ function Checkout({
       {docked ? (
         <button
           type="button"
-          aria-label="Drag to resize checkout"
+          aria-label="Drag to resize chosen parts"
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
@@ -998,10 +1026,11 @@ function Checkout({
       ) : null}
       <div className="flex items-center gap-2 px-3 pb-2">
         <p className="min-w-0 flex-1">
-          <span className="block text-xs text-faint">Checkout</span>
+          <span className="block text-xs text-faint">Chosen parts</span>
           <span className="tabular text-sm font-medium">
             {count} {count === 1 ? "part" : "parts"} · {money(spendOf(build, extras))}
           </span>
+          <span className="block text-xs text-muted">{ready ? "This computer can turn on." : "Add the blank rows to finish it."}</span>
         </p>
         <button type="button" onClick={() => setOpen((value) => !value)} className="h-8 rounded-full border border-line px-3 text-xs text-muted">
           {open ? "Close" : "Open"}
@@ -1009,39 +1038,49 @@ function Checkout({
       </div>
       {open ? (
         <ul className="min-h-0 flex-1 space-y-2 overflow-y-auto px-3 pb-3">
-          {rows.length === 0 && extraRows.length === 0 ? <li className="py-6 text-center text-base text-muted">Nothing in checkout yet. Tap a part.</li> : null}
-          {rows.map((cat, index) => {
+          {rows.map((cat) => {
             const part = build[cat];
             if (!part) return null;
             const others: ReturnType<typeof partsFrom> = { ...build };
             delete others[cat];
             const ok = fitWhy(part, others) === "";
             return (
-              <li key={cat} className="flex items-center gap-2 rounded-lg border border-line px-2 py-2">
-                <span className="tabular w-5 shrink-0 text-center text-xs text-faint">{index + 1}</span>
+              <li key={cat} className="flex items-center gap-2 rounded-xl border border-line px-2 py-2">
                 <PartMark part={part} />
-                <span className="min-w-0 flex-1">
+                <button type="button" onClick={() => onOpen(cat)} className="min-w-0 flex-1 text-left">
                   <span className="block text-xs text-faint">{CAT_LABEL[cat]}</span>
-                  <span className="block truncate text-sm">{shortName(part)}</span>
-                </span>
-                <span className={`flex size-8 shrink-0 items-center justify-center rounded-full text-sm ${ok ? "bg-subtle text-ok" : "bg-subtle text-danger"}`} title={ok ? "Fits the other parts" : fitWhy(part, others)}>
+                  <span className="block truncate text-base">{shortName(part)}</span>
+                  <span className="tabular block text-sm text-muted">{money(part.price)}</span>
+                </button>
+                <span className={`flex size-8 shrink-0 items-center justify-center rounded-full text-sm ${ok ? "bg-subtle text-ok" : "bg-subtle text-danger"}`}>
                   {ok ? "✓" : "✕"}
                 </span>
-                <button type="button" onClick={() => onRemove(cat)} aria-label={`Remove ${CAT_LABEL[cat]}`} className="flex size-8 shrink-0 items-center justify-center rounded-full border border-line text-muted">
-                  <X className="size-3.5" />
+                <button type="button" onClick={() => onRemove(cat)} aria-label={`Remove ${CAT_LABEL[cat]}`} className="flex size-11 shrink-0 items-center justify-center rounded-full border border-line text-muted">
+                  <X className="size-4" />
                 </button>
               </li>
             );
           })}
           {extraRows.map(({ cat, part, index }) => (
-            <li key={`${cat}-extra-${index}`} className="flex items-center gap-2 rounded-lg border border-line px-2 py-2">
+            <li key={`${cat}-extra-${index}`} className="flex items-center gap-2 rounded-xl border border-line px-2 py-2">
               <PartMark part={part} />
               <span className="min-w-0 flex-1">
-                <span className="block text-sm text-muted">Extra {CAT_LABEL[cat].toLowerCase()}</span>
+                <span className="block text-xs text-faint">Extra {CAT_LABEL[cat].toLowerCase()}</span>
                 <span className="block truncate text-base">{shortName(part)}</span>
               </span>
               <button type="button" onClick={() => onRemoveExtra(cat, index)} aria-label={`Remove extra ${CAT_LABEL[cat]}`} className="flex size-11 shrink-0 items-center justify-center rounded-full border border-line text-muted">
                 <X className="size-4" />
+              </button>
+            </li>
+          ))}
+          {missing.map((cat) => (
+            <li key={`need-${cat}`}>
+              <button type="button" onClick={() => onOpen(cat)} className="flex h-14 w-full items-center justify-between rounded-xl border border-dashed border-line px-3 text-left">
+                <span>
+                  <span className="block text-xs text-faint">Not chosen</span>
+                  <span className="block text-base">{CAT_LABEL[cat]}</span>
+                </span>
+                <span className="text-base text-accent">Add</span>
               </button>
             </li>
           ))}
