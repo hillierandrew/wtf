@@ -107,6 +107,7 @@ export const useBench = create<State>((set, get) => ({
     const nextIds = idsOf(next);
     writeLocal(nextIds, openBox, saved);
     const dropped = droppedNote(ids, nextIds);
+    const replacedDrive = part.cat === "storage" && ids.storage && ids.storage !== part.id && nextIds.storage === part.id;
     const note =
       part.cat === "prebuilt" && next.prebuilt
         ? "Finished PC. That price is the whole system."
@@ -114,7 +115,9 @@ export const useBench = create<State>((set, get) => ({
           ? dropped
             ? `Bundle applied. ${dropped}`
             : "Bundle applied. The deal price replaces those parts."
-          : dropped;
+          : replacedDrive
+            ? "Replaced the drive. You still have one drive, not two."
+            : dropped;
     set({ ids: nextIds, notice: note });
   },
   remove: (cat) => {

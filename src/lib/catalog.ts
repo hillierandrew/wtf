@@ -113,9 +113,13 @@ export function sticksOf(part: Part): number {
 }
 
 export function gbOf(part: Part): number {
-  const m = part.name.toUpperCase().match(/\b(\d+)\s*GB\b/);
+  const upper = part.name.toUpperCase();
+  const tb = upper.match(/\b(\d+(?:\.\d+)?)\s*TB\b/);
+  if (tb && (part.cat === "storage" || part.cat === "memory")) return Math.round(Number(tb[1]) * 1000);
+  const m = upper.match(/\b(\d+)\s*GB\b/);
   if (!m) return 0;
   const n = Number(m[1]);
+  if (part.cat === "storage" && n >= 120 && n <= 8000) return n;
   if (n >= 4 && n <= 256) return n;
   return 0;
 }
@@ -156,6 +160,38 @@ export function gpuTier(part: Part): number {
   if (/1030|1050|\b710\b|\b730\b/.test(n)) return 1;
   if (/RTX|RADEON|GEFORCE/.test(n)) return 3;
   return 0;
+}
+
+export function m2Slots(board: Part | undefined): number {
+  if (!board) return 2;
+  const n = board.name.toUpperCase();
+  if (/QUAD|4\s*[X×]?\s*M\.?2/.test(n)) return 4;
+  if (/TRIPLE|3\s*[X×]?\s*M\.?2/.test(n)) return 3;
+  if (/DUAL|2\s*[X×]?\s*M\.?2/.test(n)) return 2;
+  const counted = n.match(/([1-4])\s*[X×]\s*M\.?2/);
+  if (counted) return Number(counted[1]);
+  const form = formOf(board);
+  if (form === "itx") return 2;
+  if (form === "atx" || form === "eatx") return 3;
+  return 2;
+}
+
+export function driveKind(part: Part): "nvme" | "sata" | "hdd" | "2230" | "" {
+  const n = part.name.toUpperCase();
+  if (/2230|2242/.test(n)) return "2230";
+  if (/NVME|M\.2|PCI-?E/.test(n)) return "nvme";
+  if (/HDD|HARD DRIVE|\d+\s?RPM|3\.5/.test(n)) return "hdd";
+  if (/SATA|2\.5/.test(n)) return "sata";
+  return "";
+}
+
+export const PRICE_CHECKED = "Nov 21, 2026";
+
+export function priceChange(part: Part): { kind: "down" | "up"; diff: number } | null {
+  if (part.was == null || part.was === part.price) return null;
+  const diff = Math.round(Math.abs(part.was - part.price) * 100) / 100;
+  if (diff < 0.01) return null;
+  return { kind: part.was > part.price ? "down" : "up", diff };
 }
 
 export function needWatts(build: Build): number {
@@ -212,6 +248,13 @@ export function fitWhy(part: Part, others: Build): string {
     const sticks = sticksOf(others.memory);
     const slots = dimmSlots(part);
     if (sticks > slots) return `Memory is ${sticks} sticks. This board has ${slots} slots.`;
+  }
+  if (part.cat === "storage") {
+    const kind = driveKind(part);
+    if (kind === "2230") return "2230 is a tiny laptop drive. A desktop board takes a 2280 NVMe. Do not buy this.";
+  }
+  if (part.cat === "cooler" && others.cpu && /with cooler|wraith/i.test(others.cpu.name)) {
+    return "This processor already includes a cooler. A second one is an extra part.";
   }
   if (part.cat === "case" && others.motherboard && formOf(part) && formOf(others.motherboard) && !fitsCase(part, others.motherboard)) {
     return "Case is too small for this motherboard.";
@@ -300,44 +343,54 @@ export function tagsOf(part: Part): string[] {
   const n = part.name.toUpperCase();
   if (part.socket) tags.push(part.socket);
   const ram = ramKindOf(part);
-  if (ram && part.cat !== "cpu") tags.push(ram);
+  if (ram) tags.push(ram);
   const form = formOf(part);
-  if (form && part.cat !== "prebuilt") tags.push(formLabel(form));
-  if (part.cat === "psu" || part.cat === "cpu") {
+  if (form && part.cat !== "prebuilt" && part.cat !== "cpu" && part.cat !== "memory") tags.push(formLabel(form));
+  if (/2230/.test(n)) tags.push("2230");
+  else if (/2242/.test(n)) tags.push("2242");
+  else if (/2280/.test(n)) tags.push("2280");
+  if (/NVME|M\.2/.test(n)) tags.push("NVMe");
+  else if (/HDD|HARD DRIVE|\d+\s?RPM/.test(n)) tags.push("HDD");
+  else if (/SATA/.test(n)) tags.push("SATA");
+  else if (/\bSSD\b/.test(n)) tags.push("SSD");
+  const gen = n.match(/GEN\s?([345])|PCI-?E\s?(?:GEN\s?)?([345])/);
+  if (gen) tags.push(`Gen${gen[1] || gen[2]}`);
+  if (part.cat === "psu" || part.cat === "cpu" || part.cat === "gpu") {
     const w = wattOf(part);
     if (w) tags.push(`${w}W`);
   }
-  const gb = part.cat === "memory" || part.cat === "storage" ? gbOf(part) : 0;
-  if (gb) tags.push(`${gb}GB`);
+  if (part.cat === "storage" || part.cat === "memory") {
+    const tb = n.match(/\b(\d+(?:\.\d+)?)\s*TB\b/);
+    if (tb) tags.push(`${tb[1]}TB`);
+    else {
+      const gb = gbOf(part);
+      if (gb) tags.push(`${gb}GB`);
+    }
+  }
   if (part.cat === "memory") tags.push(sticksOf(part) === 1 ? "1 stick" : `${sticksOf(part)} sticks`);
   const rad = n.match(/\b(120|140|240|280|360|420)\s?MM\b/);
   if (rad) tags.push(`${rad[1]}mm`);
-  if (/NVME|M\.2/.test(n)) tags.push("NVMe");
-  else if (/\bSSD\b/.test(n)) tags.push("SSD");
-  else if (/HARD DRIVE|\bHDD\b/.test(n)) tags.push("HDD");
   if (part.cat === "monitor") {
     const inch = part.name.match(/(\d{2}(?:\.\d)?)"/);
     if (inch) tags.push(`${inch[1]}"`);
-    if (/\b(FHD|QHD|UHD|4K|OLED|IPS|VA)\b/.test(n)) {
-      const kind = n.match(/\b(OLED|IPS|VA|FHD|QHD|UHD|4K)\b/);
-      if (kind) tags.push(kind[1]);
-    }
+    const kind = n.match(/\b(OLED|IPS|VA|FHD|QHD|UHD|4K)\b/);
+    if (kind) tags.push(kind[1]);
     const hz = n.match(/(\d{2,3})\s*HZ/);
     if (hz) tags.push(`${hz[1]}Hz`);
   }
   if (part.cat === "bundle" && part.includes?.length) tags.push(`${part.includes.length} parts`);
   if (part.cat === "prebuilt") {
-    const ram = part.name.match(/(\d+)\s*GB(?!\s*SSD)/i);
+    const ramMatch = part.name.match(/(\d+)\s*GB(?!\s*SSD)/i);
     const disk = part.name.match(/(\d+(?:\.\d+)?)\s*(TB|GB)\s*SSD/i);
     const gpu = part.name.match(/RTX\s?\d{3,4}(?:\s?Ti)?|RX\s?\d{3,4}(?:\s?XT)?|UHD Graphics|HD Graphics|Intel Graphics/i);
-    if (ram) tags.push(`${ram[1]}GB RAM`);
+    if (ramMatch) tags.push(`${ramMatch[1]}GB RAM`);
     if (disk) tags.push(`${disk[1]}${disk[2].toUpperCase()} SSD`);
     if (gpu) tags.push(gpu[0].replace(/\s+/g, " "));
     if (part.form === "aio") tags.push("All-in-one");
     else if (part.form === "mini") tags.push("Mini");
     else if (part.form === "gaming") tags.push("Gaming");
   }
-  return tags.slice(0, 4);
+  return [...new Set(tags)].slice(0, 6);
 }
 
 export function shelfNote(cat: Category, build: Build): string {
@@ -362,6 +415,15 @@ export function shelfNote(cat: Category, build: Build): string {
   if (cat === "psu" && build.gpu) bits.push(`${needWatts(build)}W and up`);
   if (cat === "gpu" && build.psu && wattOf(build.psu)) bits.push(`within ${wattOf(build.psu)}W`);
   if (cat === "cooler" && build.cpu?.socket) bits.push(build.cpu.socket);
+  if (cat === "cooler" && build.cpu && /with cooler|wraith/i.test(build.cpu.name)) {
+    bits.push("Skip this. A cooler is already in the processor box");
+  }
+  if (cat === "storage") {
+    if (build.motherboard) {
+      const slots = m2Slots(build.motherboard);
+      bits.push(`Buy 1 drive. This board has ${slots} NVMe slots. Do not buy more`);
+    } else bits.push("Buy 1 drive. A second pick replaces it");
+  }
   if (cat === "monitor") bits.push("Optional");
   if (cat === "bundle") bits.push("Deal price replaces the parts inside");
   if (cat === "prebuilt") bits.push("Finished PCs. One price for the whole system");
@@ -600,12 +662,68 @@ export function aiPicks(): AiPick[] {
   return [
     {
       id: "frames",
-      name: "Most frames per dollar",
+      name: "Price per performance, medium",
       kicker: "Best",
       best: true,
-      tags: ["value", "1440"],
+      tags: ["value", "1440", "perf"],
       why: "The Radeon RX 9070 16GB beats the more expensive 5060 Ti and 5070 on this shelf. DDR4 leaves the money in the graphics card.",
       build: buildFrom(["61d2f9663c", BOARD_AM4, DDR4_32, GPU_9070, SSD1, CASE, PSU750, AIR]),
+    },
+    {
+      id: "cheap",
+      name: "Cheapest PC that turns on",
+      kicker: "Cheapest",
+      tags: ["cheap", "desk", "college"],
+      why: "The floor. Built-in graphics, 16GB, one small drive, one case, one power supply. No extra parts.",
+      build: buildFrom(["ae65baf2c4", BOARD_AM4, DDR4_16, "222da28bfa", CASE, PSU550]),
+    },
+    {
+      id: "college",
+      name: "College: class, Zoom, essays",
+      kicker: "College",
+      tags: ["college", "desk"],
+      why: "For Word, a browser, and Zoom. 32GB and a 1TB drive. No graphics card, because class does not need one.",
+      build: buildFrom(["ae65baf2c4", BOARD_AM4, DDR4_32, SSD1, CASE, PSU550]),
+    },
+    {
+      id: "photo",
+      name: "Photoshop and class projects",
+      kicker: "Photoshop",
+      tags: ["college", "photo"],
+      why: "32GB is the part Photoshop actually wants. A mid graphics card is enough for filters. One drive.",
+      build: buildFrom(["61d2f9663c", BOARD_AM4, DDR4_32, GPU_9060, SSD1, CASE, PSU650, AIR]),
+    },
+    {
+      id: "cad",
+      name: "AutoCAD for class",
+      kicker: "AutoCAD",
+      tags: ["college", "cad"],
+      why: "AutoCAD likes an Intel chip, 32GB, and an NVIDIA card. This is for class files, not a render farm. One drive.",
+      build: buildFrom(["5b8cc605f2", "bfed39ecdd", DDR4_32, GPU_5060, SSD1, CASE, PSU650, AIR]),
+    },
+    {
+      id: "console",
+      name: "About as strong as a console",
+      kicker: "Console",
+      tags: ["1080", "games", "console"],
+      why: "1080p, a real graphics card, and a 144Hz screen. It costs more than a console. You can change the parts later.",
+      build: buildFrom(["2dfbcfdbfb", GPU_9060, SSD1, CASE, PSU650, SCREEN_1080]),
+    },
+    {
+      id: "gta",
+      name: "GTA 6 ready, as far as anyone knows",
+      kicker: "GTA 6",
+      tags: ["games", "am5", "gta"],
+      why: "PC specs are not out. This has 32GB, a 16GB graphics card, and a 2TB drive so you are not short when it lands.",
+      build: buildFrom(["84d819ea71", BOARD_AM5, DDR5_32, GPU_9070, SSD2, CASE, PSU750, AIR]),
+    },
+    {
+      id: "max",
+      name: "Most expensive on the shelf",
+      kicker: "Top",
+      tags: ["max", "am5"],
+      why: "The top processor, a 64GB kit, an RTX 5080, and a 4K screen. You are paying for the ceiling, not for more frames per dollar.",
+      build: buildFrom(["0e1b30db1f", "11a8a65f7a", "d96159d6eb", "ae7ff1d182", SSD2, "0522c8f24d", "0d6e4a6a3a", "c307b5e046", "81e3cc6157"]),
     },
     {
       id: "frames-16",
@@ -641,9 +759,9 @@ export function aiPicks(): AiPick[] {
     },
     {
       id: "starter",
-      name: "1080p, still a real card",
-      kicker: "Start here",
-      tags: ["value", "1080"],
+      name: "Price per performance, low",
+      kicker: "Low",
+      tags: ["value", "1080", "perf"],
       why: "Cheapest PC here that is not stuck on a low-end card. The 8GB RX 9060 XT is the ceiling, and the processor already includes a cooler.",
       build: buildFrom(["2dfbcfdbfb", GPU_9060, SSD1, CASE, PSU650]),
     },
@@ -737,17 +855,17 @@ export function aiPicks(): AiPick[] {
     },
     {
       id: "esports",
-      name: "High frame rates",
-      kicker: "Competitive",
-      tags: ["am5", "1440"],
-      why: "The 9800X3D is the gaming processor. The RX 9070 is enough card, so the extra money stays in the chip.",
+      name: "Tarkov and high frame rates",
+      kicker: "Tarkov",
+      tags: ["am5", "1440", "games"],
+      why: "The 9800X3D is the chip Tarkov actually uses. 32GB, and an RX 9070 so the money stays in the processor.",
       build: buildFrom(["0abb21ae33", BOARD_B850, DDR5_32, GPU_9070, SSD1, CASE, PSU750, AIR]),
     },
     {
       id: "stop",
-      name: "Stop before it gets silly",
+      name: "Price per performance, high",
       kicker: "High",
-      tags: ["am5", "1440"],
+      tags: ["am5", "1440", "perf"],
       why: "The 9800X3D is only a little more than the 9700X and is the better gaming chip. The RX 9070 XT is the last step up before the 5070 Ti and 5080 cost more for each frame.",
       build: buildFrom(["0abb21ae33", BOARD_B850, DDR5_32, GPU_9070XT, SSD2, CASE, PSU850, AIR]),
     },
@@ -770,4 +888,4 @@ export function aiPicks(): AiPick[] {
   ];
 }
 
-export const AI_FILTERS = ["All", "Value", "1080p", "1440p", "Newer socket", "NVIDIA", "No card", "Screen", "Work"] as const;
+export const AI_FILTERS = ["All", "Per frame", "Cheap", "College", "Games", "Value", "1080p", "1440p", "Newer socket", "NVIDIA", "No card", "Screen", "Work", "Top"] as const;

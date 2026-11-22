@@ -15,7 +15,10 @@ import {
   includedParts,
   isJunk,
   money,
+  m2Slots,
   needWatts,
+  priceChange,
+  PRICE_CHECKED,
   shelfNote,
   shortName,
   spendOf,
@@ -268,6 +271,22 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
           />
         ) : (
           <div className="space-y-3 px-4 py-3">
+            {cat === "storage" ? (
+              <div className="rounded-xl border border-line bg-elevated p-3 text-sm">
+                <p className="font-medium">One drive.</p>
+                <p className="mt-1 text-muted">
+                  {build.motherboard
+                    ? `This board has ${m2Slots(build.motherboard)} NVMe slots. Buy 1. Picking another drive replaces this one. It does not add a second.`
+                    : "Pick the motherboard first if you can. Then buy one drive. A second pick replaces it."}
+                </p>
+              </div>
+            ) : null}
+            {cat === "cooler" && build.cpu && /with cooler|wraith/i.test(build.cpu.name) ? (
+              <div className="rounded-xl border border-line bg-elevated p-3 text-sm">
+                <p className="font-medium">Skip the cooler.</p>
+                <p className="mt-1 text-muted">This processor already includes one. Another cooler is an extra part.</p>
+              </div>
+            ) : null}
             {cat === "bundle" ? (
               <div className="rounded-xl border border-line bg-elevated p-3">
                 <p className="font-display text-2xl font-medium leading-none tracking-tight">Build a whole PC</p>
@@ -359,7 +378,8 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
                   <span className="tabular">{visible.length}</span> fit · {shelfNote(cat, build)}
                 </>
               )}
-              {" · Prices checked Nov 21, 2026"}
+              {" · Prices checked "}
+              {PRICE_CHECKED}
             </p>
             {shown.length === 0 ? (
               <p className="py-12 text-center text-sm text-muted">
@@ -392,8 +412,11 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
                         </span>
                         <span className="shrink-0 text-right">
                           <span className="tabular block text-sm font-medium">{money(part.price)}</span>
-                          {part.was && part.was > part.price ? (
-                            <span className="tabular block text-xs text-faint line-through">{money(part.was)}</span>
+                          <span className="block text-[11px] leading-tight text-faint">Updated {PRICE_CHECKED}</span>
+                          {priceChange(part) ? (
+                            <span className={`block text-[11px] leading-tight ${priceChange(part)!.kind === "down" ? "text-ok" : "text-danger"}`}>
+                              {priceChange(part)!.kind === "down" ? "Down" : "Up"} {money(priceChange(part)!.diff)} since {PRICE_CHECKED}
+                            </span>
                           ) : null}
                         </span>
                       </button>
@@ -450,14 +473,22 @@ function AiPanel({ onUse }: { onUse: (pick: ReturnType<typeof aiPicks>[number]) 
   const [filter, setFilter] = useState<(typeof AI_FILTERS)[number]>("All");
   const shown = picks.filter((pick) => {
     if (filter === "All") return true;
-    if (filter === "Value") return pick.tags.includes("value");
-    if (filter === "1080p") return pick.tags.includes("1080");
-    if (filter === "1440p") return pick.tags.includes("1440");
-    if (filter === "Newer socket") return pick.tags.includes("am5");
-    if (filter === "NVIDIA") return pick.tags.includes("nvidia");
-    if (filter === "No card") return pick.tags.includes("desk");
-    if (filter === "Screen") return pick.tags.includes("screen");
-    return pick.tags.includes("work");
+    const tag = {
+      Value: "value",
+      "1080p": "1080",
+      "1440p": "1440",
+      "Newer socket": "am5",
+      NVIDIA: "nvidia",
+      "No card": "desk",
+      Screen: "screen",
+      Work: "work",
+      Cheap: "cheap",
+      College: "college",
+      Games: "games",
+      "Per frame": "perf",
+      Top: "max",
+    }[filter];
+    return tag ? pick.tags.includes(tag) : false;
   });
   return (
     <div className="space-y-3 px-4 py-3">
@@ -573,7 +604,14 @@ function Review({
               >
                 <span className="min-w-0">
                   <span className="block text-xs text-faint">{CAT_LABEL[cat]}</span>
-                  <span className="block truncate text-sm">{part ? shortName(part) : "Skip for now"}</span>
+                  <span className="block truncate text-sm">
+                    {part ? shortName(part) : cat === "storage" ? "One drive. Not five." : "Skip for now"}
+                  </span>
+                  {part && priceChange(part) ? (
+                    <span className={`block text-xs ${priceChange(part)!.kind === "down" ? "text-ok" : "text-danger"}`}>
+                      {priceChange(part)!.kind === "down" ? "Down" : "Up"} {money(priceChange(part)!.diff)} since {PRICE_CHECKED}
+                    </span>
+                  ) : null}
                 </span>
                 <span className={`shrink-0 text-sm ${included ? "text-faint" : "tabular"}`}>
                   {part ? (included ? "Included" : money(part.price)) : "—"}
@@ -709,7 +747,7 @@ function Review({
         </ul>
       ) : null}
 
-      <p className="text-xs text-faint">Prices in CAD. A part only stays if it fits the rest of the build.</p>
+      <p className="text-xs text-faint">Prices in CAD. Updated {PRICE_CHECKED}. A part only stays if it fits. One drive, even if the board has empty slots.</p>
     </div>
   );
 }
