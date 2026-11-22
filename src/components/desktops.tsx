@@ -3,7 +3,7 @@ import { Check, Search, X } from "lucide-react";
 import { PARTS, careerPicks, explainBuild, explainPart, machineScore, money, spendOf, tagsOf, aiScore, type AiPick, type Part, type ShelfSort } from "@/lib/catalog";
 import { RankBadge } from "@/components/rank";
 import { SortRow } from "@/components/sorts";
-import { ThemeToggle, useWide } from "@/lib/theme";
+import { ThemeToggle, usePane } from "@/lib/theme";
 
 type Filter = "all" | "gaming" | "desk" | "mini" | "aio" | "college" | "career" | "programs";
 
@@ -85,11 +85,11 @@ export function Desktops({ onLeave, onUse }: { onLeave: () => void; onUse?: (pic
 
   const choice = items.find((part) => part.id === picked);
   const meta = FILTERS.find((item) => item.id === filter)!;
-  const wide = useWide();
+  const wide = usePane();
   const jobs = filter === "career" || filter === "college" || filter === "programs" ? careerPicks() : [];
 
   return (
-    <div className={`mx-auto flex h-dvh w-full overflow-hidden bg-bg text-fg ${wide ? "max-w-6xl flex-row" : "max-w-xl flex-col"}`}>
+    <div className={`mx-auto flex h-full w-full overflow-hidden bg-bg text-fg ${wide ? "max-w-6xl flex-row" : "max-w-xl flex-col"}`}>
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
       <header className="safe-top shrink-0 border-b border-line px-4 py-3">
         <div className="flex items-center justify-between">

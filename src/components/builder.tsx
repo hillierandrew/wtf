@@ -47,7 +47,7 @@ import {
 import { extrasFromIds, partsFrom, useBench } from "@/lib/store";
 import { RankBadge } from "@/components/rank";
 import { SortRow } from "@/components/sorts";
-import { ThemeToggle, useWide } from "@/lib/theme";
+import { ThemeToggle, usePane } from "@/lib/theme";
 
 const REVIEW = CATS.length;
 const ORDER: Category[] = ["cpu", "motherboard", "memory", "gpu", "storage", "psu", "case", "cooler", "monitor"];
@@ -91,7 +91,7 @@ export function Builder({ onLeave, start = "play" }: { onLeave: () => void; star
   const [blocked, setBlocked] = useState(false);
   const [tag, setTag] = useState("all");
   const [facet, setFacet] = useState("all");
-  const wide = useWide();
+  const wide = usePane();
   const [showTabs, setShowTabs] = useState(false);
   const [name, setName] = useState("");
   const [copied, setCopied] = useState(false);
@@ -229,7 +229,7 @@ export function Builder({ onLeave, start = "play" }: { onLeave: () => void; star
   }
 
   return (
-    <div className={`mx-auto flex h-dvh w-full min-w-0 overflow-hidden bg-bg text-fg ${wide ? "max-w-6xl flex-col md:flex-row" : "max-w-xl flex-col"}`}>
+    <div className={`mx-auto flex h-full w-full min-w-0 overflow-hidden bg-bg text-fg ${wide ? "max-w-6xl flex-row" : "max-w-xl flex-col"}`}>
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
       <header className="safe-top min-w-0 shrink-0 border-b border-line px-4 pb-3 pt-3">
         <div className="flex items-center justify-between gap-3">
@@ -986,7 +986,6 @@ function Checkout({
   const [open, setOpen] = useState(true);
   const [height, setHeight] = useState(360);
   const [width, setWidth] = useState(360);
-  const [side, setSide] = useState(false);
   const drag = useRef<{ axis: "x" | "y"; start: number; size: number } | null>(null);
 
   useEffect(() => {
@@ -995,11 +994,7 @@ function Checkout({
     if (savedH >= 120) setHeight(savedH);
     else setHeight(Math.round(window.innerHeight * 0.42));
     if (savedW >= 220) setWidth(savedW);
-    const media = window.matchMedia("(min-width: 768px)");
-    const apply = () => setSide(media.matches);
-    apply();
-    media.addEventListener("change", apply);
-    return () => media.removeEventListener("change", apply);
+    else if (window.innerWidth > window.innerHeight && window.innerHeight <= 520) setWidth(280);
   }, []);
 
   const heightRef = useRef(height);
@@ -1008,7 +1003,7 @@ function Checkout({
   widthRef.current = width;
 
   function onPointerDown(event: PointerEvent<HTMLButtonElement>) {
-    const axis = wide && side ? "x" : "y";
+    const axis = wide ? "x" : "y";
     drag.current = { axis, start: axis === "y" ? event.clientY : event.clientX, size: axis === "y" ? height : width };
     event.currentTarget.setPointerCapture(event.pointerId);
   }
@@ -1041,7 +1036,7 @@ function Checkout({
     else localStorage.setItem("drew-checkout-w", String(widthRef.current));
   }
 
-  const docked = wide && side;
+  const docked = wide;
   return (
     <aside
       className={`relative flex min-h-0 flex-col border-line bg-elevated ${docked ? "h-full shrink-0 border-l" : "shrink-0 border-t"}`}

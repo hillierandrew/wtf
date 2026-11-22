@@ -4,7 +4,7 @@ import raw from "@/data/laptops.json";
 import { rankFrom, type ShelfSort } from "@/lib/catalog";
 import { RankBadge } from "@/components/rank";
 import { SortRow } from "@/components/sorts";
-import { ThemeToggle, useWide } from "@/lib/theme";
+import { ThemeToggle, usePane } from "@/lib/theme";
 
 type Kind = "game" | "home" | "work" | "tablet" | "chrome";
 type Filter = "deal" | "games" | "work" | "school" | "create" | "tablet" | "chrome";
@@ -260,7 +260,7 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
   const choice = ITEMS.find((item) => item.id === picked);
   const meta = FILTERS.find((item) => item.id === filter)!;
   const qualityLabel = QUALITIES.find((item) => item.id === quality)?.label ?? "Normal";
-  const wide = useWide();
+  const wide = usePane();
 
   function pickGame(id: string) {
     setGameId(id);
@@ -277,7 +277,7 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
   }
 
   return (
-    <div className={`mx-auto flex h-dvh w-full overflow-hidden bg-bg text-fg ${wide ? "max-w-6xl flex-row" : "max-w-xl flex-col"}`}>
+    <div className={`mx-auto flex h-full w-full overflow-hidden bg-bg text-fg ${wide ? "max-w-6xl flex-row" : "max-w-xl flex-col"}`}>
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
       <header className="safe-top shrink-0 border-b border-line px-4 py-3">
         <div className="flex items-center justify-between">
