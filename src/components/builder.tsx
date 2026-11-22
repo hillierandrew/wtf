@@ -8,6 +8,7 @@ import {
   PARTS,
   AI_FILTERS,
   aiPicks,
+  buildSpeed,
   coveredByBundle,
   fitWhy,
   formLabel,
@@ -29,6 +30,7 @@ import {
   type Category,
 } from "@/lib/catalog";
 import { partsFrom, useBench } from "@/lib/store";
+import { ThemeToggle } from "@/lib/theme";
 
 const REVIEW = CATS.length;
 
@@ -155,7 +157,10 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
           <button type="button" onClick={onLeave} className="text-sm text-muted">
             Welcome
           </button>
-          <p className="tabular text-sm font-medium">{money(total)}</p>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <p className="tabular text-sm font-medium">{money(total)}</p>
+          </div>
         </div>
         <div className="mt-3 flex items-end justify-between gap-3">
           <h1 className="font-display text-3xl font-medium leading-none tracking-tight">
@@ -406,8 +411,13 @@ export function Builder({ onLeave }: { onLeave: () => void }) {
                           </span>
                           <span className="mt-0.5 line-clamp-2 block text-sm font-medium leading-snug">{shortName(part)}</span>
                           {reason ? <span className="mt-1 block text-xs text-danger">{reason}</span> : null}
+                          {!reason && part.cat === "gpu" && buildSpeed({ gpu: part }) ? (
+                            <span className="mt-1 block text-xs text-muted">Roughly {buildSpeed({ gpu: part })}% of an RX 9070</span>
+                          ) : null}
                           {!reason && tags.length ? (
-                            <span className={`mt-1 block text-xs text-muted ${part.cat === "bundle" ? "line-clamp-3" : ""}`}>{tags.join(part.cat === "bundle" ? " + " : " · ")}</span>
+                            <span className={`mt-1 block text-xs text-muted ${part.cat === "bundle" ? "line-clamp-3" : ""}`}>
+                              {tags.join(part.cat === "bundle" ? " + " : " · ")}
+                            </span>
                           ) : null}
                         </span>
                         <span className="shrink-0 text-right">
@@ -521,6 +531,7 @@ function AiPanel({ onUse }: { onUse: (pick: ReturnType<typeof aiPicks>[number]) 
                 <p className="tabular shrink-0 text-sm font-medium">{money(spendOf(pick.build))}</p>
               </div>
               <p className="mt-2 text-sm text-muted">{pick.why}</p>
+              <BuildStats build={pick.build} />
               <ul className="mt-3 space-y-1">
                 {CATS.map((cat) => {
                   const part = pick.build[cat];
@@ -547,6 +558,37 @@ function AiPanel({ onUse }: { onUse: (pick: ReturnType<typeof aiPicks>[number]) 
           );
         })}
       </ul>
+    </div>
+  );
+}
+
+function BuildStats({ build }: { build: ReturnType<typeof partsFrom> }) {
+  const speed = buildSpeed(build);
+  const spend = spendOf(build);
+  const per = speed ? spend / speed : 0;
+  const need = needWatts(build);
+  const supply = wattOf(build.psu);
+  const used = supply ? Math.min(100, Math.round((need / supply) * 100)) : 0;
+  return (
+    <div className="mt-3">
+      <div className="grid grid-cols-3 gap-2 text-xs">
+        <div>
+          <p className="text-faint">Rough speed</p>
+          <p className="tabular font-medium">{speed ? `${speed}%` : "—"}</p>
+        </div>
+        <div>
+          <p className="text-faint">$ per point</p>
+          <p className="tabular font-medium">{speed ? money(per) : "—"}</p>
+        </div>
+        <div>
+          <p className="text-faint">Power used</p>
+          <p className="tabular font-medium">{supply ? `${used}%` : "—"}</p>
+        </div>
+      </div>
+      <div className="mt-2 h-1 overflow-hidden rounded-full bg-line">
+        <div className="h-full bg-accent" style={{ width: `${Math.min(100, Math.round((speed / 148) * 100))}%` }} />
+      </div>
+      <p className="mt-1 text-[11px] text-faint">100% speed is an RX 9070. Rough, not a lab test.</p>
     </div>
   );
 }
@@ -644,8 +686,25 @@ function Review({
           <dd>{build.cpu?.socket || build.motherboard?.socket || "—"}</dd>
         </div>
         <div>
-          <dt className="text-xs text-faint">Board</dt>
+          <dt className="text-xs text-faint">Board size</dt>
           <dd>{board ? formLabel(board) : "—"}</dd>
+        </div>
+        <div>
+          <dt className="text-xs text-faint">Power used</dt>
+          <dd className="tabular text-lg font-medium">{supply ? `${Math.min(100, Math.round((need / supply) * 100))}%` : "—"}</dd>
+          <p className="text-xs text-faint">{supply ? `${need}W of ${supply}W` : `About ${need}W needed`}</p>
+        </div>
+        <div>
+          <dt className="text-xs text-faint">Rough speed</dt>
+          <dd className="tabular text-lg font-medium">{buildSpeed(build) ? `${buildSpeed(build)}%` : "—"}</dd>
+          <p className="text-xs text-faint">100 is an RX 9070</p>
+        </div>
+        <div>
+          <dt className="text-xs text-faint">Drive slots</dt>
+          <dd className="tabular text-lg font-medium">
+            {build.storage ? "1" : "0"} of {m2Slots(build.motherboard)}
+          </dd>
+          <p className="text-xs text-faint">Buy one. Leave the rest empty</p>
         </div>
       </dl>
       )}

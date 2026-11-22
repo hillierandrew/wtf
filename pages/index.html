@@ -9,6 +9,11 @@
       content="Build a PC from the shelf. Socket, memory, case, and power checked against the inventory."
     />
     <meta name="theme-color" content="#f3efe6" />
+    <script>
+      try {
+        if (localStorage.getItem("drew-theme") === "night") document.documentElement.dataset.theme = "night";
+      } catch (e) {}
+    </script>
     <link rel="icon" type="image/svg+xml" href="/wtf/favicon.svg" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="drew.wtf" />

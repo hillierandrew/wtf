@@ -33,6 +33,11 @@ export const Route = createRootRoute({
         <HeadContent />
       </head>
       <body>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{if(localStorage.getItem("drew-theme")==="night")document.documentElement.dataset.theme="night"}catch(e){}`,
+          }}
+        />
         <PreviewHostBridge />
         <AuthProvider>
           <Outlet />

@@ -94,8 +94,8 @@ export function formOf(part: Part | undefined): string {
 }
 
 export function formLabel(form: string): string {
-  if (form === "itx") return "ITX";
-  if (form === "matx") return "mATX";
+  if (form === "itx") return "Mini-ITX";
+  if (form === "matx") return "Micro-ATX";
   if (form === "atx") return "ATX";
   if (form === "eatx") return "E-ATX";
   if (form === "full") return "Full tower";
@@ -159,6 +159,33 @@ export function gpuTier(part: Part): number {
   if (/3060|3050|1660|1650|6500|6600|6650|2060|2070/.test(n)) return 2;
   if (/1030|1050|\b710\b|\b730\b/.test(n)) return 1;
   if (/RTX|RADEON|GEFORCE/.test(n)) return 3;
+  return 0;
+}
+
+/** Rough speed where an RX 9070 is 100. Not a lab benchmark. */
+export function gpuIndex(part: Part): number {
+  const n = part.name.toUpperCase();
+  if (/5090/.test(n)) return 180;
+  if (/5080/.test(n)) return 148;
+  if (/5070\s?TI/.test(n)) return 122;
+  if (/9070\s?XT/.test(n)) return 116;
+  if (/\b9070\b/.test(n)) return 100;
+  if (/\b5070\b/.test(n)) return 90;
+  if (/5060\s?TI/.test(n) && /16\s?G/.test(n)) return 78;
+  if (/5060\s?TI/.test(n)) return 72;
+  if (/9060\s?XT/.test(n) && /16\s?G/.test(n)) return 68;
+  if (/9060/.test(n)) return 64;
+  if (/\b5060\b/.test(n)) return 62;
+  if (/\b7600\b/.test(n)) return 55;
+  if (/3050/.test(n)) return 32;
+  const tier = gpuTier(part);
+  return [0, 20, 40, 60, 85, 120, 170][tier] ?? 0;
+}
+
+export function buildSpeed(build: Build): number {
+  if (build.gpu) return gpuIndex(build.gpu);
+  const cpu = build.cpu?.name.toUpperCase() ?? "";
+  if (/780M|760M|RADEON GRAPHICS|GT\b/.test(cpu)) return 12;
   return 0;
 }
 
@@ -387,10 +414,27 @@ export function tagsOf(part: Part): string[] {
     if (disk) tags.push(`${disk[1]}${disk[2].toUpperCase()} SSD`);
     if (gpu) tags.push(gpu[0].replace(/\s+/g, " "));
     if (part.form === "aio") tags.push("All-in-one");
-    else if (part.form === "mini") tags.push("Mini");
+    else if (part.form === "mini") tags.push("Mini-ITX");
     else if (part.form === "gaming") tags.push("Gaming");
   }
-  return [...new Set(tags)].slice(0, 6);
+  if (/WI-?FI/.test(n)) tags.push("Wi-Fi");
+  if (/TITANIUM/.test(n)) tags.push("Titanium");
+  else if (/PLATINUM/.test(n)) tags.push("Platinum");
+  else if (/GOLD/.test(n)) tags.push("Gold");
+  else if (/BRONZE/.test(n)) tags.push("Bronze");
+  if (/NON-?MODULAR/.test(n)) tags.push("Not modular");
+  else if (/MODULAR/.test(n)) tags.push("Modular");
+  if (/ATX\s?3/.test(n)) tags.push("ATX 3");
+  if (/WITH COOLER|WRAITH/.test(n)) tags.push("Cooler included");
+  const cores = n.match(/(\d+)\s*-?\s*CORE/);
+  if (cores && part.cat === "cpu") tags.push(`${cores[1]} cores`);
+  if (part.cat === "gpu") {
+    const vram = n.match(/\b(4|6|8|10|12|16|20|24|32)\s*G(?:B)?\b/);
+    if (vram) tags.push(`${vram[1]}GB VRAM`);
+  }
+  if (/TRIPLE FAN|3X|3 X/.test(n) && part.cat === "gpu") tags.push("Triple fan");
+  else if (/DUAL|DOUBLE FAN|2X/.test(n) && part.cat === "gpu") tags.push("Dual fan");
+  return [...new Set(tags)].slice(0, 8);
 }
 
 export function shelfNote(cat: Category, build: Build): string {
@@ -427,6 +471,7 @@ export function shelfNote(cat: Category, build: Build): string {
   if (cat === "monitor") bits.push("Optional");
   if (cat === "bundle") bits.push("Deal price replaces the parts inside");
   if (cat === "prebuilt") bits.push("Finished PCs. One price for the whole system");
+  if (cat === "case" || cat === "motherboard") bits.push("Mini-ITX is tiny. Micro-ATX is small. ATX is normal");
   return bits.length ? bits.join(" · ") : "Full shelf";
 }
 

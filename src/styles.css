@@ -30,6 +30,26 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  body {
+    background:
+      radial-gradient(900px 420px at 50% -12%, color-mix(in oklab, var(--color-accent) 22%, transparent), transparent 70%),
+      var(--color-bg);
+  }
+
+  html[data-theme="night"] {
+    --color-bg: #12100e;
+    --color-elevated: #1c1916;
+    --color-subtle: #2a241e;
+    --color-fg: #f6f1e7;
+    --color-muted: #c8bfb2;
+    --color-faint: #8f867b;
+    --color-line: #3a332c;
+    --color-accent: #e38b62;
+    --color-accent-fg: #1a120e;
+    --color-danger: #f0a8a2;
+    --color-ok: #8dceb0;
+  }
+
   button:not(:disabled),
   [role="button"]:not(:disabled) {
     cursor: pointer;
