@@ -25,7 +25,7 @@ const STEPS: { id: Kind; label: string; line: string }[] = [
   { id: "pad", label: "Mouse pad", line: "Optional. The mouse works without one." },
   { id: "webcam", label: "Camera", line: "One camera. Optional. The computer works without it." },
   { id: "mic", label: "Microphone", line: "One microphone. Optional. A headset or camera may already hear you." },
-  { id: "headset", label: "Headset", line: "One headset. It has its own microphone. You do not need a second one." },
+  { id: "headset", label: "Headset", line: "One headset or pair of headphones. A headset already has a microphone." },
 ];
 
 function money(value: number) {
@@ -164,7 +164,7 @@ export function Desk({ onLeave }: { onLeave: () => void }) {
             : step === "mic"
               ? [["all", "All"], ["USB", "USB"]]
               : step === "headset"
-                ? [["all", "All"], ["Gaming", "Gaming"], ["Office", "Office"], ["Wireless", "Wireless"], ["Wired", "Wired"]]
+                ? [["all", "All"], ["Gaming", "Gaming"], ["Music", "Music"], ["Office", "Office"], ["Earbuds", "Earbuds"], ["Wireless", "Wireless"], ["Wired", "Wired"]]
               : step === "pad"
                 ? [["all", "All"]]
                 : [
