@@ -7,6 +7,8 @@ import { Sim } from "@/components/sim";
 import { Desk } from "@/components/desk";
 import { Gate } from "@/components/lock";
 import { ScreenBar, type Screen } from "@/components/nav";
+import { Games } from "@/components/games";
+import { Guide } from "@/components/guide";
 import { Steam } from "@/components/steam";
 import { Value } from "@/components/value";
 import { Welcome } from "@/components/welcome";
@@ -37,9 +39,27 @@ function Home() {
     hydrate();
   }, [hydrate]);
 
-  if (!mode || !hydrated) return <Welcome onEnter={() => go("pc")} onDesk={() => go("desk")} onSim={() => go("sim")} onLaptop={() => go("laptop")} onDesktop={() => go("desktop")} onValue={() => go("value")} onSteam={() => go("steam")} />;
+  if (!mode || !hydrated) return <Welcome onEnter={() => go("pc")} onDesk={() => go("desk")} onSim={() => go("sim")} onLaptop={() => go("laptop")} onDesktop={() => go("desktop")} onValue={() => go("value")} onSteam={() => go("steam")} onGames={() => go("games")} onGuide={() => go("guide")} />;
   const screen =
-    mode === "steam" ? (
+    mode === "games" ? (
+      <Games
+        onLeave={home}
+        onUse={(pick) => {
+          useBench.getState().apply(pick.build, `${pick.name}. Change a part if you want.`);
+          setBoot("review");
+          setStack((current) => [...current, "pc"]);
+        }}
+      />
+    ) : mode === "guide" ? (
+      <Guide
+        onLeave={home}
+        onUse={(name, build) => {
+          useBench.getState().apply(build, `${name}. The questions picked these parts.`);
+          setBoot("review");
+          setStack((current) => [...current, "pc"]);
+        }}
+      />
+    ) : mode === "steam" ? (
       <Steam
         onLeave={home}
         onUse={(pick) => {

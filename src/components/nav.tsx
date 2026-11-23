@@ -1,6 +1,8 @@
-export type Screen = "pc" | "desk" | "sim" | "laptop" | "desktop" | "value" | "steam";
+export type Screen = "pc" | "desk" | "sim" | "laptop" | "desktop" | "value" | "steam" | "games" | "guide";
 
 const LINKS: { id: Screen; label: string }[] = [
+  { id: "guide", label: "Guide" },
+  { id: "games", label: "Games" },
   { id: "pc", label: "PC" },
   { id: "steam", label: "Steam" },
   { id: "value", label: "Price" },
@@ -11,6 +13,8 @@ const LINKS: { id: Screen; label: string }[] = [
 ];
 
 const NAMES: Record<string, string> = {
+  guide: "Guide",
+  games: "Games",
   pc: "Build",
   steam: "Steam",
   value: "Price",

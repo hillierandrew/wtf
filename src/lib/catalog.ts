@@ -1080,6 +1080,50 @@ function buildFrom(ids: string[]): Build {
   return reconcile(priority, map);
 }
 
+export type GuideAnswers = {
+  job: "games" | "work" | "both";
+  power: "easy" | "normal" | "strong";
+  cpu: "amd" | "intel" | "any";
+  gpu: "nvidia" | "amd" | "none" | "any";
+  size: "normal" | "small";
+  screen: "yes" | "no";
+};
+
+/** One plain computer from the answers. Every part is on the shelf. */
+export function guidePick(answers: GuideAnswers): AiPick {
+  const box = answers.size === "small" ? CASE_SMALL : CASE;
+  const intel = answers.cpu === "intel";
+  const skipCard = answers.gpu === "none" || (answers.gpu === "any" && answers.job === "work" && answers.power === "easy");
+  const nvidia = answers.gpu === "nvidia" || (answers.gpu !== "amd" && !skipCard);
+  const screen = answers.screen === "yes" ? (answers.power === "strong" ? SCREEN_1440 : SCREEN_1080) : "";
+  const card = skipCard ? "" : answers.power === "easy" ? (nvidia ? GPU_5060 : GPU_9060) : answers.power === "normal" ? (nvidia ? GPU_5070 : GPU_9070) : nvidia ? GPU_5070TI : GPU_9070XT;
+  const ids = intel
+    ? skipCard
+      ? ["bc01af734d", "40f139f263", DDR5_16, SSD1, box, PSU550, AIR, screen]
+      : answers.power === "strong"
+        ? ["947a6322f8", "40f139f263", DDR5_32, card, SSD2, box, PSU850, AIR, screen]
+        : answers.power === "normal"
+          ? ["5b8cc605f2", "cf7081ad5f", DDR4_32, card, SSD2, box, PSU750, AIR, screen]
+          : ["5b8cc605f2", "cf7081ad5f", DDR4_16, card, SSD1, box, PSU650, AIR, screen]
+    : skipCard
+      ? ["12f0a4d78a", "5f5a90664b", DDR5_16, SSD1, box, PSU550, screen]
+      : answers.power === "strong"
+        ? ["0abb21ae33", answers.size === "small" ? "5f5a90664b" : BOARD_B850, DDR5_32, answers.size === "small" ? (nvidia ? GPU_5070 : GPU_9070) : card, SSD2, box, PSU850, AIR, screen]
+        : answers.power === "normal"
+          ? ["9ab94a8d13", "5f5a90664b", DDR5_32, card, SSD2, box, PSU750, AIR, screen]
+          : ["7e2a9c25b9", "5f5a90664b", DDR5_16, card, SSD1, box, PSU650, screen];
+  const brand = intel ? "Intel" : "AMD";
+  const cardName = skipCard ? "No graphics card." : nvidia ? "An NVIDIA card." : "An AMD card.";
+  return {
+    id: "guide",
+    name: "Your PC",
+    kicker: "Basic builder",
+    tags: ["guide"],
+    why: `${brand}. ${cardName} ${answers.power === "easy" ? "The easy one." : answers.power === "strong" ? "The strong one." : "The normal one."} ${answers.size === "small" ? "A small case." : "A normal case."}`,
+    build: buildFrom(ids.filter(Boolean)),
+  };
+}
+
 /** Tiny living-room PCs. Every part is on the shelf. */
 export function steamPicks(): AiPick[] {
   const ch160 = "081c74c5ae";
