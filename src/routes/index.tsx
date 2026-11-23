@@ -12,6 +12,7 @@ import { Guide } from "@/components/guide";
 import { Steam } from "@/components/steam";
 import { Value } from "@/components/value";
 import { Welcome } from "@/components/welcome";
+import { Colour } from "@/components/colour";
 import { useBench } from "@/lib/store";
 
 export const Route = createFileRoute("/")({ component: Home });
@@ -40,7 +41,7 @@ function Home() {
     hydrate();
   }, [hydrate]);
 
-  let screen = <Welcome onEnter={() => go("pc")} onDesk={() => go("desk")} onSim={() => go("sim")} onLaptop={() => go("laptop")} onDesktop={() => go("desktop")} onValue={() => go("value")} onSteam={() => go("steam")} onGames={() => go("games")} onGuide={() => go("guide")} />;
+  let screen = <Welcome onEnter={() => go("pc")} onDesk={() => go("desk")} onSim={() => go("sim")} onLaptop={() => go("laptop")} onDesktop={() => go("desktop")} onValue={() => go("value")} onSteam={() => go("steam")} onGames={() => go("games")} onGuide={() => go("guide")} onColour={() => go("colour")} />;
   if (mode && hydrated) {
     const page =
       mode === "games" ? (
@@ -87,6 +88,8 @@ function Home() {
             setStack((current) => [...current, "pc"]);
           }}
         />
+      ) : mode === "colour" ? (
+        <Colour onLeave={home} />
       ) : (
         <Builder onLeave={home} start={boot} />
       );
