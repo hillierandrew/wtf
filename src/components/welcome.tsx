@@ -10,6 +10,7 @@ export function Welcome({
   onSteam,
   onGames,
   onGuide,
+  onColour,
 }: {
   onEnter: () => void;
   onDesk: () => void;
@@ -20,6 +21,7 @@ export function Welcome({
   onSteam: () => void;
   onGames: () => void;
   onGuide: () => void;
+  onColour: () => void;
 }) {
   const buttons = [
     { label: "GAMES", line: "Pick a game or a program. See the computers and laptops that run it.", onClick: onGames },
@@ -29,6 +31,7 @@ export function Welcome({
     { label: "PRICE CHECK", line: "Cost per gigabyte, or per point of speed. Tap to add it.", onClick: onValue },
     { label: "PREBUILDS", line: "A finished PC. Scored 0 to 100.", onClick: onDesktop },
     { label: "LAPTOPS", line: "Games, a college class, or the best price.", onClick: onLaptop },
+    { label: "COLOUR", line: "White laptops, black laptops, all laptops, or all white builds.", onClick: onColour },
     { label: "SIMULATORS", line: "Racing, flying, or farming.", onClick: onSim },
     { label: "KEYBOARDS", line: "Keyboard, mouse, camera, microphone, and headset.", onClick: onDesk },
   ];
