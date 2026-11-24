@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-11-23",
-  "note": "Canada Computers prices dated 2026-11-23, including the sim builder.",
+  "note": "Canada Computers prices dated 2026-11-23, including monitors and mounts.",
   "sound": "2026-11-23",
   "servers": "2026-11-23",
   "controllers": "2026-11-23",
@@ -13,5 +13,7 @@
   "gpus": "2026-11-23",
   "memory": "2026-11-23",
   "cpus": "2026-11-23",
-  "sim": "2026-11-23"
+  "sim": "2026-11-23",
+  "monitors": "2026-11-23",
+  "mounts": "2026-11-23"
 }
