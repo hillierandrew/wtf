@@ -103,21 +103,25 @@ export function Value({ onLeave, onBuild }: { onLeave: () => void; onBuild: () =
 
       {notice ? <p className="shrink-0 border-b border-line px-4 py-3 text-base text-muted">{notice}</p> : null}
 
-      <div className="flex shrink-0 gap-2 overflow-x-auto px-4 py-3">
-        {STEPS.map((item) => (
-          <button
-            key={item.cat}
-            type="button"
-            onClick={() => {
-              setCat(item.cat);
+      <div className="shrink-0 px-4 py-3">
+        <label className="flex h-12 items-center gap-2 rounded-2xl border border-line bg-elevated px-3">
+          <span className="shrink-0 text-sm text-muted">Part</span>
+          <select
+            value={cat}
+            onChange={(event) => {
+              setCat(event.target.value as Category);
               setQuery("");
             }}
-            className={`h-12 shrink-0 rounded-full border px-4 text-base ${cat === item.cat ? "border-accent bg-subtle" : "border-line"}`}
+            className="h-full min-w-0 flex-1 bg-transparent text-base outline-none"
           >
-            {item.title}
-            {build[item.cat] ? " ✓" : ""}
-          </button>
-        ))}
+            {STEPS.map((item) => (
+              <option key={item.cat} value={item.cat}>
+                {item.title}
+                {build[item.cat] ? " · picked" : ""}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
 
       <label className="mx-4 mb-3 flex h-12 shrink-0 items-center rounded-xl border border-line bg-elevated px-3">

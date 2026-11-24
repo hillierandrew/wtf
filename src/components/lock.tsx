@@ -3,7 +3,7 @@ import { lazy, Suspense, useEffect, useRef, useState } from "react";
 const CODE = "1234";
 const PHONE = "5678";
 const Phone = lazy(() => import("@/components/phone").then((mod) => ({ default: mod.Phone })));
-const KEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "C", "0", "#"] as const;
+const KEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "C", "0", "OK"] as const;
 
 function tone(kind: "tap" | "no" | "yes") {
   try {
@@ -108,7 +108,7 @@ function Lock({ onOpen }: { onOpen: (next: "site" | "phone") => void }) {
       tone("tap");
       return;
     }
-    if (key === "#") {
+    if (key === "OK" || key === "#") {
       tone("tap");
       decide(digitsRef.current);
       return;
@@ -142,35 +142,33 @@ function Lock({ onOpen }: { onOpen: (next: "site" | "phone") => void }) {
 
   return (
     <div className="flex min-h-dvh items-center justify-center bg-[#100e0c] px-4 py-8 text-[#f6f1e7]">
-      <div className={`w-full max-w-sm rounded-[2rem] border border-[#3a332c] bg-[#1a1613] p-5 shadow-[0_24px_60px_rgba(0,0,0,0.45)] ${state === "denied" ? "lock-shake" : ""}`}>
+      <div className={`w-full max-w-sm rounded-[2rem] border border-[#5c6168] bg-[radial-gradient(circle_at_30%_0%,#4c5158,#2a2d32_42%,#141618)] p-5 shadow-[0_28px_50px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.16)] ${state === "denied" ? "lock-shake" : ""}`}>
         <div className="flex items-center justify-between px-1">
-          <p className="font-display text-lg tracking-tight">drew.wtf</p>
-          <p className="flex items-center gap-2 text-sm tracking-[0.2em] text-[#c8bfb2]">
+          <p className="text-sm font-medium tracking-[0.28em] text-[#d7dbe0]">DOOR</p>
+          <p className="flex items-center gap-2 text-xs tracking-[0.22em] text-[#aeb6bf]">
             <span className={`size-2.5 rounded-full ${lamp} ${state === "armed" ? "lock-pulse" : ""}`} />
             {label}
           </p>
         </div>
-        <div className="mt-5 grid grid-cols-4 gap-3" aria-label="Code">
+        <div className="mt-5 flex justify-center gap-3" aria-label="Code">
           {[0, 1, 2, 3].map((index) => (
-            <span key={index} className={`flex h-14 items-center justify-center rounded-xl border border-[#3a332c] bg-[#100e0c] text-3xl ${index < digits.length ? "text-accent" : "text-transparent"}`}>
-              {index < digits.length ? "●" : "·"}
-            </span>
+            <span key={index} className={`size-3 rounded-full ${index < digits.length ? "bg-[#7dffb2] shadow-[0_0_10px_#7dffb2]" : "bg-[#0c0d0f] shadow-[inset_0_1px_2px_rgba(0,0,0,0.8)]"}`} />
           ))}
         </div>
-        <div className="mt-5 grid grid-cols-3 gap-3">
+        <div className="mt-6 grid grid-cols-3 gap-3">
           {KEYS.map((key) => (
             <button
               key={key}
               type="button"
               onClick={() => press(key)}
-              aria-label={key === "C" ? "Clear" : key === "#" ? "Enter" : key}
-              className="press flex h-16 items-center justify-center rounded-2xl border border-[#3a332c] bg-[#241f1b] font-display text-3xl text-[#f6f1e7] shadow-[inset_0_-3px_0_rgba(0,0,0,0.35)] active:bg-[#2e2823]"
+              aria-label={key === "C" ? "Clear" : key === "OK" ? "OK" : key}
+              className={`press flex h-16 items-center justify-center rounded-full text-2xl font-medium text-[#f6f7f8] shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_5px_0_#0c0d10] active:translate-y-0.5 active:shadow-none ${key === "OK" ? "bg-[#1f8f4d]" : "bg-[#3c4148]"}`}
             >
               {key}
             </button>
           ))}
         </div>
-        <p className="mt-4 text-center text-sm text-[#8f867b]">Type 1234 on the number pad, or tap the keys.</p>
+        <p className="mt-5 text-center text-sm text-[#9aa3ab]">Enter the code. It opens on its own, or press OK.</p>
         <input
           ref={field}
           autoFocus

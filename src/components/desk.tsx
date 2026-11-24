@@ -133,23 +133,28 @@ export function Desk({ onLeave }: { onLeave: () => void }) {
         <h1 className="font-display mt-3 text-4xl font-medium leading-none tracking-tight">Build a keyboard</h1>
         <p className="mt-2 text-base text-muted">Keyboard, mouse, pad, camera, microphone, and headset. One of each.</p>
       </header>
-      <div className="flex shrink-0 gap-2 overflow-x-auto px-4 py-3">
-        {STEPS.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => {
-              setStep(item.id);
+      <div className="shrink-0 px-4 py-3">
+        <label className="flex h-12 items-center gap-2 rounded-2xl border border-line bg-elevated px-3">
+          <span className="shrink-0 text-sm text-muted">Part</span>
+          <select
+            value={step}
+            onChange={(event) => {
+              setStep(event.target.value as Kind);
               setQuery("");
               setBrand("all");
               setFilter("all");
               setLimit(24);
             }}
-            className={`h-12 shrink-0 rounded-full border px-4 text-base ${step === item.id ? "border-accent bg-accent text-accent-fg" : "border-line bg-elevated"}`}
+            className="h-full min-w-0 flex-1 bg-transparent text-base outline-none"
           >
-            {item.label}
-          </button>
-        ))}
+            {STEPS.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.label}
+                {picked[item.id] ? " · in" : ""}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
       <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 pb-4">
         <p className="text-base text-muted">{stepMeta.line}</p>

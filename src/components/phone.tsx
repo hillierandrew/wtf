@@ -1,12 +1,15 @@
-import { useEffect, useMemo, useState } from "react";
-import { ChevronLeft, Heart, LayoutGrid, Lock, Search, Tag } from "lucide-react";
-import { money } from "@/lib/catalog";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { ChevronLeft, Cpu, Gamepad2, Heart, LayoutGrid, Lock, Search } from "lucide-react";
+import { CAT_LABEL, CATS, PARTS, byId, fitWhy, isJunk, money, reconcile, shortName, spendOf, suggest, type Build, type Category, type Part } from "@/lib/catalog";
 import { PHONE_ITEMS, PHONE_SECTIONS, groupMeta, phoneItem, type PhoneItem } from "@/lib/phone-catalog";
+import { LOOKS, childFor, laptopsFor, needsOf, prebuildsFor, type Look, type UseKind, type UseNeed } from "@/lib/phone-use";
 
-type Tab = "shop" | "deals" | "search" | "saved";
+type Tab = "use" | "build" | "shop" | "deals" | "search" | "saved";
 type Sort = "low" | "high" | "name" | "sale";
 
 const SAVED = "drew-phone-saved";
+const PC_KEY = "drew-phone-pc";
+const SLOTS: Category[] = ["cpu", "motherboard", "memory", "gpu", "storage", "cooler", "case", "psu", "monitor"];
 
 function loadSaved() {
   try {
@@ -31,7 +34,7 @@ function sortItems(list: PhoneItem[], sort: Sort) {
 }
 
 export function Phone({ onLock }: { onLock: () => void }) {
-  const [tab, setTab] = useState<Tab>("shop");
+  const [tab, setTab] = useState<Tab>("use");
   const [group, setGroup] = useState<string | null>(null);
   const [openId, setOpenId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -40,6 +43,29 @@ export function Phone({ onLock }: { onLock: () => void }) {
   const [hideOpen, setHideOpen] = useState(false);
   const [saved, setSaved] = useState<Set<string>>(loadSaved);
   const [limit, setLimit] = useState(48);
+  const [pc, setPc] = useState<Build>({});
+
+  useEffect(() => {
+    try {
+      const ids = JSON.parse(localStorage.getItem(PC_KEY) || "[]");
+      if (!Array.isArray(ids)) return;
+      const next: Build = {};
+      for (const id of ids) {
+        const part = typeof id === "string" ? byId.get(id) : undefined;
+        if (part) next[part.cat] = part;
+      }
+      if (Object.keys(next).length) setPc(next);
+    } catch {
+      /* a new computer is fine */
+    }
+  }, []);
+
+  useEffect(() => {
+    const ids = Object.values(pc)
+      .filter((part): part is Part => Boolean(part))
+      .map((part) => part.id);
+    localStorage.setItem(PC_KEY, JSON.stringify(ids));
+  }, [pc]);
 
   useEffect(() => {
     const tag = document.querySelector('meta[name="theme-color"]');
@@ -105,7 +131,7 @@ export function Phone({ onLock }: { onLock: () => void }) {
   }
 
   const shown = listed.slice(0, limit);
-  const title = open ? "Details" : meta?.title ?? (tab === "deals" ? "Deals" : tab === "saved" ? "Saved" : tab === "search" ? "Search" : "Store");
+  const title = open ? "Details" : meta?.title ?? (tab === "use" ? "Use" : tab === "build" ? "Build" : tab === "deals" ? "Deals" : tab === "saved" ? "Saved" : tab === "search" ? "Search" : "Store");
 
   return (
     <div className="min-h-dvh bg-[#1d1d1f] text-[#1c1c1e] sm:flex sm:items-center sm:justify-center sm:p-6" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif' }}>
@@ -163,11 +189,25 @@ export function Phone({ onLock }: { onLock: () => void }) {
             </article>
           ) : null}
 
+          {!open && tab === "use" ? (
+            <PhoneUse
+              onTake={(next) => {
+                setPc(next);
+                setTab("build");
+              }}
+            />
+          ) : null}
+          {!open && tab === "build" ? <PhoneBuild build={pc} onChange={setPc} /> : null}
+
           {!open && !group && tab === "shop" ? (
             <div className="space-y-6">
               <button type="button" onClick={() => goTab("search")} className="flex h-11 w-full items-center gap-2 rounded-xl bg-[#e3e3e8] px-3 text-left text-[17px] text-[#8e8e93]">
                 <Search className="size-4" />
                 Search
+              </button>
+              <button type="button" onClick={() => goTab("deals")} className="flex h-12 w-full items-center justify-between rounded-2xl bg-white px-4 text-left shadow-sm">
+                <span className="text-[17px] font-medium">Deals</span>
+                <ChevronLeft className="size-4 rotate-180 text-[#c7c7cc]" />
               </button>
               {PHONE_SECTIONS.map((section) => (
                 <section key={section.title}>
@@ -200,7 +240,7 @@ export function Phone({ onLock }: { onLock: () => void }) {
             </div>
           ) : null}
 
-          {!open && (group || tab !== "shop") ? (
+          {!open && tab !== "use" && tab !== "build" && (group || tab !== "shop") ? (
             <div>
               <div className="sticky top-0 z-10 -mx-4 mb-3 grid grid-cols-2 gap-2 bg-[#f2f2f7]/95 px-4 py-2 backdrop-blur">
                 <label className="flex h-10 items-center rounded-xl bg-[#e3e3e8] px-3">
@@ -265,9 +305,9 @@ export function Phone({ onLock }: { onLock: () => void }) {
         <nav className="grid shrink-0 grid-cols-4 border-t border-[#d1d1d6] bg-[#f8f8f8]/95 px-2 pt-1.5 pb-[max(0.4rem,env(safe-area-inset-bottom))] backdrop-blur">
           {(
             [
+              ["use", "Use", Gamepad2],
+              ["build", "Build", Cpu],
               ["shop", "Shop", LayoutGrid],
-              ["deals", "Deals", Tag],
-              ["search", "Search", Search],
               ["saved", "Saved", Heart],
             ] as const
           ).map(([id, label, Icon]) => {
@@ -284,3 +324,255 @@ export function Phone({ onLock }: { onLock: () => void }) {
     </div>
   );
 }
+
+function PhoneUse({ onTake }: { onTake: (build: Build) => void }) {
+  const [kind, setKind] = useState<UseKind>("game");
+  const [look, setLook] = useState<Look>("normal");
+  const options = useMemo(() => needsOf(kind, look), [kind, look]);
+  const [id, setId] = useState(options[0]?.id ?? "");
+  useEffect(() => {
+    if (!options.some((item) => item.id === id)) setId(options[0]?.id ?? "");
+  }, [options, id]);
+  const need = options.find((item) => item.id === id) ?? options[0];
+  const made = useMemo(() => (need ? childFor(need) : {}), [need]);
+  const boxes = useMemo(() => (need ? prebuildsFor(need) : []), [need]);
+  const laps = useMemo(() => (need ? laptopsFor(need) : []), [need]);
+  const parts = CATS.map((cat) => made[cat]).filter((part): part is Part => Boolean(part));
+
+  return (
+    <div className="space-y-4">
+      <p className="px-1 text-[15px] leading-snug text-[#8e8e93]">Pick what the computer is for. I will put one together from the shelf.</p>
+      <div className="grid grid-cols-2 gap-2">
+        <Menu label="For" value={kind} onChange={(value) => setKind(value as UseKind)}>
+          <option value="game">Games</option>
+          <option value="app">Apps</option>
+          <option value="course">Courses</option>
+        </Menu>
+        <Menu label={kind === "game" ? "Look" : "List"} value={kind === "game" ? look : id} onChange={(value) => (kind === "game" ? setLook(value as Look) : setId(value))}>
+          {kind === "game"
+            ? LOOKS.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.label}
+                </option>
+              ))
+            : options.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.label}
+                </option>
+              ))}
+        </Menu>
+      </div>
+      {kind === "game" ? (
+        <Menu label="Game" value={id} onChange={setId}>
+          {options.map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.label}
+            </option>
+          ))}
+        </Menu>
+      ) : null}
+      {need ? <NeedCard need={need} parts={parts} total={spendOf(made)} onTake={() => onTake(made)} boxes={boxes} laps={laps} /> : null}
+    </div>
+  );
+}
+
+function Menu({ label, value, onChange, children }: { label: string; value: string; onChange: (value: string) => void; children: ReactNode }) {
+  return (
+    <label className="flex h-11 min-w-0 items-center gap-2 rounded-xl bg-[#e3e3e8] px-3">
+      <span className="shrink-0 text-[13px] text-[#8e8e93]">{label}</span>
+      <select value={value} onChange={(event) => onChange(event.target.value)} className="h-full min-w-0 flex-1 truncate bg-transparent text-[16px] outline-none">
+        {children}
+      </select>
+    </label>
+  );
+}
+
+function NeedCard({
+  need,
+  parts,
+  total,
+  onTake,
+  boxes,
+  laps,
+}: {
+  need: UseNeed;
+  parts: Part[];
+  total: number;
+  onTake: () => void;
+  boxes: Part[];
+  laps: { id: string; name: string; brand: string; price: number }[];
+}) {
+  return (
+    <div className="space-y-4">
+      <section className="rounded-2xl bg-white p-4 shadow-sm">
+        <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-[#8e8e93]">A PC I made</p>
+        <h2 className="mt-1 text-[22px] font-semibold leading-tight">{need.label}</h2>
+        <p className="mt-1 text-[15px] text-[#8e8e93]">{need.line}</p>
+        <ul className="mt-3">
+          {parts.map((part) => (
+            <li key={part.id} className="flex items-start justify-between gap-3 border-t border-[#e5e5ea] py-2 text-[15px]">
+              <span className="min-w-0">
+                <span className="block text-[12px] text-[#8e8e93]">{CAT_LABEL[part.cat]}</span>
+                <span className="block leading-snug">{shortName(part)}</span>
+              </span>
+              <span className="shrink-0 font-medium">{money(part.price)}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-2 text-[28px] font-semibold tracking-tight">{money(total)}</p>
+        <button type="button" onClick={onTake} className="mt-3 h-12 w-full rounded-2xl bg-[#007aff] text-[17px] font-semibold text-white active:opacity-80">
+          Open in the builder
+        </button>
+      </section>
+      <section>
+        <h3 className="mb-2 px-1 text-[13px] font-semibold uppercase tracking-[0.08em] text-[#8e8e93]">Already built</h3>
+        <ul className="overflow-hidden rounded-2xl bg-white shadow-sm">
+          {boxes.length === 0 ? <li className="px-4 py-4 text-[15px] text-[#8e8e93]">No finished PC on the shelf is strong enough.</li> : null}
+          {boxes.map((part, index) => (
+            <li key={part.id} className={`flex items-start justify-between gap-3 px-4 py-3 ${index ? "border-t border-[#e5e5ea]" : ""}`}>
+              <span className="min-w-0 text-[16px] leading-snug">{part.name}</span>
+              <span className="shrink-0 font-semibold">{money(part.price)}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+      <section>
+        <h3 className="mb-2 px-1 text-[13px] font-semibold uppercase tracking-[0.08em] text-[#8e8e93]">Laptops</h3>
+        <ul className="overflow-hidden rounded-2xl bg-white shadow-sm">
+          {laps.length === 0 ? <li className="px-4 py-4 text-[15px] text-[#8e8e93]">No laptop on the shelf runs that.</li> : null}
+          {laps.map((item, index) => (
+            <li key={item.id} className={`flex items-start justify-between gap-3 px-4 py-3 ${index ? "border-t border-[#e5e5ea]" : ""}`}>
+              <span className="min-w-0">
+                <span className="block text-[12px] text-[#8e8e93]">{item.brand}</span>
+                <span className="block text-[16px] leading-snug">{item.name.replace(" (Open box)", "")}</span>
+              </span>
+              <span className="shrink-0 font-semibold">{money(item.price)}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
+  );
+}
+
+function PhoneBuild({ build, onChange }: { build: Build; onChange: (next: Build) => void }) {
+  const [slot, setSlot] = useState<Category>("cpu");
+  const [query, setQuery] = useState("");
+  const [brand, setBrand] = useState("all");
+  const [budget, setBudget] = useState("1500");
+  const [limit, setLimit] = useState(24);
+
+  useEffect(() => {
+    setLimit(24);
+    setBrand("all");
+  }, [slot]);
+
+  const brands = useMemo(() => {
+    const others: Build = { ...build };
+    delete others[slot];
+    const names = new Set(PARTS.filter((part) => part.cat === slot && !isJunk(part, false) && !fitWhy(part, others)).map((part) => part.brand));
+    return [...names].sort((a, b) => a.localeCompare(b));
+  }, [build, slot]);
+
+  const shown = useMemo(() => {
+    const others: Build = { ...build };
+    delete others[slot];
+    const q = query.trim().toLowerCase();
+    return PARTS.filter((part) => {
+      if (part.cat !== slot || isJunk(part, false) || fitWhy(part, others)) return false;
+      if (brand !== "all" && part.brand !== brand) return false;
+      if (q && !`${part.brand} ${part.name}`.toLowerCase().includes(q)) return false;
+      return true;
+    }).sort((a, b) => a.price - b.price);
+  }, [build, slot, query, brand]);
+
+  const missing = SLOTS.filter((cat) => !build[cat]);
+  const chosen = build[slot];
+
+  function take(part: Part) {
+    onChange(reconcile(part.cat, { ...build, [part.cat]: part }));
+  }
+
+  return (
+    <div className="space-y-3">
+      <p className="px-1 text-[15px] leading-snug text-[#8e8e93]">Pick each part. Ones that do not fit stay out of the list.</p>
+      <div className="grid grid-cols-2 gap-2">
+        <Menu label="Part" value={slot} onChange={(value) => setSlot(value as Category)}>
+          {SLOTS.map((cat) => (
+            <option key={cat} value={cat}>
+              {CAT_LABEL[cat]}
+              {build[cat] ? " · in" : ""}
+            </option>
+          ))}
+        </Menu>
+        <Menu label="Make" value={budget} onChange={setBudget}>
+          <option value="850">Under $850</option>
+          <option value="1200">Under $1,200</option>
+          <option value="1500">Under $1,500</option>
+          <option value="2200">Under $2,200</option>
+          <option value="3000">Under $3,000</option>
+          <option value="4500">Under $4,500</option>
+        </Menu>
+      </div>
+      <button type="button" onClick={() => onChange(suggest(Number(budget)))} className="h-11 w-full rounded-2xl bg-[#1c1c1e] text-[16px] font-semibold text-white">
+        Make one for me
+      </button>
+      <div className="rounded-2xl bg-white px-4 py-3 shadow-sm">
+        <div className="flex items-center justify-between">
+          <p className="text-[13px] text-[#8e8e93]">{missing.length ? `Still need ${missing.map((cat) => CAT_LABEL[cat].toLowerCase()).join(", ")}` : "This computer can turn on."}</p>
+          <p className="text-[20px] font-semibold">{money(spendOf(build))}</p>
+        </div>
+        {chosen ? (
+          <button
+            type="button"
+            onClick={() => {
+              const next = { ...build };
+              delete next[slot];
+              onChange(next);
+            }}
+            className="mt-2 text-[15px] text-[#ff3b30]"
+          >
+            Remove {CAT_LABEL[slot].toLowerCase()}
+          </button>
+        ) : null}
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <label className="flex h-11 items-center gap-2 rounded-xl bg-[#e3e3e8] px-3">
+          <Search className="size-4 text-[#8e8e93]" />
+          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search" className="h-full w-full bg-transparent text-[16px] outline-none" />
+        </label>
+        <select value={brand} onChange={(event) => setBrand(event.target.value)} className="h-11 rounded-xl bg-[#e3e3e8] px-3 text-[16px] outline-none">
+          <option value="all">Every brand</option>
+          {brands.map((name) => (
+            <option key={name} value={name}>
+              {name}
+            </option>
+          ))}
+        </select>
+      </div>
+      <ul className="overflow-hidden rounded-2xl bg-white shadow-sm">
+        {shown.slice(0, limit).map((part, index) => {
+          const on = chosen?.id === part.id;
+          return (
+            <li key={part.id} className={index ? "border-t border-[#e5e5ea]" : ""}>
+              <button type="button" onClick={() => take(part)} className={`flex w-full items-start justify-between gap-3 px-4 py-3 text-left ${on ? "bg-[#eef5ff]" : ""}`}>
+                <span className="min-w-0">
+                  <span className="block text-[12px] uppercase tracking-wide text-[#8e8e93]">{part.brand}</span>
+                  <span className="mt-0.5 block text-[16px] leading-snug">{shortName(part)}</span>
+                </span>
+                <span className="shrink-0 font-semibold">{money(part.price)}</span>
+              </button>
+            </li>
+          );
+        })}
+        {shown.length === 0 ? <li className="px-4 py-6 text-center text-[16px] text-[#8e8e93]">Nothing here fits.</li> : null}
+      </ul>
+      {shown.length > limit ? (
+        <button type="button" onClick={() => setLimit((value) => value + 24)} className="h-11 w-full rounded-2xl bg-white text-[17px] font-medium text-[#007aff] shadow-sm">
+          Show more
+        </button>
+      ) : null}
+    </div>
+  );
+}
+

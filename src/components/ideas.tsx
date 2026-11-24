@@ -32,12 +32,24 @@ export function Ideas({ onLeave, onUse }: { onLeave: () => void; onUse: (pick: A
         <h1 className="font-display mt-3 text-4xl font-medium leading-none tracking-tight">AI created builds</h1>
         <p className="mt-2 text-base text-muted">{shown.length} computers. Tap one. Then tap Use this PC.</p>
       </header>
-      <div className="flex shrink-0 gap-2 overflow-x-auto px-4 py-3">
-        {FILTERS.map((item) => (
-          <button key={item.id} type="button" onClick={() => { setFilter(item.id); setOpen(null); }} className={`h-12 shrink-0 rounded-full border px-4 text-base ${filter === item.id ? "border-accent bg-subtle" : "border-line"}`}>
-            {item.label}
-          </button>
-        ))}
+      <div className="shrink-0 px-4 py-3">
+        <label className="flex h-12 items-center gap-2 rounded-2xl border border-line bg-elevated px-3">
+          <span className="shrink-0 text-sm text-muted">Show</span>
+          <select
+            value={filter}
+            onChange={(event) => {
+              setFilter(event.target.value);
+              setOpen(null);
+            }}
+            className="h-full min-w-0 flex-1 bg-transparent text-base outline-none"
+          >
+            {FILTERS.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.label}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
       <div className={`min-h-0 flex-1 overflow-y-auto px-4 pb-4 ${pane && !current ? "grid grid-cols-2 gap-3 content-start" : "space-y-3"}`}>
         {current ? (

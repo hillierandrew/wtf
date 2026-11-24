@@ -251,29 +251,36 @@ export function Sim({ onLeave }: { onLeave: () => void }) {
         </div>
       ) : (
         <>
-          <div className="flex shrink-0 gap-2 overflow-x-auto px-4 py-3">
-            {GAMES.map((item) => (
-              <button key={item.id} type="button" onClick={() => pickGame(item.id)} className={`h-12 shrink-0 rounded-full border px-4 text-base ${game === item.id ? "border-accent bg-subtle" : "border-line"}`}>
-                {item.label}
-              </button>
-            ))}
-          </div>
-          <div className="flex shrink-0 gap-2 overflow-x-auto px-4 pb-3">
-            {steps.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => {
-                  setStep(item.id);
+          <div className="grid shrink-0 grid-cols-2 gap-2 px-4 py-3">
+            <label className="flex h-12 min-w-0 items-center gap-2 rounded-2xl border border-line bg-elevated px-3">
+              <span className="shrink-0 text-sm text-muted">Rig</span>
+              <select value={game} onChange={(event) => pickGame(event.target.value as Game)} className="h-full min-w-0 flex-1 bg-transparent text-base outline-none">
+                {GAMES.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex h-12 min-w-0 items-center gap-2 rounded-2xl border border-line bg-elevated px-3">
+              <span className="shrink-0 text-sm text-muted">Part</span>
+              <select
+                value={step}
+                onChange={(event) => {
+                  setStep(event.target.value as Slot);
                   setBrand("all");
                   setQuery("");
                   setNotice("");
                 }}
-                className={`h-12 shrink-0 rounded-full border px-4 text-base ${step === item.id ? "border-accent bg-subtle" : "border-line"}`}
+                className="h-full min-w-0 flex-1 bg-transparent text-base outline-none"
               >
-                {item.label}
-              </button>
-            ))}
+                {steps.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
           <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 pb-4">
             <p className="text-base text-muted">{LEVELS.find((item) => item.id === level)?.line} {stepMeta?.line}</p>

@@ -291,38 +291,33 @@ export function Builder({ onLeave, start = "play" }: { onLeave: () => void; star
           })}
         </div>
         {showTabs && !play ? (
-        <div className="mt-3 flex w-full min-w-0 gap-1.5 overflow-x-auto pb-1">
+        <div className="mt-3 grid grid-cols-2 gap-2">
           <button
             type="button"
             onClick={() => setPanel("ai")}
             aria-pressed={ai}
-            className={`h-8 shrink-0 rounded-full px-3 text-xs ${ai ? "bg-fg text-bg" : "border border-line text-muted"}`}
+            className={`h-11 rounded-xl px-3 text-sm ${ai ? "bg-fg text-bg" : "border border-line text-muted"}`}
           >
-            BUILD BY AI
+            Build by AI
           </button>
-          {CATS.map((item, index) => {
-            const on = !reviewing && index === step;
-            const picked = Boolean(build[item]);
-            return (
-              <button
-                key={item}
-                type="button"
-                onClick={() => go(index)}
-                aria-pressed={on}
-                className={`h-8 shrink-0 rounded-full px-3 text-xs ${on ? "bg-fg text-bg" : picked ? "bg-subtle text-fg" : "border border-line text-muted"}`}
-              >
+          <select
+            aria-label="Part"
+            value={reviewing ? "review" : String(step)}
+            onChange={(event) => {
+              const value = event.target.value;
+              if (value === "review") go(REVIEW);
+              else go(Number(value));
+            }}
+            className="h-11 rounded-xl border border-line bg-elevated px-3 text-sm"
+          >
+            {CATS.map((item, index) => (
+              <option key={item} value={index}>
                 {CAT_TAB[item]}
-              </button>
-            );
-          })}
-          <button
-            type="button"
-            onClick={() => go(REVIEW)}
-            aria-pressed={reviewing}
-            className={`h-8 shrink-0 rounded-full px-3 text-xs ${reviewing ? "bg-fg text-bg" : "border border-line text-muted"}`}
-          >
-            Review
-          </button>
+                {build[item] ? " · in" : ""}
+              </option>
+            ))}
+            <option value="review">Review</option>
+          </select>
         </div>
         ) : null}
         {!play ? (
@@ -458,29 +453,80 @@ export function Builder({ onLeave, start = "play" }: { onLeave: () => void; star
                 setLimit(36);
               }}
             />
-            <div className="flex gap-2 overflow-x-auto">
+            <div className="grid grid-cols-2 gap-2">
+              <select
+                value={facet}
+                onChange={(event) => {
+                  setFacet(event.target.value);
+                  setLimit(36);
+                }}
+                className="h-11 rounded-xl border border-line bg-elevated px-3 text-sm"
+              >
+                <option value="all">All types</option>
+                {extraFilters(cat).map((item) => (
+                  <option key={item.label} value={item.label}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
+              {!blocked && tagChoices.length ? (
+                <select
+                  value={tag}
+                  onChange={(event) => {
+                    setTag(event.target.value);
+                    setLimit(36);
+                  }}
+                  className="h-11 rounded-xl border border-line bg-elevated px-3 text-sm"
+                >
+                  <option value="all">Any tag</option>
+                  {tagChoices.map(([label]) => (
+                    <option key={label} value={label}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <select
+                  value={brand}
+                  onChange={(event) => {
+                    setBrand(event.target.value);
+                    setLimit(36);
+                  }}
+                  className="h-11 rounded-xl border border-line bg-elevated px-3 text-sm"
+                >
+                  <option value="all">All brands</option>
+                  {brands.map(([label, count]) => (
+                    <option key={label} value={label}>
+                      {label} ({count})
+                    </option>
+                  ))}
+                </select>
+              )}
+              {!blocked && tagChoices.length ? (
+                <select
+                  value={brand}
+                  onChange={(event) => {
+                    setBrand(event.target.value);
+                    setLimit(36);
+                  }}
+                  className="h-11 rounded-xl border border-line bg-elevated px-3 text-sm"
+                >
+                  <option value="all">All brands</option>
+                  {brands.map(([label, count]) => (
+                    <option key={label} value={label}>
+                      {label} ({count})
+                    </option>
+                  ))}
+                </select>
+              ) : null}
               <button
                 type="button"
                 aria-pressed={openBox}
                 onClick={() => setOpenBox(!openBox)}
-                className={`h-10 shrink-0 rounded-lg border px-3 text-sm ${openBox ? "border-accent bg-subtle text-fg" : "border-line bg-elevated text-muted"}`}
+                className={`h-11 rounded-xl border px-3 text-sm ${openBox ? "border-accent bg-subtle text-fg" : "border-line bg-elevated text-muted"}`}
               >
                 Open box
               </button>
-              {extraFilters(cat).map((item) => (
-                <button
-                  key={item.label}
-                  type="button"
-                  aria-pressed={facet === item.label}
-                  onClick={() => {
-                    setFacet(facet === item.label ? "all" : item.label);
-                    setLimit(36);
-                  }}
-                  className={`h-10 shrink-0 rounded-lg border px-3 text-sm ${facet === item.label ? "border-accent bg-subtle text-fg" : "border-line bg-elevated text-muted"} ${blocked ? "hidden" : ""}`}
-                >
-                  {item.label}
-                </button>
-              ))}
               <button
                 type="button"
                 aria-pressed={blocked}
@@ -488,57 +534,11 @@ export function Builder({ onLeave, start = "play" }: { onLeave: () => void; star
                   setBlocked((value) => !value);
                   setLimit(36);
                 }}
-                className={`h-10 shrink-0 rounded-lg border px-3 text-sm ${blocked ? "border-danger text-danger" : "border-line bg-elevated text-muted"} ${cat === "bundle" || cat === "monitor" || cat === "prebuilt" ? "hidden" : ""}`}
+                className={`h-11 rounded-xl border px-3 text-sm ${blocked ? "border-danger text-danger" : "border-line bg-elevated text-muted"} ${cat === "bundle" || cat === "monitor" || cat === "prebuilt" ? "hidden" : ""}`}
               >
                 Won't fit ({rejected.length})
               </button>
-              {!blocked ? (
-                <label className="h-10 shrink-0">
-                  <span className="sr-only">Brand</span>
-                  <select
-                    value={brand}
-                    onChange={(event) => {
-                      setBrand(event.target.value);
-                      setLimit(36);
-                    }}
-                    className="h-10 rounded-lg border border-line bg-elevated px-3 text-sm text-muted"
-                  >
-                    <option value="all">All brands</option>
-                    {brands.map(([label, count]) => (
-                      <option key={label} value={label}>
-                        {label} ({count})
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              ) : null}
             </div>
-            {!blocked && tagChoices.length ? (
-              <div className="flex gap-1.5 overflow-x-auto">
-                <button
-                  type="button"
-                  aria-pressed={tag === "all"}
-                  onClick={() => setTag("all")}
-                  className={`h-8 shrink-0 rounded-full border px-3 text-xs ${tag === "all" ? "border-accent bg-subtle text-fg" : "border-line text-muted"}`}
-                >
-                  Any tag
-                </button>
-                {tagChoices.map(([label]) => (
-                  <button
-                    key={label}
-                    type="button"
-                    aria-pressed={tag === label}
-                    onClick={() => {
-                      setTag(label);
-                      setLimit(36);
-                    }}
-                    className={`h-8 shrink-0 rounded-full border px-3 text-xs ${tag === label ? "border-accent bg-subtle text-fg" : "border-line text-muted"}`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            ) : null}
             <p className="text-xs text-faint">
               {blocked ? (
                 <>
@@ -1190,19 +1190,16 @@ function AiPanel({ onUse }: { onUse: (pick: ReturnType<typeof aiPicks>[number]) 
       <p className="text-sm text-muted">
         {picks.length} full PCs. Crystal is the strongest, then gold, silver, bronze, and brown. A lower price per point is more computer for the money.
       </p>
-      <div className="flex gap-2 overflow-x-auto">
-        {AI_FILTERS.map((item) => (
-          <button
-            key={item}
-            type="button"
-            aria-pressed={filter === item}
-            onClick={() => setFilter(item)}
-            className={`h-10 shrink-0 rounded-lg border px-3 text-sm ${filter === item ? "border-accent bg-subtle text-fg" : "border-line bg-elevated text-muted"}`}
-          >
-            {item}
-          </button>
-        ))}
-      </div>
+      <label className="flex h-11 items-center gap-2 rounded-xl border border-line bg-elevated px-3">
+        <span className="shrink-0 text-sm text-muted">Show</span>
+        <select value={filter} onChange={(event) => setFilter(event.target.value as (typeof AI_FILTERS)[number])} className="h-full min-w-0 flex-1 bg-transparent text-base outline-none">
+          {AI_FILTERS.map((item) => (
+            <option key={item} value={item}>
+              {item}
+            </option>
+          ))}
+        </select>
+      </label>
       <SortRow value={sort} onChange={setSort} />
       <label className="flex h-11 items-center gap-2 rounded-lg border border-line bg-elevated px-3">
         <Search className="size-4 shrink-0 text-faint" strokeWidth={1.75} />
