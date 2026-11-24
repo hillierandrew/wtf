@@ -1,0 +1,162 @@
+[
+  {
+    "id": "1d9d70cf48",
+    "name": "Maiwo KC019 USB 3.1 Type-C PCI Express Card with Four Type-C Ports",
+    "price": 19.99,
+    "was": null,
+    "brand": "Maiwo",
+    "kind": "usb",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "95ead0ea3e",
+    "name": "Vantec M.2 PCIe Gen3x2 B+M Key to 5-Port SATA III Expansion Card (UGT-M2670)",
+    "price": 59.99,
+    "was": null,
+    "brand": "Vantec",
+    "kind": "sata",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "0bb52c6d68",
+    "name": "Maiwo PCIe to M.2 PCIe SSD and M.2 SATA SSD (KT015)",
+    "price": 8.99,
+    "was": null,
+    "brand": "Maiwo",
+    "kind": "m2",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "a582539ac3",
+    "name": "Maiwo PCIe to M.2 PCIe SSD (KT016)",
+    "price": 8.99,
+    "was": null,
+    "brand": "Maiwo",
+    "kind": "m2",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "d3f5e9c863",
+    "name": "ORICO M.2 NVMe to PCIe 3.0 x4 Expansion Card (PDM2)",
+    "price": 7.88,
+    "was": null,
+    "brand": "ORICO",
+    "kind": "m2",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "784e46c354",
+    "name": "Maiwo KT058 RGB PCIe x16 to NVMe SSD Expansion Converter",
+    "price": 5.88,
+    "was": null,
+    "brand": "Maiwo",
+    "kind": "m2",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "4f5c3ff9e6",
+    "name": "Maiwo KT060A PCIe x4 NVMe Expansion Card Converter with RGB",
+    "price": 4.88,
+    "was": null,
+    "brand": "Maiwo",
+    "kind": "m2",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "1e19ae7988",
+    "name": "Vantec Single Port USB 3.2 20Gbps Type-C PCIe Host Card (UGT-PCE320C)",
+    "price": 59.99,
+    "was": null,
+    "brand": "Vantec",
+    "kind": "usb",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "3bd320c628",
+    "name": "Vantec Dual Chip 4-Port USB 3.1 Gen 2 10Gbps PCIe Host Card (UGT-PCE470-2C)",
+    "price": 163.99,
+    "was": null,
+    "brand": "Vantec",
+    "kind": "usb",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "e885ea90e9",
+    "name": "Maiwo USB 3.2 Gen 2 20Gbps PCIe 3.0 x4 Controller Card (KC008)",
+    "price": 14.88,
+    "was": null,
+    "brand": "Maiwo",
+    "kind": "usb",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "fca6d48347",
+    "name": "Maiwo KT016L PCIe to M.2 PCIe SSD with Full Profile Bracket",
+    "price": 5.88,
+    "was": null,
+    "brand": "Maiwo",
+    "kind": "m2",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "756a700e85",
+    "name": "Maiwo KC019 USB 3.1 Type-C PCI Express Card with Four Type-C Ports (Open Box)",
+    "price": 17.99,
+    "was": null,
+    "brand": "Maiwo",
+    "kind": "usb",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "f585611b95",
+    "name": "ORICO M.2 NVMe to PCIe 3.0 x4 Expansion Card (PDM2) (Open Box)",
+    "price": 7.09,
+    "was": null,
+    "brand": "ORICO",
+    "kind": "m2",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "73542e7f9b",
+    "name": "Vantec 5-Port SATA III 6Gbps PCIe x4 Host Card (UGT-ST655) (Open Box)",
+    "price": 53.99,
+    "was": null,
+    "brand": "Vantec",
+    "kind": "sata",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "61695a9454",
+    "name": "Maiwo PCIe to M.2 PCIe SSD and M.2 SATA SSD (KT015) (Open Box)",
+    "price": 8.09,
+    "was": null,
+    "brand": "Maiwo",
+    "kind": "m2",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "a2287af6e3",
+    "name": "Vantec 2-Port USB 3.1 Gen II Type A/C PCIe Host Card (UGT-PC371AC) (Open Box)",
+    "price": 49.49,
+    "was": null,
+    "brand": "Vantec",
+    "kind": "usb",
+    "open": true,
+    "updated": "2026-11-23"
+  }
+]
