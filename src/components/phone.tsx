@@ -134,8 +134,8 @@ export function Phone({ onLock }: { onLock: () => void }) {
   const title = open ? "Details" : meta?.title ?? (tab === "use" ? "Use" : tab === "build" ? "Build" : tab === "deals" ? "Deals" : tab === "saved" ? "Saved" : tab === "search" ? "Search" : "Store");
 
   return (
-    <div className="min-h-dvh bg-[#1d1d1f] text-[#1c1c1e] sm:flex sm:items-center sm:justify-center sm:p-6" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif' }}>
-      <div className="mx-auto flex h-dvh w-full max-w-[430px] flex-col overflow-hidden bg-[#f2f2f7] sm:h-[min(100dvh-3rem,920px)] sm:rounded-[2.6rem] sm:shadow-[0_40px_90px_rgba(0,0,0,0.45)] sm:ring-8 sm:ring-[#0e0e10]">
+    <div className="min-h-dvh bg-[#f2f2f7] text-[#1c1c1e] sm:bg-[#1d1d1f] sm:flex sm:items-center sm:justify-center sm:p-6" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif' }}>
+      <div className="mx-auto flex h-dvh w-full flex-col overflow-hidden bg-[#f2f2f7] sm:max-w-[430px] sm:h-[min(100dvh-3rem,920px)] sm:rounded-[2.6rem] sm:shadow-[0_40px_90px_rgba(0,0,0,0.45)] sm:ring-8 sm:ring-[#0e0e10]">
         <header className="shrink-0 bg-[#f2f2f7]/90 px-4 pt-[max(0.75rem,env(safe-area-inset-top))] backdrop-blur">
           <div className="flex h-11 items-center gap-2">
             {open || group ? (
