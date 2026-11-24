@@ -1,0 +1,895 @@
+[
+  {
+    "id": "5beaff5265",
+    "name": "CORSAIR iCUE LC100 Case Accent Lighting Panels - Mini Triangle - 9x Tile Starter Kit",
+    "price": 29.88,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "lighting",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "5cf579509f",
+    "name": "Fractal Design FD-A-USBC-001",
+    "price": 19.99,
+    "was": null,
+    "brand": "FRACTAL DESIGN",
+    "kind": "io",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "80ded58306",
+    "name": "iCAN Metal GPU Holder Black",
+    "price": 9.99,
+    "was": null,
+    "brand": "iCAN",
+    "kind": "bracket",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "873ddb477f",
+    "name": "ASUS ROG Herculx Graphics Card Anti-Sag Holder",
+    "price": 59.99,
+    "was": null,
+    "brand": "ASUS",
+    "kind": "bracket",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "e06223c91e",
+    "name": "DeepCool PIXEL 10 Rubber Bits, Create 8-Bit Designs, Customize various CH and Morpheus Cases",
+    "price": 39.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "panel",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "466e2051b5",
+    "name": "iCAN GPU Holder Silver",
+    "price": 9.99,
+    "was": null,
+    "brand": "iCAN",
+    "kind": "bracket",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "1b0725341e",
+    "name": "HYTE Y70 Touch Infinite Display Upgrade - 2.5K Touchscreen for Y70 - Snow White",
+    "price": 349.99,
+    "was": null,
+    "brand": "HYTE",
+    "kind": "panel",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "f45a8826c1",
+    "name": "HYTE Y70 Touch Infinite Display Upgrade - 2.5K Touchscreen for Y70 - Strawberry Milk",
+    "price": 349.99,
+    "was": null,
+    "brand": "HYTE",
+    "kind": "panel",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "07066e90c3",
+    "name": "DeepCool EA160 ARGB strip, Diffused lighting, Flexible, 1600mm strip, Transparent Mounting Clips, 3M adhesive strips",
+    "price": 44.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "led",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "43442472bb",
+    "name": "CORSAIR iCUE LINK LS430",
+    "price": 99.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "led",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "50aac0fd0f",
+    "name": "CORSAIR iCUE LINK LS350",
+    "price": 89.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "led",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "760d1037e0",
+    "name": "CORSAIR LS350",
+    "price": 64.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "led",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "cb8cea59f9",
+    "name": "CORSAIR 5000D Airflow Front Panel, White",
+    "price": 19.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "panel",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "58383de018",
+    "name": "CORSAIR 4000D Airflow Front Panel, White",
+    "price": 9.88,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "panel",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "cd69eb7e80",
+    "name": "LIAN LI Vertical Kit for A3-mATX, Black",
+    "price": 69.99,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "bracket",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "d1e9d73086",
+    "name": "CORSAIR LS430",
+    "price": 69.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "led",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "393f938700",
+    "name": "Phanteks Eclipse P400A Air Mesh Front Panel, Black",
+    "price": 34.99,
+    "was": null,
+    "brand": "Phanteks",
+    "kind": "panel",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "39c0bc6081",
+    "name": "ASUS TUF Gaming ARGB Lighting Kit for GT502 Horizon Series (White)",
+    "price": 59.99,
+    "was": null,
+    "brand": "ASUS",
+    "kind": "bracket",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "8d0421be30",
+    "name": "HYTE Internal USB HUB",
+    "price": 44.99,
+    "was": null,
+    "brand": "HYTE",
+    "kind": "hub",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "258dda53cf",
+    "name": "ASUS ROG Herculx Graphics Card Anti-Sag Holder, White",
+    "price": 59.99,
+    "was": null,
+    "brand": "ASUS",
+    "kind": "bracket",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "2a74f3b191",
+    "name": "CORSAIR iCUE LC100 Case Accent Lighting Panels - Mini Triangle - 9x Tile Expansion Kit",
+    "price": 49.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "lighting",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "31e5cc29db",
+    "name": "HYTE Y70 Touch Infinite Display Upgrade - 2.5K Touchscreen for Y70 - Pitch Black",
+    "price": 349.99,
+    "was": null,
+    "brand": "HYTE",
+    "kind": "panel",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "a69d7406b0",
+    "name": "LIAN LI USB 2.0 1-to-3 Hub (Type A Male Port), Black",
+    "price": 24.99,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "hub",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "294c3f6149",
+    "name": "LIAN LI USB 2.0 1-to-3 Hub (Type A Male Port), White",
+    "price": 24.99,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "hub",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "ef94ec5747",
+    "name": "Phanteks NV5 Premium DRGB KIT, White",
+    "price": 99.99,
+    "was": null,
+    "brand": "Phanteks",
+    "kind": "led",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "fdd05b011c",
+    "name": "LIAN LI O11 Dynamic EVO Additional I/O Kit (Black) - O11DE-3X",
+    "price": 27.99,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "io",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "2e1f64a105",
+    "name": "CORSAIR 5000D Airflow Front Panel, Black",
+    "price": 9.88,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "panel",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "84a0eeed7f",
+    "name": "LIAN LI GPU Upright Kit for O11D EVO XL - White",
+    "price": 14.99,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "bracket",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "045e4125e7",
+    "name": "LIAN LI Vertical Kit for A3-mATX, White",
+    "price": 69.99,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "bracket",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "08b822142a",
+    "name": "FRACTAL DESIGN USB-C 10Gbps Cable Front I/O Add-on - Model E",
+    "price": 19.99,
+    "was": null,
+    "brand": "FRACTAL DESIGN",
+    "kind": "io",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "5efd45958d",
+    "name": "CORSAIR 5000 Series Wooden PC Case Panels - Bamboo",
+    "price": 104.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "panel",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "712571fa6a",
+    "name": "CORSAIR Lighting Node PRO RGB Lighting Controller",
+    "price": 79.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "led",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "75f11e6df6",
+    "name": "HYTE Y70 Touch Infinite Display Upgrade - 2.5K Touchscreen for Y70 - Blueberry Milk",
+    "price": 349.99,
+    "was": null,
+    "brand": "HYTE",
+    "kind": "panel",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "7ff1bc6201",
+    "name": "CORSAIR 4000D Airflow Front Panel, Black",
+    "price": 19.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "panel",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "672c6fa2ce",
+    "name": "CORSAIR 5000 Series Wooden PC Case Panels - Teak",
+    "price": 104.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "panel",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "aa598a1aa1",
+    "name": "LIAN LI O11D EVO Top I/O Kit - Black",
+    "price": 14.88,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "io",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "eb71267612",
+    "name": "CORSAIR 5000 Series Wooden PC Case Panels - Sapele",
+    "price": 104.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "panel",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "18a09c5eb7",
+    "name": "LIAN LI O11 Dynamic EVO Additional I/O Kit (White) - O11DE-3W",
+    "price": 27.99,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "io",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "d8a2954194",
+    "name": "LIAN LI O11 Dynamic EVO Top I/O Kit (White) - O11DE-5W",
+    "price": 24.99,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "io",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "f411791c2b",
+    "name": "Phanteks Eclipse P400A Air Mesh Front Panel, White",
+    "price": 34.99,
+    "was": null,
+    "brand": "Phanteks",
+    "kind": "panel",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "1db63bb2c0",
+    "name": "LIAN LI Optional filter kit for Lancool 3 RW, Lancool 3W",
+    "price": 21.99,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "panel",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "2b68e1caa5",
+    "name": "LIAN LI O11D MINI-3X Dual PSU Kit for O11 Dynamic Mini",
+    "price": 2.88,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "io",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "7fbdae0fee",
+    "name": "LIAN LI LANCOOL-II-MESH-PW Front Panel Set for LANCOOL II - White",
+    "price": 19.88,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "panel",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "bfac6be349",
+    "name": "LIAN LI LANCOOL-II-MESH-PX Front Panel Set for LANCOOL II - Black",
+    "price": 19.88,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "panel",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "b9e1553003",
+    "name": "InWin Mag Ear Headphone and Earphone Holder (Mag Ear Blue)",
+    "price": 14.98,
+    "was": null,
+    "brand": "InWin",
+    "kind": "panel",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "2ab9327a72",
+    "name": "ASUS TUF Gaming ARGB Lighting Kit for GT502 Horizon Series (Black)",
+    "price": 59.99,
+    "was": null,
+    "brand": "ASUS",
+    "kind": "bracket",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "599657f172",
+    "name": "LIAN LI Cable Strimer 8 pin RGB 8-pin (6+2) VGA extension cable (Open Box)",
+    "price": 8.89,
+    "was": 13.39,
+    "brand": "LIAN LI",
+    "kind": "led",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "1092eb0e85",
+    "name": "ASUS ROG Herculx Graphics Card Anti-Sag Holder (Open Box)",
+    "price": 53.99,
+    "was": null,
+    "brand": "ASUS",
+    "kind": "bracket",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "58e3b5c7e2",
+    "name": "LIAN LI Vertical Kit for A3-mATX, Black (Open Box)",
+    "price": 62.99,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "bracket",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "2c287e66e0",
+    "name": "LIAN LI USB 2.0 1-to-3 Hub (Type A Male Port), Black (Open Box)",
+    "price": 22.49,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "hub",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "f0bf954419",
+    "name": "LIAN LI GPU Upright Kit for O11D EVO XL - White (Open Box)",
+    "price": 13.49,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "bracket",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "c42763e000",
+    "name": "LIAN LI Vertical Kit for A3-mATX, White (Open Box)",
+    "price": 62.99,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "bracket",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "9de9fcbc65",
+    "name": "LIAN LI Upright GPU bracket for O11 Dynamic EVO White - O11DE-6W",
+    "price": 14.99,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "bracket",
+    "open": false,
+    "updated": "2026-11-23",
+    "available": false
+  },
+  {
+    "id": "44496bbd0f",
+    "name": "CORSAIR iCUE LC100 Case Accent Lighting Panels - Mini Triangle - 9x Tile Expansion Kit (Open Box)",
+    "price": 44.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "lighting",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "2798bcde28",
+    "name": "CORSAIR Lighting Node PRO RGB Lighting Controller (Open Box)",
+    "price": 71.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "led",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "7caeea7e28",
+    "name": "HYTE Y70 Touch Infinite Display Upgrade - 2.5K Touchscreen for Y70 - Snow White (Open Box)",
+    "price": 314.99,
+    "was": null,
+    "brand": "HYTE",
+    "kind": "panel",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "ec5cf22800",
+    "name": "LIAN LI O11D EVO Top I/O Kit - Black (Open Box)",
+    "price": 13.39,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "io",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "4f3e5da77e",
+    "name": "CORSAIR iCUE LC100 Case Accent Lighting Panels - Mini Triangle - 9x Tile Starter Kit (Open Box)",
+    "price": 26.89,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "lighting",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "712734226b",
+    "name": "DeepCool EA160 ARGB strip (Open Box)",
+    "price": 40.49,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "led",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "61c6bf0434",
+    "name": "LIAN LI Upright GPU bracket for O11 Dynamic EVO White - O11DE-6W (Open Box)",
+    "price": 13.49,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "bracket",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "db6a041224",
+    "name": "CORSAIR 5000 Series Wooden PC Case Panels - Teak (Open Box)",
+    "price": 94.49,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "panel",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "38b1b9a2f6",
+    "name": "CORSAIR 5000D Airflow Front Panel, Black (Open Box)",
+    "price": 8.89,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "panel",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "bdaa593715",
+    "name": "iCAN GPU Holder Silver (Open Box)",
+    "price": 8.99,
+    "was": null,
+    "brand": "iCAN",
+    "kind": "bracket",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "5cf8a9be57",
+    "name": "CORSAIR 4000D Airflow Front Panel, White (Open Box)",
+    "price": 8.89,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "panel",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "07d5f5606e",
+    "name": "Phanteks Eclipse P400A Air Mesh Front Panel, White (Open Box)",
+    "price": 31.49,
+    "was": null,
+    "brand": "Phanteks",
+    "kind": "panel",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "433f1cba07",
+    "name": "LIAN LI O11 Dynamic EVO Top I/O Kit (White) - O11DE-5W (Open Box)",
+    "price": 22.49,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "io",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "d1188f8a1b",
+    "name": "HYTE LS10 qRGB Light Strips (3 Pack) (Open Box)",
+    "price": 58.49,
+    "was": null,
+    "brand": "HYTE",
+    "kind": "led",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "46b11ff741",
+    "name": "CORSAIR iCUE LINK LS350 (Open Box)",
+    "price": 80.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "led",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "7bebad1273",
+    "name": "CORSAIR 5000D Airflow Front Panel, White (Open Box)",
+    "price": 17.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "panel",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "b906af5700",
+    "name": "CORSAIR iCUE LINK LS430 (Open Box)",
+    "price": 89.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "led",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "6bf7bd0f3c",
+    "name": "LIAN LI LANCOOL-II-MESH-PX Front Panel Set for LANCOOL II - Black (Open Box)",
+    "price": 17.89,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "panel",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "196e8ffb5a",
+    "name": "LIAN LI LANCOOL-II-MESH-PW Front Panel Set for LANCOOL II - White (Open Box)",
+    "price": 17.89,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "panel",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "6e59773512",
+    "name": "ASUS TUF Gaming ARGB Lighting Kit for GT502 Horizon Series (White) (Open Box)",
+    "price": 53.99,
+    "was": null,
+    "brand": "ASUS",
+    "kind": "bracket",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "053fd38ac4",
+    "name": "HYTE Internal USB HUB (Open Box)",
+    "price": 40.49,
+    "was": null,
+    "brand": "HYTE",
+    "kind": "hub",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "0f31f2156f",
+    "name": "ASUS ROG Herculx Graphics Card Anti-Sag Holder, White (Open Box)",
+    "price": 53.99,
+    "was": null,
+    "brand": "ASUS",
+    "kind": "bracket",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "8a6be1e701",
+    "name": "CORSAIR LS430 (Open Box)",
+    "price": 62.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "led",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "7d143285d5",
+    "name": "HYTE Y70 Touch Infinite Display Upgrade - 2.5K Touchscreen for Y70 - Taro Milk",
+    "price": 349.99,
+    "was": null,
+    "brand": "HYTE",
+    "kind": "panel",
+    "open": false,
+    "updated": "2026-11-23",
+    "available": false
+  },
+  {
+    "id": "9f06a958d5",
+    "name": "NZXT Internal USB Hub (Gen 3)",
+    "price": 34.99,
+    "was": null,
+    "brand": "NZXT",
+    "kind": "hub",
+    "open": false,
+    "updated": "2026-11-23",
+    "available": false
+  },
+  {
+    "id": "606cd9ec05",
+    "name": "DeepCool EA080 ARGB strips, Diffused lighting, Flexible, Two 400mm strips",
+    "price": 29.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "led",
+    "open": false,
+    "updated": "2026-11-23",
+    "available": false
+  },
+  {
+    "id": "9251cdc854",
+    "name": "THERMALTAKE Chassis Stand Kit for The Tower 300 Computer Case, Bumblebee",
+    "price": 39.99,
+    "was": null,
+    "brand": "THERMALTAKE",
+    "kind": "panel",
+    "open": false,
+    "updated": "2026-11-23",
+    "available": false
+  },
+  {
+    "id": "919b362005",
+    "name": "THERMALTAKE Chassis Stand Kit for The Tower 300 Computer Case, Snow",
+    "price": 39.99,
+    "was": null,
+    "brand": "THERMALTAKE",
+    "kind": "panel",
+    "open": false,
+    "updated": "2026-11-23",
+    "available": false
+  },
+  {
+    "id": "26097f66ac",
+    "name": "THERMALTAKE Chassis Stand Kit for The Tower 300 Computer Case, Black",
+    "price": 39.99,
+    "was": null,
+    "brand": "THERMALTAKE",
+    "kind": "panel",
+    "open": false,
+    "updated": "2026-11-23",
+    "available": false
+  },
+  {
+    "id": "2a0297208b",
+    "name": "NZXT Vertical GPU Mounting Kit - Black Bracket and 175 mm PCIe 4.0 x16 Riser Cable",
+    "price": 99.99,
+    "was": null,
+    "brand": "NZXT",
+    "kind": "bracket",
+    "open": false,
+    "updated": "2026-11-23",
+    "available": false
+  },
+  {
+    "id": "40656791a5",
+    "name": "THERMALTAKE Chassis Stand Kit for The Tower 300 Computer Case, Hydrangea Blue",
+    "price": 39.99,
+    "was": null,
+    "brand": "THERMALTAKE",
+    "kind": "panel",
+    "open": false,
+    "updated": "2026-11-23",
+    "available": false
+  },
+  {
+    "id": "71c1c81d03",
+    "name": "DeepCool PIXEL Series Bits, Yellow",
+    "price": 9.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "panel",
+    "open": false,
+    "updated": "2026-11-23",
+    "available": false
+  },
+  {
+    "id": "9c21646242",
+    "name": "LIAN LI Cable Strimer 8 pin RGB 8-pin (6+2) VGA extension cable",
+    "price": 9.88,
+    "was": 14.88,
+    "brand": "LIAN LI",
+    "kind": "led",
+    "open": false,
+    "updated": "2026-11-23",
+    "available": false
+  },
+  {
+    "id": "2bc9af4f60",
+    "name": "HYTE LS10 qRGB Light Strips (3 Pack)",
+    "price": 64.99,
+    "was": null,
+    "brand": "HYTE",
+    "kind": "led",
+    "open": false,
+    "updated": "2026-11-23",
+    "available": false
+  },
+  {
+    "id": "aae4d1699b",
+    "name": "DeepCool PIXEL Series Bits, Pumpkin Orange",
+    "price": 9.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "panel",
+    "open": false,
+    "updated": "2026-11-23",
+    "available": false
+  }
+]
