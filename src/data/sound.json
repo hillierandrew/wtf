@@ -1,0 +1,152 @@
+[
+  {
+    "id": "965a7c4a2a",
+    "name": "Creative Sound Blaster X4 USB Hi-res 7.1 USB DAC and Amp",
+    "price": 189.99,
+    "was": 209.99,
+    "brand": "Creative",
+    "kind": "external",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "e143e70668",
+    "name": "Creative Sound Blaster PLAY! 3",
+    "price": 21.99,
+    "was": 29.99,
+    "brand": "Creative",
+    "kind": "external",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "e1b6f2bc86",
+    "name": "Creative Live! Audio A3",
+    "price": 99.99,
+    "was": 179.99,
+    "brand": "Creative",
+    "kind": "external",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "d938acf4f2",
+    "name": "Creative Sound Blaster Audigy Fx Pro Hi-res 7.1 PCI-e Sound Card",
+    "price": 79.99,
+    "was": 89.99,
+    "brand": "Creative",
+    "kind": "internal",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "a8fa623921",
+    "name": "Creative Sound Blaster AE-X Hi-res PCIe DAC with Discrete Headphone Amp",
+    "price": 229.99,
+    "was": 249.99,
+    "brand": "Creative",
+    "kind": "internal",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "36686058aa",
+    "name": "Creative Sound BlasterX G6 USB-C 7.1 HD External Console Gaming DAC",
+    "price": 179.99,
+    "was": 229.99,
+    "brand": "Creative",
+    "kind": "external",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "d7df2bdbcf",
+    "name": "Creative Sound BlasterX AE-5 Plus PCIe Sound Card",
+    "price": 179.99,
+    "was": 219.99,
+    "brand": "Creative",
+    "kind": "internal",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "d41f5398a1",
+    "name": "Creative Sound Blaster G8 Hi-Res Gaming Dual USB DAC and Amp",
+    "price": 199.99,
+    "was": 219.99,
+    "brand": "Creative",
+    "kind": "external",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "9098743755",
+    "name": "Creative Sound Blaster Audigy FX V2",
+    "price": 79.99,
+    "was": null,
+    "brand": "Creative",
+    "kind": "internal",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "52b22be188",
+    "name": "Creative Sound Blaster Z SE PCIe Gaming Sound Card",
+    "price": 129.99,
+    "was": 159.99,
+    "brand": "Creative",
+    "kind": "internal",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "0c7ef02d89",
+    "name": "Creative Sound Blaster AE-9 PCIe with Audio Control Module Metallic Grey",
+    "price": 489.99,
+    "was": null,
+    "brand": "Creative",
+    "kind": "internal",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "8ac11c81f8",
+    "name": "Creative Sound Blaster X5 32bit/384kHz PCM 130 dB DNR",
+    "price": 369.99,
+    "was": 389.99,
+    "brand": "Creative",
+    "kind": "external",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "3e54c263af",
+    "name": "Creative Sound Blaster Audigy FX V2 (Open Box)",
+    "price": 71.99,
+    "was": null,
+    "brand": "Creative",
+    "kind": "internal",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "ca1acd2271",
+    "name": "Creative Sound Blaster GC7 Game Streaming USB DAC and Amp (Open Box)",
+    "price": 161.99,
+    "was": 202.49,
+    "brand": "Creative",
+    "kind": "external",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "471dd53979",
+    "name": "Creative BT-W5 USB Bluetooth 5.3 Audio Transmitter aptX Adaptive (Open Box)",
+    "price": 53.99,
+    "was": 62.99,
+    "brand": "Creative",
+    "kind": "external",
+    "open": true,
+    "updated": "2026-11-23"
+  }
+]
