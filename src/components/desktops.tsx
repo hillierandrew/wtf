@@ -98,29 +98,27 @@ export function Desktops({ onLeave, onUse }: { onLeave: () => void; onUse?: (pic
           </button>
           <ThemeToggle />
         </div>
-        <h1 className="font-display mt-3 text-4xl font-medium leading-none tracking-tight">Prebuilds</h1>
-        <p className="mt-2 text-base text-muted">Games, a program, college, or a career. Tap a big button.</p>
+        <h1 className="font-display mt-2 text-3xl font-medium leading-none tracking-tight">Prebuilds</h1>
+        <p className="mt-1 text-sm text-muted">Pick what you want it for. The computers are under that.</p>
       </header>
-      <div className="grid shrink-0 grid-cols-2 gap-2 px-4 pt-3">
-        <button type="button" onClick={() => setFilter("gaming")} className={`h-14 rounded-2xl border text-lg ${filter === "gaming" ? "border-accent bg-subtle" : "border-line"}`}>Games</button>
-        <button type="button" onClick={() => setFilter("programs")} className={`h-14 rounded-2xl border text-lg ${filter === "programs" ? "border-accent bg-subtle" : "border-line"}`}>Programs</button>
-        <button type="button" onClick={() => setFilter("college")} className={`h-14 rounded-2xl border text-lg ${filter === "college" ? "border-accent bg-subtle" : "border-line"}`}>College</button>
-        <button type="button" onClick={() => setFilter("career")} className={`h-14 rounded-2xl border text-lg ${filter === "career" ? "border-accent bg-subtle" : "border-line"}`}>Careers</button>
-      </div>
-      <div className="flex shrink-0 gap-2 overflow-x-auto px-4 py-3">
-        {FILTERS.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => {
-              setFilter(item.id);
+      <div className="shrink-0 px-4 pt-3">
+        <label className="flex h-12 min-w-0 items-center gap-2 rounded-2xl border border-line bg-elevated px-3">
+          <span className="shrink-0 text-sm text-muted">For</span>
+          <select
+            value={filter}
+            onChange={(event) => {
+              setFilter(event.target.value as Filter);
               setBrand("all");
             }}
-            className={`h-12 shrink-0 rounded-full border px-4 text-base ${filter === item.id ? "border-accent bg-subtle" : "border-line"}`}
+            className="h-full min-w-0 flex-1 truncate bg-transparent text-base outline-none"
           >
-            {item.label}
-          </button>
-        ))}
+            {FILTERS.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.label}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
       <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 pb-4">
         <p className="text-base text-muted">{meta.line}</p>

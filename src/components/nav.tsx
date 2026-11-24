@@ -43,42 +43,39 @@ export function ScreenBar({
   onJump: (index: number) => void;
   onGo: (next: Screen) => void;
 }) {
+  const prevIndex = trail.length >= 2 ? trail.length - 2 : -1;
+  const previous = prevIndex >= 0 ? trail[prevIndex] : null;
   return (
     <div className="safe-top shrink-0 border-b border-line bg-bg">
-      <div className="flex items-center gap-2 overflow-x-auto px-3 py-2">
+      <div className="flex items-center gap-2 px-3 py-2">
         <button type="button" onClick={onBack} className="h-11 shrink-0 rounded-full bg-accent px-4 text-base text-accent-fg">
           Back
         </button>
         <button type="button" onClick={onFull} className="h-11 shrink-0 rounded-full border border-line px-4 text-base">
           Full
         </button>
-        <button type="button" onClick={() => onJump(0)} className={`h-11 shrink-0 rounded-full border px-4 text-base ${mode === null ? "border-accent bg-subtle" : "border-line"}`}>
+        <button type="button" onClick={() => onJump(0)} className="h-11 shrink-0 rounded-full border border-line px-4 text-base">
           Home
         </button>
-        {trail.map((step, index) =>
-          step ? (
-            <button
-              key={`${step}-${index}`}
-              type="button"
-              onClick={() => onJump(index)}
-              className={`h-11 shrink-0 rounded-full border px-4 text-base ${index === trail.length - 1 ? "border-accent bg-subtle" : "border-line"}`}
-            >
-              {NAMES[step] ?? step}
-            </button>
-          ) : null,
-        )}
-      </div>
-      <div className="flex items-center gap-2 overflow-x-auto px-3 pb-2">
-        {LINKS.map((link) => (
-          <button
-            key={link.id}
-            type="button"
-            onClick={() => onGo(link.id)}
-            className={`h-11 shrink-0 rounded-full border px-4 text-base ${mode === link.id ? "border-accent bg-subtle" : "border-line"}`}
-          >
-            {link.label}
+        {previous ? (
+          <button type="button" onClick={() => onJump(prevIndex)} className="hidden h-11 max-w-32 shrink truncate rounded-full border border-line px-4 text-base sm:inline-flex sm:items-center">
+            {NAMES[previous] ?? previous}
           </button>
-        ))}
+        ) : null}
+        <label className="ml-auto flex h-11 min-w-0 flex-1 items-center rounded-full border border-line bg-elevated px-3 sm:max-w-xs">
+          <select
+            aria-label="Go to"
+            value={mode}
+            onChange={(event) => onGo(event.target.value as Screen)}
+            className="h-full w-full truncate bg-transparent text-base outline-none"
+          >
+            {LINKS.map((link) => (
+              <option key={link.id} value={link.id}>
+                {link.label}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
     </div>
   );

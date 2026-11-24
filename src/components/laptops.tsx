@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Check, Search, X } from "lucide-react";
 import raw from "@/data/laptops.json";
 import { rankFrom, type ShelfSort } from "@/lib/catalog";
@@ -193,6 +193,17 @@ function studies(item: Laptop, course: Course) {
   return item.gpu >= course.gpu;
 }
 
+function Menu({ label, value, onChange, children }: { label: string; value: string; onChange: (value: string) => void; children: ReactNode }) {
+  return (
+    <label className="flex h-12 min-w-0 items-center gap-2 rounded-2xl border border-line bg-elevated px-3">
+      <span className="shrink-0 text-sm text-muted">{label}</span>
+      <select value={value} onChange={(event) => onChange(event.target.value)} className="h-full min-w-0 flex-1 truncate bg-transparent text-base outline-none">
+        {children}
+      </select>
+    </label>
+  );
+}
+
 export function Laptops({ onLeave }: { onLeave: () => void }) {
   const [filter, setFilter] = useState<Filter>("deal");
   const [picked, setPicked] = useState("");
@@ -286,69 +297,63 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
           </button>
           <ThemeToggle />
         </div>
-        <h1 className="font-display mt-3 text-4xl font-medium leading-none tracking-tight">Pick a laptop</h1>
-        <p className="mt-2 text-base text-muted">One laptop. Games, a program, a college class, or a career.</p>
+        <h1 className="font-display mt-2 text-3xl font-medium leading-none tracking-tight">Pick a laptop</h1>
+        <p className="mt-1 text-sm text-muted">Games, a class, or the best price. The list is right under the menus.</p>
       </header>
       <div className="grid shrink-0 grid-cols-2 gap-2 px-4 pt-3">
-        <button type="button" onClick={() => { setFilter("games"); setCourseId("any"); }} className={`h-14 rounded-2xl border text-lg ${filter === "games" ? "border-accent bg-subtle" : "border-line"}`}>Games</button>
-        <button type="button" onClick={() => { setFilter("create"); setGameId("any"); }} className={`h-14 rounded-2xl border text-lg ${filter === "create" ? "border-accent bg-subtle" : "border-line"}`}>Programs</button>
-        <button type="button" onClick={() => { setFilter("school"); setGameId("any"); }} className={`h-14 rounded-2xl border text-lg ${filter === "school" ? "border-accent bg-subtle" : "border-line"}`}>College</button>
-        <button type="button" onClick={() => { setFilter("work"); setGameId("any"); }} className={`h-14 rounded-2xl border text-lg ${filter === "work" ? "border-accent bg-subtle" : "border-line"}`}>Careers</button>
-      </div>
-      <div className="flex shrink-0 gap-2 overflow-x-auto px-4 py-3">
-        {FILTERS.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => {
-              setFilter(item.id);
-              setBrand("all");
-              setQuery("");
-            }}
-            className={`h-12 shrink-0 rounded-full border px-4 text-base ${filter === item.id ? "border-accent bg-subtle" : "border-line"}`}
-          >
-            {item.label}
-          </button>
-        ))}
-      </div>
-      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 pb-4">
-        <p className="text-base text-muted">{game ? `${game.label} (${game.year}) at ${qualityLabel}. ${game.note ?? "Only laptops that can run it."}` : course ? `${course.label}. Runs ${course.program}.` : meta.line}</p>
-        <div className="flex gap-2 overflow-x-auto">
-          <button type="button" onClick={() => pickGame("any")} className={`h-12 shrink-0 rounded-full border px-4 text-base ${gameId === "any" && courseId === "any" ? "border-accent bg-subtle" : "border-line"}`}>
-            Any use
-          </button>
+        <Menu
+          label="For"
+          value={filter}
+          onChange={(id) => {
+            setFilter(id as Filter);
+            setBrand("all");
+            setQuery("");
+          }}
+        >
+          {FILTERS.map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.label}
+            </option>
+          ))}
+        </Menu>
+        <Menu label="Game" value={gameId} onChange={pickGame}>
+          <option value="any">Any game</option>
           {GAMES.map((item) => (
-            <button key={item.id} type="button" onClick={() => pickGame(item.id)} className={`h-12 shrink-0 rounded-full border px-4 text-base ${gameId === item.id ? "border-accent bg-subtle" : "border-line"}`}>
+            <option key={item.id} value={item.id}>
               {item.label}
-            </button>
+            </option>
           ))}
-        </div>
-        {game ? (
-          <div className="flex gap-2 overflow-x-auto">
-            {QUALITIES.map((item) => (
-              <button key={item.id} type="button" onClick={() => setQuality(item.id)} className={`h-12 shrink-0 rounded-full border px-4 text-base ${quality === item.id ? "border-accent bg-subtle" : "border-line"}`}>
-                {item.label}
-              </button>
-            ))}
-          </div>
-        ) : null}
-        <div className="flex gap-2 overflow-x-auto">
+        </Menu>
+        <Menu label="Class" value={courseId} onChange={pickCourse}>
+          <option value="any">Any class</option>
           {COURSES.map((item) => (
-            <button key={item.id} type="button" onClick={() => pickCourse(item.id)} className={`h-12 shrink-0 rounded-full border px-4 text-base ${courseId === item.id ? "border-accent bg-subtle" : "border-line"}`}>
+            <option key={item.id} value={item.id}>
               {item.label}
-            </button>
+            </option>
           ))}
-        </div>
-        <div className="px-0">
+        </Menu>
+        {game ? (
+          <Menu label="Look" value={quality} onChange={(id) => setQuality(id as Quality)}>
+            {QUALITIES.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.label}
+              </option>
+            ))}
+          </Menu>
+        ) : (
           <SortRow value={sort} onChange={setSort} />
-        </div>
-        <label className="flex h-12 items-center gap-2 rounded-2xl border border-line bg-elevated px-3">
-          <Search className="size-4 text-muted" strokeWidth={1.75} />
-          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search" className="h-full w-full bg-transparent text-base outline-none" />
-        </label>
-        <div className="flex flex-wrap gap-2">
-          <button type="button" onClick={() => setOpenBox((value) => !value)} className={`h-11 rounded-full border px-4 text-base ${openBox ? "border-accent bg-subtle" : "border-line"}`}>
-            {openBox ? "Open box on" : "Open box off"}
+        )}
+      </div>
+      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-3">
+        <p className="text-sm text-muted">{game ? `${game.label} (${game.year}) at ${qualityLabel}. ${game.note ?? "Only laptops that can run it."}` : course ? `${course.label}. Runs ${course.program}.` : meta.line}</p>
+        {game ? <SortRow value={sort} onChange={setSort} /> : null}
+        <div className="flex gap-2">
+          <label className="flex h-12 min-w-0 flex-1 items-center gap-2 rounded-2xl border border-line bg-elevated px-3">
+            <Search className="size-4 shrink-0 text-muted" strokeWidth={1.75} />
+            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search" className="h-full w-full bg-transparent text-base outline-none" />
+          </label>
+          <button type="button" onClick={() => setOpenBox((value) => !value)} className={`h-12 shrink-0 rounded-2xl border px-3 text-sm ${openBox ? "border-accent bg-subtle" : "border-line"}`}>
+            Open box
           </button>
         </div>
         <select value={brand} onChange={(event) => setBrand(event.target.value)} className="h-12 w-full rounded-2xl border border-line bg-elevated px-3 text-base">
