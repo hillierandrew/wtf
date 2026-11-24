@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-11-23",
-  "note": "Canada Computers prices dated 2026-11-23, including laptops and tablets.",
+  "note": "Canada Computers prices dated 2026-11-23, including desktops.",
   "sound": "2026-11-23",
   "servers": "2026-11-23",
   "controllers": "2026-11-23",
@@ -17,5 +17,6 @@
   "monitors": "2026-11-23",
   "mounts": "2026-11-23",
   "keyboardsMice": "2026-11-23",
-  "laptops": "2026-11-23"
+  "laptops": "2026-11-23",
+  "desktops": "2026-11-23"
 }
