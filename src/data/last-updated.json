@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-11-23",
-  "note": "Canada Computers servers, sound cards, controller cards, cooling, power supplies, case accessories, computer cases, hard drives, SSDs, graphics cards, memory, and CPUs priced 2026-11-23. Other catalog prices were already on file.",
+  "note": "Canada Computers prices dated 2026-11-23, including the sim builder.",
   "sound": "2026-11-23",
   "servers": "2026-11-23",
   "controllers": "2026-11-23",
@@ -12,5 +12,6 @@
   "ssds": "2026-11-23",
   "gpus": "2026-11-23",
   "memory": "2026-11-23",
-  "cpus": "2026-11-23"
+  "cpus": "2026-11-23",
+  "sim": "2026-11-23"
 }
