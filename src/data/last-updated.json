@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-11-23",
-  "note": "Canada Computers servers, sound cards, controller cards, cooling, power supplies, case accessories, computer cases, and hard drives priced 2026-11-23. Other catalog prices were already on file.",
+  "note": "Canada Computers servers, sound cards, controller cards, cooling, power supplies, case accessories, computer cases, hard drives, and SSDs priced 2026-11-23. Other catalog prices were already on file.",
   "sound": "2026-11-23",
   "servers": "2026-11-23",
   "controllers": "2026-11-23",
@@ -8,5 +8,6 @@
   "power": "2026-11-23",
   "caseAccessories": "2026-11-23",
   "cases": "2026-11-23",
-  "hardDrives": "2026-11-23"
+  "hardDrives": "2026-11-23",
+  "ssds": "2026-11-23"
 }
