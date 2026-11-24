@@ -1,0 +1,4425 @@
+[
+  {
+    "id": "18cbe90b0a",
+    "name": "PCCOOLER CPS GT360M ARGB Display AIO CPU Liquid Cooler, 300W TDP",
+    "price": 129.99,
+    "was": null,
+    "brand": "PCCOOLER",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23",
+    "member": 109.99
+  },
+  {
+    "id": "895715c2ee",
+    "name": "PCCOOLER CPS RZ700D Single Tower CPU Air Cooler, 7 Heat Pipes",
+    "price": 84.99,
+    "was": null,
+    "brand": "PCCOOLER",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23",
+    "member": 59.99
+  },
+  {
+    "id": "a98f28c999",
+    "name": "DeepCool MYSTIQUE 360 LCD Liquid Cooler",
+    "price": 159.99,
+    "was": 239.99,
+    "brand": "DeepCool",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "89097accb4",
+    "name": "DeepCool MYSTIQUE 240 LCD Liquid Cooler",
+    "price": 199.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "5c15b90d16",
+    "name": "Arctic MX-4 4g - High Performance Thermal Compound",
+    "price": 9.99,
+    "was": null,
+    "brand": "Arctic",
+    "kind": "thermal",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "0d435028af",
+    "name": "TRYX PANORAMA SE 360 ARGB Liquid Cooler White",
+    "price": 409.99,
+    "was": null,
+    "brand": "TRYX",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "be274cfe0f",
+    "name": "be quiet! Pure Wings Pure Wings 3 120mm Case Fan Black",
+    "price": 9.99,
+    "was": 19.99,
+    "brand": "be quiet!",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "a1d5e1062c",
+    "name": "MSI MAG Coreliquid I360 AIO Liquid CPU Cooler, 360mm Radiator, Triple 120mm ARGB PWM Fans, Compatible with LGA 1851 Socket",
+    "price": 224.99,
+    "was": null,
+    "brand": "MSI",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "ec5f8a5105",
+    "name": "MSI MAG CORELIQUID A15 360",
+    "price": 179.99,
+    "was": null,
+    "brand": "MSI",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "89fff31139",
+    "name": "LIAN LI UF-SLIN120-1B 120mm Case Fan Black",
+    "price": 39.99,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "697d18c6b5",
+    "name": "MSI MAG Coreliquid I360 AIO Liquid CPU Cooler - White, 360mm Radiator, Triple 120mm ARGB PWM Fans, Compatible with LGA 1851 Soc",
+    "price": 224.99,
+    "was": null,
+    "brand": "MSI",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "38faa32baf",
+    "name": "MSI A13 360mm Liquid Cooler White",
+    "price": 99.99,
+    "was": 164.99,
+    "brand": "MSI",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "cf91d5070c",
+    "name": "MSI MAG Coreliquid E360 AIO White",
+    "price": 99.99,
+    "was": 224.99,
+    "brand": "MSI",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "3d5f60ca12",
+    "name": "DeepCool FK120 High Performance Cooling Fan, 4-Pin PWM, Fluid Dynamic",
+    "price": 29.88,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "0f4ce2c122",
+    "name": "be quiet! BL093 120mm Case Fan Black",
+    "price": 19.99,
+    "was": 29.99,
+    "brand": "be quiet!",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "199eac4798",
+    "name": "LIAN LI UF-SLIN120-1W 120mm Case Fan White",
+    "price": 39.99,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "848685ff41",
+    "name": "Gigabyte AORUS WATERFORCE X II 360 Liquid CPU Cooler",
+    "price": 384.99,
+    "was": null,
+    "brand": "Gigabyte",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "c3dad58bd6",
+    "name": "be quiet! SILENT LOOP 3 360mm AIO Liquid Cooler",
+    "price": 154.99,
+    "was": 199.99,
+    "brand": "be quiet!",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "aa5ee26ed2",
+    "name": "Cooler Master HYPER 212 Spectrum V3",
+    "price": 29.99,
+    "was": 34.99,
+    "brand": "Cooler Master",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "40387b4ddb",
+    "name": "PCCOOLER CPS RZ620 Dual Tower CPU Cooler,275W TDP, Aluminum Top Cover",
+    "price": 74.99,
+    "was": null,
+    "brand": "PCCOOLER",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "bcf04099eb",
+    "name": "be quiet! BL094 120mm Case Fan Black",
+    "price": 19.99,
+    "was": 29.99,
+    "brand": "be quiet!",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "ead81b26be",
+    "name": "iCAN High Performance Thermal Compound 13.5W/m-k",
+    "price": 5.99,
+    "was": null,
+    "brand": "iCAN",
+    "kind": "thermal",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "3b5cc36cb0",
+    "name": "DeepCool LP360 Liquid Cooler, 360mm, Black",
+    "price": 189.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "0a68cdf198",
+    "name": "Arctic Freezer 36 CO S1700 AM5 Direct touch dual 12CM Pressure optimized fan",
+    "price": 64.99,
+    "was": null,
+    "brand": "Arctic",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "4d7bc3d6b1",
+    "name": "be quiet! PURE ROCK 3 CPU Air Cooler",
+    "price": 29.99,
+    "was": 59.99,
+    "brand": "be quiet!",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "f929636279",
+    "name": "PCCOOLER CPS RT620 Digital Dual Tower CPU Air Cooler,Real-Time Status",
+    "price": 44.99,
+    "was": 59.99,
+    "brand": "PCCOOLER",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "47404badf3",
+    "name": "DeepCool FC120-3 IN 1 Performance RGB PWM Case Fan - Triple Pack",
+    "price": 29.88,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "f9052718f2",
+    "name": "ARMOURY Block III 120MM ARGB PWM Fan, Daisy Chained PWM",
+    "price": 11.99,
+    "was": null,
+    "brand": "ARMOURY",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "ff4eecbc50",
+    "name": "Arctic 10 Port PWM Fan Hub with SATA Power",
+    "price": 14.99,
+    "was": null,
+    "brand": "Arctic",
+    "kind": "controller",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "79199a9a8f",
+    "name": "TRYX PANORAMA ARGB 360mm Liquid Cooler White",
+    "price": 519.99,
+    "was": null,
+    "brand": "TRYX",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "3450ff102d",
+    "name": "DeepCool FL12 3IN1, 120mm High-Performance ARGB Gen 2 Fans, Black, PW",
+    "price": 79.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "89cabe744d",
+    "name": "ARMOURY 5V 3PIN ARGB fan controller with remote control Pc case fanhub",
+    "price": 14.99,
+    "was": null,
+    "brand": "ARMOURY",
+    "kind": "controller",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "2e0afc9091",
+    "name": "PCCOOLER CPS FG120 ARGB FAN , 800-1800 RPM, 120 mm",
+    "price": 7.99,
+    "was": null,
+    "brand": "PCCOOLER",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "93d457c872",
+    "name": "LIAN LI UF-SLIN140-1W 140mm Case Fan White",
+    "price": 39.99,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "7c856b62b5",
+    "name": "ARMOURY Block III 120MM ARGB PWM Fan",
+    "price": 11.99,
+    "was": null,
+    "brand": "ARMOURY",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "72fd02c45a",
+    "name": "DarkFlash M400 Black+White Aircooler",
+    "price": 29.99,
+    "was": null,
+    "brand": "DarkFlash",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "341933bde3",
+    "name": "PCCOOLER CPS RT400 ARGB CPU Cooler,235W TDP \uff0cTower Air Cooler",
+    "price": 24.99,
+    "was": null,
+    "brand": "PCCOOLER",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "682c01e2ef",
+    "name": "ASUS ROG RYUJIN III 360 ARGB EXTREME White Edition all-in-one AIO CPU liquid cooler",
+    "price": 499.99,
+    "was": null,
+    "brand": "ASUS",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "4ca8223775",
+    "name": "PCCOOLER CPS RT400-BK CPU Cooler\uff0c235W TDP, Quiet Cooling",
+    "price": 24.99,
+    "was": null,
+    "brand": "PCCOOLER",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "a37e6b0e70",
+    "name": "Gigabyte AORUS WATERFORCE II 240 Liquid CPU Cooler",
+    "price": 154.99,
+    "was": null,
+    "brand": "Gigabyte",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "25472ddc28",
+    "name": "Arctic Liquid Freezer III PRO 420 Black AIO CPU Water Cooler",
+    "price": 209.99,
+    "was": null,
+    "brand": "Arctic",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "20e66886bc",
+    "name": "Arctic Freezer 36 A-RGB S1700 AM5 Direct touch dual 12CM Pressure optimized fan, Black",
+    "price": 79.99,
+    "was": null,
+    "brand": "Arctic",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "f8691a4451",
+    "name": "DeepCool FL12 WH 3IN1, 120mm High-Performance ARGB Gen 2 Fans, White,",
+    "price": 79.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "a16dd72d0a",
+    "name": "PCCOOLER CPS RT620 ARGB Dual Tower CPU Air Coo, 265W TDP,6 Heat Pipes",
+    "price": 49.99,
+    "was": null,
+    "brand": "PCCOOLER",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "90899347b3",
+    "name": "Arctic MX-4 8g Thermal Compound",
+    "price": 12.99,
+    "was": null,
+    "brand": "Arctic",
+    "kind": "thermal",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "7b52adae74",
+    "name": "ASUS ProArt LC PROART LC 360 360 mm Liquid Cooler Black",
+    "price": 329.99,
+    "was": null,
+    "brand": "ASUS",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "0a1250b855",
+    "name": "CORSAIR CORSAIR NAUTILUS 360 LCD 360mm Liquid Cooler White",
+    "price": 224.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "76029c5b6a",
+    "name": "CORSAIR iCUE LINK TITAN 240 RX LCD",
+    "price": 279.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "5119a06fe1",
+    "name": "be quiet! Light Wings LX 120mm PWM High-speed ARGB Case Fan, Black, 3",
+    "price": 39.99,
+    "was": 74.99,
+    "brand": "be quiet!",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "95b8379551",
+    "name": "be quiet! 120mm Case Fan",
+    "price": 14.99,
+    "was": 24.99,
+    "brand": "be quiet!",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "e6116823d6",
+    "name": "COOLER MASTER Masterliquid 360 CORE II ARGB CPU Liquid Cooler, Black",
+    "price": 119.99,
+    "was": 139.99,
+    "brand": "Cooler Master",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "21535662b9",
+    "name": "MSI A13 240mm Liquid Cooler White",
+    "price": 84.99,
+    "was": 129.99,
+    "brand": "MSI",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "59f9979e5a",
+    "name": "Gigabyte AORUS WATERFORCE X II 240 Liquid CPU Cooler",
+    "price": 319.99,
+    "was": null,
+    "brand": "Gigabyte",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "bd5938d7d0",
+    "name": "be quiet! ARGB Light Wings 140mm PWM Triple Pack",
+    "price": 54.99,
+    "was": 114.99,
+    "brand": "be quiet!",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "23136a21d4",
+    "name": "CORSAIR iCUE LINK TITAN 360 RX RGB",
+    "price": 189.99,
+    "was": 279.99,
+    "brand": "CORSAIR",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "d82317a4f4",
+    "name": "CORSAIR iCUE LINK RX120 MAX RGB 120mm PWM Fans Starter Kit",
+    "price": 209.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "ab47f8f09c",
+    "name": "DeepCool LT520 WH Premium Liquid CPU Cooler",
+    "price": 89.88,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "4c8879e863",
+    "name": "be quiet! Light Wings LX 120mm PWM ARGB Case Fan, White, 3 Pack",
+    "price": 39.99,
+    "was": 74.99,
+    "brand": "be quiet!",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "642ba7bba4",
+    "name": "LIAN LI Galahad II Trinity SL-INF 360mm AIO Liquid CPU Cooler - White",
+    "price": 254.99,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "ddfa4f0a8f",
+    "name": "LIAN LI Galahad II LCD SL-INF 360mm AIO Liquid CPU Cooler - White",
+    "price": 384.99,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "580b7507bf",
+    "name": "CORSAIR iCUE LINK LX120 RGB 120mm PWM Fan Expansion - White",
+    "price": 39.99,
+    "was": 54.99,
+    "brand": "CORSAIR",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "8cb0e0f548",
+    "name": "MSI MPG EZ120 ARGB WHITE-1W, Magnetic Connector Block - 1 Pack white",
+    "price": 34.97,
+    "was": 59.99,
+    "brand": "MSI",
+    "kind": "other",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "e258a21f10",
+    "name": "Arctic Freezer 36 A-RGB S1700 AM5 Direct touch dual 12CM Pressure optimized fan, White",
+    "price": 84.99,
+    "was": null,
+    "brand": "Arctic",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "a7586f47f1",
+    "name": "CORSAIR iCUE LINK LX120 RGB 120mm PWM Fans Starter Kit - White",
+    "price": 129.99,
+    "was": 179.99,
+    "brand": "CORSAIR",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "cc2f663cd3",
+    "name": "be quiet! Light Wings LX 120mm PWM Reverse White",
+    "price": 14.99,
+    "was": 24.99,
+    "brand": "be quiet!",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "932e714bdf",
+    "name": "be quiet! Light Wings LX 120mm PWM High-speed ARGB Case Fan, White, 3",
+    "price": 34.99,
+    "was": 74.99,
+    "brand": "be quiet!",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "0ae85c7859",
+    "name": "CORSAIR CORSAIR RS120 120mm Case Fan White",
+    "price": 19.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "55172f96fb",
+    "name": "DeepCool FL12 WH Case Fan White",
+    "price": 19.99,
+    "was": 34.99,
+    "brand": "DeepCool",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "9f8ad36a10",
+    "name": "DeepCool ASSASSIN VC ELITE WH CPU Air Cooler, White",
+    "price": 154.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "0bf0af2d93",
+    "name": "PCCOOLER CPS FG120 ARGB FAN, 800-1800 RPM, 120 mm",
+    "price": 7.99,
+    "was": null,
+    "brand": "PCCOOLER",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "c61b93eb14",
+    "name": "be quiet! ARGB Light Wings 140mm PWM high-speed Triple Pack",
+    "price": 54.99,
+    "was": 114.99,
+    "brand": "be quiet!",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "40925ff765",
+    "name": "be quiet! Light Wings LX 140mm PWM High-speed ARGB Case Fan, Black, 3",
+    "price": 39.99,
+    "was": 79.99,
+    "brand": "be quiet!",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "6ae9427b6d",
+    "name": "DeepCool FL12, 120mm High-Performance ARGB Gen 2 Fans, Black",
+    "price": 19.99,
+    "was": 34.99,
+    "brand": "DeepCool",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "9ba1d2d999",
+    "name": "DeepCool LP240 Liquid Cooler, 240mm, Black",
+    "price": 159.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "71cd329d86",
+    "name": "LIAN LI UNI FAN SL WIRELESS RGB LCD White 3x 12cm Fan Pack with Controller",
+    "price": 194.99,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "controller",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "680e86748f",
+    "name": "CORSAIR CORSAIR LX120-R RGB Case Fan White",
+    "price": 54.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "e57daef2df",
+    "name": "Lian-Li Fan 12TLLCD1W3W FDB fan White",
+    "price": 209.99,
+    "was": null,
+    "brand": "Lian-Li",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "c3c2f9a88c",
+    "name": "be quiet! Light Wings LX 140mm PWM ARGB Case Fan, White, 3 Pack",
+    "price": 39.99,
+    "was": 79.99,
+    "brand": "be quiet!",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "a1c8fbc0ac",
+    "name": "be quiet! 120mm Case Fan",
+    "price": 14.99,
+    "was": 29.99,
+    "brand": "be quiet!",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "18b93d2803",
+    "name": "GIGABYTE GAMING 240 ICE CPU Liquid Cooler",
+    "price": 124.99,
+    "was": null,
+    "brand": "Gigabyte",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "aaf938410b",
+    "name": "INTEL",
+    "price": 5.99,
+    "was": null,
+    "brand": "INTEL",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "41c64361b5",
+    "name": "CORSAIR RX Series, iCUE LINK RX120 RGB 120mm Fan, White, Single Pack",
+    "price": 34.99,
+    "was": 49.99,
+    "brand": "CORSAIR",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "5a8b63f575",
+    "name": "be quiet! PURE ROCK PRO 3 CPU Air Cooler",
+    "price": 89.99,
+    "was": null,
+    "brand": "be quiet!",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "be66ee3e8e",
+    "name": "LIAN LI Galahad II LCD 360mm AIO Liquid CPU Cooler - White",
+    "price": 329.99,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "29464bd555",
+    "name": "CORSAIR iCUE LINK LX140 RGB 140mm PWM Fan Expansion, Black",
+    "price": 59.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "7100457992",
+    "name": "CORSAIR RX Series, iCUE LINK RX120 120mm Fan, Single Pack",
+    "price": 39.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "2f8e8d4e0c",
+    "name": "be quiet! Light Wings LX 140mm PWM ARGB Case Fan, Black, 3 Pack",
+    "price": 39.99,
+    "was": 79.99,
+    "brand": "be quiet!",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "61092738d7",
+    "name": "CORSAIR iCUE LINK LX140 RGB 140mm PWM Fan Expansion - White",
+    "price": 59.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "536893e70f",
+    "name": "be quiet! ARGB Light Wings 120mm PWM",
+    "price": 14.99,
+    "was": 39.99,
+    "brand": "be quiet!",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "dc7b8103cd",
+    "name": "be quiet! Light Wings 140mm PWM Reverse Black",
+    "price": 24.99,
+    "was": 44.99,
+    "brand": "be quiet!",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "5afbb3dd4a",
+    "name": "COOLER MASTER Masterliquid 360 CORE II ARGB CPU Liquid Cooler, White",
+    "price": 119.99,
+    "was": 139.99,
+    "brand": "Cooler Master",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "88d6d34784",
+    "name": "THERMALTAKE CT120 ARGB Sync PC Cooling Fan 2 Pack",
+    "price": 54.99,
+    "was": null,
+    "brand": "THERMALTAKE",
+    "kind": "thermal",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "033aa4647f",
+    "name": "MSI MAG CORELIQUID I240, Black",
+    "price": 179.99,
+    "was": null,
+    "brand": "MSI",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "8ecd7dc3a8",
+    "name": "Lian-Li Fan 12TL1W3W FDB fan White",
+    "price": 139.99,
+    "was": null,
+    "brand": "Lian-Li",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "00d4bcf43d",
+    "name": "ARCTIC COOLING P8 P8 PWM PST Case Fan Black",
+    "price": 14.99,
+    "was": null,
+    "brand": "ARCTIC COOLING",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "c25af391df",
+    "name": "DeepCool FT12, 120mm FDB Fan, 3-Phase 10-pole 12-slot Motor, PWM, Tra",
+    "price": 25.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "d972cea9c3",
+    "name": "MSI MAG CORELIQUID I240, White",
+    "price": 119.97,
+    "was": 179.99,
+    "brand": "MSI",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "81bc4adbc7",
+    "name": "CORSAIR iCUE LINK TITAN 240 RX RGB",
+    "price": 224.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "2e5310affc",
+    "name": "THERMALTAKE CPU Air Cooler",
+    "price": 54.99,
+    "was": null,
+    "brand": "THERMALTAKE",
+    "kind": "thermal",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "075e285004",
+    "name": "be quiet! ARGB Light Wings 120mm PWM-high-speed",
+    "price": 14.99,
+    "was": 39.99,
+    "brand": "be quiet!",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "1efd91448e",
+    "name": "DeepCool FT12 WH, 120mm FDB Fan, 3-Phase 10-pole 12-slot Motor, PWM,",
+    "price": 25.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "b52e7c3bfe",
+    "name": "CORSAIR RX Series, iCUE LINK RX140 RGB 140mm Fan, Single Pack",
+    "price": 54.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "47904cd034",
+    "name": "CORSAIR RX Series, iCUE LINK RX140 140mm Fan, Single Pack",
+    "price": 49.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "1db1025a15",
+    "name": "CORSAIR RS140 140mm PWM Fan \u2013 White",
+    "price": 24.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "cb00d57eae",
+    "name": "be quiet! Light Wings LX 140mm PWM High-speed ARGB Case Fan, White, 3",
+    "price": 39.99,
+    "was": 79.99,
+    "brand": "be quiet!",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "a565486502",
+    "name": "be quiet! Light Wings 140mm PWM Reverse White",
+    "price": 24.99,
+    "was": 44.99,
+    "brand": "be quiet!",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "df777c4938",
+    "name": "CORSAIR RS140 140mm PWM Fans Dual Pack \u2013 White",
+    "price": 49.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "e1e16b55a1",
+    "name": "CORSAIR CORSAIR NAUTILUS 240 LCD 240mm Liquid Cooler White",
+    "price": 199.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "a335102f27",
+    "name": "Lian-Li Fan 12TL1W1W FDB fan White",
+    "price": 44.99,
+    "was": null,
+    "brand": "Lian-Li",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "a1f80c31ab",
+    "name": "NZXT F140 RGB Core Case Fan, Black",
+    "price": 29.99,
+    "was": null,
+    "brand": "NZXT",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "99df3aa3c7",
+    "name": "DeepCool FT14 WH, 140mm FDB Fan, 3-Phase 10-pole 12-slot Motor, PWM,",
+    "price": 31.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "0659ed7690",
+    "name": "be quiet! ARGB Light Wings 140mm PWM high-speed",
+    "price": 14.99,
+    "was": 44.99,
+    "brand": "be quiet!",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "bc4d3d32d0",
+    "name": "DeepCool FT14, 140mm FDB Fan, 3-Phase 10-pole 12-slot Motor, PWM, Tra",
+    "price": 31.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "8c1f3e4a79",
+    "name": "NZXT RF-R14DF-B1 Case Fan Black",
+    "price": 89.99,
+    "was": null,
+    "brand": "NZXT",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "72e9ff093d",
+    "name": "Lian-Li Fan 12RTLLCD1W1W FDB fan",
+    "price": 64.99,
+    "was": null,
+    "brand": "Lian-Li",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "1677255cdd",
+    "name": "NZXT F120 F120 RGB DUO Case Fan White",
+    "price": 129.99,
+    "was": null,
+    "brand": "NZXT",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "ee70538b96",
+    "name": "CORSAIR RX Series, iCUE LINK RX140 RGB 140mm Fan, Dual Pack",
+    "price": 124.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "0c5e489148",
+    "name": "ARCTIC COOLING ACFAN00231A 120mm Case Fan Black",
+    "price": 24.99,
+    "was": null,
+    "brand": "ARCTIC COOLING",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "654279159b",
+    "name": "CORSAIR RX Series, iCUE LINK RX140 140mm Fan, Dual Pack",
+    "price": 114.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "260d7acc73",
+    "name": "Montech AX 120 PWM Case Fan, White",
+    "price": 9.88,
+    "was": null,
+    "brand": "Montech",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "99441b6805",
+    "name": "CORSAIR NAUTILUS LCD Module, 2.1\" IPS Display -Black",
+    "price": 84.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "cead2faa32",
+    "name": "Montech RX 140 PWM Case Fan, White",
+    "price": 15.88,
+    "was": null,
+    "brand": "Montech",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "2bb75953ab",
+    "name": "DeepCool FL12R WH, 120mm High-Performance ARGB Gen 2 Fans, White, Rev",
+    "price": 34.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "f6433910f5",
+    "name": "Arctic P14 PWM PST 140m PWM Fan with Cable Splitter, White",
+    "price": 19.99,
+    "was": null,
+    "brand": "Arctic",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "d815faf9b1",
+    "name": "Bykski Flex 10mm ID x 13mm OD Fitting (B-FT3-TN-V2BK)",
+    "price": 3.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23",
+    "available": false
+  },
+  {
+    "id": "2a6100d4c5",
+    "name": "THERMALTAKE TH240 V2 ARGB Sync CPU Liquid Cooler Snow Edition",
+    "price": 134.99,
+    "was": null,
+    "brand": "THERMALTAKE",
+    "kind": "thermal",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "c85684da2a",
+    "name": "AMD Wraith Stealth Ryzen Cooler Heatsink Fan",
+    "price": 9.99,
+    "was": null,
+    "brand": "AMD",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "c247a0b98a",
+    "name": "LIAN LI HydroShift LCD 360S",
+    "price": 244.99,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "b5c373f00e",
+    "name": "GIGABYTE AORUS WATERFORCE X 240, All-in-one Liquid Cooler with Circular LCD Display, RGB Fusion 2.0, 120mm ARGB Fans",
+    "price": 244.99,
+    "was": null,
+    "brand": "Gigabyte",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "9c74f681bf",
+    "name": "CORSAIR Fitting (hard tube),XF Hardline 4-pack (12mm OD compression; glossy white)",
+    "price": 34.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "cba84fdb35",
+    "name": "Lian Li UNI FAN SL 120 Wireless RGB 120mm Reverse Blade Fan, White",
+    "price": 39.99,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "94b070196e",
+    "name": "GIGABYTE AORUS WATERFORCE 280 AIO Liquid CPU Cooler, 280mm Radiator with 2X 140mm Low Noise ARGB Fans, Rotatable ARGB Lighting",
+    "price": 214.99,
+    "was": null,
+    "brand": "Gigabyte",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "e75b103f58",
+    "name": "NZXT F140 RGB Core Case Fan, White",
+    "price": 9.88,
+    "was": 29.99,
+    "brand": "NZXT",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "18fab92f9b",
+    "name": "Montech HyperFlow ARGB 240 AIO Cooler, Black",
+    "price": 124.99,
+    "was": null,
+    "brand": "Montech",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "a807e44bb4",
+    "name": "MSI MPG CORELIQUID P13 360, AIO Liquid CPU Cooler, Black",
+    "price": 284.99,
+    "was": null,
+    "brand": "MSI",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "f9ad1f449c",
+    "name": "CORSAIR NAUTILUS LCD Module, 2.1\" IPS Display -White",
+    "price": 84.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "8d4a4cba88",
+    "name": "Arctic Liquid Freezer III PRO 4200 A-RGB AIO CPU Water Cooler White",
+    "price": 239.99,
+    "was": null,
+    "brand": "Arctic",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "b590fcb380",
+    "name": "GIGABYTE AORUS WATERFORCE 240 AIO Liquid CPU Cooler, 240mm Radiator with 2X 120mm Low Noise ARGB Fans, Rotatable ARGB Lighting",
+    "price": 194.99,
+    "was": null,
+    "brand": "Gigabyte",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "0ed1e4aa16",
+    "name": "Bykski CPU-XPR-CU-M-V3 High-Performance CPU WaterCooling Block for AMD",
+    "price": 54.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "308ee5f297",
+    "name": "Bykski DDC CP-PMD3COV-X / 100mm PMMA Reservoir Combo - Black w/",
+    "price": 84.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "2db57f5cdf",
+    "name": "Bykski 9 Blade High Volume 120mm PWM Fan - 3000 RPM / 101.65 CFM",
+    "price": 7.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "51105bd840",
+    "name": "Bykski CPU-XPR-C-M High-Efficiency CPU Water Cooling Block for AMD",
+    "price": 39.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "7521c72214",
+    "name": "Bykski CPU-XPR-MK-M-V5 High-Efficiency CPU Water Cooling Block for AMD",
+    "price": 69.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "45e85d0980",
+    "name": "Bykski DDC Pump / 180mm Reservoir Station w and 5v Addressable RGB",
+    "price": 159.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "75d388aeb2",
+    "name": "Bykski DDC CP-PMD3COV-X / 200mm PMMA Reservoir Combo - Black w/ 5v",
+    "price": 89.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "f968f52015",
+    "name": "Bykski 3-Way Flow Indicator - Frosted w/ 5v Addressable RGB (RBW)",
+    "price": 9.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "c13e82a4e7",
+    "name": "Bykski CPU-XPR-MK-I-V5 High-Efficiency CPU Water Cooling Block intel",
+    "price": 64.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "71e9588224",
+    "name": "Bykski CPU-XPR-CU-I High-Performance CPU Water Cooling Block for Intel",
+    "price": 49.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "37a2f8ed29",
+    "name": "DeepCool AK700 DIGITAL NYX Air Cooler",
+    "price": 69.99,
+    "was": 99.99,
+    "brand": "DeepCool",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "4c78912dbd",
+    "name": "Bykski 6-Sided Flow Indicator w/ 5v Addressable RGB (RBW)",
+    "price": 14.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "6333798377",
+    "name": "Bykski DDC Pump / 220mm Reservoir Station w/ and 5v Addressable RGB",
+    "price": 169.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "e85077da73",
+    "name": "Bykski 360mm x 30mm RC Series Radiator, 120mm x 3, Triple Fan White",
+    "price": 64.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "a694593b6e",
+    "name": "Bykski 240mm x 30mm RC Series Radiator, 120mm x 2, Dual Fan",
+    "price": 49.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "e51e03c040",
+    "name": "Bykski B-PD5 Hand Screw Plug\uff0cWhite",
+    "price": 3.09,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "69cc53bd80",
+    "name": "Bykski 120mm Multi Function 90 Degree Shelf Style Water Cooling Bracke",
+    "price": 9.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "b511947286",
+    "name": "Bykski DDC CP-PMD3COV-X / 150mm PMMA Reservoir Combo - Black w/ 5v",
+    "price": 86.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "a3ddf145e0",
+    "name": "DeepCool AK400 DIGITAL SE Air Cooler, Single Tower",
+    "price": 39.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "ca937a0899",
+    "name": "Bykski B-PD5 Hand Screw Plug\uff0cblack",
+    "price": 3.09,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "2155267f99",
+    "name": "Bykski 10mm ID x 14mm OD Rigid PETG Tube - 1x 500mm - Clear",
+    "price": 3.09,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "d7358d2055",
+    "name": "Bykski 360mm x 30mm RC Series Radiator, 120mm x 3, Triple Fan Black",
+    "price": 59.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "c79fd30a6d",
+    "name": "Bykski G 1/4in. Male/Female Extension Coupler - 40mm (B-EXJ-40-BK)",
+    "price": 3.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "8103d62744",
+    "name": "Bykski G 1/4in. Male to Female 90 Degree Rotary Elbow Fitting White",
+    "price": 3.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "6d99cd29b2",
+    "name": "Bykski G 1/4in. Male to Female 90 Degree Rotary Elbow Fitting SNB",
+    "price": 3.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "3440c8e929",
+    "name": "Bykski 12mm ID x 16mm OD Rigid PETG Tube - 1x 500mm - Clear",
+    "price": 3.09,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "8fef1cf04f",
+    "name": "Bykski Rigid 14mm OD Fitting V2-W (B-HTJV2-L14)",
+    "price": 3.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "48fecdceb9",
+    "name": "Bykski G 1/4in Pressure Exhaust Port Cap for Custom Water Cooling",
+    "price": 4.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "2efdd73625",
+    "name": "Bykski G 1/4in. Male/Female Extension Coupler - 20mm ( B-EXJ-20-BK)",
+    "price": 3.09,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "d66e5a8143",
+    "name": "Bykski 240mm x 30mm RC Series Radiator, 120mm x 2, Dual Fan White",
+    "price": 54.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "0b061ea0d0",
+    "name": "Bykski G 1/4in. Male/Female Extension Coupler - 40mm (B-EXJ-40-W)",
+    "price": 3.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "cc76bef620",
+    "name": "Bykski Rigid 14mm OD Fitting V2 BK (B-HTJV2-L14)",
+    "price": 3.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "de71d106fe",
+    "name": "Bykski G 1/4in. Male to Female 90 Degree Rotary Elbow Fitting Black",
+    "price": 3.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "c9f2ce09dd",
+    "name": "Bykski Rigid 16mm OD Fitting V2-BK (B-HTJV2-L16)",
+    "price": 4.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "f894daee1c",
+    "name": "Bykski Rigid 14mm OD Fitting V2-S (B-HTJV2-L14)",
+    "price": 3.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "b0e79bfdb8",
+    "name": "Bykski G 1/4in. Male/Female Extension Coupler - 20mm (B-EXJ-20-W)",
+    "price": 3.09,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "876fc29210",
+    "name": "Bykski G 1/4in. Male/Female Extension Coupler - 30mm (B-EXJ-30-SNB)",
+    "price": 3.09,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "8aaf4744b9",
+    "name": "Bykski G 1/4in. Male/Female Extension Coupler - 30mm (B-EXJ-30-BK)",
+    "price": 3.09,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "a2ed162967",
+    "name": "Bykski G 1/4in. Male/Female Extension Coupler - 20mm (B-EXJ-20-SNB)",
+    "price": 3.09,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "2d05423e55",
+    "name": "Bykski G 1/4in. Male/Female Extension Coupler - 30mm (B-EXJ-30-W)",
+    "price": 3.09,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "811cdd8e2c",
+    "name": "ASUS LC 360 ARGB 360mm Liquid Cooler Black",
+    "price": 129.99,
+    "was": null,
+    "brand": "ASUS",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "a2ade16abf",
+    "name": "COOLER MASTER V8 ACE 3DHP CPU Air Cooler Black",
+    "price": 159.99,
+    "was": null,
+    "brand": "Cooler Master",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "33e893f642",
+    "name": "COOLER MASTER MasterLiquid ATMOS Stealth 360mm Liquid Cooler Black",
+    "price": 179.99,
+    "was": null,
+    "brand": "Cooler Master",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "b9328e538d",
+    "name": "COOLER MASTER MasterLiquid Core LCD 6\" 360mm Liquid Cooler Black",
+    "price": 199.99,
+    "was": null,
+    "brand": "Cooler Master",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "9abbafd7ed",
+    "name": "COOLER MASTER V8 ACE 3DHP AMD CPU Air Cooler Black",
+    "price": 159.99,
+    "was": null,
+    "brand": "Cooler Master",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "b91e7cf06a",
+    "name": "COOLER MASTER MasterFan M120 ARGB 120mm Case Fan Single Pack Black",
+    "price": 59.9,
+    "was": null,
+    "brand": "Cooler Master",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "110be5448f",
+    "name": "DeepCool FD12 ARGB V2 120mm Regular Case Fan Single Pack Black",
+    "price": 12.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "e4f37609d9",
+    "name": "MSI MPG CORELIQUID P22 360 W 360mm Liquid Cooler White",
+    "price": 164.99,
+    "was": 194.99,
+    "brand": "MSI",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "7ba72e66f4",
+    "name": "DeepCool AK700 VC CPU Air Cooler Black",
+    "price": 79.99,
+    "was": 99.99,
+    "brand": "DeepCool",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "cba772f00e",
+    "name": "ASUS Prime MR120 ARGB 120mm Reverse Case Fan 3-Pack White",
+    "price": 54.99,
+    "was": null,
+    "brand": "ASUS",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "029fee8689",
+    "name": "CORSAIR iCUE LINK TITAN II 360 LCD 360mm Liquid Cooler White",
+    "price": 334.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "68b804d69c",
+    "name": "CORSAIR iCUE LINK TITAN II 360 LCD 360mm Liquid Cooler Black",
+    "price": 334.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "c4be712dc0",
+    "name": "CORSAIR iCUE LINK TITAN II 360 RX RGB 360mm Liquid Cooler Black",
+    "price": 254.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "852607e718",
+    "name": "CORSAIR iCUE LINK RX120 II RGB 120mm Case Fan Single Pack White",
+    "price": 49.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "3e7a5f7cc2",
+    "name": "CORSAIR iCUE LINK RX120 II RGB 120mm Case Fan Single Pack Black",
+    "price": 49.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "59a1f0dc67",
+    "name": "CORSAIR RX360 II RGB with iCUE LINK System Hub 360mm Case Fan 3-Pack",
+    "price": 139.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "6dc65fd74f",
+    "name": "CORSAIR RX360 II RGB Unified Case Triple Fan, White",
+    "price": 139.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "0ddf999081",
+    "name": "CORSAIR RS360 II Unibody 120mm Regular Case Fan 3-Pack Black",
+    "price": 54.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "77c9b1a7ee",
+    "name": "CORSAIR RS360 II ARGB Unibody 120mm Regular Case Fan 3-Pack Black",
+    "price": 74.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "832dc9aed4",
+    "name": "CORSAIR RS360 II ARGB Unibody 120mm Regular Case Fan 3-Pack White",
+    "price": 74.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "108fa8904c",
+    "name": "CORSAIR NAUTILUS II 360 LCD 360mm Liquid Cooler Black",
+    "price": 224.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "cddfcbf40f",
+    "name": "CORSAIR NAUTILUS II 360 LCD 360mm Liquid Cooler White",
+    "price": 224.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "2aa472cfd4",
+    "name": "ASUS ROG Eurux GR120 ARGB 120mm Case Fan Single Pack Black",
+    "price": 69.99,
+    "was": null,
+    "brand": "ASUS",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "c3f9c5fcfc",
+    "name": "ASUS ROG Eurux GR120 ARGB 120mm Reverse Case Fan Single Pack Black",
+    "price": 69.99,
+    "was": null,
+    "brand": "ASUS",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "e1b9da1c62",
+    "name": "ASUS ROG Eurux GR120 ARGB 120mm Case Fan 3-Pack Black",
+    "price": 199.99,
+    "was": null,
+    "brand": "ASUS",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "c310a70d61",
+    "name": "ASUS ROG Eurux GR120 ARGB 120mm Reverse Case Fan 3-Pack Black",
+    "price": 199.99,
+    "was": null,
+    "brand": "ASUS",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "dc44fda141",
+    "name": "ASUS Prime MR120 120mm Reverse Case Fan 3-Pack Black",
+    "price": 54.99,
+    "was": null,
+    "brand": "ASUS",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "4fa699017a",
+    "name": "COOLER MASTER Elite Liquid 360mm Liquid Cooler White",
+    "price": 59.99,
+    "was": 94.99,
+    "brand": "Cooler Master",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "d7076f4258",
+    "name": "COOLER MASTER Elite Liquid 360mm Liquid Cooler Black",
+    "price": 59.99,
+    "was": 94.99,
+    "brand": "Cooler Master",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "9d090b4e38",
+    "name": "KIWIHOME Cooling Fan Compatible With PS5 Slim",
+    "price": 39.99,
+    "was": null,
+    "brand": "KIWIHOME",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "7f1d317f21",
+    "name": "PCCOOLER CPS DA360 V2 ARGB BK",
+    "price": 79.99,
+    "was": null,
+    "brand": "PCCOOLER",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "c3c7b8e94b",
+    "name": "Sudokoo SK700 MACH CPU Air Cooler Black",
+    "price": 104.99,
+    "was": null,
+    "brand": "Sudokoo",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "61a992e845",
+    "name": "Thermal Grizzly WireView Pro II Reverse Black",
+    "price": 189.99,
+    "was": null,
+    "brand": "Thermal Grizzly",
+    "kind": "thermal",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "c0eeaa1cca",
+    "name": "be quiet! DARK ROCK PRO 6 CPU Air Cooler Black",
+    "price": 109.99,
+    "was": 134.99,
+    "brand": "be quiet!",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "7b2bce7c90",
+    "name": "be quiet! DARK ROCK 6 CPU Air Cooler Black",
+    "price": 89.99,
+    "was": 109.99,
+    "brand": "be quiet!",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "bb70f18987",
+    "name": "DarkFlash DM8R LINE Reverse Blade A-RGB Cooling Fan, 1 Pack, White",
+    "price": 9.99,
+    "was": null,
+    "brand": "DarkFlash",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "4163f5b48f",
+    "name": "DarkFlash DM8R LINE Reverse Blade A-RGB Cooling Fan, 1 Pack, Black",
+    "price": 9.99,
+    "was": null,
+    "brand": "DarkFlash",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "afce598e64",
+    "name": "HAVN H18 180mm Case Fan 2-Pack Black",
+    "price": 49.99,
+    "was": 69.99,
+    "brand": "HAVN",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "487b4a8157",
+    "name": "HAVN H14 140mm Case Fan 3-Pack Black",
+    "price": 49.99,
+    "was": 69.99,
+    "brand": "HAVN",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "b24ca35474",
+    "name": "HAVN H14 140mm Case Fan 3-Pack White",
+    "price": 49.99,
+    "was": 69.99,
+    "brand": "HAVN",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "70af3a854f",
+    "name": "HAVN H14 140mm Case Fan Single Pack Black",
+    "price": 19.99,
+    "was": 30.99,
+    "brand": "HAVN",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "b9d8f7dbdf",
+    "name": "HAVN H14 140mm Case Fan Single Pack White",
+    "price": 19.99,
+    "was": 30.99,
+    "brand": "HAVN",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "01b231dc05",
+    "name": "HAVN H12 120mm Case Fan 3-Pack Black",
+    "price": 49.99,
+    "was": 59.99,
+    "brand": "HAVN",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "db995ecdd0",
+    "name": "HAVN H12 120mm Case Fan 3-Pack White",
+    "price": 49.99,
+    "was": 59.99,
+    "brand": "HAVN",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "d810c20f50",
+    "name": "HAVN H12 120mm Case Fan Single Pack Black",
+    "price": 19.99,
+    "was": 29.99,
+    "brand": "HAVN",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "c7d086d758",
+    "name": "DeepCool AK620 G2 WH CPU Air Cooler White",
+    "price": 79.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "31961fe203",
+    "name": "DeepCool AG620 G2 WH ARGB CPU Air Cooler White",
+    "price": 59.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "077b1bfeda",
+    "name": "DeepCool AG620 G2 ARGB CPU Air Cooler Black",
+    "price": 49.99,
+    "was": 59.99,
+    "brand": "DeepCool",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "b1d79f58ed",
+    "name": "DeepCool AG620 G2 CPU Air Cooler Black",
+    "price": 44.99,
+    "was": 49.99,
+    "brand": "DeepCool",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "63b7a3a7f1",
+    "name": "DeepCool AG500 G2 ARGB CPU Air Cooler Black",
+    "price": 41.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "a15e0b7e11",
+    "name": "DeepCool AG400 G2 WH ARGB CPU Air Cooler White",
+    "price": 29.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "b8f38d99f9",
+    "name": "DeepCool AG400 G2 ARGB CPU Air Cooler Black",
+    "price": 19.99,
+    "was": 29.99,
+    "brand": "DeepCool",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "f8446820f8",
+    "name": "DeepCool LT360 VISION ARGB 360mm Liquid Cooler Black",
+    "price": 219.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "01c4dec3e8",
+    "name": "PCCOOLER CPS RT720 TC ARGB High-Performance CPU Cooler",
+    "price": 59.99,
+    "was": null,
+    "brand": "PCCOOLER",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "b938e76400",
+    "name": "Sudokoo MACH120 120mm Regular Case Fan 3-Pack Black",
+    "price": 74.99,
+    "was": 99.99,
+    "brand": "Sudokoo",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "730c584794",
+    "name": "Sudokoo MACH120 120mm Regular Case Fan Single Pack Black",
+    "price": 39.99,
+    "was": null,
+    "brand": "Sudokoo",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "80b134ce85",
+    "name": "Sudokoo MACH140 140mm Regular Case Fan Single Pack Black",
+    "price": 34.99,
+    "was": 44.99,
+    "brand": "Sudokoo",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "541267dd29",
+    "name": "Sudokoo NEXAURA 360 360mm Liquid Cooler White",
+    "price": 69.99,
+    "was": 99.99,
+    "brand": "Sudokoo",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "c93e5e4b57",
+    "name": "Sudokoo NEXAURA 360 Liquid Cooler Black",
+    "price": 69.99,
+    "was": 99.99,
+    "brand": "Sudokoo",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "0d50c01016",
+    "name": "Sudokoo ENERGLO 360 Liquid Cooler w/ Data Display Black",
+    "price": 174.99,
+    "was": null,
+    "brand": "Sudokoo",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "66134d63a9",
+    "name": "Sudokoo SK620 CPU Air Cooler Black",
+    "price": 79.99,
+    "was": 99.99,
+    "brand": "Sudokoo",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "9770cb4c33",
+    "name": "Sudokoo SK620V CPU Air Cooler Black",
+    "price": 124.99,
+    "was": null,
+    "brand": "Sudokoo",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "b7ec648138",
+    "name": "Sudokoo SK700 CPU Air Cooler White",
+    "price": 69.99,
+    "was": 94.99,
+    "brand": "Sudokoo",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "a95b02ee6e",
+    "name": "Sudokoo SK700 CPU Air Cooler Black",
+    "price": 94.99,
+    "was": null,
+    "brand": "Sudokoo",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "1e79339790",
+    "name": "Sudokoo SK700V CPU Air Cooler White",
+    "price": 84.99,
+    "was": 114.99,
+    "brand": "Sudokoo",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "ef07f0fe57",
+    "name": "Sudokoo SK700V CPU Air Cooler Black",
+    "price": 114.99,
+    "was": null,
+    "brand": "Sudokoo",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "94d25e88ac",
+    "name": "ASUS TUF Gaming LC III 360 ARGB 360mm Liquid Cooler Black",
+    "price": 169.99,
+    "was": null,
+    "brand": "ASUS",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "f26fd7a830",
+    "name": "ASUS TUF Gaming LC III 360 ARGB LCD 360mm Liquid Cooler Black",
+    "price": 209.99,
+    "was": null,
+    "brand": "ASUS",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "43e4111edc",
+    "name": "ARCTIC MX-7 4G ULTIMATE PERFORMANCE THERMAL PASTE",
+    "price": 17.99,
+    "was": null,
+    "brand": "Arctic",
+    "kind": "thermal",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "8ba69729f1",
+    "name": "ASUS PRIME MR120 FAN ARGB WHITE 120mm Case Fan Single Pack White",
+    "price": 18.88,
+    "was": null,
+    "brand": "ASUS",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "8080016b1b",
+    "name": "ASUS PRIME MR120 FAN ARGB BLACK 120mm Case Fan Black",
+    "price": 18.99,
+    "was": null,
+    "brand": "ASUS",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "7dd2b9a9ed",
+    "name": "ASUS ASUS Prime MR120 ARGB Fan - Triple Pack 120mm Case Fan White",
+    "price": 54.99,
+    "was": null,
+    "brand": "ASUS",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "6ff9c4beaa",
+    "name": "ASUS ASUS Prime MR120 ARGB Fan - Triple Pack 120mm Case Fan Black",
+    "price": 54.99,
+    "was": null,
+    "brand": "ASUS",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "11c5170169",
+    "name": "ASUS TUF GAMING TF120 ARGB White 3IN1 120mm Case Fan 3-Pack White",
+    "price": 89.99,
+    "was": null,
+    "brand": "ASUS",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "03ec34bd2d",
+    "name": "ASUS Prime LC 360 ARGB 360mm Liquid Cooler White",
+    "price": 169.99,
+    "was": null,
+    "brand": "ASUS",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "6c47d19d85",
+    "name": "ASUS ROG RYUO IV 360 ARGB WHT 360mm Liquid Cooler White",
+    "price": 419.99,
+    "was": null,
+    "brand": "ASUS",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "980339e29e",
+    "name": "ASUS TUF Gaming ARGB PWM Fan Hub",
+    "price": 49.99,
+    "was": null,
+    "brand": "ASUS",
+    "kind": "controller",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "94143d2b89",
+    "name": "JONSBO ZA-360BR (Reversed) PC Case Fan (700-1800RPM)",
+    "price": 39.99,
+    "was": null,
+    "brand": "JONSBO",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "77adc53590",
+    "name": "JONSBO ZA-360B PC Case Fan (700-2400RPM)",
+    "price": 39.99,
+    "was": null,
+    "brand": "JONSBO",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "5180c2c771",
+    "name": "JONSBO ZA-120B PC Case Fan (700-2400RPM)",
+    "price": 14.99,
+    "was": null,
+    "brand": "JONSBO",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "933b3511e4",
+    "name": "DeepCool FD12 V2 3IN1 120mm Case Fan 3-Pack Black",
+    "price": 26.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "d5f2731bf2",
+    "name": "DeepCool FD12 V2 120mm Case Fan Single Pack Black",
+    "price": 9.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "2e0c75e6f0",
+    "name": "DeepCool AK620 G2 DIGITAL NYX CPU Air Cooler Black",
+    "price": 89.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "9990d42cef",
+    "name": "DeepCool AK620 G2 CPU Air Cooler Black",
+    "price": 79.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "0e0db4a461",
+    "name": "DeepCool LM360 WH 360mm Liquid Cooler White",
+    "price": 129.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "3d9425a11d",
+    "name": "DeepCool LM360 360mm Liquid Cooler Black",
+    "price": 99.99,
+    "was": 129.99,
+    "brand": "DeepCool",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "2cc49066eb",
+    "name": "TRYX TURRIS 620 CPU Air Cooler White",
+    "price": 169.99,
+    "was": null,
+    "brand": "TRYX",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "64478f9e5f",
+    "name": "be quiet! Pure Wings 3 Reverse Triple Pack 120mm Case Fan 3-Pack Whit",
+    "price": 29.99,
+    "was": 64.99,
+    "brand": "be quiet!",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "70833400f5",
+    "name": "be quiet! Pure Wings 3 Reverse Triple Pack 120mm Case Fan 3-Pack Blac",
+    "price": 34.99,
+    "was": 64.99,
+    "brand": "be quiet!",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "56dd210847",
+    "name": "be quiet! Pure Wings 3 PWM 120mm Case Fan 3-Pack Black",
+    "price": 29.99,
+    "was": 64.99,
+    "brand": "be quiet!",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "456ff419ff",
+    "name": "be quiet! Pure Wings 3 PWM high-speed (BL140)",
+    "price": 29.99,
+    "was": 64.99,
+    "brand": "be quiet!",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "243420b84f",
+    "name": "be quiet! PURE WINGS PWM High-Speed 140mm Case Fan 3-Pack Black",
+    "price": 69.99,
+    "was": null,
+    "brand": "be quiet!",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "97d373ed9d",
+    "name": "ARCTIC COOLING P14 Pro PST 140mm Case FanSingle Pack Black",
+    "price": 21.99,
+    "was": null,
+    "brand": "ARCTIC COOLING",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "f2246c4325",
+    "name": "ARCTIC COOLING P12 Pro PST 120mm Case FanSingle Pack White",
+    "price": 17.99,
+    "was": null,
+    "brand": "ARCTIC COOLING",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23",
+    "available": false
+  },
+  {
+    "id": "4c810787ef",
+    "name": "DarkFlash DV360S Max 360mm Liquid AIO CPU Cooler with LCD Screen, WH",
+    "price": 109.99,
+    "was": null,
+    "brand": "DarkFlash",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "16a83b2f04",
+    "name": "DarkFlash DV360S Max 360mm Liquid AIO CPU Cooler with LCD Screen, Bla",
+    "price": 109.99,
+    "was": null,
+    "brand": "DarkFlash",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "2eae98dfbc",
+    "name": "ARMOURY MagLev 120MM Non-RGB Slim Case Fans, White",
+    "price": 6.15,
+    "was": null,
+    "brand": "ARMOURY",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23",
+    "fromPrice": true
+  },
+  {
+    "id": "c5021d5d69",
+    "name": "ARMOURY MagLev 120MM Non-RGB Slim Case Fans, Black",
+    "price": 5.93,
+    "was": null,
+    "brand": "ARMOURY",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23",
+    "fromPrice": true
+  },
+  {
+    "id": "69203a2358",
+    "name": "ARMOURY Block Vanguard 120MM ARGB Fan,Reverse MagLev Fan,White",
+    "price": 10.21,
+    "was": null,
+    "brand": "ARMOURY",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23",
+    "fromPrice": true
+  },
+  {
+    "id": "24e7afffe0",
+    "name": "ARMOURY Block Vanguard 120MM ARGB Fan,Reverse MagLev Fan,Black",
+    "price": 9.97,
+    "was": null,
+    "brand": "ARMOURY",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23",
+    "fromPrice": true
+  },
+  {
+    "id": "1541dba451",
+    "name": "ARMOURY Block Vanguard 120MM ARGB Fan,Regular MagLev Fan,White",
+    "price": 10.21,
+    "was": null,
+    "brand": "ARMOURY",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23",
+    "fromPrice": true
+  },
+  {
+    "id": "6f756dbbc5",
+    "name": "ARMOURY Block Vanguard 120MM ARGB Fan,Regular MagLev Fan,Black",
+    "price": 9.97,
+    "was": null,
+    "brand": "ARMOURY",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23",
+    "fromPrice": true
+  },
+  {
+    "id": "998d560fc9",
+    "name": "DarkFlash DM8 LINE A-RGB Cooling Fan, 1 Pack, Black",
+    "price": 9.99,
+    "was": null,
+    "brand": "DarkFlash",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "239a49cde1",
+    "name": "HYTE Thermal Goop",
+    "price": 11.99,
+    "was": null,
+    "brand": "HYTE",
+    "kind": "thermal",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "73ffe1a946",
+    "name": "HYTE FA12 120mm Regular Case Fan TARO MILK",
+    "price": 69.99,
+    "was": null,
+    "brand": "HYTE",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "a65f2681c3",
+    "name": "HYTE FA12 120mm Case Fan 4-Pack White",
+    "price": 54.99,
+    "was": null,
+    "brand": "HYTE",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "ecc82c673b",
+    "name": "HYTE FA12 120mm Case Fan 4-Pack Black",
+    "price": 54.99,
+    "was": null,
+    "brand": "HYTE",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "7449118a58",
+    "name": "Thermal GrizzlyThermal Grizzly Minus Pad Advance - 120x20x1,0 mm 4 pc",
+    "price": 31.99,
+    "was": null,
+    "brand": "Thermal Grizzly",
+    "kind": "thermal",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "7c037b8e42",
+    "name": "Thermal Grizzly Minus Pad 8 - 120x 20x 1,0 mm - 2 pcs",
+    "price": 9.99,
+    "was": null,
+    "brand": "Thermal Grizzly",
+    "kind": "thermal",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "fd02c6acfa",
+    "name": "Thermal Grizzly Intel 13th & 14th Gen CPU Contact Frame",
+    "price": 31.99,
+    "was": null,
+    "brand": "Thermal Grizzly",
+    "kind": "thermal",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "6890239c8d",
+    "name": "Thermal Grizzly KryoSheet - 38 x 38 mm",
+    "price": 39.99,
+    "was": null,
+    "brand": "Thermal Grizzly",
+    "kind": "thermal",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "e842a9184e",
+    "name": "Thermal Grizzly Kryonaut - 5,5 g / 1,5 ml",
+    "price": 34.99,
+    "was": null,
+    "brand": "Thermal Grizzly",
+    "kind": "thermal",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "a844a766a9",
+    "name": "Thermal Grizzly PhaseSheet PTM - 50x40mm",
+    "price": 18.99,
+    "was": null,
+    "brand": "Thermal Grizzly",
+    "kind": "thermal",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "24e168a4c6",
+    "name": "Thermal Grizzly AM5 Contact Sealing Frame",
+    "price": 37.99,
+    "was": null,
+    "brand": "Thermal Grizzly",
+    "kind": "thermal",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "037d6efb88",
+    "name": "Thermal Grizzly Duronaut 6g",
+    "price": 29.99,
+    "was": null,
+    "brand": "Thermal Grizzly",
+    "kind": "thermal",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "719eeacd5b",
+    "name": "Thermal Grizzly Aeronaut - 1g",
+    "price": 8.99,
+    "was": null,
+    "brand": "Thermal Grizzly",
+    "kind": "thermal",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "f2b9f57d19",
+    "name": "Thermal Grizzly Hydronaut - 1 g",
+    "price": 9.99,
+    "was": null,
+    "brand": "Thermal Grizzly",
+    "kind": "thermal",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "b78e5b7961",
+    "name": "Thermal Grizzly Duronaut 2g",
+    "price": 16.99,
+    "was": null,
+    "brand": "Thermal Grizzly",
+    "kind": "thermal",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "dc7ada3789",
+    "name": "Thermal Grizzly Kryonaut -",
+    "price": 11.99,
+    "was": null,
+    "brand": "Thermal Grizzly",
+    "kind": "thermal",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "74f25b7fbe",
+    "name": "ARMOURY Block Guardian 120MM ARGB Fan,Silent Fan,White",
+    "price": 9.48,
+    "was": null,
+    "brand": "ARMOURY",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23",
+    "fromPrice": true
+  },
+  {
+    "id": "06ea7afa4a",
+    "name": "ARMOURY Block Guardian 120MM ARGB Fan,Silent Fan,Black",
+    "price": 9.26,
+    "was": null,
+    "brand": "ARMOURY",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23",
+    "fromPrice": true
+  },
+  {
+    "id": "c433a28c13",
+    "name": "MSI MAG COREFROZR AA13 White Air CPU Cooler",
+    "price": 29.99,
+    "was": 54.99,
+    "brand": "MSI",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "936ad75911",
+    "name": "PCCOOLER CPS RT720-TC High-Performance CPU Cooler,7 Copper Heat Pipes",
+    "price": 52.99,
+    "was": null,
+    "brand": "PCCOOLER",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "cef25ff244",
+    "name": "PCCOOLER CPS FG120R ARGB FAN , Reverse Airflow,800-1800 RPM, 120 mm,WH",
+    "price": 7.99,
+    "was": null,
+    "brand": "PCCOOLER",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "f7a9c6b2a7",
+    "name": "PCCOOLER CPS FG120R ARGB FAN , Reverse Airflow,800-1800 RPM, 120 mm",
+    "price": 7.99,
+    "was": null,
+    "brand": "PCCOOLER",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "9b243a1bdc",
+    "name": "PCCOOLER CPS RT500 TC ARGB High-Performance CPU Cooler",
+    "price": 29.99,
+    "was": null,
+    "brand": "PCCOOLER",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "b66736dfa2",
+    "name": "DarkFlash UV360 AIO CPU Cooler 6.67in Curved 2K OLED Display",
+    "price": 199.99,
+    "was": 259.99,
+    "brand": "DarkFlash",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "af8cdfccf6",
+    "name": "Fractal Design Fan Speed and ARGB Controller 16 ARGB Gen 2 devices Ma",
+    "price": 59.99,
+    "was": null,
+    "brand": "Fractal Design",
+    "kind": "controller",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "584afc5569",
+    "name": "Fractal Design Momentum 12 RGB PWM Black 120 mm ARGB LED FDB (3-pack",
+    "price": 109.99,
+    "was": null,
+    "brand": "Fractal Design",
+    "kind": "other",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "2af99a9aec",
+    "name": "Fractal Design Momentum 12 RGB PWM White 120 mm ARGB LED FDB",
+    "price": 44.99,
+    "was": null,
+    "brand": "Fractal Design",
+    "kind": "other",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "b69c9fa287",
+    "name": "Fractal Design Momentum 12 RGB PWM Black 120 mm ARGB LED FDB",
+    "price": 44.99,
+    "was": null,
+    "brand": "Fractal Design",
+    "kind": "other",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "d4530cd284",
+    "name": "Fractal Design Momentum 12 PWM White 120 mm FDB",
+    "price": 29.99,
+    "was": null,
+    "brand": "Fractal Design",
+    "kind": "other",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "3e1336b7fb",
+    "name": "Fractal Design Momentum 12 PWM Black 120 mm FDB (Fluid Dynamic Bearin",
+    "price": 29.99,
+    "was": null,
+    "brand": "Fractal Design",
+    "kind": "other",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "cf450772c6",
+    "name": "ARCTIC COOLING ACALP00027A CPU Air Cooler White",
+    "price": 59.0,
+    "was": null,
+    "brand": "ARCTIC COOLING",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "9cc36457d1",
+    "name": "DeepCool R-AG400-BKANMC-G-2 CPU Air Cooler Black",
+    "price": 19.88,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "49ee45f549",
+    "name": "DeepCool LS720 WH High-Performance 360mm ARGB CPU Liquid Cooler - Wh",
+    "price": 99.88,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "e3e913ec99",
+    "name": "DeepCool LS520 SE WH 240mm Liquid CPU Cooler, white",
+    "price": 79.88,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "d7284ec009",
+    "name": "DeepCool LT720 WH Premium Liquid CPU Cooler",
+    "price": 109.88,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "4898d02e81",
+    "name": "DeepCool AK400 WH CPU Cooler",
+    "price": 24.88,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "4e287e8fda",
+    "name": "DarkFlash INF34R A-RGB Cooling Fan, Reverse Airflow, 1 Pack, Black",
+    "price": 10.99,
+    "was": null,
+    "brand": "DarkFlash",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "8a30ef33d2",
+    "name": "THERMALTAKE TH360 V2 ARGB Sync CPU Liquid Cooler",
+    "price": 174.99,
+    "was": null,
+    "brand": "THERMALTAKE",
+    "kind": "thermal",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "ba72411e40",
+    "name": "DarkFlash INF34 A-RGB Cooling Fan, 1 Pack, Black",
+    "price": 10.99,
+    "was": null,
+    "brand": "DarkFlash",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "865c045721",
+    "name": "DarkFlash INF34R A-RGB Cooling Fan, Reverse Airflow, 1 Pack, White",
+    "price": 10.99,
+    "was": null,
+    "brand": "DarkFlash",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "2ac27d82ef",
+    "name": "MSI MPG CORELIQUID D240 AIO Liquid CPU Cooler, 240mm Radiator",
+    "price": 179.88,
+    "was": null,
+    "brand": "MSI",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "a897dc0ee3",
+    "name": "DarkFlash 120*120*25mm Regular Case Fan White",
+    "price": 10.99,
+    "was": null,
+    "brand": "DarkFlash",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "3d2fe405f2",
+    "name": "Lian Li UNI FAN SL 120 Wireless RGB 120mm Fan, White",
+    "price": 39.99,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "ad0aa27d72",
+    "name": "PCCOOLER CPS F7X120 ARGB FAN \uff0cWireless Connection \uff0cDual Ball Bearing",
+    "price": 78.88,
+    "was": null,
+    "brand": "PCCOOLER",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "8233a34d09",
+    "name": "FRACTAL DESIGN Prisma AL-12 120mm Computer Case Fan \u2013 3-Pack",
+    "price": 89.99,
+    "was": null,
+    "brand": "Fractal Design",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "c2021e89fc",
+    "name": "LIAN LI P28ARGB P28ARGB Case Fan Black",
+    "price": 4.88,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "f21326497f",
+    "name": "LIAN LI P28ARGB P28ARGB Case Fan White",
+    "price": 4.88,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "336a46bacc",
+    "name": "CORSAIR Fitting (hard tube),XF Hardline 4-pack",
+    "price": 34.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "620bc2959f",
+    "name": "be quiet! AMD sTRX4 / TR4 Socket (Threadripper) Mounting-Kit for Sile",
+    "price": 9.99,
+    "was": null,
+    "brand": "be quiet!",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "7aa258bd70",
+    "name": "ASUS TUF Gaming LC II 240 ARGB all-in-one liquid CPU cooler features reinforced-tubing, low-noise pump, ARGB fans + cover, 6-ye",
+    "price": 164.99,
+    "was": null,
+    "brand": "ASUS",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "b72d321d3a",
+    "name": "DeepCool R-LS520-WHAMNT-G-1 282\u00d7120\u00d727 mm Liquid Cooler White",
+    "price": 89.88,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "46c7d80f9b",
+    "name": "CORSAIR iCUE H100i",
+    "price": 129.88,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "d696bcbe48",
+    "name": "GIGABYTE AORUS WATERFORCE 360 AIO Liquid CPU Cooler, 360mm Radiator with 3X 120mm Low Noise ARGB Fans, Rotatable ARGB Lighting",
+    "price": 229.99,
+    "was": null,
+    "brand": "Gigabyte",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "2f72511d80",
+    "name": "HYTE THICC Q80 TRIO 360mm Liquid Cooler White",
+    "price": 479.99,
+    "was": null,
+    "brand": "HYTE",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "f6c5ce8692",
+    "name": "Silverstone Shark Force 120 ARGB Performance Enhanced 120mm PWM ARGB Fan, SST-SF120B-ARGB",
+    "price": 14.88,
+    "was": 29.88,
+    "brand": "Silverstone",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "b0925702be",
+    "name": "THERMALTAKE TOUGHLIQUID Ultra 240 All-In-One Liquid Cooler",
+    "price": 219.88,
+    "was": null,
+    "brand": "THERMALTAKE",
+    "kind": "thermal",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "71cc5ab0d7",
+    "name": "CORSAIR Radiator, XR7 240 (2x120mm radiator; 54mm thick)",
+    "price": 129.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "33af00a83d",
+    "name": "Cougar AQUA ARGB 360 Liquid Cooling",
+    "price": 144.88,
+    "was": null,
+    "brand": "Cougar",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "1b8160645c",
+    "name": "EKWB EK-FC1080 GTX Strix Backplate - Nickel",
+    "price": 3.88,
+    "was": null,
+    "brand": "EKWB",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "74e5f02003",
+    "name": "be quiet! LIGHT WINGS 140mm White PWM Triple-Pack , Case fan",
+    "price": 114.99,
+    "was": null,
+    "brand": "be quiet!",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "8f16a12379",
+    "name": "Granzon GAMSC CPU Water Cooling Block w/ Temp Digital Display - Black",
+    "price": 179.99,
+    "was": null,
+    "brand": "Granzon",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "97bef291cb",
+    "name": "Bykski CP-D6PB-X Pump / 180mm PMMA Reservoir Combo - Black",
+    "price": 199.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "457370a7e7",
+    "name": "CORSAIR Tubing (hard), XF Multicard adapter (12mm OD; black)",
+    "price": 14.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "98a94b3dad",
+    "name": "INWIN BR24 240mm AIO with UMA Cooling Design",
+    "price": 119.88,
+    "was": null,
+    "brand": "INWIN",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "5eafb43dee",
+    "name": "be quiet! LIGHT WINGS 120mm White PWM Triple-Pack, Case fan",
+    "price": 109.99,
+    "was": null,
+    "brand": "be quiet!",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "eab0aacb97",
+    "name": "Bykski ZROE Liquid Cooling Coolant - 500ml Blue(B-NS-ZROE)",
+    "price": 5.59,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "cd82898bb3",
+    "name": "CORSAIR Fitting (Hard Tube), XF Hardline 4-pack",
+    "price": 34.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "b4ec725832",
+    "name": "Bykski ZROE Liquid Cooling Coolant - 500ml Green (B-NS-ZROE)",
+    "price": 5.59,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "cbe4701927",
+    "name": "DarkFlash DO360 360mm Liquid AIO CPU Cooler with LCD Screen",
+    "price": 58.88,
+    "was": null,
+    "brand": "DarkFlash",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "a21f64cd2f",
+    "name": "DarkFlash DO360 360mm Liquid AIO CPU Cooler with LCD Screen, White",
+    "price": 58.88,
+    "was": null,
+    "brand": "DarkFlash",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "387c702b9d",
+    "name": "COUGAR Helor 240 High performance Liquid Cooler",
+    "price": 154.88,
+    "was": null,
+    "brand": "Cougar",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "809fd0d8d2",
+    "name": "DarkFlash DM20R LINE Reverse Blade Version\uff0cWhite",
+    "price": 5.99,
+    "was": null,
+    "brand": "DarkFlash",
+    "kind": "other",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "2154adb541",
+    "name": "Bykski ZROE Liquid Cooling Coolant - 500ml Orange (B-NS-ZROE)",
+    "price": 5.59,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "e973c9b433",
+    "name": "Bykski G 1/4in. Male/Female Extension Coupler - 40mm ( B-EXJ-40-SNB)",
+    "price": 3.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "3a8673fbc9",
+    "name": "Bykski Rigid 16mm OD Fitting V2-W (B-HTJV2-L16)",
+    "price": 4.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "513209afcd",
+    "name": "Bykski Rigid 16mm OD Fitting V2-S (B-HTJV2-L16)",
+    "price": 4.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "bebcf165da",
+    "name": "JONSBO ZB-360B PC Case Fan\uff0cAll-IN-One",
+    "price": 34.99,
+    "was": null,
+    "brand": "JONSBO",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "8848c90b8b",
+    "name": "JONSBO ZB-120B PC Case Fan\uff0c2400RPM\uff0c3Pin ARGB\uff0c4Pin PWM",
+    "price": 11.99,
+    "was": null,
+    "brand": "JONSBO",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "b553d5049e",
+    "name": "Bykski ZROE Liquid Cooling Coolant - 500ml Yellow (B-NS-ZROE)",
+    "price": 5.59,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "61b54f4213",
+    "name": "Bykski AMD White Hard Tube Water Cooling Kit",
+    "price": 309.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "d10610498a",
+    "name": "Bykski AMD Flagship Kit with Digital Screen Water Cooling",
+    "price": 429.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "c19000ac74",
+    "name": "Bykski AMD Hard Tube Beginner Water Cooling Kit",
+    "price": 179.99,
+    "was": null,
+    "brand": "Bykski",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "8f17e09403",
+    "name": "MSI MEG CORELIQUID E15 360mm Liquid Cooler Black",
+    "price": 599.99,
+    "was": null,
+    "brand": "MSI",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "f503aba167",
+    "name": "KIWIHOME PB02 Cooling Fan Compatible With PS5 Slim",
+    "price": 49.99,
+    "was": null,
+    "brand": "KIWIHOME",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "3248103457",
+    "name": "Ventilateur de refroidissement KIWIHOME compatible avec PS5 Pro",
+    "price": 44.99,
+    "was": null,
+    "brand": "KIWIHOME",
+    "kind": "other",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "5d7e84866f",
+    "name": "HYTE THICC Q80 TRIO 360mm Liquid Cooler Black",
+    "price": 479.99,
+    "was": null,
+    "brand": "HYTE",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "bb28194b17",
+    "name": "HAVN H12 120mm Case Fan Single Pack White",
+    "price": 19.99,
+    "was": 29.99,
+    "brand": "HAVN",
+    "kind": "fan",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "7cbcdf6779",
+    "name": "Sudokoo ENERGLO 360 Liquid Cooler w/ Data Display White",
+    "price": 189.99,
+    "was": null,
+    "brand": "Sudokoo",
+    "kind": "aio",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "c01196a557",
+    "name": "Sudokoo SK620 CPU Air Cooler White",
+    "price": 79.99,
+    "was": 99.99,
+    "brand": "Sudokoo",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "ff1b61b9cc",
+    "name": "Sudokoo SK620V CPU Air Cooler White",
+    "price": 124.99,
+    "was": null,
+    "brand": "Sudokoo",
+    "kind": "air",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "214f7af9f2",
+    "name": "DeepCool LS720 High-Performance 360mm ARGB CPU Liquid Cooler - Black(Open Box)",
+    "price": 74.91,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "aio",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "26832086ed",
+    "name": "DeepCool Assassin IV CPU Air Cooler Black(Open Box)",
+    "price": 67.41,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "air",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "35685c4ca1",
+    "name": "DeepCool LT720 Premium Liquid CPU Cooler, 360mm Radiator, High-Perfor(Open Box)",
+    "price": 74.91,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "custom",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "ba0927b2d6",
+    "name": "DeepCool LD360 Liquid Cooler(Open Box)",
+    "price": 119.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "aio",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "1ee685c705",
+    "name": "DeepCool LS720 SE 360mm Liquid CPU Cooler(Open Box)",
+    "price": 74.91,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "aio",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "aa4fbeb8cc",
+    "name": "DeepCool AK400 AK400 Digital CPU Air Cooler Black(Open Box)",
+    "price": 29.91,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "air",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "8059095175",
+    "name": "Cooler Master HYPER 212 Spectrum V3(Open Box)",
+    "price": 22.49,
+    "was": 26.24,
+    "brand": "Cooler Master",
+    "kind": "air",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "aeb7da1899",
+    "name": "DeepCool AK620 High-Performance CPU Cooler(Open Box)",
+    "price": 74.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "air",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "d96ac4d805",
+    "name": "MSI MPG EZ120 MPG EZ120 120mm Case Fan White(Open Box)",
+    "price": 89.99,
+    "was": 134.99,
+    "brand": "MSI",
+    "kind": "fan",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "a9be3c34fa",
+    "name": "CORSAIR NAUTILUS 360 RS ARGB(Open Box)",
+    "price": 101.24,
+    "was": 138.74,
+    "brand": "CORSAIR",
+    "kind": "aio",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "6ca3d749b3",
+    "name": "CORSAIR CORSAIR 120mm Case Fan Black(Open Box)",
+    "price": 37.49,
+    "was": 56.24,
+    "brand": "CORSAIR",
+    "kind": "fan",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "42aef74707",
+    "name": "DEEPCOOL ASSASSIN III CPU Cooler/7 Heatpipes/Premium Twin-tower/Dual(Open Box)",
+    "price": 44.91,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "air",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "179f448622",
+    "name": "CORSAIR iCUE H170i ELITE CAPELLIX Liquid CPU Cooler [REFURBISHED](Open Box)",
+    "price": 101.16,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "aio",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "ab195172e4",
+    "name": "NZXT F240 RGB Core(Open Box)",
+    "price": 26.24,
+    "was": 59.99,
+    "brand": "NZXT",
+    "kind": "other",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "d4137dab22",
+    "name": "DeepCool LT520 Premium Liquid CPU Cooler, 240mm Radiator, High-Perfor(Open Box)",
+    "price": 67.41,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "custom",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "843f13c689",
+    "name": "LIAN LI Uni Fan TLLCD140 White, Single Pack(Open Box)",
+    "price": 20.14,
+    "was": 41.16,
+    "brand": "LIAN LI",
+    "kind": "fan",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "397b1463fd",
+    "name": "DeepCool LS520 High-Performance 240mm ARGB CPU Liquid Cooler - Black(Open Box)",
+    "price": 67.41,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "aio",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "e706223dd3",
+    "name": "GIGABYTE AORUS WATERFORCE X 360, All-in-one Liquid Cooler with Circular LCD Display, RGB Fusion 2.0, 120mm ARGB Fans(Open Box)",
+    "price": 236.24,
+    "was": null,
+    "brand": "Gigabyte",
+    "kind": "aio",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "c9fb37addc",
+    "name": "DeepCool AK400 WH CPU Cooler(Open Box)",
+    "price": 18.66,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "air",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "53f1ba433c",
+    "name": "TRYX PANORAMA 360mm Liquid Cooler White(Open Box)",
+    "price": 382.49,
+    "was": null,
+    "brand": "TRYX",
+    "kind": "aio",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "362c943fb0",
+    "name": "Gigabyte AORUS WATERFORCE X II 360 ICE Liquid CPU Cooler(Open Box)",
+    "price": 299.99,
+    "was": null,
+    "brand": "Gigabyte",
+    "kind": "aio",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "1ea92a7a64",
+    "name": "MSI MPG CoreLiquid K240 AIO Liquid CPU Cooler, 2.4\" IPS Display 240mm Radiator, Duo 120mm TORX Fan 4.0 PWM Fans w/ ARGB Ligh",
+    "price": 142.41,
+    "was": null,
+    "brand": "MSI",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "b55b270f7e",
+    "name": "LIAN LI Galahad II Trinity 360mm AIO Liquid CPU Cooler - Black(Open Box)",
+    "price": 149.99,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "aio",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "c4d8050799",
+    "name": "GIGABYTE AORUS WATERFORCE 360 AIO Liquid CPU Cooler, 360mm Radiator with 3X 120mm Low Noise ARGB Fans, Rotatable ARGB Lighti",
+    "price": 172.49,
+    "was": null,
+    "brand": "Gigabyte",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "6903bf80f7",
+    "name": "CORSAIR iCUE LINK LX120 RGB 120mm PWM Fan Expansion - White(Open Box)",
+    "price": 29.99,
+    "was": 41.24,
+    "brand": "CORSAIR",
+    "kind": "fan",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "8e95aa6349",
+    "name": "CORSAIR RX Series, iCUE LINK RX120 120mm Fan, Single Pack(Open Box)",
+    "price": 29.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "fan",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "19b08a9ace",
+    "name": "Arctic F9 PWM PST 92mm PWM Fan with Cable Splitter(Open Box)",
+    "price": 11.24,
+    "was": null,
+    "brand": "Arctic",
+    "kind": "fan",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "5887a85466",
+    "name": "CORSAIR QX RGB Series, iCUE LINK QX120 RGB, 120mm Magnetic Dome RGB Fan, Single Pack(Open Box)",
+    "price": 33.74,
+    "was": 52.49,
+    "brand": "CORSAIR",
+    "kind": "fan",
+    "open": true,
+    "updated": "2026-11-23",
+    "available": false
+  },
+  {
+    "id": "32fa12cca1",
+    "name": "DarkFlash INF34R A-RGB Cooling Fan, Reverse Airflow, 1 Pack, Black(Open Box)",
+    "price": 8.24,
+    "was": null,
+    "brand": "DarkFlash",
+    "kind": "fan",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "50b59bca9c",
+    "name": "CORSAIR iCUE LINK TITAN 240 RX RGB(Open Box)",
+    "price": 168.74,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "aio",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "b61a197c55",
+    "name": "CORSAIR iCUE H100i ELITE RGB Liquid CPU Cooler(Open Box)",
+    "price": 112.41,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "aio",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "cc7ac671d0",
+    "name": "MSI MAG CORELIQUID C240 240mm Liquid Cooler ARGB(Open Box)",
+    "price": 82.49,
+    "was": null,
+    "brand": "MSI",
+    "kind": "aio",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "ea47d50cb2",
+    "name": "CORSAIR Hydro X Series XC5 RGB PRO CPU Water Block (1700/1200)(Open Box)",
+    "price": 52.41,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "custom",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "ee7055b289",
+    "name": "TRYX PANORAMA 360mm Liquid Cooler Black(Open Box)",
+    "price": 382.49,
+    "was": null,
+    "brand": "TRYX",
+    "kind": "aio",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "a49ac321c2",
+    "name": "ARMOURY Block III 120MM ARGB PWM Fan(Open Box)",
+    "price": 8.99,
+    "was": null,
+    "brand": "ARMOURY",
+    "kind": "fan",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "fd900ca190",
+    "name": "CORSAIR iCUE LINK LX120-R RGB 120mm PWM Reverse Fan Expansion(Open Box)",
+    "price": 41.24,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "fan",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "a8ede6c593",
+    "name": "MSI MPG EZ120 ARGB WHITE-1W, Magnetic Connector Block - 1 Pack white(Open Box)",
+    "price": 26.23,
+    "was": 44.99,
+    "brand": "MSI",
+    "kind": "other",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "8b79e82f49",
+    "name": "CORSAIR iCUE H115i ELITE RGB Liquid CPU Cooler(Open Box)",
+    "price": 131.16,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "aio",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "0c109a7d03",
+    "name": "LIAN LI UF-SLIN140-1B 140mm Case Fan Black(Open Box)",
+    "price": 29.99,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "fan",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "91dc3a68e6",
+    "name": "PCCOOLER CPS RZ620 Dual Tower CPU Cooler,275W TDP, Aluminum Top Cover(Open Box)",
+    "price": 56.24,
+    "was": null,
+    "brand": "PCCOOLER",
+    "kind": "air",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "934bade6d0",
+    "name": "CORSAIR iCUE LINK LX140 RGB 140mm PWM Fan Expansion, Black(Open Box)",
+    "price": 44.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "fan",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "1ac99e24a8",
+    "name": "DeepCool FL12, 120mm High-Performance ARGB Gen 2 Fans, Black(Open Box)",
+    "price": 14.99,
+    "was": 26.24,
+    "brand": "DeepCool",
+    "kind": "fan",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "147fb344ee",
+    "name": "Arctic Liquid Freezer III PRO 420 Black AIO CPU Water Cooler(Open Box)",
+    "price": 157.49,
+    "was": null,
+    "brand": "Arctic",
+    "kind": "aio",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "302a8af3a2",
+    "name": "THERMALTAKE TH240 V2 ARGB Sync CPU Liquid Cooler Snow Edition(Open Box)",
+    "price": 101.24,
+    "was": null,
+    "brand": "THERMALTAKE",
+    "kind": "thermal",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "76765f6565",
+    "name": "Arctic Liquid Freezer III Pro 240 Black AIO CPU Water Cooler(Open Box)",
+    "price": 112.49,
+    "was": null,
+    "brand": "Arctic",
+    "kind": "aio",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "3f0edf3c6b",
+    "name": "DeepCool FL12R, 120mm High-Performance ARGB Gen 2 Fans, Black, Revers(Open Box)",
+    "price": 26.24,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "fan",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "dd23d18a55",
+    "name": "Lian Li UNI FAN SL 120 Wireless RGB 120mm Fan, Black(Open Box)",
+    "price": 29.99,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "fan",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "8d3a812357",
+    "name": "CORSAIR RX Series, iCUE LINK RX120 RGB 120mm Fan, White, Single Pack(Open Box)",
+    "price": 26.24,
+    "was": 37.49,
+    "brand": "CORSAIR",
+    "kind": "fan",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "7460065766",
+    "name": "CORSAIR iCUE LINK TITAN 240 RX LCD(Open Box)",
+    "price": 209.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "aio",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "8a3ac53828",
+    "name": "Cougar AQUA ARGB 280 Liquid Cooling(Open Box)",
+    "price": 108.66,
+    "was": null,
+    "brand": "Cougar",
+    "kind": "aio",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "e9a126c22b",
+    "name": "LIAN LI UNI FAN SL WIRELESS RGB LCD White Color Single Pack 12cm Fan Pack without Controller(Open Box)",
+    "price": 44.99,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "controller",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "2bd609921b",
+    "name": "Gigabyte AORUS WATERFORCE X II 240 Liquid CPU Cooler(Open Box)",
+    "price": 239.99,
+    "was": null,
+    "brand": "Gigabyte",
+    "kind": "aio",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "9932629e7a",
+    "name": "CORSAIR Fitting (hard tube), XF Hardline 2-pack(Open Box)",
+    "price": 29.99,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "custom",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "cf7cad86dd",
+    "name": "GIGABYTE AORUS WATERFORCE 240 AIO Liquid CPU Cooler, 240mm Radiator with 2X 120mm Low Noise ARGB Fans, Rotatable ARGB Lighti",
+    "price": 146.24,
+    "was": null,
+    "brand": "Gigabyte",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "1b39f34847",
+    "name": "LIAN LI P28ARGB P28ARGB Case Fan White(Open Box)",
+    "price": 3.66,
+    "was": null,
+    "brand": "LIAN LI",
+    "kind": "fan",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "4d0dfbdf02",
+    "name": "DarkFlash 120*120*25mm Regular Case Fan White(Open Box)",
+    "price": 8.24,
+    "was": null,
+    "brand": "DarkFlash",
+    "kind": "fan",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "e68ae4a82e",
+    "name": "CORSAIR RX Series, iCUE LINK RX140 140mm Fan, Single Pack(Open Box)",
+    "price": 37.49,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "fan",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "95a728af73",
+    "name": "CORSAIR Fitting (hard tube),XF Hardline 4-pack (12mm OD compression; glossy white)(Open Box)",
+    "price": 26.24,
+    "was": null,
+    "brand": "CORSAIR",
+    "kind": "custom",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "3713851ae8",
+    "name": "be quiet! LIGHT WINGS 120mm White PWM high-speed Triple-Pack , Case f(Open Box)",
+    "price": 48.74,
+    "was": 82.49,
+    "brand": "be quiet!",
+    "kind": "fan",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "a464989271",
+    "name": "DarkFlash DM8R LINE Reverse Blade A-RGB Cooling Fan, 1 Pack, White(Open Box)",
+    "price": 7.49,
+    "was": null,
+    "brand": "DarkFlash",
+    "kind": "fan",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "f2126dbcfd",
+    "name": "DarkFlash DM8R LINE Reverse Blade A-RGB Cooling Fan, 1 Pack, Black(Open Box)",
+    "price": 7.49,
+    "was": null,
+    "brand": "DarkFlash",
+    "kind": "fan",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "67ccfffba7",
+    "name": "JONSBO ZA-360B PC Case Fan (700-2400RPM)(Open Box)",
+    "price": 29.99,
+    "was": null,
+    "brand": "JONSBO",
+    "kind": "fan",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "4b2c5f1743",
+    "name": "DeepCool AK620 G2 CPU Air Cooler Black(Open Box)",
+    "price": 59.99,
+    "was": null,
+    "brand": "DeepCool",
+    "kind": "air",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "f2e972582d",
+    "name": "ASUS TUF Gaming ARGB PWM Fan Hub(Open Box)",
+    "price": 37.49,
+    "was": null,
+    "brand": "ASUS",
+    "kind": "controller",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "61a598564d",
+    "name": "be quiet! SILENT LOOP 3 420mm(Open Box)",
+    "price": 116.24,
+    "was": 149.99,
+    "brand": "be quiet!",
+    "kind": "aio",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "d37fb5c5db",
+    "name": "PCCOOLER CPS FG120R ARGB FAN , Reverse Airflow,800-1800 RPM, 120 mm,WH(Open Box)",
+    "price": 5.99,
+    "was": null,
+    "brand": "PCCOOLER",
+    "kind": "fan",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "e557e20f05",
+    "name": "PCCOOLER CPS F7X120 ARGB FAN \uff0cWireless Connection \uff0cDual Ball Bearing(Open Box)",
+    "price": 59.16,
+    "was": null,
+    "brand": "PCCOOLER",
+    "kind": "fan",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "2b59ae3a49",
+    "name": "COOLER MASTER Masterliquid 360 CORE II ARGB CPU Liquid Cooler, White(Open Box)",
+    "price": 89.99,
+    "was": 104.99,
+    "brand": "Cooler Master",
+    "kind": "aio",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "84d708c168",
+    "name": "MSI A13 240mm Liquid Cooler White(Open Box)",
+    "price": 63.74,
+    "was": 97.49,
+    "brand": "MSI",
+    "kind": "aio",
+    "open": true,
+    "updated": "2026-11-23"
+  },
+  {
+    "id": "7ad8872a87",
+    "name": "MSI MPG CORELIQUID D360 AIO Liquid CPU Cooler, 360mm Radiator, Triple 120mm PWM Fans, ARGB, Compatible with LGA 1851 Socket(",
+    "price": 239.99,
+    "was": null,
+    "brand": "MSI",
+    "kind": "custom",
+    "open": false,
+    "updated": "2026-11-23"
+  }
+]
