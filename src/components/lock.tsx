@@ -2,6 +2,8 @@ import { lazy, Suspense, useEffect, useRef, useState } from "react";
 
 const CODE = "1234";
 const PHONE = "5678";
+const STORE = "7777";
+const Storefront = lazy(() => import("@/components/storefront").then((mod) => ({ default: mod.Storefront })));
 const Phone = lazy(() => import("@/components/phone").then((mod) => ({ default: mod.Phone })));
 const KEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "C", "0", "OK"] as const;
 
@@ -24,20 +26,20 @@ function tone(kind: "tap" | "no" | "yes") {
 }
 
 export function Gate({ children }: { children: React.ReactNode }) {
-  const [door, setDoor] = useState<"wait" | "closed" | "site" | "phone">("wait");
+  const [door, setDoor] = useState<"wait" | "closed" | "site" | "phone" | "store">("wait");
 
   useEffect(() => {
     try {
       const saved = sessionStorage.getItem("drew-gate");
-      setDoor(saved === "phone" ? "phone" : saved === "1" ? "site" : "closed");
+      setDoor(saved === "store" ? "store" : saved === "phone" ? "phone" : saved === "1" ? "site" : "closed");
     } catch {
       setDoor("closed");
     }
   }, []);
 
-  function enter(next: "site" | "phone") {
+  function enter(next: "site" | "phone" | "store") {
     try {
-      sessionStorage.setItem("drew-gate", next === "phone" ? "phone" : "1");
+      sessionStorage.setItem("drew-gate", next === "store" ? "store" : next === "phone" ? "phone" : "1");
     } catch {
       /* the door still opens for this visit */
     }
@@ -45,6 +47,19 @@ export function Gate({ children }: { children: React.ReactNode }) {
   }
 
   if (door === "wait") return <div className="min-h-dvh bg-[#141210]" />;
+  if (door === "store") {
+    return (
+      <Suspense fallback={<div className="min-h-dvh bg-[#fafafa]" />}>
+        <Storefront
+          onLock={() => {
+            try { sessionStorage.removeItem("drew-gate"); } catch {}
+            setDoor("closed");
+          }}
+        />
+      </Suspense>
+    );
+  }
+
   if (door === "phone") {
     return (
       <Suspense fallback={<div className="min-h-dvh bg-[#f2f2f7]" />}>
@@ -75,7 +90,7 @@ function fromKey(event: KeyboardEvent): string | null {
   return null;
 }
 
-function Lock({ onOpen }: { onOpen: (next: "site" | "phone") => void }) {
+function Lock({ onOpen }: { onOpen: (next: "site" | "phone" | "store") => void }) {
   const [digits, setDigits] = useState("");
   const [state, setState] = useState<"armed" | "denied" | "open">("armed");
   const digitsRef = useRef("");
@@ -87,7 +102,7 @@ function Lock({ onOpen }: { onOpen: (next: "site" | "phone") => void }) {
     if (value === CODE || value === PHONE) {
       setState("open");
       tone("yes");
-      window.setTimeout(() => onOpen(value === PHONE ? "phone" : "site"), 480);
+      window.setTimeout(() => onOpen(value === STORE ? "store" : value === PHONE ? "phone" : "site"), 480);
       return;
     }
     setState("denied");
