@@ -193,6 +193,8 @@ export function partScore(part: Part): number {
     const speed = gpuIndex(part);
     return speed ? Math.min(100, Math.round((speed / 180) * 100)) : 8;
   }
+  if (part.cat === "cpu" && hasIGPULogic(part)) tags.unshift("iGPU");
+
   if (part.cat === "cpu") {
     const points = cpuPoints(part.name);
     return points ? Math.min(100, Math.round((points / 96) * 100)) : 20;
@@ -309,6 +311,8 @@ export function explainPart(part: Part): string[] {
     lines.push(`Speed points are ${speed}. An RX 9070 is 100. A 5090 is 180.`);
     lines.push(`Score is ${speed} ÷ 180 × 100 = ${speed ? Math.min(100, Math.round((speed / 180) * 100)) : 8}.`);
     if (speed) lines.push(`${money(part.price)} ÷ ${speed} speed points = ${money(part.price / speed)} per point.`);
+  if (part.cat === "cpu" && hasIGPULogic(part)) tags.unshift("iGPU");
+
   } else if (part.cat === "cpu") {
     const points = cpuPoints(part.name);
     lines.push(`Chip points are ${points || 0} out of 96. A 9800X3D is 96. An older chip is lower.`);
@@ -654,8 +658,17 @@ export function applyBundle(part: Part, current: Build): Build {
   return next;
 }
 
+function hasIGPU(part: Part): boolean {
+  if (part.cat !== "cpu") return false;
+  const n = part.name.toUpperCase();
+  // Most modern non-F Intel and all Ryzen have iGPU except some
+  return !(/\bF\b|KF\b|KS\b/.test(n)) && (/RYZEN|ULTRA|I[3579]-|CORE\s?(I|ULTRA)/.test(n));
+}
+
 export function tagsOf(part: Part): string[] {
   const tags: string[] = [];
+  if (hasIGPU(part)) tags.push("iGPU");
+
   const n = part.name.toUpperCase();
   if (part.socket) tags.push(part.socket);
   const ram = ramKindOf(part);
