@@ -11,6 +11,8 @@ import { Games } from "@/components/games";
 import { Guide } from "@/components/guide";
 import { Steam } from "@/components/steam";
 import { Value } from "@/components/value";
+import { Colour } from "@/components/colour";
+import { Ideas } from "@/components/ideas";
 import { Welcome } from "@/components/welcome";
 import { useBench } from "@/lib/store";
 import "./styles.css";
@@ -20,6 +22,7 @@ function Home() {
   const hydrate = useBench((state) => state.hydrate);
   const [stack, setStack] = useState<Array<Screen | null>>([null]);
   const [boot, setBoot] = useState<"play" | "review">("play");
+  const [colour, setColour] = useState<"white" | "black" | "all">("white");
   const mode = stack[stack.length - 1] ?? null;
 
   function go(next: Screen) {
@@ -39,7 +42,26 @@ function Home() {
     hydrate();
   }, [hydrate]);
 
-  if (!mode || !hydrated) return <Welcome onEnter={() => go("pc")} onDesk={() => go("desk")} onSim={() => go("sim")} onLaptop={() => go("laptop")} onDesktop={() => go("desktop")} onValue={() => go("value")} onSteam={() => go("steam")} onGames={() => go("games")} onGuide={() => go("guide")} />;
+  if (!mode || !hydrated) {
+    return (
+      <Welcome
+        onEnter={() => go("pc")}
+        onDesk={() => go("desk")}
+        onSim={() => go("sim")}
+        onLaptop={() => go("laptop")}
+        onDesktop={() => go("desktop")}
+        onValue={() => go("value")}
+        onSteam={() => go("steam")}
+        onGames={() => go("games")}
+        onGuide={() => go("guide")}
+        onIdeas={() => go("ideas")}
+        onColour={(pick) => {
+          setColour(pick);
+          go("colour");
+        }}
+      />
+    );
+  }
   const screen =
     mode === "games" ? (
       <Games
@@ -76,6 +98,17 @@ function Home() {
       <Sim onLeave={home} />
     ) : mode === "laptop" ? (
       <Laptops onLeave={home} />
+    ) : mode === "colour" ? (
+      <Colour onLeave={home} start={colour} />
+    ) : mode === "ideas" ? (
+      <Ideas
+        onLeave={home}
+        onUse={(pick) => {
+          useBench.getState().apply(pick.build, `${pick.name}. Change a part if you want.`);
+          setBoot("review");
+          setStack((current) => [...current, "pc"]);
+        }}
+      />
     ) : mode === "desktop" ? (
       <Desktops
         onLeave={home}

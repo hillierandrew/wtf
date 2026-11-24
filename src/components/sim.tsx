@@ -3,9 +3,9 @@ import { Check, Search, X } from "lucide-react";
 import raw from "@/data/sim.json";
 import { ThemeToggle } from "@/lib/theme";
 
-type Game = "racing" | "flight" | "farm";
+type Game = "racing" | "flight" | "farm" | "pads" | "consoles" | "extras";
 type Level = "all" | "entry" | "novice" | "mid" | "pro" | "real";
-type Slot = "seat" | "wheel" | "rim" | "pedals" | "shifter" | "brake" | "controls" | "throttle" | "rudder" | "farm";
+type Slot = "seat" | "wheel" | "rim" | "pedals" | "shifter" | "brake" | "controls" | "throttle" | "rudder" | "farm" | "pad" | "console" | "headset" | "extra";
 
 type SimItem = {
   id: string;
@@ -73,6 +73,9 @@ const GAMES: { id: Game; label: string; line: string }[] = [
   { id: "racing", label: "Racing", line: "A seat, a wheel, and pedals. A shifter is optional." },
   { id: "flight", label: "Flying", line: "A stick or a yoke. A throttle and rudder pedals if you want them." },
   { id: "farm", label: "Farming", line: "A farm stick. Add a wheel if the game also drives a tractor." },
+  { id: "pads", label: "Controllers", line: "One gamepad. Xbox, PlayStation, Switch, or PC." },
+  { id: "consoles", label: "Consoles", line: "A Switch, a handheld, or a PlayStation Portal." },
+  { id: "extras", label: "Extras", line: "A headset, a mount, a clutch add-on, or a button box." },
 ];
 
 const STEPS: Record<Game, { id: Slot; label: string; line: string }[]> = {
@@ -94,6 +97,12 @@ const STEPS: Record<Game, { id: Slot; label: string; line: string }[]> = {
     { id: "wheel", label: "Wheel", line: "Optional. Most farm games also want a wheel." },
     { id: "pedals", label: "Pedals", line: "One set, unless the wheel kit already has them." },
     { id: "seat", label: "Seat", line: "Optional. One cockpit or one stand." },
+  ],
+  pads: [{ id: "pad", label: "Controller", line: "One gamepad." }],
+  consoles: [{ id: "console", label: "Console", line: "One console or one handheld." }],
+  extras: [
+    { id: "headset", label: "Headset", line: "One headset." },
+    { id: "extra", label: "Extra", line: "A mount, a clutch add-on, a button box, or a stand." },
   ],
 };
 

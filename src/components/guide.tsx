@@ -6,60 +6,39 @@ const STEPS: { key: keyof GuideAnswers; ask: string; help: string; options: { id
   {
     key: "job",
     ask: "What is this computer for?",
-    help: "Tap one. You can go back.",
+    help: "Tap one box. That is the whole question.",
     options: [
       { id: "games", label: "Games", line: "Playing games is the main thing." },
       { id: "work", label: "School and work", line: "Class, email, and programs." },
-      { id: "both", label: "Both", line: "Games and school." },
+      { id: "both", label: "Both", line: "Not sure? Tap this." },
     ],
   },
   {
     key: "power",
     ask: "How strong should it be?",
-    help: "Easy is cheaper. Strong costs more.",
+    help: "Cheap costs less. Strong costs more.",
     options: [
-      { id: "easy", label: "Easy", line: "Class, older games, and a browser." },
-      { id: "normal", label: "Normal", line: "Most new games at normal settings." },
-      { id: "strong", label: "Strong", line: "New games turned up, or a hard program." },
-    ],
-  },
-  {
-    key: "cpu",
-    ask: "AMD or Intel?",
-    help: "This is the processor. Either one can make a good PC.",
-    options: [
-      { id: "amd", label: "AMD", line: "Usually the better price." },
-      { id: "intel", label: "Intel", line: "The other big name." },
-      { id: "any", label: "You pick", line: "I will choose AMD." },
-    ],
-  },
-  {
-    key: "gpu",
-    ask: "Which graphics card?",
-    help: "This draws the games. Skip it if you do not play games.",
-    options: [
-      { id: "nvidia", label: "NVIDIA", line: "The green ones. Good for games and editing." },
-      { id: "amd", label: "AMD", line: "The red ones. Good for games." },
-      { id: "none", label: "No card", line: "The processor draws the picture." },
-      { id: "any", label: "You pick", line: "I will choose NVIDIA, unless this is an easy work PC." },
+      { id: "easy", label: "Cheap", line: "Class, older games, and a browser." },
+      { id: "normal", label: "Normal", line: "Not sure? Tap this." },
+      { id: "strong", label: "Strong", line: "New games turned up." },
     ],
   },
   {
     key: "size",
     ask: "How big is the box?",
-    help: "A normal box is easier. A small box fits on a desk.",
+    help: "A normal box is easier to build.",
     options: [
-      { id: "normal", label: "Normal", line: "A regular tower." },
-      { id: "small", label: "Small", line: "A shorter case." },
+      { id: "normal", label: "Normal", line: "A regular tower. Pick this if you are not sure." },
+      { id: "small", label: "Small", line: "A shorter case for a desk." },
     ],
   },
   {
     key: "screen",
-    ask: "Do you need a screen?",
-    help: "Skip this if you already have one.",
+    ask: "Do you need a monitor?",
+    help: "A monitor is the screen. A TV counts. Not sure? Say you already have one.",
     options: [
-      { id: "no", label: "I have a screen", line: "Do not add one." },
-      { id: "yes", label: "I need a screen", line: "Add one monitor." },
+      { id: "no", label: "I already have a screen", line: "Nothing extra gets added." },
+      { id: "yes", label: "Add a monitor", line: "A screen goes on the list." },
     ],
   },
 ];
@@ -70,7 +49,7 @@ export function Guide({ onLeave, onUse }: { onLeave: () => void; onUse: (name: s
   const [answers, setAnswers] = useState<Partial<GuideAnswers>>({});
   const current = STEPS[step];
   const done = step >= STEPS.length;
-  const pick = done ? guidePick(answers as GuideAnswers) : null;
+  const pick = done ? guidePick({ ...(answers as GuideAnswers), cpu: "any", gpu: answers.job === "work" && answers.power === "easy" ? "none" : "any" }) : null;
   const notes = pick ? warnings(pick.build) : [];
 
   function choose(id: string) {
@@ -98,8 +77,8 @@ export function Guide({ onLeave, onUse }: { onLeave: () => void; onUse: (name: s
             <p className="mt-2 text-base text-muted">{current.help}</p>
             <div className={`mt-4 grid gap-3 ${pane ? "grid-cols-2" : "grid-cols-1"}`}>
               {current.options.map((option) => (
-                <button key={option.id} type="button" onClick={() => choose(option.id)} className="press min-h-20 rounded-2xl border border-line bg-elevated px-4 py-4 text-left">
-                  <span className="block text-2xl font-medium">{option.label}</span>
+                <button key={option.id} type="button" onClick={() => choose(option.id)} className="press min-h-24 rounded-3xl border border-line bg-elevated px-5 py-5 text-left">
+                  <span className="block text-3xl font-medium">{option.label}</span>
                   <span className="mt-1 block text-base text-muted">{option.line}</span>
                 </button>
               ))}
@@ -132,8 +111,8 @@ export function Guide({ onLeave, onUse }: { onLeave: () => void; onUse: (name: s
                 {note}
               </p>
             ))}
-            <p className="mt-4 text-2xl font-medium">Total {money(spendOf(pick.build))}</p>
-            <button type="button" onClick={() => onUse(pick.name, pick.build)} className="mt-4 h-14 w-full rounded-2xl bg-accent text-lg text-accent-fg">
+            <p className="mt-4 text-3xl font-medium">Total {money(spendOf(pick.build))}</p>
+            <button type="button" onClick={() => onUse(pick.name, pick.build)} className="mt-4 h-16 w-full rounded-2xl bg-accent text-xl text-accent-fg">
               Use this PC
             </button>
             <button type="button" onClick={() => { setAnswers({}); setStep(0); }} className="mt-3 h-12 w-full rounded-2xl border border-line text-base">

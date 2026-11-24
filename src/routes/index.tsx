@@ -13,6 +13,7 @@ import { Steam } from "@/components/steam";
 import { Value } from "@/components/value";
 import { Welcome } from "@/components/welcome";
 import { Colour } from "@/components/colour";
+import { Ideas } from "@/components/ideas";
 import { useBench } from "@/lib/store";
 
 export const Route = createFileRoute("/")({ component: Home });
@@ -22,6 +23,7 @@ function Home() {
   const hydrate = useBench((state) => state.hydrate);
   const [stack, setStack] = useState<Array<Screen | null>>([null]);
   const [boot, setBoot] = useState<"play" | "review">("play");
+  const [colour, setColour] = useState<"white" | "black" | "all">("white");
   const mode = stack[stack.length - 1] ?? null;
 
   function go(next: Screen) {
@@ -41,7 +43,24 @@ function Home() {
     hydrate();
   }, [hydrate]);
 
-  let screen = <Welcome onEnter={() => go("pc")} onDesk={() => go("desk")} onSim={() => go("sim")} onLaptop={() => go("laptop")} onDesktop={() => go("desktop")} onValue={() => go("value")} onSteam={() => go("steam")} onGames={() => go("games")} onGuide={() => go("guide")} onColour={() => go("colour")} />;
+  let screen = (
+    <Welcome
+      onEnter={() => go("pc")}
+      onDesk={() => go("desk")}
+      onSim={() => go("sim")}
+      onLaptop={() => go("laptop")}
+      onDesktop={() => go("desktop")}
+      onValue={() => go("value")}
+      onSteam={() => go("steam")}
+      onGames={() => go("games")}
+      onGuide={() => go("guide")}
+      onIdeas={() => go("ideas")}
+      onColour={(pick) => {
+        setColour(pick);
+        go("colour");
+      }}
+    />
+  );
   if (mode && hydrated) {
     const page =
       mode === "games" ? (
@@ -89,7 +108,16 @@ function Home() {
           }}
         />
       ) : mode === "colour" ? (
-        <Colour onLeave={home} />
+        <Colour onLeave={home} start={colour} />
+      ) : mode === "ideas" ? (
+        <Ideas
+          onLeave={home}
+          onUse={(pick) => {
+            useBench.getState().apply(pick.build, `${pick.name}. Change a part if you want.`);
+            setBoot("review");
+            setStack((current) => [...current, "pc"]);
+          }}
+        />
       ) : (
         <Builder onLeave={home} start={boot} />
       );
