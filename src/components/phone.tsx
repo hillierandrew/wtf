@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, Cpu, Gamepad2, Heart, LayoutGrid, Lock, Search, Zap } from "lucide-react";
-import { CAT_LABEL, CATS, PARTS, byId, fitWhy, isJunk, money, reconcile, shortName, spendOf, suggest, type Build, type Category, type Part } from "@/lib/catalog";
+import { CAT_LABEL, CATS, PARTS, byId, fitWhy, isJunk, laptopBits, machineScore, money, reconcile, shortName, spendOf, suggest, type Build, type Category, type Part } from "@/lib/catalog";
 import { PHONE_ITEMS, PHONE_SECTIONS, groupMeta, phoneItem, type PhoneItem } from "@/lib/phone-catalog";
 import { EasyPick, GpuPower } from "@/components/easy";
 import { KeyboardShop } from "@/components/keyboard-shop";
@@ -10,8 +10,27 @@ import laptopsRaw from "@/data/laptops.json";
 import { CopyList, named } from "@/components/copy-list";
 import { Sim } from "@/components/sim";
 import { HistoryRoot, latest, usePath } from "@/components/history";
+import { AddButton, BagDock, ThreeSearch } from "@/components/bag";
+import { Five } from "@/components/five";
+import { keyBag, lapBag, partBag, simBag } from "@/lib/bag";
 
 const LAPS = laptopsRaw as { id: string; name: string; price: number; gpu: number; specs: string; kind?: string }[];
+
+function phoneLine(item: PhoneItem) {
+  const rule = `Phone shelf. For ${item.kind}. Budget ${money(item.price)}. Score is on the product, not a lab test.`;
+  if (item.group === "laptops") return lapBag(item, rule);
+  if (item.group === "keys") return keyBag(item, rule);
+  if (item.group === "sim") return simBag(item, rule);
+  return partBag(item, rule);
+}
+
+function phoneScore(item: PhoneItem) {
+  if (item.group === "laptops") {
+    const lap = LAPS.find((row) => row.id === item.id);
+    return lap ? laptopBits(lap).score : 1;
+  }
+  return machineScore(item.name) || 1;
+}
 
 type Tab = "use" | "power" | "build" | "shop" | "deals" | "search" | "saved";
 type Sort = "low" | "high" | "name" | "sale";
@@ -56,6 +75,7 @@ export function Phone({ onLock }: { onLock: () => void }) {
   return (
     <HistoryRoot home="Phone">
       <PhoneBody onLock={onLock} />
+      <BagDock />
     </HistoryRoot>
   );
 }
@@ -72,6 +92,7 @@ function PhoneBody({ onLock }: { onLock: () => void }) {
   const [limit, setLimit] = useState(48);
   const [pc, setPc] = useState<Build>({});
   const [walk, setWalk] = useState(false);
+  const [five, setFive] = useState(false);
   const path = usePath();
 
   useEffect(() => {
@@ -175,6 +196,7 @@ function PhoneBody({ onLock }: { onLock: () => void }) {
   const night = group === "keys";
   const title = open ? "Details" : meta?.title ?? (tab === "use" ? "Use" : tab === "power" ? "Power" : tab === "build" ? "Build" : tab === "deals" ? "Deals" : tab === "saved" ? "Saved" : tab === "search" ? "Search" : "Store");
 
+  if (five) return <Five onClose={() => setFive(false)} />;
   if (walk) return <Counter onClose={() => setWalk(false)} />;
   if (group === "keys") return <KeyboardShop onLeave={() => setGroup(null)} />;
 
@@ -236,13 +258,19 @@ function PhoneBody({ onLock }: { onLock: () => void }) {
           ) : null}
 
           {!open && tab === "use" ? (
-            <EasyPick
-              look="phone"
-              onUse={(next) => {
-                setPc(next);
-                setTab("build");
-              }}
-            />
+            <div className="space-y-3">
+              <button type="button" onClick={() => setFive(true)} className="min-h-20 w-full rounded-2xl bg-[#1c1c1e] px-4 py-4 text-left text-white">
+                <span className="block text-[22px] font-semibold">Five minutes</span>
+                <span className="mt-1 block text-[15px] text-white/70">What it is for, the games, the budget, and the desk.</span>
+              </button>
+              <EasyPick
+                look="phone"
+                onUse={(next) => {
+                  setPc(next);
+                  setTab("build");
+                }}
+              />
+            </div>
           ) : null}
           {!open && tab === "power" ? <GpuPower look="phone" /> : null}
           {!open && tab === "build" ? (
@@ -341,9 +369,16 @@ function PhoneBody({ onLock }: { onLock: () => void }) {
                   {hideOpen ? "Open box hidden" : "Open box shown"}
                 </button>
               </div>
-              {shown.length === 0 ? <p className="rounded-2xl bg-white px-4 py-8 text-center text-[17px] text-[#8e8e93]">{tab === "search" && !query.trim() ? "Search a name or a brand." : "Nothing in this list."}</p> : null}
+              {tab === "search" && query.trim() ? (
+                <ThreeSearch
+                  rows={listed.filter((item) => item.group === "laptops" || item.group === "desktops").map((item) => ({ id: item.id, name: item.name, brand: item.brand, price: item.price, score: phoneScore(item) }))}
+                  who={query.trim()}
+                  lineFor={(item, how) => (listed.find((row) => row.id === item.id)?.group === "laptops" ? lapBag(item, how) : partBag(item, how))}
+                />
+              ) : null}
+              {shown.filter((item) => !(tab === "search" && query.trim() && (item.group === "laptops" || item.group === "desktops"))).length === 0 && !(tab === "search" && query.trim()) ? <p className="rounded-2xl bg-white px-4 py-8 text-center text-[17px] text-[#8e8e93]">{tab === "search" && !query.trim() ? "Search a name or a brand." : "Nothing in this list."}</p> : null}
               <ul className="overflow-hidden rounded-2xl bg-white shadow-sm">
-                {shown.map((item, index) => (
+                {shown.filter((item) => !(tab === "search" && query.trim() && (item.group === "laptops" || item.group === "desktops"))).map((item, index) => (
                   <li key={item.id} className={index ? "border-t border-[#e5e5ea]" : ""}>
                     <div className="flex items-start gap-2 px-3 py-3">
                       <button type="button" onClick={() => { setOpenId(item.id); path?.note(`item:${item.id}`, item.name.slice(0, 22)); }} className="min-w-0 flex-1 text-left">
@@ -357,6 +392,7 @@ function PhoneBody({ onLock }: { onLock: () => void }) {
                       <div className="flex shrink-0 flex-col items-end gap-1">
                         <span className="text-[16px] font-semibold">{money(item.price)}</span>
                         {item.was ? <span className="text-[12px] text-[#ff3b30] line-through">{money(item.was)}</span> : null}
+                        <AddButton line={phoneLine(item)} className="h-8 rounded-full bg-[#f2f2f7] px-3 text-[13px]" />
                         <button type="button" aria-label={saved.has(item.id) ? "Unsave" : "Save"} onClick={() => toggleSave(item.id)} className="flex size-8 items-center justify-center">
                           <Heart className={`size-4 ${saved.has(item.id) ? "fill-[#ff3b30] text-[#ff3b30]" : "text-[#c7c7cc]"}`} />
                         </button>

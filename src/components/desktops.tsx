@@ -6,6 +6,8 @@ import { deskMarks } from "@/components/marks";
 import { RankBadge } from "@/components/rank";
 import { SortRow } from "@/components/sorts";
 import { ThemeToggle, usePane } from "@/lib/theme";
+import { AddButton, ThreeSearch } from "@/components/bag";
+import { partBag } from "@/lib/bag";
 
 type Filter = "all" | "gaming" | "desk" | "mini" | "aio" | "college" | "career" | "programs";
 
@@ -166,7 +168,13 @@ export function Desktops({ onLeave, onUse }: { onLeave: () => void; onUse?: (pic
           ))}
         </select>
         <ul className="flex flex-col gap-2">
-          {shown.map((part) => {
+          {query.trim() ? (
+            <ThreeSearch
+              rows={shown.map((part) => ({ id: part.id, name: part.name, brand: part.brand, price: part.price, score: machineScore(part.name) }))}
+              who={query.trim()}
+              lineFor={(item, how) => partBag(item, how)}
+            />
+          ) : shown.map((part) => {
             const selected = picked === part.id;
             const score = machineScore(part.name);
             return (
@@ -187,7 +195,10 @@ export function Desktops({ onLeave, onUse }: { onLeave: () => void; onUse?: (pic
                     {part.was ? <span className="block text-sm text-ok">Down {money(part.was - part.price)}</span> : null}
                   </span>
                 </button>
-                <div className="px-3 pb-3">{deskMarks(part)}</div>
+                <div className="px-3 pb-3">
+                  <AddButton line={partBag(part, `Desktop shelf. Budget ${money(part.price)}. Score ${score}.`)} />
+                  {deskMarks(part)}
+                </div>
               </li>
             );
           })}

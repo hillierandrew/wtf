@@ -7,6 +7,8 @@ import { CopyList, partLine } from "@/components/copy-list";
 import { SortRow } from "@/components/sorts";
 import { ThemeToggle, usePane } from "@/lib/theme";
 import { latest, usePath } from "@/components/history";
+import { AddButton, MoreDetail, ThreeSearch } from "@/components/bag";
+import { lapBag } from "@/lib/bag";
 
 type Kind = "game" | "home" | "work" | "tablet" | "chrome";
 type Filter = "deal" | "games" | "work" | "school" | "grandma" | "create" | "tablet" | "chrome";
@@ -355,8 +357,13 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
           ))}
         </select>
         <ul className="flex flex-col gap-2">
-          {shown.length === 0 ? <li className="rounded-2xl border border-line px-4 py-4 text-base">Nothing here runs that. Try a lower setting, or Best deal.</li> : null}
-          {shown.map((item) => {
+          {query.trim() ? (
+            <ThreeSearch
+              rows={shown.map((item) => ({ id: item.id, name: item.name, brand: item.brand, price: item.price, score: hundred(item) }))}
+              who={query.trim()}
+              lineFor={(item, how) => lapBag(item, how)}
+            />
+          ) : shown.length === 0 ? <li className="rounded-2xl border border-line px-4 py-4 text-base">Nothing here runs that. Try a lower setting, or Best deal.</li> : shown.map((item) => {
             const selected = picked === item.id;
             return (
               <li key={item.id} className={`overflow-hidden rounded-2xl border ${selected ? "border-accent bg-subtle" : "border-line bg-elevated"}`}>
@@ -367,7 +374,6 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
                       {selected ? <Check className="size-4 text-accent" /> : null}
                     </span>
                     <span className="mt-1 block text-base font-medium leading-snug">{item.name.replace(" (Open box)", "")}</span>
-                    <span className="mt-1 block text-sm text-muted">{item.specs}</span>
                     {game ? <span className="mt-1 block text-sm text-muted">{game.label} at {qualityLabel}</span> : null}
                     {course ? <span className="mt-1 block text-sm text-muted">Runs {course.program}</span> : null}
                     <span className="mt-1 block text-sm text-muted">{money(item.price / hundred(item))} per point</span>
@@ -378,7 +384,9 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
                   </span>
                 </button>
                 <div className="px-3 pb-3">
+                  <MoreDetail text={item.specs} />
                   {laptopMarks(item)}
+                  <AddButton line={lapBag(item, `Laptop shelf. Budget ${money(item.price)}. Score ${Math.round(hundred(item))}.`)} />
                 </div>
               </li>
             );

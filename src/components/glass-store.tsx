@@ -7,6 +7,9 @@ import { Counter } from "@/components/counter";
 import { KeyboardShop } from "@/components/keyboard-shop";
 import { Sim } from "@/components/sim";
 import { HistoryRoot, latest, usePath } from "@/components/history";
+import { AddButton, BagDock, ThreeSearch } from "@/components/bag";
+import { Five } from "@/components/five";
+import { lapBag, partBag } from "@/lib/bag";
 
 type Card = { id: string; name: string; brand: string; price: number };
 type Shelf = { id: string; title: string; line: string };
@@ -77,6 +80,7 @@ export function GlassStore({ onLock }: { onLock: () => void }) {
   return (
     <HistoryRoot home="Liquid">
       <GlassBody onLock={onLock} />
+      <BagDock />
     </HistoryRoot>
   );
 }
@@ -90,6 +94,7 @@ function GlassBody({ onLock }: { onLock: () => void }) {
   const [panel, setPanel] = useState<"shop" | "build" | "keys" | "sim">("shop");
   const [sort, setSort] = useState<"low" | "high" | "score" | "score-low">("low");
   const [grid, setGrid] = useState(false);
+  const [five, setFive] = useState(false);
   const path = usePath();
 
   useEffect(() => {
@@ -131,6 +136,7 @@ function GlassBody({ onLock }: { onLock: () => void }) {
     path?.note(`pick:${item.id}`, item.name.slice(0, 22));
   }
 
+  if (five) return <Five onClose={() => setFive(false)} />;
   if (panel === "build") return <Counter onClose={() => setPanel("shop")} />;
   if (panel === "keys") return <KeyboardShop onLeave={() => setPanel("shop")} />;
   if (panel === "sim") return <Sim onLeave={() => setPanel("shop")} />;
@@ -153,6 +159,7 @@ function GlassBody({ onLock }: { onLock: () => void }) {
           </button>
         </header>
         <div className="mt-3 flex gap-2">
+          <button type="button" onClick={() => { blip(); path?.note("five", "Five minutes"); setFive(true); }} className="h-11 rounded-full bg-white/15 px-4 text-sm">Five minutes</button>
           <button type="button" onClick={() => { blip(); path?.note("build", "Build"); setPanel("build"); }} className="h-11 rounded-full bg-white/15 px-4 text-sm">Build with them</button>
           <button type="button" onClick={() => { blip(); path?.note("keys", "Keyboards"); setPanel("keys"); }} className="h-11 rounded-full bg-white/15 px-4 text-sm">Keyboards</button>
           <button type="button" onClick={() => { blip(); path?.note("sim", "Sims"); setPanel("sim"); }} className="h-11 rounded-full bg-white/15 px-4 text-sm">Sims</button>
@@ -199,6 +206,16 @@ function GlassBody({ onLock }: { onLock: () => void }) {
               ))}
               <button type="button" onClick={() => { blip(); setGrid((value) => !value); }} className="h-10 rounded-full bg-white/15 px-3 text-sm">{grid ? "List" : "Grid"}</button>
             </div>
+            {query.trim() && (shelf === "prebuilt" || shelf === "laptop") ? (
+              <div className="mt-3">
+                <ThreeSearch
+                  rows={rows.map((item) => ({ ...item, score: scoreOf(item) }))}
+                  who={query.trim()}
+                  lineFor={(item, how) => (shelf === "laptop" ? lapBag(item, how) : partBag(item, how))}
+                />
+              </div>
+            ) : (
+            <>
             <ul className={`mt-3 ${grid ? "grid grid-cols-2 gap-2" : "space-y-2"}`} style={{ perspective: "900px" }} onMouseLeave={() => setHot(null)}>
               {rows.slice(0, limit).map((item) => (
                 <li key={item.id}>
@@ -234,6 +251,8 @@ function GlassBody({ onLock }: { onLock: () => void }) {
               </button>
             ) : null}
             {rows.length === 0 ? <p className="mt-6 text-center text-white/70">Nothing on this shelf.</p> : null}
+            </>
+            )}
           </div>
         )}
       </div>
@@ -244,6 +263,10 @@ function GlassBody({ onLock }: { onLock: () => void }) {
             <p className="text-[11px] uppercase tracking-[0.2em] text-[#f5d0fe]">{picked.brand}</p>
             <p className="mt-2 text-2xl font-medium leading-tight">{picked.name}</p>
             <p className="mt-4 text-3xl">{money(picked.price)}</p>
+            <AddButton
+              line={shelf === "laptop" ? lapBag(picked, `Liquid. Budget ${money(picked.price)}. Score ${Math.round(scoreOf(picked))}.`) : partBag(picked, `Liquid. Budget ${money(picked.price)}. Score ${Math.round(scoreOf(picked))}.`)}
+              className="mt-4 h-12 w-full rounded-full bg-white text-base font-medium text-black"
+            />
             <button type="button" onClick={() => { blip(); setPicked(null); }} className="mt-5 h-12 w-full rounded-full bg-[#7c3aed] text-base font-medium text-white">
               Close
             </button>

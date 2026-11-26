@@ -179,6 +179,12 @@
   flex: 1 1 auto;
 }
 
+.history-slot > .bag-dock {
+  flex: none;
+  max-height: none;
+  min-height: 0;
+}
+
 @keyframes mush {
   0%,
   100% {

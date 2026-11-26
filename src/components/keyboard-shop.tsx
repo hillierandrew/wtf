@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, Search } from "lucide-react";
 import { FEEL_LABEL, KEYS, LAYOUT_LABEL, LIGHT_LABEL, money, type Feel, type FnRow, type KeyItem, type Layout, type Light, type Numpad, type Shelf } from "@/lib/keyboard";
 import { latest, usePath } from "@/components/history";
+import { AddButton } from "@/components/bag";
+import { keyBag } from "@/lib/bag";
 
 type Look = "paper" | "phone";
 type Sort = "quiet" | "loud" | "low" | "high";
@@ -381,9 +383,10 @@ export function KeyboardShop({ onLeave }: { look?: Look; onLeave?: () => void })
                     <span key={tag.label} className={`text-[13px] font-semibold ${tag.className}`}>{tag.label}</span>
                   ))}
                 </span>
-                <span className="mt-2 block text-[14px] leading-snug text-[#333]">{story(item)}</span>
+                <span className="mt-2 block text-[14px] leading-snug text-[#333]">{open ? story(item) : "More detail"}</span>
                 {open ? <span className="mt-2 block text-[14px] leading-snug text-[#161616]">{item.sound || "That is the whole note on this one."}</span> : null}
               </button>
+              <AddButton line={keyBag(item, `Keyboard shop. ${item.feel}. Budget ${money(item.price)}. ${item.estimated ? `About ${item.estimated} dB.` : "No dB on this one."}`)} className="mt-2 h-11 w-full rounded-full border border-[#ccc] bg-white text-sm" />
             </li>
           );
         })}

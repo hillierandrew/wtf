@@ -7,6 +7,9 @@ import { ThemeToggle } from "@/lib/theme";
 import { PARTS, isJunk, machineScore, money as partMoney } from "@/lib/catalog";
 import QRCode from "qrcode";
 import { latest, usePath } from "@/components/history";
+import { AddButton } from "@/components/bag";
+import { simBag } from "@/lib/bag";
+import { Packs } from "@/components/packs";
 
 type Game = "racing" | "flight" | "farm" | "pads" | "consoles" | "extras";
 type Level = "all" | "entry" | "novice" | "mid" | "pro" | "real";
@@ -359,6 +362,7 @@ export function Sim({ onLeave, look = "paper" }: { onLeave?: () => void; look?: 
       )}
       {!game ? (
         <div className={phone ? "flex flex-col gap-3" : "flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-4"}>
+          <Packs />
           <p className="text-sm text-muted">Games</p>
           {TITLES.map((item) => (
             <button key={item.id} type="button" onClick={() => { path?.note(`played-${item.id}`, item.label); pickGame(item.rig, { triple: item.triple, blurb: item.pc, title: item.label }); }} className="press flex min-h-24 flex-col items-start justify-center rounded-3xl border border-line bg-elevated px-5 py-4 text-left">
@@ -464,6 +468,7 @@ export function Sim({ onLeave, look = "paper" }: { onLeave?: () => void; look?: 
                             {item.was ? <span className="block text-sm text-ok">Down {money(item.was - item.price)}</span> : null}
                           </span>
                         </button>
+                        <AddButton line={simBag(item, `Sim gear. ${item.slot}. Budget ${money(item.price)}.`)} className="mt-2 h-11 w-full rounded-full border border-line text-sm" />
                       </li>
                     );
                   })}

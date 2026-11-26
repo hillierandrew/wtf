@@ -128,7 +128,9 @@ export function Marks({
         </div>
       ) : null}
       {which === "games" ? (
-        <ul className="mt-2 space-y-1 text-sm">
+        <div className="mt-2">
+          <p className="text-sm">Estimate. Not a promised frame rate.</p>
+          <ul className="mt-1 space-y-1 text-sm">
           {GAMES.map((game) => {
             const ok = chip >= game.need && ram >= game.ram;
             return (
@@ -137,7 +139,8 @@ export function Marks({
               </li>
             );
           })}
-        </ul>
+          </ul>
+        </div>
       ) : null}
       {which === "apps" ? (
         <ul className="mt-2 space-y-1 text-sm">

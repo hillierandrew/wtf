@@ -7,6 +7,9 @@ import { Counter } from "@/components/counter";
 import { KeyboardShop } from "@/components/keyboard-shop";
 import { Sim } from "@/components/sim";
 import { HistoryRoot, latest, usePath } from "@/components/history";
+import { AddButton, BagDock, RuleLine, ThreeSearch } from "@/components/bag";
+import { Five } from "@/components/five";
+import { lapBag, partBag } from "@/lib/bag";
 import { CAT_LABEL, PARTS, explainPart, explainLaptop, laptopBits, isJunk, machineScore, money, partScore, rankFrom, tagsOf, type Category, type Part } from "@/lib/catalog";
 
 type View = "ai" | "desktops" | "laptops" | "parts";
@@ -231,6 +234,7 @@ export function Storefront({ onLock }: { onLock: () => void }) {
   return (
     <HistoryRoot home="AI Store">
       <StoreBody onLock={onLock} />
+      <BagDock />
     </HistoryRoot>
   );
 }
@@ -246,6 +250,7 @@ function StoreBody({ onLock }: { onLock: () => void }) {
   const [panel, setPanel] = useState<"shop" | "build" | "keys" | "sim">("shop");
   const [grid, setGrid] = useState(true);
   const [spot, setSpot] = useState<string | null>(null);
+  const [five, setFive] = useState(false);
   const path = usePath();
 
   useEffect(() => {
@@ -295,6 +300,7 @@ function StoreBody({ onLock }: { onLock: () => void }) {
     path?.note(`view:${next}`, next === "ai" ? "AI Builds" : next === "desktops" ? "Desktops" : next === "laptops" ? "Laptops" : "Parts");
   }
 
+  if (five) return <Five onClose={() => setFive(false)} />;
   if (panel === "build") return <Counter onClose={() => setPanel("shop")} />;
   if (panel === "keys") return <KeyboardShop onLeave={() => setPanel("shop")} />;
   if (panel === "sim") return <Sim onLeave={() => setPanel("shop")} />;
@@ -312,7 +318,8 @@ function StoreBody({ onLock }: { onLock: () => void }) {
           </button>
         </div>
         <div className="mx-auto flex max-w-6xl gap-2 px-4 pb-3">
-          <button type="button" onClick={() => { path?.note("build", "Build"); setPanel("build"); }} className="h-11 rounded-full bg-black px-4 text-sm font-medium text-white">Build with them</button>
+          <button type="button" onClick={() => { path?.note("five", "Five minutes"); setFive(true); }} className="h-11 rounded-full bg-black px-4 text-sm font-medium text-white">Five minutes</button>
+          <button type="button" onClick={() => { path?.note("build", "Build"); setPanel("build"); }} className="h-11 rounded-full bg-neutral-100 px-4 text-sm font-medium">Build with them</button>
           <button type="button" onClick={() => { path?.note("keys", "Keyboards"); setPanel("keys"); }} className="h-11 rounded-full bg-neutral-100 px-4 text-sm font-medium">Keyboards</button>
           <button type="button" onClick={() => { path?.note("sim", "Sims"); setPanel("sim"); }} className="h-11 rounded-full bg-neutral-100 px-4 text-sm font-medium">Sims</button>
         </div>
@@ -366,6 +373,7 @@ function StoreBody({ onLock }: { onLock: () => void }) {
                   <p className="mt-1 text-sm text-neutral-500">{idea.line}</p>
                   <p className="mt-4 text-sm font-medium leading-snug">{idea.card.name}</p>
                   <p className="mt-1 text-2xl font-bold">{money(idea.card.price)}</p>
+                  <RuleLine how={idea.name} who={idea.line} budget={money(idea.card.price)} score={String(Math.round(idea.card.score))} />
                 </button>
                 <div className="mt-3 flex items-center justify-between">
                   <button type="button" onClick={() => setScoreId(idea.card.id)} className="rounded-full px-2.5 py-1 text-xs font-bold" style={{ background: rankFrom(idea.card.score).bg, color: rankFrom(idea.card.score).fg }}>
@@ -414,8 +422,14 @@ function StoreBody({ onLock }: { onLock: () => void }) {
             </p>
           </div>
           <main className="mx-auto max-w-6xl px-4 pb-16">
-            {page.length === 0 ? (
+              {page.length === 0 ? (
               <p className="py-20 text-center text-neutral-400">Nothing in this shelf matches.</p>
+            ) : query.trim() && (view === "desktops" || view === "laptops") ? (
+              <ThreeSearch
+                rows={shown}
+                who={query.trim()}
+                lineFor={(item, how) => (shown.find((row) => row.id === item.id)?.where === "laptops" ? lapBag(item, how) : partBag(item, how))}
+              />
             ) : (
               <div className={grid ? "grid gap-4 sm:grid-cols-2 lg:grid-cols-3" : "flex flex-col gap-3"}>
                 {page.map((item) => {
@@ -450,6 +464,7 @@ function StoreBody({ onLock }: { onLock: () => void }) {
                       ) : null}
                       {item.where === "laptops" && LAPTOPS.some((row) => row.id === item.id) ? laptopMarks(LAPTOPS.find((row) => row.id === item.id)!) : null}
                       {item.where === "desktops" && PARTS.some((row) => row.id === item.id) ? deskMarks(PARTS.find((row) => row.id === item.id)!) : null}
+                      <AddButton line={item.where === "laptops" ? lapBag(item, `AI Store. ${item.shelf}. Budget ${money(item.price)}. Score ${Math.round(item.score)}.`) : partBag(item, `AI Store. ${item.shelf}. Budget ${money(item.price)}. Score ${Math.round(item.score)}.`)} />
                     </article>
                   );
                 })}

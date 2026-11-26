@@ -8,6 +8,7 @@ import { Desk } from "@/components/desk";
 import { Gate } from "@/components/lock";
 import { ScreenBar, type Screen, NAMES } from "@/components/nav";
 import { HistoryRoot, latest, usePath } from "@/components/history";
+import { BagDock } from "@/components/bag";
 import { Games } from "@/components/games";
 import { Guide } from "@/components/guide";
 import { Steam } from "@/components/steam";
@@ -33,6 +34,7 @@ function Home() {
     <Gate>
       <HistoryRoot home="Shop">
         <Site hydrated={hydrated} />
+        <BagDock />
       </HistoryRoot>
     </Gate>
   );
