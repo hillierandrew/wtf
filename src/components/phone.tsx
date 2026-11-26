@@ -13,6 +13,7 @@ import { HistoryRoot, latest, usePath } from "@/components/history";
 import { AddButton, BagDock, ThreeSearch } from "@/components/bag";
 import { Five } from "@/components/five";
 import { keyBag, lapBag, partBag, simBag } from "@/lib/bag";
+import { laptopWeight, specTags } from "@/lib/facts";
 
 const LAPS = laptopsRaw as { id: string; name: string; price: number; gpu: number; specs: string; kind?: string }[];
 
@@ -33,7 +34,7 @@ function phoneScore(item: PhoneItem) {
 }
 
 type Tab = "use" | "power" | "build" | "shop" | "deals" | "search" | "saved";
-type Sort = "low" | "high" | "name" | "sale";
+type Sort = "low" | "high" | "name" | "sale" | "light" | "heavy";
 
 const SAVED = "drew-phone-saved";
 const PC_KEY = "drew-phone-pc";
@@ -54,9 +55,12 @@ function saleOf(item: PhoneItem) {
 
 function sortItems(list: PhoneItem[], sort: Sort) {
   const next = [...list];
+  const pounds = (item: PhoneItem) => (item.group === "laptops" || item.group === "tablets" ? laptopWeight(item.name, item.kind).lb : 99);
   if (sort === "high") next.sort((a, b) => b.price - a.price);
   else if (sort === "name") next.sort((a, b) => a.name.localeCompare(b.name));
   else if (sort === "sale") next.sort((a, b) => saleOf(b) - saleOf(a) || a.price - b.price);
+  else if (sort === "light") next.sort((a, b) => pounds(a) - pounds(b) || a.price - b.price);
+  else if (sort === "heavy") next.sort((a, b) => pounds(b) - pounds(a) || a.price - b.price);
   else next.sort((a, b) => a.price - b.price);
   return next;
 }
@@ -350,6 +354,8 @@ function PhoneBody({ onLock }: { onLock: () => void }) {
                 <select value={sort} onChange={(event) => setSort(event.target.value as Sort)} className="h-10 rounded-xl bg-[#e3e3e8] px-3 text-[16px] outline-none">
                   <option value="low">Price, low</option>
                   <option value="high">Price, high</option>
+                  <option value="light">Light first</option>
+                  <option value="heavy">Heavy first</option>
                   <option value="sale">Biggest save</option>
                   <option value="name">Name</option>
                 </select>
@@ -388,6 +394,14 @@ function PhoneBody({ onLock }: { onLock: () => void }) {
                           {item.kind}
                           {item.open ? " · Open box" : ""}
                         </span>
+                        <span className="mt-1 flex flex-wrap gap-1">
+                          {specTags(item.name).map((tag) => (
+                            <span key={tag} className="rounded-full bg-[#f2f2f7] px-2 py-0.5 text-[11px] text-[#333]">{tag}</span>
+                          ))}
+                          {item.group === "laptops" || item.group === "tablets" ? (
+                            <span className="rounded-full bg-[#f2f2f7] px-2 py-0.5 text-[11px] text-[#333]">{laptopWeight(item.name, item.kind).lb} lb · {laptopWeight(item.name, item.kind).kg} kg</span>
+                          ) : null}
+                        </span>
                       </button>
                       <div className="flex shrink-0 flex-col items-end gap-1">
                         <span className="text-[16px] font-semibold">{money(item.price)}</span>
@@ -398,6 +412,11 @@ function PhoneBody({ onLock }: { onLock: () => void }) {
                         </button>
                       </div>
                     </div>
+                    {item.group === "laptops" || item.group === "desktops" ? (
+                      <div className="px-3 pb-3">
+                        <PhoneMarks item={item} />
+                      </div>
+                    ) : null}
                   </li>
                 ))}
               </ul>

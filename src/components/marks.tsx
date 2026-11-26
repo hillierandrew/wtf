@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import { dealFrom, dealLines, explainLaptop, explainPart, faceTags, laptopBits, machineParts, money, rankFrom, type Part } from "@/lib/catalog";
+import { laptopWeight, releaseYear, specTags } from "@/lib/facts";
 
 const RING: Record<string, string> = {
   Crystal: "#0891b2",
@@ -48,6 +49,14 @@ function chipPower(name: string, gpu?: number) {
   if (/3050|4050/.test(n)) return 40;
   if (/780M|890M|RYZEN\s?AI|ULTRA\s?9/.test(n)) return 24;
   return 12;
+}
+
+function setting(chip: number, ram: number, need: number, needRam: number) {
+  if (chip >= need && ram >= needRam) return "Ultra";
+  if (chip >= need * 0.75 && ram >= Math.max(8, needRam - 8)) return "Normal";
+  if (chip >= need * 0.55) return "Medium";
+  if (chip >= Math.max(8, need * 0.35)) return "Basic";
+  return "No";
 }
 
 function ramOf(name: string, specs?: string) {
@@ -103,7 +112,12 @@ export function Marks({
   const deal = dealFrom(price, score);
   const chip = chipPower(name, gpu);
   const ram = ramOf(name, specs);
-  const tags = faceTags(`${name} ${specs ?? ""}`);
+  const tags = [...faceTags(`${name} ${specs ?? ""}`), ...specTags(name, specs)];
+  const carry = Boolean(specs?.match(/memory/i) || /\d{2}(\.\d)?\s*"/.test(name));
+  if (carry) {
+    const weight = laptopWeight(name, specs);
+    tags.push(`${weight.lb} lb`, `${weight.kg} kg`, String(releaseYear(name)));
+  }
   return (
     <div className="mt-2">
       <div className="flex flex-wrap gap-2">
@@ -129,13 +143,13 @@ export function Marks({
       ) : null}
       {which === "games" ? (
         <div className="mt-2">
-          <p className="text-sm">Estimate. Not a promised frame rate.</p>
+          <p className="text-sm">Estimate only. Ultra, Normal, Medium, or Basic. Not a promised frame rate.</p>
           <ul className="mt-1 space-y-1 text-sm">
           {GAMES.map((game) => {
-            const ok = chip >= game.need && ram >= game.ram;
+            const how = setting(chip, ram, game.need, game.ram);
             return (
-              <li key={game.name} className={ok ? "text-[#145214]" : "text-[#6b1420]"}>
-                {ok ? "Runs" : "No"} · {game.name}
+              <li key={game.name} className={how === "No" ? "text-[#6b1420]" : "text-[#145214]"}>
+                {how} · {game.name}
               </li>
             );
           })}

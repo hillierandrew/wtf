@@ -9,6 +9,7 @@ import { ThemeToggle, usePane } from "@/lib/theme";
 import { latest, usePath } from "@/components/history";
 import { AddButton, MoreDetail, ThreeSearch } from "@/components/bag";
 import { lapBag } from "@/lib/bag";
+import { laptopWeight, specTags, releaseYear } from "@/lib/facts";
 
 type Kind = "game" | "home" | "work" | "tablet" | "chrome";
 type Filter = "deal" | "games" | "work" | "school" | "grandma" | "create" | "tablet" | "chrome";
@@ -57,7 +58,6 @@ const FILTERS: { id: Filter; label: string; line: string }[] = [
   { id: "school", label: "School", line: "Home and school. Not a gaming laptop." },
   { id: "grandma", label: "Grandma", line: "Email, photos, and a video call. Nothing extra to learn." },
   { id: "create", label: "Create", line: "Photos, video, and big files. Lots of memory, or a graphics chip." },
-  { id: "tablet", label: "Tablet", line: "A tablet. It is not a laptop." },
   { id: "chrome", label: "Chromebook", line: "For the web and school. Not for heavy games." },
 ];
 
@@ -154,13 +154,13 @@ function ramOf(item: Laptop) {
 }
 
 function fits(item: Laptop, filter: Filter) {
-  if (filter === "deal") return item.kind !== "tablet" && item.kind !== "chrome";
+  if (item.kind === "tablet") return false;
+  if (filter === "deal" || filter === "tablet") return item.kind !== "chrome";
   if (filter === "games") return item.kind === "game" || item.gpu >= 45;
   if (filter === "work") return item.kind === "work";
   if (filter === "school") return (item.kind === "home" || item.kind === "chrome") && item.gpu < 45;
   if (filter === "grandma") return (item.kind === "home" || item.kind === "chrome" || item.kind === "work") && item.gpu < 28;
-  if (filter === "create") return item.kind !== "tablet" && item.kind !== "chrome" && (item.gpu > 0 || item.specs.includes("32GB") || item.specs.includes("64GB"));
-  if (filter === "tablet") return item.kind === "tablet";
+  if (filter === "create") return item.kind !== "chrome" && (item.gpu > 0 || item.specs.includes("32GB") || item.specs.includes("64GB"));
   return item.kind === "chrome";
 }
 
@@ -197,7 +197,7 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
   const [gameId, setGameId] = useState("any");
   const [quality, setQuality] = useState<Quality>("normal");
   const [courseId, setCourseId] = useState("any");
-  const [sort, setSort] = useState<ShelfSort>("deal-asc");
+  const [sort, setSort] = useState<ShelfSort | "light" | "heavy">("deal-asc");
   const path = usePath();
 
   useEffect(() => {
@@ -255,12 +255,14 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
       if (sort === "deal-desc") return bDeal - aDeal;
       if (sort === "gig-asc" || sort === "gig-desc") return sort === "gig-desc" ? b.price - a.price : a.price - b.price;
       if (sort === "price-asc") return a.price - b.price;
+      if (sort === "light") return laptopWeight(a.name, a.kind).lb - laptopWeight(b.name, b.kind).lb;
+      if (sort === "heavy") return laptopWeight(b.name, b.kind).lb - laptopWeight(a.name, a.kind).lb;
       return aDeal - bDeal;
     });
   }, [filter, query, brand, openBox, game, course, quality, sort]);
 
   const choice = ITEMS.find((item) => item.id === picked);
-  const meta = FILTERS.find((item) => item.id === filter)!;
+  const meta = FILTERS.find((item) => item.id === filter) ?? FILTERS[0];
   const qualityLabel = QUALITIES.find((item) => item.id === quality)?.label ?? "Normal";
   const wide = usePane();
 
@@ -333,12 +335,16 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
             ))}
           </Menu>
         ) : (
-          <SortRow value={sort} onChange={setSort} />
+          <SortRow value={sort === "light" || sort === "heavy" ? "price-asc" : sort} onChange={setSort} />
         )}
       </div>
       <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-3">
         <p className="text-sm text-muted">{game ? `${game.label} (${game.year}) at ${qualityLabel}. ${game.note ?? "Only laptops that can run it."}` : course ? `${course.label}. Runs ${course.program}.` : meta.line}</p>
-        {game ? <SortRow value={sort} onChange={setSort} /> : null}
+        {game ? <SortRow value={sort === "light" || sort === "heavy" ? "price-asc" : sort} onChange={setSort} /> : null}
+        <div className="flex gap-2">
+          <button type="button" onClick={() => setSort("light")} className={`h-11 rounded-full border px-4 text-sm ${sort === "light" ? "border-accent bg-subtle" : "border-line"}`}>Light first</button>
+          <button type="button" onClick={() => setSort("heavy")} className={`h-11 rounded-full border px-4 text-sm ${sort === "heavy" ? "border-accent bg-subtle" : "border-line"}`}>Heavy first</button>
+        </div>
         <div className="flex gap-2">
           <label className="flex h-12 min-w-0 flex-1 items-center gap-2 rounded-2xl border border-line bg-elevated px-3">
             <Search className="size-4 shrink-0 text-muted" strokeWidth={1.75} />
@@ -376,7 +382,12 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
                     <span className="mt-1 block text-base font-medium leading-snug">{item.name.replace(" (Open box)", "")}</span>
                     {game ? <span className="mt-1 block text-sm text-muted">{game.label} at {qualityLabel}</span> : null}
                     {course ? <span className="mt-1 block text-sm text-muted">Runs {course.program}</span> : null}
-                    <span className="mt-1 block text-sm text-muted">{money(item.price / hundred(item))} per point</span>
+                    <span className="mt-1 flex flex-wrap gap-1">
+                      {specTags(item.name, item.specs).map((tag) => (
+                        <span key={tag} className="rounded-full bg-neutral-100 px-2 py-0.5 text-[11px]">{tag}</span>
+                      ))}
+                      <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[11px]">{laptopWeight(item.name, item.kind).lb} lb · {laptopWeight(item.name, item.kind).kg} kg · {releaseYear(item.name)}</span>
+                    </span>
                   </span>
                   <span className="shrink-0 text-right">
                     <span className="tabular block text-base font-medium">{money(item.price)}</span>

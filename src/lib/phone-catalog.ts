@@ -15,6 +15,7 @@ import mounts from "@/data/mounts.json";
 import psus from "@/data/psus.json";
 import sim from "@/data/sim.json";
 import sound from "@/data/sound.json";
+import { DEALS } from "@/data/deals";
 import ssds from "@/data/ssds.json";
 
 export type PhoneItem = {
@@ -154,6 +155,18 @@ const bundles: PhoneItem[] = PARTS.filter((part) => part.cat === "bundle").map((
   open: /open box/i.test(part.name),
 }));
 
+const deals: PhoneItem[] = DEALS.map((deal) => ({
+  id: `bundle:${deal.id}`,
+  name: deal.name,
+  price: deal.price,
+  was: deal.save > 0 ? Math.round((deal.price + deal.save) * 100) / 100 : null,
+  member: null,
+  brand: deal.kind,
+  group: "bundle",
+  kind: deal.kind,
+  open: false,
+}));
+
 export const PHONE_ITEMS: PhoneItem[] = [
   ...take(cpus as Shelf[], "cpu"),
   ...take(gpus as Shelf[], "gpu"),
@@ -167,17 +180,20 @@ export const PHONE_ITEMS: PhoneItem[] = [
   ...take(accessories as Shelf[], "case-parts"),
   ...take(monitors as Shelf[], "monitor"),
   ...take(mounts as Shelf[], "mount"),
-  ...take(laptops as Shelf[], "laptops"),
+  ...take((laptops as Shelf[]).filter((row) => row.kind !== "tablet"), "laptops"),
+  ...take((laptops as Shelf[]).filter((row) => row.kind === "tablet"), "tablets"),
   ...take(desktops as Shelf[], "desktops"),
   ...take(keys as Shelf[], "keys"),
   ...take(sound as Shelf[], "sound"),
   ...take(controllers as Shelf[], "controller"),
   ...take(sim as Shelf[], "sim"),
   ...bundles,
+  ...deals,
 ];
 
 export const PHONE_GROUPS: { id: string; title: string; line: string }[] = [
-  { id: "laptops", title: "Laptops", line: "Carry it." },
+  { id: "laptops", title: "Laptops", line: "Carry it. Not a tablet." },
+  { id: "tablets", title: "Tablets", line: "A tablet. Not a laptop." },
   { id: "desktops", title: "Desktops", line: "Already built." },
   { id: "cpu", title: "Processors", line: "The chip." },
   { id: "gpu", title: "Graphics", line: "The card." },
@@ -198,7 +214,7 @@ export const PHONE_GROUPS: { id: string; title: string; line: string }[] = [
 ];
 
 export const PHONE_SECTIONS: { title: string; ids: string[] }[] = [
-  { title: "Computers", ids: ["laptops", "desktops"] },
+  { title: "Computers", ids: ["laptops", "tablets", "desktops"] },
   { title: "Core parts", ids: ["cpu", "gpu", "memory", "storage", "board"] },
   { title: "Power and cooling", ids: ["psu", "cooling", "case", "case-parts"] },
   { title: "Screen and desk", ids: ["monitor", "mount", "keys", "sound", "controller"] },

@@ -6,6 +6,7 @@ import { laptopMarks, deskMarks } from "@/components/marks";
 import { Counter } from "@/components/counter";
 import { KeyboardShop } from "@/components/keyboard-shop";
 import { Sim } from "@/components/sim";
+import { Bundles } from "@/components/bundles";
 import { HistoryRoot, latest, usePath } from "@/components/history";
 import { AddButton, BagDock, RuleLine, ThreeSearch } from "@/components/bag";
 import { Five } from "@/components/five";
@@ -247,7 +248,7 @@ function StoreBody({ onLock }: { onLock: () => void }) {
   const [openBox, setOpenBox] = useState(false);
   const [more, setMore] = useState(24);
   const [scoreId, setScoreId] = useState<string | null>(null);
-  const [panel, setPanel] = useState<"shop" | "build" | "keys" | "sim">("shop");
+  const [panel, setPanel] = useState<"shop" | "build" | "keys" | "sim" | "deals">("shop");
   const [grid, setGrid] = useState(true);
   const [spot, setSpot] = useState<string | null>(null);
   const [five, setFive] = useState(false);
@@ -255,8 +256,8 @@ function StoreBody({ onLock }: { onLock: () => void }) {
 
   useEffect(() => {
     if (!path) return;
-    const panelId = latest(path.log, path.at, (id) => id === "build" || id === "keys" || id === "sim" || id === "home");
-    setPanel(panelId === "build" || panelId === "keys" || panelId === "sim" ? panelId : "shop");
+    const panelId = latest(path.log, path.at, (id) => id === "build" || id === "keys" || id === "sim" || id === "deals" || id === "home");
+    setPanel(panelId === "build" || panelId === "keys" || panelId === "sim" || panelId === "deals" ? panelId : "shop");
     const viewId = latest(path.log, path.at, (id) => id.startsWith("view:"));
     if (viewId) setView(viewId.slice(5) as View);
     const catId = latest(path.log, path.at, (id) => id.startsWith("cat:"));
@@ -304,6 +305,7 @@ function StoreBody({ onLock }: { onLock: () => void }) {
   if (panel === "build") return <Counter onClose={() => setPanel("shop")} />;
   if (panel === "keys") return <KeyboardShop onLeave={() => setPanel("shop")} />;
   if (panel === "sim") return <Sim onLeave={() => setPanel("shop")} />;
+  if (panel === "deals") return <Bundles onLeave={() => setPanel("shop")} />;
 
   return (
     <div className="min-h-dvh bg-[#fafafa] text-[#111] antialiased" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif' }}>
@@ -322,6 +324,7 @@ function StoreBody({ onLock }: { onLock: () => void }) {
           <button type="button" onClick={() => { path?.note("build", "Build"); setPanel("build"); }} className="h-11 rounded-full bg-neutral-100 px-4 text-sm font-medium">Build with them</button>
           <button type="button" onClick={() => { path?.note("keys", "Keyboards"); setPanel("keys"); }} className="h-11 rounded-full bg-neutral-100 px-4 text-sm font-medium">Keyboards</button>
           <button type="button" onClick={() => { path?.note("sim", "Sims"); setPanel("sim"); }} className="h-11 rounded-full bg-neutral-100 px-4 text-sm font-medium">Sims</button>
+          <button type="button" onClick={() => { path?.note("deals", "Bundles"); setPanel("deals"); }} className="h-11 rounded-full bg-neutral-100 px-4 text-sm font-medium">Bundles</button>
         </div>
       </header>
 

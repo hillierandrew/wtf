@@ -6,6 +6,7 @@ import { RankBadge } from "@/components/rank";
 import { Counter } from "@/components/counter";
 import { KeyboardShop } from "@/components/keyboard-shop";
 import { Sim } from "@/components/sim";
+import { Bundles } from "@/components/bundles";
 import { HistoryRoot, latest, usePath } from "@/components/history";
 import { AddButton, BagDock, ThreeSearch } from "@/components/bag";
 import { Five } from "@/components/five";
@@ -91,7 +92,7 @@ function GlassBody({ onLock }: { onLock: () => void }) {
   const [query, setQuery] = useState("");
   const [picked, setPicked] = useState<Card | null>(null);
   const [limit, setLimit] = useState(24);
-  const [panel, setPanel] = useState<"shop" | "build" | "keys" | "sim">("shop");
+  const [panel, setPanel] = useState<"shop" | "build" | "keys" | "sim" | "deals">("shop");
   const [sort, setSort] = useState<"low" | "high" | "score" | "score-low">("low");
   const [grid, setGrid] = useState(false);
   const [five, setFive] = useState(false);
@@ -99,8 +100,8 @@ function GlassBody({ onLock }: { onLock: () => void }) {
 
   useEffect(() => {
     if (!path) return;
-    const panelId = latest(path.log, path.at, (id) => id === "build" || id === "keys" || id === "sim" || id === "home");
-    setPanel(panelId === "build" || panelId === "keys" || panelId === "sim" ? panelId : "shop");
+    const panelId = latest(path.log, path.at, (id) => id === "build" || id === "keys" || id === "sim" || id === "deals" || id === "home");
+    setPanel(panelId === "build" || panelId === "keys" || panelId === "sim" || panelId === "deals" ? panelId : "shop");
     const shelfId = latest(path.log, path.at, (id) => id.startsWith("shelf-"));
     setShelf(shelfId ? shelfId.slice(6) : null);
   }, [path?.at]);
@@ -140,6 +141,7 @@ function GlassBody({ onLock }: { onLock: () => void }) {
   if (panel === "build") return <Counter onClose={() => setPanel("shop")} />;
   if (panel === "keys") return <KeyboardShop onLeave={() => setPanel("shop")} />;
   if (panel === "sim") return <Sim onLeave={() => setPanel("shop")} />;
+  if (panel === "deals") return <Bundles onLeave={() => setPanel("shop")} />;
 
   return (
     <div className="relative min-h-dvh overflow-hidden bg-black text-white">
@@ -163,6 +165,7 @@ function GlassBody({ onLock }: { onLock: () => void }) {
           <button type="button" onClick={() => { blip(); path?.note("build", "Build"); setPanel("build"); }} className="h-11 rounded-full bg-white/15 px-4 text-sm">Build with them</button>
           <button type="button" onClick={() => { blip(); path?.note("keys", "Keyboards"); setPanel("keys"); }} className="h-11 rounded-full bg-white/15 px-4 text-sm">Keyboards</button>
           <button type="button" onClick={() => { blip(); path?.note("sim", "Sims"); setPanel("sim"); }} className="h-11 rounded-full bg-white/15 px-4 text-sm">Sims</button>
+          <button type="button" onClick={() => { blip(); path?.note("deals", "Bundles"); setPanel("deals"); }} className="h-11 rounded-full bg-white/15 px-4 text-sm">Bundles</button>
         </div>
 
         {!shelf ? (

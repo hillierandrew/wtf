@@ -7,6 +7,7 @@ import { deskMarks, laptopMarks } from "@/components/marks";
 import { Counter } from "@/components/counter";
 import { KeyboardShop } from "@/components/keyboard-shop";
 import { Sim } from "@/components/sim";
+import { Bundles } from "@/components/bundles";
 import { HistoryRoot, latest, usePath } from "@/components/history";
 import { AddButton, BagDock } from "@/components/bag";
 import { Five } from "@/components/five";
@@ -59,15 +60,15 @@ export function Spread({ onLock }: { onLock: () => void }) {
 
 function Floor({ onLock }: { onLock: () => void }) {
   const path = usePath();
-  const [panel, setPanel] = useState<"home" | "build" | "keys" | "sim">("home");
+  const [panel, setPanel] = useState<"home" | "build" | "keys" | "sim" | "deals">("home");
   const [who, setWho] = useState<Who>("school");
   const [budget, setBudget] = useState(1400);
   const [five, setFive] = useState(false);
 
   useEffect(() => {
     if (!path) return;
-    const panelId = latest(path.log, path.at, (id) => id === "build" || id === "keys" || id === "sim" || id === "home");
-    setPanel(panelId === "build" || panelId === "keys" || panelId === "sim" ? panelId : "home");
+    const panelId = latest(path.log, path.at, (id) => id === "build" || id === "keys" || id === "sim" || id === "deals" || id === "home");
+    setPanel(panelId === "build" || panelId === "keys" || panelId === "sim" || panelId === "deals" ? panelId : "home");
     const whoId = latest(path.log, path.at, (id) => id.startsWith("who:"));
     if (whoId) setWho(whoId.slice(4) as Who);
   }, [path?.at]);
@@ -105,6 +106,7 @@ function Floor({ onLock }: { onLock: () => void }) {
   if (panel === "build") return <Counter onClose={() => setPanel("home")} />;
   if (panel === "keys") return <KeyboardShop onLeave={() => setPanel("home")} />;
   if (panel === "sim") return <Sim onLeave={() => setPanel("home")} />;
+  if (panel === "deals") return <Bundles onLeave={() => setPanel("home")} />;
 
   return (
     <div className="min-h-full overflow-y-auto bg-[#07151c] pb-28 text-[#f4efe6]">
@@ -197,6 +199,9 @@ function Floor({ onLock }: { onLock: () => void }) {
           </button>
           <button type="button" onClick={() => { path?.note("build", "From scratch"); setPanel("build"); }} className="h-12 rounded-full border border-[#07151c] text-base font-semibold">
             Start from the chip
+          </button>
+          <button type="button" onClick={() => { path?.note("deals", "Bundles"); setPanel("deals"); }} className="h-12 rounded-full border border-[#07151c] text-base font-semibold">
+            Bundles
           </button>
         </div>
       </section>

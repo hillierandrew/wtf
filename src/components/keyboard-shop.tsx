@@ -277,10 +277,10 @@ export function KeyboardShop({ onLeave }: { look?: Look; onLeave?: () => void })
       <div className="mt-3 flex flex-wrap gap-2">
         {(
           [
+            ["low", "Price, low"],
+            ["high", "Price, high"],
             ["quiet", "Quiet first"],
             ["loud", "Loud first"],
-            ["low", "Cheapest"],
-            ["high", "Dearest"],
           ] as const
         ).map(([id, label]) => (
           <button key={id} type="button" aria-pressed={sort === id} onClick={() => setSort(sort === id ? "low" : id)} className={chip(sort === id)}>
