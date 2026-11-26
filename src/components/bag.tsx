@@ -92,8 +92,8 @@ export function BagDock({ lift = false }: { lift?: boolean }) {
   }, [open, text, lines.length]);
 
   return (
-    <div className={`bag-dock pointer-events-none fixed inset-x-0 z-40 flex justify-center px-3 ${lift ? "bottom-[calc(4.75rem+env(safe-area-inset-bottom))]" : "bottom-0 pb-[max(0.5rem,env(safe-area-inset-bottom))]"}`}>
-      <div className="pointer-events-auto w-full max-w-xl rounded-3xl bg-[#111] text-white shadow-2xl">
+    <div className={`bag-dock pointer-events-none fixed inset-x-0 z-30 flex justify-end px-3 ${lift ? "bottom-[calc(4.75rem+env(safe-area-inset-bottom))]" : "bottom-0 pb-[max(0.5rem,env(safe-area-inset-bottom))]"}`}>
+      <div className="pointer-events-auto w-full max-w-sm rounded-3xl bg-[#111] text-white shadow-2xl">
         <button type="button" onClick={() => setOpen(!open)} className="flex h-14 w-full items-center justify-between px-4 text-left">
           <span>Cart · {lines.length}</span>
           <span>

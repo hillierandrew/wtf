@@ -29,7 +29,7 @@ type Preset = {
 const DOORS: Preset[] = [
   { id: "feel-board", title: "Best mechanical", line: "A real switch, not a rubber dome. Quiet enough to live with. For someone who feels every key.", shelf: "board", who: "feel", sort: "quiet" },
   { id: "grandma-board", title: "Grandma's board", line: "Cheap, quiet, and already finished. Full size if we have it.", shelf: "board", who: "grandma", sort: "low", max: 80 },
-  { id: "boards", title: "Finished keyboards", line: "A board that is already built. Switches are in it.", shelf: "board", sort: "quiet" },
+  { id: "boards", title: "Finished keyboards", line: "A board that is already built. Switches are in it.", shelf: "board", sort: "low" },
   { id: "switches", title: "Switches only", line: "Loose switches. No board in the box.", shelf: "switch", sort: "quiet" },
   { id: "keycaps", title: "Keycaps only", line: "The caps. Not the board, not the switches.", shelf: "keycap" },
 ];
@@ -267,30 +267,25 @@ export function KeyboardShop({ onLeave }: { look?: Look; onLeave?: () => void })
   );
 
   const list = (
-    <div className="pb-10">
+    <div className="pb-36">
       <h2 className="text-[28px] font-semibold leading-none">{preset.title}</h2>
       <p className="mt-2 text-[15px] leading-snug text-[#333]">{preset.line}</p>
       <label className="mt-3 flex h-12 items-center gap-2 rounded-xl border border-[#ccc] bg-white px-3">
         <Search className="size-4 text-[#333]" />
         <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search this shelf" className="h-full w-full bg-white text-[16px] text-[#161616] outline-none" />
       </label>
-      <div className="mt-3 flex flex-wrap gap-2">
-        {(
-          [
-            ["low", "Price, low"],
-            ["high", "Price, high"],
-            ["quiet", "Quiet first"],
-            ["loud", "Loud first"],
-          ] as const
-        ).map(([id, label]) => (
-          <button key={id} type="button" aria-pressed={sort === id} onClick={() => setSort(sort === id ? "low" : id)} className={chip(sort === id)}>
-            {label}
-          </button>
-        ))}
-        <button type="button" aria-pressed={!openBox} onClick={() => setOpenBox((value) => !value)} className={chip(!openBox)}>
-          {openBox ? "Hide open box" : "Open box hidden"}
-        </button>
-      </div>
+      <label className="mt-3 flex h-12 items-center gap-3 rounded-xl border border-[#161616] bg-white px-3">
+        <span className="shrink-0 text-[15px] font-semibold">Sort</span>
+        <select value={sort} onChange={(event) => setSort(event.target.value as Sort)} className="h-full w-full bg-white text-[16px] text-[#161616] outline-none">
+          <option value="low">Price, low to high</option>
+          <option value="high">Price, high to low</option>
+          <option value="quiet">Quiet first</option>
+          <option value="loud">Loud first</option>
+        </select>
+      </label>
+      <button type="button" aria-pressed={!openBox} onClick={() => setOpenBox((value) => !value)} className={`mt-3 ${chip(!openBox)}`}>
+        {openBox ? "Hide open box" : "Open box hidden"}
+      </button>
       {boards ? (
         <div className="mt-3 space-y-2">
           <div className="flex flex-wrap gap-2">
@@ -356,7 +351,7 @@ export function KeyboardShop({ onLeave }: { look?: Look; onLeave?: () => void })
           </div>
         </div>
       ) : null}
-      <p className="mt-3 text-[13px] text-[#333]">{shown.length} shown. Tap a filter again to turn it off.</p>
+      <p className="mt-3 text-[13px] text-[#333]">{shown.length} shown, {sort === "high" ? "dearest first" : sort === "quiet" ? "quiet first" : sort === "loud" ? "loud first" : "cheapest first"}. Tap a filter again to turn it off.</p>
       {shown.length === 0 ? <p className="mt-3 rounded-2xl border border-[#ccc] bg-white px-4 py-8 text-center text-[17px]">Nothing matches. Turn a filter off.</p> : null}
       <ul className="mt-2 space-y-2">
         {shown.slice(0, limit).map((item) => {

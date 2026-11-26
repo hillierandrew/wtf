@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Lock } from "lucide-react";
 import rawLaptops from "@/data/laptops.json";
-import { PARTS, isJunk, machineParts, machineScore, money } from "@/lib/catalog";
+import { PARTS, isJunk, laptopBits, machineParts, machineScore, money, partScore, type Part } from "@/lib/catalog";
 import { KEYS } from "@/lib/keyboard";
 import { deskMarks, laptopMarks } from "@/components/marks";
 import { Counter } from "@/components/counter";
@@ -13,8 +13,6 @@ import { AddButton, BagDock } from "@/components/bag";
 import { Five } from "@/components/five";
 import { keyBag, lapBag, partBag } from "@/lib/bag";
 import { Packs } from "@/components/packs";
-import boxPc from "@/assets/box-pc.jpg";
-import boxKeys from "@/assets/box-keys.jpg";
 
 const WHO = [
   { id: "grandma", title: "Grandma", say: "Email, photos, a video call. Nothing she has to learn." },
@@ -25,28 +23,28 @@ const WHO = [
 ] as const;
 
 type Who = (typeof WHO)[number]["id"];
+type Order = "low" | "high" | "score";
+type Shelf = "prebuilt" | "laptop" | "cpu" | "motherboard" | "memory" | "gpu" | "storage" | "case" | "cooler" | "psu" | "monitor" | "mount";
 type Lap = { id: string; name: string; price: number; brand: string; kind: string; gpu: number; specs: string; open?: boolean };
 const LAPS = rawLaptops as Lap[];
 
-const PLAN = [
-  { n: "1", title: "The chip", line: "Who they are decides the chip. A grandma does not get a gaming chip." },
-  { n: "2", title: "The board", line: "Only the socket that matches. This is where the memory type gets decided." },
-  { n: "3", title: "The memory", line: "DDR5 stays with a DDR5 board. The wrong kind never appears." },
-  { n: "4", title: "The graphics", line: "Skip it if the chip already draws the screen. Otherwise this is the picture." },
-  { n: "5", title: "Power, case, drive", line: "The supply has to feed the card. The case has to fit the board. Then we copy the list." },
+const SHELVES: { id: Shelf; title: string }[] = [
+  { id: "prebuilt", title: "Desktops" },
+  { id: "laptop", title: "Laptops" },
+  { id: "cpu", title: "CPUs" },
+  { id: "motherboard", title: "Boards" },
+  { id: "memory", title: "Memory" },
+  { id: "gpu", title: "Graphics" },
+  { id: "storage", title: "Drives" },
+  { id: "case", title: "Cases" },
+  { id: "cooler", title: "Coolers" },
+  { id: "psu", title: "Power" },
+  { id: "monitor", title: "Screens" },
+  { id: "mount", title: "Mounts" },
 ];
 
-function BoxShot({ src, brand, name, price }: { src: string; brand: string; name: string; price: number }) {
-  return (
-    <figure className="relative mt-3 overflow-hidden rounded-2xl">
-      <img src={src} alt="" className="h-48 w-full object-cover" />
-      <figcaption className="absolute inset-x-3 bottom-3 rounded-xl bg-[#07151c]/90 p-3 text-[#f4efe6]">
-        <p className="text-[11px] uppercase tracking-[0.16em] text-[#e7ff4a]">{brand}</p>
-        <p className="mt-1 text-sm leading-snug">{name}</p>
-        <p className="mt-1 text-lg font-semibold">{money(price)}</p>
-      </figcaption>
-    </figure>
-  );
+function byMoney<T extends { price: number; score: number }>(rows: T[], order: Order): T[] {
+  return rows.slice().sort((a, b) => (order === "high" ? b.price - a.price : order === "score" ? b.score - a.score || a.price - b.price : a.price - b.price));
 }
 
 export function Spread({ onLock }: { onLock: () => void }) {
@@ -63,6 +61,9 @@ function Floor({ onLock }: { onLock: () => void }) {
   const [panel, setPanel] = useState<"home" | "build" | "keys" | "sim" | "deals">("home");
   const [who, setWho] = useState<Who>("school");
   const [budget, setBudget] = useState(1400);
+  const [order, setOrder] = useState<Order>("low");
+  const [shelf, setShelf] = useState<Shelf>("prebuilt");
+  const [more, setMore] = useState(12);
   const [five, setFive] = useState(false);
 
   useEffect(() => {
@@ -76,31 +77,51 @@ function Floor({ onLock }: { onLock: () => void }) {
   const person = WHO.find((item) => item.id === who) ?? WHO[1];
 
   const pick = useMemo(() => {
-    const desks = PARTS.filter((part) => part.cat === "prebuilt" && !isJunk(part, true) && part.price > 0 && part.price <= budget);
-    if (who === "grandma") return desks.filter((part) => machineScore(part.name) < 40).sort((a, b) => a.price - b.price)[0] ?? desks.sort((a, b) => a.price - b.price)[0];
-    if (who === "school") return desks.filter((part) => machineScore(part.name) < 58).sort((a, b) => a.price / machineScore(a.name) - b.price / machineScore(b.name))[0];
-    if (who === "work") return desks.filter((part) => machineParts(part.name).ram >= 16).sort((a, b) => a.price / machineScore(a.name) - b.price / machineScore(b.name))[0];
-    if (who === "games") return desks.slice().sort((a, b) => machineScore(b.name) - machineScore(a.name))[0];
-    return desks.filter((part) => machineParts(part.name).ram >= 32).sort((a, b) => machineScore(b.name) - machineScore(a.name))[0] ?? desks.sort((a, b) => machineScore(b.name) - machineScore(a.name))[0];
-  }, [budget, who]);
+    const desks = PARTS.filter((part) => part.cat === "prebuilt" && !isJunk(part, true) && part.price > 0 && part.price <= budget).map((part) => ({ part, price: part.price, score: machineScore(part.name) }));
+    const narrow =
+      who === "grandma" ? desks.filter((row) => row.score < 40) : who === "school" ? desks.filter((row) => row.score < 58) : who === "work" ? desks.filter((row) => machineParts(row.part.name).ram >= 16) : who === "think" ? desks.filter((row) => machineParts(row.part.name).ram >= 32) : desks;
+    return byMoney(narrow.length ? narrow : desks, order)[0]?.part;
+  }, [budget, who, order]);
 
   const laptop = useMemo(() => {
-    const rows = LAPS.filter((item) => !item.open && item.price > 0 && item.price <= budget && item.kind !== "tablet");
-    if (who === "grandma") return rows.filter((item) => item.gpu < 28).sort((a, b) => a.price - b.price)[0];
-    if (who === "work") return rows.filter((item) => item.kind === "work").sort((a, b) => a.price - b.price)[0] ?? rows.sort((a, b) => a.price - b.price)[0];
-    if (who === "games") return rows.filter((item) => item.kind === "game").sort((a, b) => b.gpu - a.gpu)[0];
-    if (who === "think") return rows.filter((item) => /32GB|64GB/.test(item.specs)).sort((a, b) => b.gpu - a.gpu)[0];
-    return rows.filter((item) => item.kind === "home" || item.kind === "chrome").sort((a, b) => a.price - b.price)[0];
-  }, [budget, who]);
+    const rows = LAPS.filter((item) => !item.open && item.price > 0 && item.price <= budget && item.kind !== "tablet").map((item) => ({ item, price: item.price, score: laptopBits(item).score }));
+    const narrow =
+      who === "grandma" ? rows.filter((row) => row.item.gpu < 28) : who === "work" ? rows.filter((row) => row.item.kind === "work") : who === "games" ? rows.filter((row) => row.item.kind === "game") : who === "think" ? rows.filter((row) => /32GB|64GB/.test(row.item.specs)) : rows.filter((row) => row.item.kind === "home" || row.item.kind === "chrome");
+    return byMoney(narrow.length ? narrow : rows, order)[0]?.item;
+  }, [budget, who, order]);
 
-  const feel = useMemo(
-    () => KEYS.filter((item) => item.shelf === "board" && ["linear", "tactile", "silent"].includes(item.feel) && item.price <= 180 && !item.open).sort((a, b) => (a.estimated ?? 99) - (b.estimated ?? 99))[0],
-    [],
-  );
-  const grandma = useMemo(
-    () => KEYS.filter((item) => item.shelf === "board" && (item.feel === "membrane" || item.feel === "silent") && item.price <= 80).sort((a, b) => a.price - b.price)[0],
-    [],
-  );
+  const board = useMemo(() => {
+    const rows = KEYS.filter((item) => item.shelf === "board" && !item.open && item.price > 0 && item.price <= Math.min(budget, who === "grandma" ? 80 : 180));
+    const quiet = rows.filter((item) => item.feel === "silent" || item.feel === "membrane" || (item.estimated ?? 99) < 50);
+    const pool = who === "grandma" || who === "school" ? (quiet.length ? quiet : rows) : rows;
+    return pool.slice().sort((a, b) => (order === "high" ? b.price - a.price : order === "score" ? (a.estimated ?? 99) - (b.estimated ?? 99) : a.price - b.price))[0];
+  }, [budget, who, order]);
+
+  const shelfRows = useMemo(() => {
+    if (shelf === "laptop") {
+      return byMoney(
+        LAPS.filter((item) => !item.open && item.kind !== "tablet" && item.price > 0 && item.price <= budget).map((item) => ({ id: item.id, name: item.name, brand: item.brand, price: item.price, score: laptopBits(item).score, kind: "laptop" as const })),
+        order,
+      );
+    }
+    return byMoney(
+      PARTS.filter((part) => part.cat === shelf && !isJunk(part, false) && part.price > 0 && part.price <= budget).map((part) => ({
+        id: part.id,
+        name: part.name,
+        brand: part.brand,
+        price: part.price,
+        score: shelf === "prebuilt" ? machineScore(part.name) : partScore(part),
+        kind: "part" as const,
+        part,
+      })),
+      order,
+    );
+  }, [shelf, budget, order]);
+
+  function go(next: "home" | "build" | "keys" | "sim" | "deals", label: string) {
+    path?.note(next, label);
+    setPanel(next);
+  }
 
   if (five) return <Five onClose={() => setFive(false)} />;
   if (panel === "build") return <Counter onClose={() => setPanel("home")} />;
@@ -109,105 +130,118 @@ function Floor({ onLock }: { onLock: () => void }) {
   if (panel === "deals") return <Bundles onLeave={() => setPanel("home")} />;
 
   return (
-    <div className="min-h-full overflow-y-auto bg-[#07151c] pb-28 text-[#f4efe6]">
+    <div className="min-h-full overflow-y-auto bg-[#f4f1ea] pb-28 text-[#161616]">
       <header className="flex items-start justify-between gap-4 px-4 pt-4">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#e7ff4a]">6666</p>
-          <h1 className="font-display mt-2 max-w-3xl text-4xl font-medium leading-[0.95] sm:text-6xl">Three things. Then we build if they want more.</h1>
+          <p className="text-[12px] font-semibold uppercase tracking-[0.22em] text-[#0f6b4c]">6666</p>
+          <h1 className="mt-1 max-w-3xl text-4xl font-semibold leading-none tracking-tight sm:text-5xl">One person. One budget. One machine.</h1>
         </div>
-        <button type="button" onClick={onLock} aria-label="Lock" className="flex size-11 shrink-0 items-center justify-center rounded-full border border-[#e7ff4a] text-[#e7ff4a]">
+        <button type="button" onClick={onLock} aria-label="Lock" className="flex size-11 shrink-0 items-center justify-center rounded-full border border-[#161616]">
           <Lock className="size-4" />
         </button>
       </header>
-      <p className="mx-4 mt-4 max-w-2xl text-lg text-[#d5cbbd]">{person.say} I will say the name and the price out loud. The trail at the top is every step we tapped.</p>
+      <p className="mx-4 mt-3 max-w-2xl text-lg leading-snug text-[#333]">{person.say} Say the name, then the price.</p>
+
       <div className="mt-4 flex gap-2 overflow-x-auto px-4">
         {WHO.map((item) => (
-          <button key={item.id} type="button" onClick={() => { setWho(item.id); path?.note(`who:${item.id}`, item.title); }} className={`h-11 shrink-0 rounded-full px-4 text-sm ${who === item.id ? "bg-[#e7ff4a] font-semibold text-[#07151c]" : "border border-[#e7ff4a]/50 text-[#e7ff4a]"}`}>
+          <button key={item.id} type="button" onClick={() => { setWho(item.id); path?.note(`who:${item.id}`, item.title); }} className={`h-12 shrink-0 rounded-full px-4 text-base ${who === item.id ? "bg-[#161616] font-semibold text-white" : "border border-[#161616] bg-white"}`}>
             {item.title}
           </button>
         ))}
       </div>
-      <label className="mx-4 mt-4 block text-sm text-[#d5cbbd]">
-        Their budget {money(budget)}
-        <input type="range" min={500} max={4000} step={50} value={budget} onChange={(event) => setBudget(Number(event.target.value))} className="mt-2 h-8 w-full accent-[#e7ff4a]" />
-      </label>
 
-      <div className="mt-5 grid gap-4 px-4 lg:grid-cols-3">
-        <article className="rounded-[1.6rem] bg-[#102833] p-4">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-[#e7ff4a]">Desktop</p>
-          {pick ? (
-            <>
-              <h2 className="mt-2 text-xl font-medium leading-snug">{pick.name}</h2>
-              <p className="mt-2 text-3xl font-semibold text-[#e7ff4a]">{money(pick.price)}</p>
-              <BoxShot src={boxPc} brand={pick.brand} name={pick.name} price={pick.price} />
-              <p className="mt-3 text-sm leading-snug text-[#d5cbbd]">Say this. This is the desktop. {pick.name}. {money(pick.price)}. {person.say}</p>
-              {deskMarks(pick)}
-              <AddButton line={partBag(pick, `6666. For ${person.title}. Budget ${money(budget)}. Score ${machineScore(pick.name)}. Desktop.`)} className="mt-3 h-11 w-full rounded-full bg-[#e7ff4a] text-sm font-semibold text-[#07151c]" />
-            </>
-          ) : (
-            <p className="mt-3">Nothing finished is under that. We build it.</p>
-          )}
-        </article>
-        <article className="rounded-[1.6rem] bg-[#f4efe6] p-4 text-[#07151c]">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-[#0f6b4c]">Laptop</p>
-          {laptop ? (
-            <>
-              <h2 className="mt-2 text-xl font-medium leading-snug">{laptop.name}</h2>
-              <p className="mt-2 text-3xl font-semibold">{money(laptop.price)}</p>
-              <p className="mt-3 text-sm leading-snug text-[#3d4a46]">Say this. If they need to carry it, this is the one. {laptop.specs}. {money(laptop.price)}.</p>
-              {laptopMarks(laptop)}
-              <AddButton line={lapBag(laptop, `6666. For ${person.title}. Budget ${money(budget)}. Laptop.`)} className="mt-3 h-11 w-full rounded-full bg-[#07151c] text-sm font-semibold text-[#e7ff4a]" />
-            </>
-          ) : (
-            <p className="mt-3">No laptop under that budget. Raise it, or we build a desktop.</p>
-          )}
-        </article>
-        <article className="rounded-[1.6rem] border border-[#e7ff4a]/30 p-4">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-[#e7ff4a]">Keyboard</p>
-          {feel ? (
-            <>
-              <h2 className="mt-2 text-lg font-medium leading-snug">{feel.name}</h2>
-              <p className="mt-2 text-sm text-[#d5cbbd]">For someone who feels every key. {feel.feel}. About {feel.estimated ?? "—"} dB.</p>
-              <BoxShot src={boxKeys} brand={feel.brand} name={feel.name} price={feel.price} />
-              <AddButton line={keyBag(feel, `6666. For someone who feels every key. Budget ${money(feel.price)}. About ${feel.estimated ?? "—"} dB.`)} className="mt-3 h-11 w-full rounded-full bg-[#e7ff4a] text-sm font-semibold text-[#07151c]" />
-            </>
-          ) : null}
-          {grandma ? (
-            <AddButton line={keyBag(grandma, `6666. Simple keyboard. For ${person.title}. Budget ${money(grandma.price)}.`)} className="mt-2 h-11 w-full rounded-full border border-white/30 text-sm text-[#f4efe6]" />
-          ) : null}
-          <button type="button" onClick={() => { path?.note("keys", "Keyboards"); setPanel("keys"); }} className="mt-2 h-11 w-full rounded-full text-sm text-[#d5cbbd] underline">
-            The whole keyboard store
-          </button>
-        </article>
+      <div className="mx-4 mt-4 grid gap-3 rounded-3xl bg-white p-4 shadow-sm sm:grid-cols-[1fr_16rem]">
+        <label className="block">
+          <span className="text-sm text-[#333]">Budget</span>
+          <span className="mt-1 block text-4xl font-semibold tabular-nums">{money(budget)}</span>
+          <input type="range" min={400} max={4500} step={50} value={budget} onChange={(event) => { setBudget(Number(event.target.value)); setMore(12); }} className="mt-3 h-8 w-full accent-[#0f6b4c]" />
+        </label>
+        <label className="flex h-14 items-center gap-3 self-end rounded-2xl border border-[#161616] bg-[#f4f1ea] px-3">
+          <span className="shrink-0 text-base font-semibold">Sort</span>
+          <select value={order} onChange={(event) => setOrder(event.target.value as Order)} className="h-full w-full bg-transparent text-base outline-none">
+            <option value="low">Price, low to high</option>
+            <option value="high">Price, high to low</option>
+            <option value="score">Best score first</option>
+          </select>
+        </label>
       </div>
 
-      <section className="mx-4 mt-4 rounded-[1.6rem] bg-[#e7ff4a] p-5 text-[#07151c]">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em]">From scratch</p>
-        <h2 className="font-display mt-1 text-3xl font-medium leading-none">Five steps. About five minutes.</h2>
-        <ol className="mt-4 grid gap-3 sm:grid-cols-5">
-          {PLAN.map((step) => (
-            <li key={step.n}>
-              <p className="text-2xl font-semibold">{step.n}</p>
-              <p className="mt-1 font-medium">{step.title}</p>
-              <p className="mt-1 text-sm leading-snug">{step.line}</p>
+      <div className="mt-4 grid gap-3 px-4 lg:grid-cols-3">
+        <Offer kicker="Desktop" name={pick?.name} price={pick?.price} line={pick ? `${person.title}. ${money(pick.price)}. ${person.say}` : "Nothing finished is under that. Raise the budget, or build it."}>
+          {pick ? deskMarks(pick) : null}
+          {pick ? <AddButton line={partBag(pick, `6666. For ${person.title}. Budget ${money(budget)}. Score ${machineScore(pick.name)}. Desktop.`)} className="mt-3 h-12 w-full rounded-full bg-[#161616] text-base font-semibold text-white" /> : null}
+        </Offer>
+        <Offer kicker="Laptop" name={laptop?.name} price={laptop?.price} line={laptop ? `If they need to carry it. ${laptop.specs}` : "No laptop under that budget."}>
+          {laptop ? laptopMarks(laptop) : null}
+          {laptop ? <AddButton line={lapBag(laptop, `6666. For ${person.title}. Budget ${money(budget)}. Laptop.`)} className="mt-3 h-12 w-full rounded-full bg-[#0f6b4c] text-base font-semibold text-white" /> : null}
+        </Offer>
+        <Offer kicker="Keyboard" name={board?.name} price={board?.price} line={board ? `${board.feel}. About ${board.estimated ?? "—"} dB. ${board.layout}.` : "No finished board under that."}>
+          {board ? <AddButton line={keyBag(board, `6666. Keyboard for ${person.title}. ${money(board.price)}. About ${board.estimated ?? "—"} dB.`)} className="mt-3 h-12 w-full rounded-full bg-[#161616] text-base font-semibold text-white" /> : null}
+          <button type="button" onClick={() => go("keys", "Keyboards")} className="mt-2 h-11 w-full rounded-full border border-[#161616] text-sm">
+            All keyboards
+          </button>
+        </Offer>
+      </div>
+
+      <div className="mx-4 mt-4 flex flex-wrap gap-2">
+        <button type="button" onClick={() => { path?.note("five", "Five minutes"); setFive(true); }} className="h-12 rounded-full bg-[#0f6b4c] px-4 text-base font-semibold text-white">Five minutes</button>
+        <button type="button" onClick={() => go("build", "From scratch")} className="h-12 rounded-full border border-[#161616] bg-white px-4 text-base">Build from a chip</button>
+        <button type="button" onClick={() => go("sim", "Sims")} className="h-12 rounded-full border border-[#161616] bg-white px-4 text-base">Sims</button>
+        <button type="button" onClick={() => go("deals", "Bundles")} className="h-12 rounded-full border border-[#161616] bg-white px-4 text-base">Bundles</button>
+      </div>
+
+      <section className="mx-4 mt-6">
+        <h2 className="text-2xl font-semibold">The shelf, under {money(budget)}</h2>
+        <p className="mt-1 text-sm text-[#333]">Raise the budget to see the expensive ones. Sort is the same menu as above.</p>
+        <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+          {SHELVES.map((item) => (
+            <button key={item.id} type="button" onClick={() => { setShelf(item.id); setMore(12); path?.note(`shelf:${item.id}`, item.title); }} className={`h-11 shrink-0 rounded-full px-3 text-sm ${shelf === item.id ? "bg-[#161616] font-semibold text-white" : "bg-white"}`}>
+              {item.title}
+            </button>
+          ))}
+        </div>
+        <p className="mt-3 text-sm text-[#333]">{shelfRows.length} shown, {order === "high" ? "dearest first" : order === "score" ? "best score first" : "cheapest first"}.</p>
+        <ul className="mt-2 space-y-2">
+          {shelfRows.slice(0, more).map((row) => (
+            <li key={row.id} className="rounded-2xl bg-white px-4 py-3">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-xs uppercase tracking-wide text-[#0f6b4c]">{row.brand}</p>
+                  <p className="text-base font-medium leading-snug">{row.name}</p>
+                  <p className="mt-1 text-sm text-[#333]">Score {Math.round(row.score)}</p>
+                </div>
+                <p className="shrink-0 text-lg font-semibold tabular-nums">{money(row.price)}</p>
+              </div>
+              {row.kind === "laptop" ? (
+                <AddButton line={lapBag(LAPS.find((item) => item.id === row.id) ?? { id: row.id, name: row.name, price: row.price, brand: row.brand }, `6666 shelf. ${person.title}. ${money(row.price)}.`)} />
+              ) : (
+                <AddButton line={partBag(row.part as Part, `6666 shelf. ${person.title}. ${money(row.price)}. Score ${Math.round(row.score)}.`)} />
+              )}
             </li>
           ))}
-        </ol>
-        <div className="mt-4 grid gap-2 sm:grid-cols-2">
-          <button type="button" onClick={() => { path?.note("five", "Five minutes"); setFive(true); }} className="h-12 rounded-full bg-[#07151c] text-base font-semibold text-[#e7ff4a]">
-            Five minutes
+        </ul>
+        {shelfRows.length === 0 ? <p className="mt-3 rounded-2xl bg-white px-4 py-8 text-center">Nothing on this shelf under {money(budget)}.</p> : null}
+        {more < shelfRows.length ? (
+          <button type="button" onClick={() => setMore((count) => count + 24)} className="mt-3 h-12 w-full rounded-full border border-[#161616] bg-white text-base">
+            Show more
           </button>
-          <button type="button" onClick={() => { path?.note("build", "From scratch"); setPanel("build"); }} className="h-12 rounded-full border border-[#07151c] text-base font-semibold">
-            Start from the chip
-          </button>
-          <button type="button" onClick={() => { path?.note("deals", "Bundles"); setPanel("deals"); }} className="h-12 rounded-full border border-[#07151c] text-base font-semibold">
-            Bundles
-          </button>
-        </div>
+        ) : null}
       </section>
-      <section className="mx-4 mt-4 pb-28">
+      <section className="mx-4 mt-6">
         <Packs />
       </section>
     </div>
+  );
+}
+
+function Offer({ kicker, name, price, line, children }: { kicker: string; name?: string; price?: number; line: string; children?: React.ReactNode }) {
+  return (
+    <article className="rounded-3xl bg-white p-4 shadow-sm">
+      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#0f6b4c]">{kicker}</p>
+      <h2 className="mt-2 text-xl font-semibold leading-snug">{name ?? "None under the budget"}</h2>
+      {price ? <p className="mt-2 text-3xl font-semibold tabular-nums">{money(price)}</p> : null}
+      <p className="mt-2 text-sm leading-snug text-[#333]">{line}</p>
+      {children}
+    </article>
   );
 }
