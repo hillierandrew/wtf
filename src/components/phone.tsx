@@ -5,8 +5,12 @@ import { PHONE_ITEMS, PHONE_SECTIONS, groupMeta, phoneItem, type PhoneItem } fro
 import { EasyPick, GpuPower } from "@/components/easy";
 import { KeyboardShop } from "@/components/keyboard-shop";
 import { Counter } from "@/components/counter";
+import { laptopMarks, deskMarks } from "@/components/marks";
+import laptopsRaw from "@/data/laptops.json";
 import { CopyList, named } from "@/components/copy-list";
 import { Sim } from "@/components/sim";
+
+const LAPS = laptopsRaw as { id: string; name: string; price: number; gpu: number; specs: string; kind?: string }[];
 
 type Tab = "use" | "power" | "build" | "shop" | "deals" | "search" | "saved";
 type Sort = "low" | "high" | "name" | "sale";
@@ -35,6 +39,16 @@ function sortItems(list: PhoneItem[], sort: Sort) {
   else if (sort === "sale") next.sort((a, b) => saleOf(b) - saleOf(a) || a.price - b.price);
   else next.sort((a, b) => a.price - b.price);
   return next;
+}
+
+function PhoneMarks({ item }: { item: PhoneItem }) {
+  const id = item.id.slice(item.group.length + 1);
+  if (item.group === "laptops") {
+    const lap = LAPS.find((row) => row.id === id);
+    return lap ? laptopMarks(lap) : null;
+  }
+  const part = byId.get(id);
+  return part ? deskMarks(part) : null;
 }
 
 export function Phone({ onLock }: { onLock: () => void }) {
@@ -186,6 +200,7 @@ export function Phone({ onLock }: { onLock: () => void }) {
                 {open.open ? <span className="rounded-full bg-white px-3 py-1 text-[13px] font-medium text-[#8e8e93] shadow-sm">Open box</span> : null}
                 <span className="rounded-full bg-white px-3 py-1 text-[13px] font-medium text-[#8e8e93] shadow-sm">{groupMeta(open.group)?.title}</span>
               </div>
+              {open.group === "laptops" || open.group === "desktops" ? <PhoneMarks item={open} /> : null}
               <button
                 type="button"
                 onClick={() => toggleSave(open.id)}

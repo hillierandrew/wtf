@@ -165,11 +165,26 @@
   animation: glass-in 0.45s ease both;
 }
 
+@keyframes mush {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.mush {
+  animation: mush 3.4s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .lock-shake,
   .lock-pulse,
   .glass-rise,
-  .glass-in {
+  .glass-in,
+  .mush {
     animation: none;
   }
 }

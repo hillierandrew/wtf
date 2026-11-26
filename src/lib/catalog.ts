@@ -341,8 +341,10 @@ export function explainPart(part: Part): string[] {
     lines.push(`Memory = ${bits.ramPts}. ${bits.ram || 0} GB in the name. 64GB is 16, 32GB is 12, 16GB is 6, less is 0.`);
     lines.push(`Drive = ${bits.diskPts}. ${bits.disk || 0} TB of SSD. 4TB is 8, 2TB is 6, 1TB is 4, 0.5TB is 2, less is 0.`);
     lines.push(`Cache = ${bits.cpuPts}. An X3D chip is 6. Any other chip is 0.`);
-    lines.push(`${bits.gpu} + ${bits.ramPts} + ${bits.diskPts} + ${bits.cpuPts} = ${bits.raw}, which becomes ${bits.score}.`);
+    lines.push(`Upgrade = ${bits.room}. A tower is 6, because the card, memory, drive, and power supply can be changed later. A tiny case is 4. An all-in-one is 2.`);
+    lines.push(`${bits.gpu} + ${bits.ramPts} + ${bits.diskPts} + ${bits.cpuPts} + ${bits.room} = ${bits.raw}, which becomes ${bits.score}.`);
     lines.push(`${money(part.price)} ÷ ${bits.score} = ${money(part.price / bits.score)} per point.`);
+    lines.push(`TLDR: ${rank.name} ${bits.score}. The graphics number is most of it. ${bits.ram || 0} GB of memory is ${bits.ramPts} points. The drive is ${bits.diskPts}. Upgrade room is ${bits.room}. You pay ${money(part.price / bits.score)} per point.`);
   } else if (part.cat === "monitor") {
     lines.push("1080p starts at 36, 1440p at 55, 4K at 70. 144Hz adds 16. 240Hz adds 25.");
   } else if (part.cat === "motherboard") {
@@ -516,15 +518,16 @@ export function machineParts(name: string) {
   const disk = tb ? Number(tb[1]) : gb ? Number(gb[1]) / 1000 : 0;
   const diskPts = disk >= 4 ? 8 : disk >= 2 ? 6 : disk >= 1 ? 4 : disk >= 0.5 ? 2 : 0;
   const cpuPts = /X3D/.test(n) ? 6 : 0;
-  const raw = gpu + ramPts + diskPts + cpuPts;
-  return { gpu, ram, ramPts, disk, diskPts, cpuPts, raw, score: Math.max(1, Math.min(100, raw)) };
+  const room = /ALL-IN-ONE|\bAIO\b/.test(n) ? 2 : /\bMINI\b|\bITX\b/.test(n) ? 4 : 6;
+  const raw = gpu + ramPts + diskPts + cpuPts + room;
+  return { gpu, ram, ramPts, disk, diskPts, cpuPts, room, raw, score: Math.max(1, Math.min(100, raw)) };
 }
 
 export function machineScore(name: string): number {
   return machineParts(name).score;
 }
 
-export function laptopBits(item: { gpu: number; specs: string; price?: number }) {
+export function laptopBits(item: { gpu: number; specs: string; price?: number; name?: string; kind?: string }) {
   const ramMatch = item.specs.match(/(\d+)GB memory/i);
   const ram = ramMatch ? Number(ramMatch[1]) : 0;
   const disk = item.specs.match(/(\d+(?:\.\d+)?)(TB|GB) storage/i);
@@ -532,8 +535,10 @@ export function laptopBits(item: { gpu: number; specs: string; price?: number })
   const diskPts = diskTb >= 2 ? 6 : diskTb >= 1 ? 4 : diskTb >= 0.5 ? 2 : 0;
   const ramPts = ram >= 64 ? 16 : ram >= 32 ? 12 : ram >= 16 ? 6 : 0;
   const gpu = item.gpu >= 100 ? 88 : item.gpu >= 90 ? 80 : item.gpu >= 80 ? 72 : item.gpu >= 72 ? 64 : item.gpu >= 60 ? 52 : item.gpu >= 45 ? 40 : item.gpu >= 28 ? 30 : ram >= 16 ? 14 : 8;
-  const raw = gpu + ramPts + diskPts;
-  return { gpu, chip: item.gpu, ram, ramPts, diskTb, diskPts, raw, score: Math.max(1, Math.min(100, raw)) };
+  const blob = `${item.name ?? ""} ${item.specs} ${item.kind ?? ""}`.toUpperCase();
+  const room = /TABLET|CHROME|SOLDER|NOT UPGRAD/.test(blob) ? 0 : item.gpu >= 45 ? 4 : 2;
+  const raw = gpu + ramPts + diskPts + room;
+  return { gpu, chip: item.gpu, ram, ramPts, diskTb, diskPts, room, raw, score: Math.max(1, Math.min(100, raw)) };
 }
 
 export function explainLaptop(item: { name?: string; price: number; gpu: number; specs: string }): string[] {
@@ -541,14 +546,50 @@ export function explainLaptop(item: { name?: string; price: number; gpu: number;
   const rank = rankFrom(bits.score);
   return [
     `${rank.name} ${rank.score}. ${BANDS}`,
-    "Formula: graphics + memory + drive. The result stops at 100.",
+    "Formula: graphics + memory + drive + upgrade. The result stops at 100.",
     `Graphics = ${bits.gpu}. The chip power number is ${bits.chip}. 100 or more means 88. 90 means 80. 80 means 72. 72 means 64. 60 means 52. 45 means 40. 28 means 30. Otherwise 16GB of memory makes it 14, and less memory makes it 8.`,
     `Memory = ${bits.ramPts}. ${bits.ram || 0} GB. 64GB is 16, 32GB is 12, 16GB is 6, less is 0.`,
     `Drive = ${bits.diskPts}. ${bits.diskTb || 0} TB. 2TB is 6, 1TB is 4, 0.5TB is 2, smaller is 0.`,
-    `${bits.gpu} + ${bits.ramPts} + ${bits.diskPts} = ${bits.raw}, which becomes ${bits.score}.`,
+    `Upgrade = ${bits.room}. A gaming laptop is 4, because the drive and often the memory can be changed. A home laptop is 2. A Chromebook or tablet is 0. Buy the memory you need today if it is 0.`,
+    `${bits.gpu} + ${bits.ramPts} + ${bits.diskPts} + ${bits.room} = ${bits.raw}, which becomes ${bits.score}.`,
     `${money(item.price)} ÷ ${bits.score} = ${money(item.price / bits.score)} per point.`,
-    "Lower dollars per point means more laptop for the money.",
+    `TLDR: ${rank.name} ${bits.score}. Graphics ${bits.gpu}, ${bits.ram || 0} GB is ${bits.ramPts}, the drive is ${bits.diskPts}, upgrade room is ${bits.room}. ${money(item.price / bits.score)} per point.`,
   ];
+}
+
+export function dealFrom(price: number, score: number) {
+  const per = price / Math.max(1, score);
+  if (per <= 14) return { name: "Steal" as const, per, bg: "#d9f5d6", fg: "#145214", ring: "#1f7a34", say: "Hand them this if the budget is the whole conversation." };
+  if (per <= 22) return { name: "Fair" as const, per, bg: "#d7ecff", fg: "#0b3558", ring: "#1d4ed8", say: "A normal price for this much computer." };
+  if (per <= 32) return { name: "Full" as const, per, bg: "#fff1cc", fg: "#5a3b00", ring: "#b45309", say: "You are paying the sticker. It is not a bargain." };
+  return { name: "Stretch" as const, per, bg: "#ffe0e0", fg: "#6b1420", ring: "#be123c", say: "The computer is fine. The price is the part to talk about." };
+}
+
+export function dealLines(price: number, score: number, room: number): string[] {
+  const deal = dealFrom(price, score);
+  const roomLine = room >= 6 ? "A tower. Card, memory, drive, and power supply can change later." : room >= 4 ? "Some room later. Memory and the drive, sometimes the card." : room >= 2 ? "A little room. Usually the drive." : "Sealed. Buy the memory and the storage they need today.";
+  return [
+    `${deal.name}. ${money(price)} ÷ ${score} = ${money(deal.per)} per point.`,
+    "Steal is $14 or less per point. Fair is $22 or less. Full is $32 or less. Stretch is above that.",
+    `Upgrade room on the power score is ${room}. ${roomLine}`,
+    `TLDR: ${deal.say} ${money(deal.per)} per point. Power is a different rank. This one is only the price.`,
+  ];
+}
+
+export function faceTags(name: string): string[] {
+  const n = name.toUpperCase();
+  const tags: string[] = [];
+  if (/OLED/.test(n)) tags.push("OLED");
+  else if (/\bIPS\b/.test(n)) tags.push("IPS");
+  else if (/\bVA\b/.test(n)) tags.push("VA");
+  if (/4K|UHD|3840/.test(n)) tags.push("4K");
+  else if (/QHD|1440|\b2K\b|2560/.test(n)) tags.push("2K");
+  else if (/FHD|1080/.test(n)) tags.push("1080p");
+  const inch = name.match(/(\d{2}(?:\.\d)?)\s*(?:"|INCH)/i);
+  if (inch) tags.push(`${inch[1]}"`);
+  if (/NO BACK-?LIGHT|NON-?BACKLIT|NO BACKLIT/.test(n)) tags.push("No backlight");
+  else if (/BACK-?LIT|BACKLIGHT|RGB KEYBOARD/.test(n)) tags.push("Backlit keyboard");
+  return tags;
 }
 
 export function aiScore(build: Build): number {

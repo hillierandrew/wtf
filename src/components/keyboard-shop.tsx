@@ -335,6 +335,7 @@ export function KeyboardShop({ onLeave }: { look?: Look; onLeave?: () => void })
                 <span className="mt-2 block text-[13px] text-[#333]">
                   {item.shelf === "board" || item.shelf === "combo" ? `${LAYOUT_LABEL[item.layout]} · ${LIGHT_LABEL[item.light]} · ` : ""}
                   {heard ? FEEL_LABEL[item.feel] : "Keycaps"}
+                  {item.light === "none" ? " · No backlight" : item.light === "rgb" || item.light === "backlight" ? " · Backlit" : ""}
                   {item.open ? " · Open box" : ""}
                 </span>
                 {heard ? (

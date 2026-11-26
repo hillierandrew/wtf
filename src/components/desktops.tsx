@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Check, Search, X } from "lucide-react";
 import { PARTS, careerPicks, explainBuild, explainPart, machineScore, money, spendOf, tagsOf, aiScore, type AiPick, type Part, type ShelfSort } from "@/lib/catalog";
 import { CopyList, buildNames, partLine } from "@/components/copy-list";
+import { deskMarks } from "@/components/marks";
 import { RankBadge } from "@/components/rank";
 import { SortRow } from "@/components/sorts";
 import { ThemeToggle, usePane } from "@/lib/theme";
@@ -186,9 +187,7 @@ export function Desktops({ onLeave, onUse }: { onLeave: () => void; onUse?: (pic
                     {part.was ? <span className="block text-sm text-ok">Down {money(part.was - part.price)}</span> : null}
                   </span>
                 </button>
-                <div className="px-3 pb-3">
-                  <RankBadge score={score} lines={explainPart({ ...part, cat: "prebuilt" })} />
-                </div>
+                <div className="px-3 pb-3">{deskMarks(part)}</div>
               </li>
             );
           })}
@@ -198,7 +197,7 @@ export function Desktops({ onLeave, onUse }: { onLeave: () => void; onUse?: (pic
       <aside className={`shrink-0 bg-elevated px-4 py-4 ${wide ? "flex w-80 flex-col border-l border-line" : "safe-bottom border-t border-line"}`}>
         <div className="flex items-center justify-between gap-3">
           <p className="text-base font-medium">{choice ? money(choice.price) : "No PC yet"}</p>
-          {choice ? <RankBadge score={machineScore(choice.name)} lines={explainPart(choice)} /> : null}
+          {choice ? deskMarks(choice) : null}
         </div>
         <div className="mt-2 flex items-center gap-2">
           <span className="min-w-0 flex-1 truncate text-base">{choice ? choice.name.replace(/\(Open Box\)/i, "").trim() : "Tap one PC."}</span>

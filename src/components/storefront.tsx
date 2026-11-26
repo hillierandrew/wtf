@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Lock, Search, Sparkles, X } from "lucide-react";
 import laptopsRaw from "@/data/laptops.json";
 import { CopyList, partLine } from "@/components/copy-list";
+import { laptopMarks, deskMarks } from "@/components/marks";
 import { Counter } from "@/components/counter";
 import { KeyboardShop } from "@/components/keyboard-shop";
 import { CAT_LABEL, PARTS, explainPart, explainLaptop, laptopBits, isJunk, machineScore, money, partScore, rankFrom, tagsOf, type Category, type Part } from "@/lib/catalog";
@@ -418,6 +419,8 @@ export function Storefront({ onLock }: { onLock: () => void }) {
                           ))}
                         </div>
                       ) : null}
+                      {item.where === "laptops" && LAPTOPS.some((row) => row.id === item.id) ? laptopMarks(LAPTOPS.find((row) => row.id === item.id)!) : null}
+                      {item.where === "desktops" && PARTS.some((row) => row.id === item.id) ? deskMarks(PARTS.find((row) => row.id === item.id)!) : null}
                     </article>
                   );
                 })}

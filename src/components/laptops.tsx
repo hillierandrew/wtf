@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Check, Search, X } from "lucide-react";
 import raw from "@/data/laptops.json";
-import { explainLaptop, laptopBits, type ShelfSort } from "@/lib/catalog";
-import { RankBadge } from "@/components/rank";
+import { laptopBits, type ShelfSort } from "@/lib/catalog";
+import { laptopMarks } from "@/components/marks";
 import { CopyList, partLine } from "@/components/copy-list";
 import { SortRow } from "@/components/sorts";
 import { ThemeToggle, usePane } from "@/lib/theme";
 
 type Kind = "game" | "home" | "work" | "tablet" | "chrome";
-type Filter = "deal" | "games" | "work" | "school" | "create" | "tablet" | "chrome";
+type Filter = "deal" | "games" | "work" | "school" | "grandma" | "create" | "tablet" | "chrome";
 type Quality = "low" | "medium" | "normal" | "ultra";
 
 type Laptop = {
@@ -52,6 +52,7 @@ const FILTERS: { id: Filter; label: string; line: string }[] = [
   { id: "games", label: "Games", line: "Strongest for games first. A higher deal number is more computer for the money." },
   { id: "work", label: "Work", line: "Email, office, and class. These are the work laptops." },
   { id: "school", label: "School", line: "Home and school. Not a gaming laptop." },
+  { id: "grandma", label: "Grandma", line: "Email, photos, and a video call. Nothing extra to learn." },
   { id: "create", label: "Create", line: "Photos, video, and big files. Lots of memory, or a graphics chip." },
   { id: "tablet", label: "Tablet", line: "A tablet. It is not a laptop." },
   { id: "chrome", label: "Chromebook", line: "For the web and school. Not for heavy games." },
@@ -154,6 +155,7 @@ function fits(item: Laptop, filter: Filter) {
   if (filter === "games") return item.kind === "game" || item.gpu >= 45;
   if (filter === "work") return item.kind === "work";
   if (filter === "school") return (item.kind === "home" || item.kind === "chrome") && item.gpu < 45;
+  if (filter === "grandma") return (item.kind === "home" || item.kind === "chrome" || item.kind === "work") && item.gpu < 28;
   if (filter === "create") return item.kind !== "tablet" && item.kind !== "chrome" && (item.gpu > 0 || item.specs.includes("32GB") || item.specs.includes("64GB"));
   if (filter === "tablet") return item.kind === "tablet";
   return item.kind === "chrome";
@@ -163,10 +165,6 @@ function plays(item: Laptop, game: GameNeed, quality: Quality) {
   if (item.kind === "tablet" || item.kind === "chrome") return false;
   if (ramOf(item) < game.ram[quality]) return false;
   return item.gpu >= game.need[quality];
-}
-
-function laptopMath(item: Laptop) {
-  return explainLaptop(item);
 }
 
 function studies(item: Laptop, course: Course) {
@@ -371,7 +369,7 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
                   </span>
                 </button>
                 <div className="px-3 pb-3">
-                  <RankBadge score={hundred(item)} lines={laptopMath(item)} />
+                  {laptopMarks(item)}
                 </div>
               </li>
             );

@@ -231,8 +231,15 @@ function Lock({ onOpen }: { onOpen: (next: "site" | "phone" | "store" | "glass" 
   const label = state === "open" ? "OPEN" : state === "denied" ? "WRONG CODE" : "ARMED";
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-[#1a0530] px-4 py-8 text-white">
-      <div className={`w-full max-w-sm rounded-[2rem] border-2 border-[#ff7a1a] bg-[#14061f] p-5 shadow-[0_0_36px_rgba(255,122,26,0.45)] ${state === "denied" ? "lock-shake" : ""}`}>
+    <div className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-[#1a0530] px-4 py-8 text-white">
+      <div className="pointer-events-none absolute inset-0 z-0 text-[#c4a574]" aria-hidden="true">
+        {["8%", "22%", "70%", "84%", "12%", "78%"].map((left, index) => (
+          <pre key={left + index} className="mush absolute font-mono text-[11px] leading-none" style={{ left, top: index > 3 ? "68%" : "8%", animationDelay: `${index * 0.4}s` }}>
+{index % 2 === 0 ? "   _\n  ( )\n _|_|_\n(_____)\n  | |" : "    _\n   ( )\n  _|_|_\n (_____)\n   | |\n   | |"}
+          </pre>
+        ))}
+      </div>
+      <div className={`relative z-10 w-full max-w-sm rounded-[2rem] border-2 border-[#ff7a1a] bg-[#14061f] p-5 shadow-[0_0_36px_rgba(255,122,26,0.45)] ${state === "denied" ? "lock-shake" : ""}`}>
         <div className="flex items-center justify-between px-1">
           <p className="text-sm font-medium tracking-[0.28em] text-[#ffb070]">DOOR</p>
           <p className="flex items-center gap-2 text-xs tracking-[0.22em] text-[#e9d5ff]">
