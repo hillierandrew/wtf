@@ -231,7 +231,10 @@ export function Builder({ onLeave, start = "play" }: { onLeave: () => void; star
           </button>
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            <p className="tabular text-sm font-medium">{money(total)}</p>
+            <p className="tabular text-right text-sm font-medium">
+              <span className="block">{money(total)}</span>
+              <span className="block text-[11px] font-normal text-muted">parts together</span>
+            </p>
           </div>
         </div>
         <div className="mt-3 flex items-end justify-between gap-3">
@@ -338,6 +341,10 @@ export function Builder({ onLeave, start = "play" }: { onLeave: () => void; star
             onManual={() => {
               setPanel("shelf");
               go(CATS.indexOf("cpu"));
+            }}
+            onBundle={() => {
+              setPanel("shelf");
+              go(CATS.indexOf("bundle"));
             }}
             onMore={() => setPanel("ai")}
           />
@@ -756,10 +763,12 @@ const JOBS = [
 function Quest({
   onUse,
   onManual,
+  onBundle,
   onMore,
 }: {
   onUse: (pick: ReturnType<typeof aiPicks>[number]) => void;
   onManual: () => void;
+  onBundle: () => void;
   onMore: () => void;
 }) {
   const picks = aiPicks();
@@ -934,6 +943,10 @@ function Quest({
         <span className="block text-2xl font-medium">School and work</span>
         <span className="mt-1 block text-base text-muted">Zoom, office mail, podcasts, radio, video.</span>
       </button>
+      <button type="button" onClick={onBundle} className="press min-h-16 w-full rounded-2xl border border-line bg-elevated px-4 text-left text-xl font-medium">
+        Start from a bundle
+        <span className="mt-1 block text-base font-normal text-muted">The deal has the chip, the board, and the memory. Then you add the case.</span>
+      </button>
       <button type="button" onClick={onManual} className="press min-h-16 w-full rounded-2xl border border-line px-4 text-left text-xl font-medium">
         Pick the parts myself
       </button>
@@ -988,7 +1001,7 @@ function Checkout({
 
   const docked = wide;
   return (
-    <aside className={`flex min-h-0 flex-col border-line bg-elevated ${docked ? "h-full w-80 shrink-0 border-l" : open ? "h-[42%] shrink-0 border-t" : "shrink-0 border-t"}`}>
+    <aside className={`flex min-h-0 flex-col border-line bg-elevated pb-[calc(4.75rem+env(safe-area-inset-bottom))] ${docked ? "h-full w-80 shrink-0 border-l" : open ? "h-[42%] shrink-0 border-t" : "shrink-0 border-t"}`}>
       {open ? (
         <ul className="min-h-0 flex-1 space-y-2 overflow-y-auto px-3 pt-3 pb-3">
           {rows.map((cat) => {
@@ -1039,7 +1052,7 @@ function Checkout({
           ))}
         </ul>
       ) : null}
-      <button type="button" onClick={toggle} aria-expanded={open} className="flex h-14 w-full shrink-0 items-center gap-3 border-t border-line px-3 pr-[min(48%,12rem)] text-left">
+      <button type="button" onClick={toggle} aria-expanded={open} className="mt-auto flex h-16 w-full shrink-0 items-center gap-3 border-t border-line px-3 text-left">
         <span className="shrink-0 rounded-full bg-fg px-3 py-1.5 text-sm font-medium text-bg">{open ? "Hide" : "Show"}</span>
         <span className="min-w-0 flex-1">
           <span className="block truncate text-sm font-medium">
@@ -1146,7 +1159,8 @@ function AiPanel({ onUse }: { onUse: (pick: ReturnType<typeof aiPicks>[number]) 
                 <p className="tabular shrink-0 text-right text-sm font-medium">
                   <span className="block">{score}/100</span>
                   <span className="block">{money(spend)}</span>
-                  <span className="block text-muted">{money(spend / score)}/point</span>
+                  <span className="block text-muted">parts together</span>
+                  <span className="block text-muted">{money(spend / score)} per point of speed</span>
                   {drive ? <span className="block text-muted">Drive {drive.text}</span> : null}
                   {memory ? <span className="block text-muted">Memory {memory.text}</span> : null}
                 </p>

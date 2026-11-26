@@ -51,7 +51,7 @@ function byMoney<T extends { price: number; score: number }>(rows: T[], order: O
 
 export function Spread({ onLock }: { onLock: () => void }) {
   return (
-    <HistoryRoot home="Counter">
+    <HistoryRoot home="6666" onLock={onLock}>
       <Floor onLock={onLock} />
       <BagDock />
     </HistoryRoot>

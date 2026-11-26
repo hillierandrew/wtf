@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Lock } from "lucide-react";
 import { ThemeToggle } from "@/lib/theme";
 import { useDoorLock } from "@/components/lock";
+import { usePath } from "@/components/history";
 import { Counter } from "@/components/counter";
 import { Five } from "@/components/five";
 import { Packs } from "@/components/packs";
@@ -36,12 +37,19 @@ export function Welcome({
   onPower: () => void;
 }) {
   const lock = useDoorLock();
+  const path = usePath();
   const [walk, setWalk] = useState(false);
   const [five, setFive] = useState(false);
-  if (walk) return <Counter onClose={() => setWalk(false)} />;
-  if (five) return <Five onClose={() => setFive(false)} />;
+  useEffect(() => {
+    if (!path) return;
+    const id = path.log[path.at]?.id;
+    setFive(id === "five");
+    setWalk(id === "walk");
+  }, [path?.at, path]);
+  if (walk) return <Counter onClose={() => path?.back()} />;
+  if (five) return <Five onClose={() => path?.back()} />;
   const more = [
-    { label: "Walk the shelf", line: "Start with a chip or a graphics card. I hide what does not fit.", onClick: () => setWalk(true) },
+    { label: "Walk the shelf", line: "Start with a chip or a graphics card. I hide what does not fit.", onClick: () => { path?.note("walk", "Walk the shelf"); setWalk(true); } },
     { label: "Build each part", line: "The long way. One part at a time.", onClick: onEnter },
     { label: "Basic questions", line: "A few taps. I pick the parts.", onClick: onGuide },
     { label: "Finished PCs", line: "Already built. Sorted by the deal.", onClick: onDesktop },
@@ -65,7 +73,7 @@ export function Welcome({
       <section className="mx-auto w-full max-w-3xl px-4 pb-6">
         <h1 className="font-display text-4xl font-medium leading-none tracking-tight">Five minutes</h1>
         <p className="mt-2 text-base text-muted">What it is for, the games, the budget, and whether they need the whole desk.</p>
-        <button type="button" onClick={() => setFive(true)} className="press mt-4 flex min-h-24 w-full flex-col items-start justify-center rounded-3xl bg-accent px-5 py-4 text-left text-accent-fg">
+        <button type="button" onClick={() => { path?.note("five", "Five minutes"); setFive(true); }} className="press mt-4 flex min-h-24 w-full flex-col items-start justify-center rounded-3xl bg-accent px-5 py-4 text-left text-accent-fg">
           <span className="font-display text-3xl font-medium leading-none">Start</span>
           <span className="mt-2 text-sm">Big buttons. One answer each.</span>
         </button>

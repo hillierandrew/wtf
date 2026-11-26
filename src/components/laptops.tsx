@@ -395,7 +395,7 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
                   </span>
                   <span className="shrink-0 text-right">
                     <span className="tabular block text-base font-medium" style={{ color: dealFrom(item.price, hundred(item)).fg }}>{money(item.price)}</span>
-                    <span className="block text-xs font-semibold" style={{ color: dealFrom(item.price, hundred(item)).fg }}>{money(item.price / hundred(item))} / point · {releaseYear(item.name)}</span>
+                    <span className="block text-xs font-semibold" style={{ color: dealFrom(item.price, hundred(item)).fg }}>{money(item.price / hundred(item))} per point of speed · {releaseYear(item.name)}</span>
                     {item.was ? <span className="block text-sm text-ok">Down {money(item.was - item.price)}</span> : null}
                   </span>
                 </button>

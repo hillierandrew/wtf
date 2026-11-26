@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { CopyList, buildNames } from "@/components/copy-list";
 import { CAT_LABEL, CATS, ideaPicks, money, shortName, spendOf, type AiPick } from "@/lib/catalog";
+import { usePath } from "@/components/history";
 import { ThemeToggle, usePane } from "@/lib/theme";
 
 const FILTERS = [
@@ -14,6 +15,7 @@ const FILTERS = [
 ];
 
 export function Ideas({ onLeave, onUse }: { onLeave: () => void; onUse: (pick: AiPick) => void }) {
+  const path = usePath();
   const pane = usePane();
   const picks = useMemo(() => ideaPicks(), []);
   const [filter, setFilter] = useState("all");
@@ -52,7 +54,7 @@ export function Ideas({ onLeave, onUse }: { onLeave: () => void; onUse: (pick: A
           </select>
         </label>
       </div>
-      <div className={`min-h-0 flex-1 overflow-y-auto px-4 pb-4 ${pane && !current ? "grid grid-cols-2 gap-3 content-start" : "space-y-3"}`}>
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-8">
         {current ? (
           <div>
             <button type="button" onClick={() => setOpen(null)} className="h-12 rounded-full border border-line px-5 text-base">
@@ -60,6 +62,8 @@ export function Ideas({ onLeave, onUse }: { onLeave: () => void; onUse: (pick: A
             </button>
             <h2 className="font-display mt-4 text-3xl font-medium leading-tight">{current.name}</h2>
             <p className="mt-2 text-lg text-muted">{current.why}</p>
+            <p className="mt-4 text-4xl font-semibold">{money(spendOf(current.build))}</p>
+            <p className="text-sm text-muted">That is the parts together. Not a monthly price.</p>
             <ul className="mt-4 space-y-2">
               {CATS.map((cat) => {
                 const part = current.build[cat];
@@ -73,21 +77,23 @@ export function Ideas({ onLeave, onUse }: { onLeave: () => void; onUse: (pick: A
                 );
               })}
             </ul>
-            <p className="mt-4 text-3xl font-medium">Total {money(spendOf(current.build))}</p>
             <CopyList title={current.name} names={buildNames(current.build)} />
-            <button type="button" onClick={() => onUse(current)} className="mt-4 h-16 w-full rounded-2xl bg-accent text-xl text-accent-fg">
+            <button type="button" onClick={() => { path?.note("use-pc", "Use this PC"); onUse(current); }} className="mt-4 h-16 w-full rounded-2xl bg-accent text-xl text-accent-fg">
               Use this PC
             </button>
           </div>
         ) : (
-          shown.map((pick) => (
-            <button key={pick.id} type="button" onClick={() => setOpen(pick.id)} className="press flex min-h-28 w-full flex-col items-start justify-center rounded-3xl border border-line bg-elevated px-5 py-4 text-left">
-              <span className="text-sm text-muted">{pick.kicker}</span>
-              <span className="mt-1 font-display text-2xl font-medium leading-tight">{pick.name}</span>
-              <span className="mt-2 text-base text-muted">{pick.why}</span>
-              <span className="mt-3 text-lg font-medium">{money(spendOf(pick.build))}</span>
-            </button>
-          ))
+          <div className={`grid auto-rows-auto items-stretch gap-3 ${pane ? "grid-cols-2" : "grid-cols-1"}`}>
+            {shown.map((pick) => (
+              <button key={pick.id} type="button" onClick={() => { setOpen(pick.id); path?.note(`idea:${pick.id}`, pick.name); }} className="flex h-auto min-h-0 w-full min-w-0 flex-col items-start overflow-hidden rounded-3xl border border-line bg-elevated p-5 text-left">
+                <span className="text-sm text-muted">{pick.kicker}</span>
+                <span className="mt-1 text-2xl font-semibold leading-snug">{pick.name}</span>
+                <span className="mt-2 text-base leading-snug text-muted">{pick.why}</span>
+                <span className="mt-4 text-2xl font-semibold tabular-nums">{money(spendOf(pick.build))}</span>
+                <span className="mt-1 text-sm text-muted">Parts together. Pay this once.</span>
+              </button>
+            ))}
+          </div>
         )}
       </div>
     </div>

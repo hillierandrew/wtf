@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { Lock, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import laptopsRaw from "@/data/laptops.json";
-import { CAT_LABEL, PARTS, byId, dealFrom, explainLaptop, explainPart, isJunk, laptopBits, money, partScore, tagsOf, type Category } from "@/lib/catalog";
+import { PARTS, byId, dealFrom, explainLaptop, explainPart, isJunk, laptopBits, money, partScore, tagsOf, type Category } from "@/lib/catalog";
 import { laptopBlob, laptopFace, releaseYear, tagPaint } from "@/lib/facts";
 import { RankBadge } from "@/components/rank";
 import { Counter } from "@/components/counter";
@@ -81,7 +81,7 @@ function cardsFor(id: string): Card[] {
 
 export function GlassStore({ onLock }: { onLock: () => void }) {
   return (
-    <HistoryRoot home="Liquid">
+    <HistoryRoot home="6767" onLock={onLock}>
       <GlassBody onLock={onLock} />
       <BagDock />
     </HistoryRoot>
@@ -90,7 +90,6 @@ export function GlassStore({ onLock }: { onLock: () => void }) {
 
 function GlassBody({ onLock }: { onLock: () => void }) {
   const [shelf, setShelf] = useState<string | null>(null);
-  const [hot, setHot] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [picked, setPicked] = useState<Card | null>(null);
   const [limit, setLimit] = useState(24);
@@ -103,9 +102,19 @@ function GlassBody({ onLock }: { onLock: () => void }) {
   useEffect(() => {
     if (!path) return;
     const panelId = latest(path.log, path.at, (id) => id === "build" || id === "keys" || id === "sim" || id === "deals" || id === "home");
-    setPanel(panelId === "build" || panelId === "keys" || panelId === "sim" || panelId === "deals" ? panelId : "shop");
+    const nextPanel = panelId === "build" || panelId === "keys" || panelId === "sim" || panelId === "deals" ? panelId : "shop";
+    setPanel(nextPanel);
     const shelfId = latest(path.log, path.at, (id) => id.startsWith("shelf-"));
-    setShelf(shelfId ? shelfId.slice(6) : null);
+    const nextShelf = shelfId ? shelfId.slice(6) : null;
+    setShelf(nextShelf);
+    setFive(Boolean(latest(path.log, path.at, (id) => id === "five")));
+    const pickId = latest(path.log, path.at, (id) => id.startsWith("pick:"));
+    if (pickId && nextShelf) {
+      const id = pickId.slice(5);
+      setPicked(cardsFor(nextShelf).find((item) => item.id === id) ?? null);
+    } else {
+      setPicked(null);
+    }
   }, [path?.at]);
 
   const rows = useMemo(() => {
@@ -135,7 +144,6 @@ function GlassBody({ onLock }: { onLock: () => void }) {
     setShelf(id);
     setQuery("");
     setPicked(null);
-    setHot(null);
     setLimit(24);
     path?.note(`shelf-${id}`, SHELVES.find((item) => item.id === id)?.title ?? id);
   }
@@ -146,80 +154,87 @@ function GlassBody({ onLock }: { onLock: () => void }) {
     path?.note(`pick:${item.id}`, item.name.slice(0, 22));
   }
 
-  if (five) return <Five onClose={() => setFive(false)} />;
-  if (panel === "build") return <Counter onClose={() => setPanel("shop")} />;
-  if (panel === "keys") return <KeyboardShop onLeave={() => setPanel("shop")} />;
-  if (panel === "sim") return <Sim onLeave={() => setPanel("shop")} />;
-  if (panel === "deals") return <Bundles onLeave={() => setPanel("shop")} />;
+  function leaveTo(test: (id: string) => boolean, fallback: () => void) {
+    if (path && test(path.log[path.at]?.id ?? "")) path.back();
+    else fallback();
+  }
+
+  if (five) return <Five onClose={() => leaveTo((id) => id === "five", () => setFive(false))} />;
+  if (panel === "build") return <Counter onClose={() => leaveTo((id) => id === "build", () => setPanel("shop"))} />;
+  if (panel === "keys") return <KeyboardShop onLeave={() => leaveTo((id) => id === "keys", () => setPanel("shop"))} />;
+  if (panel === "sim") return <Sim onLeave={() => leaveTo((id) => id === "sim", () => setPanel("shop"))} />;
+  if (panel === "deals") return <Bundles onLeave={() => leaveTo((id) => id === "deals", () => setPanel("shop"))} />;
 
   return (
-    <div className="relative h-full overflow-y-auto bg-black text-white">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_-10%,rgba(168,85,247,0.55),transparent_42%),radial-gradient(circle_at_100%_100%,rgba(236,72,153,0.4),transparent_46%),radial-gradient(circle_at_50%_120%,rgba(56,189,248,0.18),transparent_40%)]" />
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.12]"
-        style={{ backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255,255,255,0.55) 4px)" }}
-      />
-      <div className="relative mx-auto flex min-h-dvh w-full max-w-5xl flex-col px-4 pb-8 pt-[max(1rem,env(safe-area-inset-top))]">
-        <header className="flex items-center justify-between gap-3">
+    <div className="h-full overflow-y-auto bg-[#f2f2f7] text-[#1c1c1e]">
+      <div className="mx-auto flex w-full max-w-3xl flex-col px-4 pb-28 pt-3">
+        <header className="flex items-end justify-between gap-3">
           <div>
-            <p className="text-[11px] font-medium tracking-[0.42em] text-[#e9d5ff]">RETRO COUNTER</p>
-            <h1 className="font-display bg-gradient-to-b from-white via-[#f5d0fe] to-[#c084fc] bg-clip-text text-4xl font-medium tracking-tight text-transparent">Liquid</h1>
+            <p className="text-[13px] font-semibold uppercase tracking-wide text-[#8e8e93]">6767</p>
+            <h1 className="text-[34px] font-semibold leading-none tracking-tight">Store</h1>
           </div>
-          <button type="button" onClick={() => { blip(); onLock(); }} aria-label="Lock" className="flex size-11 items-center justify-center rounded-full border border-white/30 bg-white/10 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.4)] backdrop-blur-xl">
-            <Lock className="size-4" />
+          <button type="button" onClick={onLock} className="mb-1 text-[17px] font-medium text-[#007aff]">
+            Lock
           </button>
         </header>
-        <div className="mt-3 flex gap-2">
-          <button type="button" onClick={() => { blip(); path?.note("five", "Five minutes"); setFive(true); }} className="h-11 rounded-full bg-white/15 px-4 text-sm">Five minutes</button>
-          <button type="button" onClick={() => { blip(); path?.note("build", "Build"); setPanel("build"); }} className="h-11 rounded-full bg-white/15 px-4 text-sm">Build with them</button>
-          <button type="button" onClick={() => { blip(); path?.note("keys", "Keyboards"); setPanel("keys"); }} className="h-11 rounded-full bg-white/15 px-4 text-sm">Keyboards</button>
-          <button type="button" onClick={() => { blip(); path?.note("sim", "Sims"); setPanel("sim"); }} className="h-11 rounded-full bg-white/15 px-4 text-sm">Sims</button>
-          <button type="button" onClick={() => { blip(); path?.note("deals", "Bundles"); setPanel("deals"); }} className="h-11 rounded-full bg-white/15 px-4 text-sm">Bundles</button>
+        <p className="mt-2 text-[17px] leading-snug text-[#8e8e93]">Tap a shelf. The price is what they pay today, once.</p>
+        <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
+          {(
+            [
+              ["five", "Five minutes", () => { path?.note("five", "Five minutes"); setFive(true); }],
+              ["build", "Build", () => { path?.note("build", "Build"); setPanel("build"); }],
+              ["keys", "Keyboards", () => { path?.note("keys", "Keyboards"); setPanel("keys"); }],
+              ["sim", "Sims", () => { path?.note("sim", "Sims"); setPanel("sim"); }],
+              ["deals", "Bundles", () => { path?.note("deals", "Bundles"); setPanel("deals"); }],
+            ] as const
+          ).map(([id, label, go]) => (
+            <button key={id} type="button" onClick={() => { blip(); go(); }} className="h-9 shrink-0 rounded-full bg-white px-4 text-[15px] font-medium text-[#007aff] shadow-sm">
+              {label}
+            </button>
+          ))}
         </div>
 
         {!shelf ? (
-          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3" style={{ perspective: "900px" }} onMouseLeave={() => setHot(null)}>
+          <ul className="mt-5 overflow-hidden rounded-2xl bg-white">
             {SHELVES.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onMouseEnter={() => setHot(item.id)}
-                onFocus={() => setHot(item.id)}
-                onClick={() => chooseShelf(item.id)}
-                className={`min-h-28 rounded-3xl border border-white/35 bg-white/10 px-4 py-4 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.5),0_18px_40px_rgba(0,0,0,0.35)] backdrop-blur-xl transition duration-300 ${hot === item.id ? "z-10 -translate-y-3 scale-105 shadow-[0_30px_50px_rgba(168,85,247,0.35)]" : hot ? "scale-95 opacity-45" : ""}`}
-              >
-                <span className="block text-xl font-medium">{item.title}</span>
-                <span className="mt-1 block text-sm text-[#e9d5ff]">{item.line}</span>
-              </button>
+              <li key={item.id} className="border-b border-[#e5e5ea] last:border-b-0">
+                <button type="button" onClick={() => chooseShelf(item.id)} className="flex min-h-16 w-full items-center justify-between gap-3 px-4 py-3 text-left">
+                  <span>
+                    <span className="block text-[17px]">{item.title}</span>
+                    <span className="mt-0.5 block text-[13px] text-[#8e8e93]">{item.line}</span>
+                  </span>
+                  <span className="text-[22px] leading-none text-[#c7c7cc]" aria-hidden>›</span>
+                </button>
+              </li>
             ))}
-          </div>
+          </ul>
         ) : (
-          <div className="mt-4 min-h-0 flex-1">
-            <button type="button" onClick={() => { blip(); setShelf(null); setPicked(null); }} className="text-sm text-[#e9d5ff]">
+          <div className="mt-5">
+            <button type="button" onClick={() => { blip(); leaveTo((id) => id.startsWith("shelf-"), () => setShelf(null)); }} className="text-[17px] font-medium text-[#007aff]">
               All shelves
             </button>
-            <h2 className="mt-1 text-3xl font-medium">{current?.title ?? CAT_LABEL.cpu}</h2>
-            <label className="mt-3 flex h-12 items-center gap-2 rounded-2xl border border-white/30 bg-white/10 px-3 backdrop-blur-xl">
-              <Search className="size-4 text-[#e9d5ff]" />
-              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={shelf === "laptop" ? "OLED, 16 inch, 32GB, school, 2025" : "Search this shelf"} className="h-full w-full bg-transparent text-base outline-none placeholder:text-white/40" />
+            <h2 className="mt-1 text-[28px] font-semibold tracking-tight">{current?.title ?? "Shelf"}</h2>
+            <p className="text-[15px] text-[#8e8e93]">{current?.line}. {rows.length} on the shelf.</p>
+            <label className="mt-3 flex h-11 items-center gap-2 rounded-xl bg-white px-3 shadow-sm">
+              <Search className="size-4 text-[#8e8e93]" />
+              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={shelf === "laptop" ? "OLED, 16 inch, 32GB, school, 2025" : "Search this shelf"} className="h-full w-full bg-transparent text-[17px] outline-none placeholder:text-[#8e8e93]" />
             </label>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {(
-                [
-                  ["low", "Price low"],
-                  ["high", "Price high"],
-                  ["score", "Score high"],
-                  ["score-low", "Score low"],
-                ] as const
-              ).map(([id, label]) => (
-                <button key={id} type="button" onClick={() => { blip(); setSort(id); }} className={`h-10 rounded-full px-3 text-sm ${sort === id ? "bg-white text-black" : "bg-white/15 text-white"}`}>
-                  {label}
-                </button>
-              ))}
-              <button type="button" onClick={() => { blip(); setGrid((value) => !value); }} className="h-10 rounded-full bg-white/15 px-3 text-sm">{grid ? "List" : "Grid"}</button>
+            <div className="mt-3 flex gap-2">
+              <label className="flex h-11 min-w-0 flex-1 items-center rounded-xl bg-white px-3 shadow-sm">
+                <span className="shrink-0 text-[15px] text-[#8e8e93]">Sort</span>
+                <select value={sort} onChange={(event) => setSort(event.target.value as typeof sort)} className="h-full min-w-0 flex-1 bg-transparent px-2 text-[17px] outline-none">
+                  <option value="low">Price, low to high</option>
+                  <option value="high">Price, high to low</option>
+                  <option value="score">Strongest first</option>
+                  <option value="score-low">Lightest score first</option>
+                </select>
+              </label>
+              <button type="button" onClick={() => setGrid((value) => !value)} className="h-11 shrink-0 rounded-xl bg-white px-4 text-[15px] font-medium text-[#007aff] shadow-sm">
+                {grid ? "List" : "Grid"}
+              </button>
             </div>
             {query.trim() && (shelf === "prebuilt" || shelf === "laptop") ? (
-              <div className="mt-3">
+              <div className="mt-4">
                 <ThreeSearch
                   rows={rows.map((item) => ({ ...item, score: scoreOf(item) }))}
                   who={query.trim()}
@@ -227,69 +242,66 @@ function GlassBody({ onLock }: { onLock: () => void }) {
                 />
               </div>
             ) : (
-            <>
-            <ul className={`mt-3 ${grid ? "grid grid-cols-2 gap-2" : "space-y-2"}`} style={{ perspective: "900px" }} onMouseLeave={() => setHot(null)}>
-              {rows.slice(0, limit).map((item) => {
-                const lap = shelf === "laptop" ? LAPS.find((row) => row.id === item.id) : undefined;
-                const tags = lap ? laptopFace(lap.name, lap.specs, lap.kind).slice(0, 6) : (byId.get(item.id) ? tagsOf(byId.get(item.id)!).slice(0, 4) : []);
-                const score = scoreOf(item);
-                const ink = lap ? dealFrom(item.price, score).fg : "#ffffff";
-                return (
-                <li key={item.id} className="rounded-2xl border border-white/25 bg-white/10 backdrop-blur-xl">
-                  <button
-                    type="button"
-                    onMouseEnter={() => setHot(item.id)}
-                    onFocus={() => setHot(item.id)}
-                    onClick={() => chooseItem(item)}
-                    className={`flex w-full items-start justify-between gap-3 px-4 py-3 text-left transition duration-300 ${hot === item.id ? "z-10 -translate-y-1 scale-[1.03]" : hot ? "opacity-50" : ""}`}
-                  >
-                    <span className="min-w-0">
-                      <span className="block text-[11px] uppercase tracking-[0.16em] text-[#e9d5ff]">{item.brand}</span>
-                      <span className="mt-0.5 block text-base leading-snug">{item.name}</span>
-                      <span className="mt-1 flex flex-wrap gap-1">
-                        {tags.map((tag) => {
-                          const paint = tagPaint(tag);
-                          return (
-                            <span key={tag} role="presentation" onClick={(event) => { event.stopPropagation(); setQuery(tag); }} className="rounded-full px-2 py-0.5 text-[11px]" style={{ background: paint.bg, color: paint.fg }}>{tag}</span>
-                          );
-                        })}
-                      </span>
-                    </span>
-                    <span className="shrink-0 text-right">
-                      <span className="block text-base font-medium" style={{ color: ink }}>{money(item.price)}</span>
-                      {lap ? <span className="mt-1 block text-xs font-semibold" style={{ color: ink }}>{money(item.price / Math.max(1, score))}/pt · {releaseYear(lap.name)}</span> : null}
-                    </span>
+              <>
+                <ul className={`mt-4 ${grid ? "grid grid-cols-2 gap-2" : "overflow-hidden rounded-2xl bg-white"}`}>
+                  {rows.slice(0, limit).map((item) => {
+                    const lap = shelf === "laptop" ? LAPS.find((row) => row.id === item.id) : undefined;
+                    const tags = lap ? laptopFace(lap.name, lap.specs, lap.kind).slice(0, 6) : (byId.get(item.id) ? tagsOf(byId.get(item.id)!).slice(0, 4) : []);
+                    const score = scoreOf(item);
+                    const ink = dealFrom(item.price, Math.max(1, score)).fg;
+                    return (
+                      <li key={item.id} className={grid ? "overflow-hidden rounded-2xl bg-white" : "border-b border-[#e5e5ea] last:border-b-0"}>
+                        <button type="button" onClick={() => chooseItem(item)} className="flex w-full items-start justify-between gap-3 px-4 py-3 text-left">
+                          <span className="min-w-0">
+                            <span className="block text-[12px] font-medium uppercase tracking-wide text-[#8e8e93]">{item.brand}</span>
+                            <span className="mt-0.5 block text-[17px] leading-snug">{item.name}</span>
+                            <span className="mt-1 flex flex-wrap gap-1">
+                              {tags.map((tag) => {
+                                const paint = tagPaint(tag);
+                                return (
+                                  <span key={tag} role="presentation" onClick={(event) => { event.stopPropagation(); setQuery(tag); }} className="rounded-full px-2 py-0.5 text-[11px]" style={{ background: paint.bg, color: paint.fg }}>{tag}</span>
+                                );
+                              })}
+                            </span>
+                          </span>
+                          <span className="shrink-0 text-right">
+                            <span className="block text-[17px] font-semibold" style={{ color: ink }}>{money(item.price)}</span>
+                            <span className="mt-0.5 block max-w-[8.5rem] text-[12px] leading-snug text-[#8e8e93]">Pay once</span>
+                            {lap ? <span className="mt-1 block max-w-[8.5rem] text-[12px] font-semibold leading-snug" style={{ color: ink }}>{money(item.price / Math.max(1, score))} per point of speed · {releaseYear(lap.name)}</span> : null}
+                          </span>
+                        </button>
+                        <div className="px-4 pb-3">
+                          <RankBadge score={score} lines={lap ? explainLaptop(lap) : linesOf(item)} />
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+                {rows.length > limit ? (
+                  <button type="button" onClick={() => { blip(); setLimit((value) => value + 24); }} className="mt-3 h-12 w-full rounded-xl bg-white text-[17px] font-medium text-[#007aff] shadow-sm">
+                    Show more
                   </button>
-                  <div className="px-4 pb-3">
-                    <RankBadge score={score} lines={lap ? explainLaptop(lap) : linesOf(item)} />
-                  </div>
-                </li>
-                );
-              })}
-            </ul>
-            {rows.length > limit ? (
-              <button type="button" onClick={() => { blip(); setLimit((value) => value + 24); }} className="mt-3 h-12 w-full rounded-full border border-white/30 bg-white/10 text-base backdrop-blur-xl">
-                Show more
-              </button>
-            ) : null}
-            {rows.length === 0 ? <p className="mt-6 text-center text-white/70">Nothing on this shelf.</p> : null}
-            </>
+                ) : null}
+                {rows.length === 0 ? <p className="mt-8 text-center text-[17px] text-[#8e8e93]">Nothing on this shelf.</p> : null}
+              </>
             )}
           </div>
         )}
       </div>
 
       {picked ? (
-        <div className="fixed inset-0 z-40 flex items-end justify-center bg-black/50 p-4 sm:items-center" onClick={() => setPicked(null)}>
-          <div className="glass-in w-full max-w-md rounded-3xl border border-white/40 bg-white/15 p-5 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_30px_80px_rgba(0,0,0,0.45)] backdrop-blur-2xl" onClick={(event) => event.stopPropagation()} style={{ transform: "translateZ(40px)" }}>
-            <p className="text-[11px] uppercase tracking-[0.2em] text-[#f5d0fe]">{picked.brand}</p>
-            <p className="mt-2 text-2xl font-medium leading-tight">{picked.name}</p>
-            <p className="mt-4 text-3xl">{money(picked.price)}</p>
+        <div className="fixed inset-0 z-40 flex items-end bg-black/40" onClick={() => leaveTo((id) => id.startsWith("pick:"), () => setPicked(null))}>
+          <div className="max-h-[85dvh] w-full overflow-y-auto rounded-t-[28px] bg-[#f2f2f7] px-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-2 shadow-2xl" onClick={(event) => event.stopPropagation()}>
+            <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-[#c7c7cc]" />
+            <p className="text-[13px] font-medium uppercase tracking-wide text-[#8e8e93]">{picked.brand}</p>
+            <p className="mt-1 text-[22px] font-semibold leading-tight">{picked.name}</p>
+            <p className="mt-4 text-[34px] font-semibold tracking-tight">{money(picked.price)}</p>
+            <p className="text-[15px] text-[#8e8e93]">On the tag. They pay this once, not monthly.</p>
             <AddButton
-              line={shelf === "laptop" ? lapBag(picked, `Liquid. Budget ${money(picked.price)}. Score ${Math.round(scoreOf(picked))}.`) : partBag(picked, `Liquid. Budget ${money(picked.price)}. Score ${Math.round(scoreOf(picked))}.`)}
-              className="mt-4 h-12 w-full rounded-full bg-white text-base font-medium text-black"
+              line={shelf === "laptop" ? lapBag(picked, `Store. Budget ${money(picked.price)}. Score ${Math.round(scoreOf(picked))}.`) : partBag(picked, `Store. Budget ${money(picked.price)}. Score ${Math.round(scoreOf(picked))}.`)}
+              className="mt-4 h-12 w-full rounded-xl bg-[#007aff] text-[17px] font-semibold text-white"
             />
-            <button type="button" onClick={() => { blip(); setPicked(null); }} className="mt-5 h-12 w-full rounded-full bg-[#7c3aed] text-base font-medium text-white">
+            <button type="button" onClick={() => { blip(); leaveTo((id) => id.startsWith("pick:"), () => setPicked(null)); }} className="mt-2 h-12 w-full rounded-xl bg-white text-[17px] font-medium text-[#007aff]">
               Close
             </button>
           </div>

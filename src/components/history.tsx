@@ -1,3 +1,4 @@
+import { useDoorLock } from "@/components/lock";
 import { createContext, useContext, useState, type ReactNode } from "react";
 
 export type Crumb = { id: string; label: string };
@@ -13,8 +14,28 @@ type Api = {
 
 const Ctx = createContext<Api | null>(null);
 
-export function HistoryRoot({ home, children }: { home: string; children: ReactNode }) {
-  const [nav, setNav] = useState<{ log: Crumb[]; at: number }>({ log: [{ id: "home", label: home }], at: 0 });
+export function HistoryRoot({ home, onLock, children }: { home: string; onLock?: () => void; children: ReactNode }) {
+  const door = useDoorLock();
+  const lock = onLock ?? door;
+  const [nav, setNav] = useState<{ log: Crumb[]; at: number }>({
+    log: [
+      { id: "lock", label: "Lock" },
+      { id: "home", label: home },
+    ],
+    at: 1,
+  });
+
+  function move(at: number) {
+    if (at <= 0) {
+      lock();
+      return;
+    }
+    setNav((current) => {
+      const next = Math.max(1, Math.min(current.log.length - 1, at));
+      return next === current.at ? current : { ...current, at: next };
+    });
+  }
+
   const api: Api = {
     log: nav.log,
     at: nav.at,
@@ -39,46 +60,44 @@ export function HistoryRoot({ home, children }: { home: string; children: ReactN
       });
     },
     back() {
-      setNav((current) => (current.at === 0 ? current : { ...current, at: current.at - 1 }));
+      move(nav.at - 1);
     },
     forward() {
-      setNav((current) => (current.at >= current.log.length - 1 ? current : { ...current, at: current.at + 1 }));
+      move(nav.at + 1);
     },
     jump(index) {
-      setNav((current) => {
-        const at = Math.max(0, Math.min(current.log.length - 1, index));
-        return at === current.at ? current : { ...current, at };
-      });
+      move(index);
     },
   };
-  const show = nav.log.length > 1;
+  const homeAt = Math.max(1, nav.log.findIndex((crumb) => crumb.id === "home"));
   return (
     <Ctx.Provider value={api}>
-      <div className="flex h-dvh max-h-dvh flex-col">
-        {show ? (
-          <div className="z-40 flex shrink-0 items-center gap-2 bg-[#111] px-2 pt-[max(0.35rem,env(safe-area-inset-top))] pb-2 text-white">
-            <button type="button" onClick={api.back} disabled={nav.at === 0} className="h-10 shrink-0 rounded-full bg-white px-3 text-sm font-semibold text-[#111] disabled:opacity-30">
-              Back
-            </button>
-            <button type="button" onClick={api.forward} disabled={nav.at >= nav.log.length - 1} className="h-10 shrink-0 rounded-full bg-white px-3 text-sm font-semibold text-[#111] disabled:opacity-30">
-              Forward
-            </button>
-            <div className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto">
-              {nav.log.map((crumb, index) => (
-                <span key={`${crumb.id}-${index}`} className="flex shrink-0 items-center gap-1">
-                  {index > 0 ? <span className="text-sm text-white/45">{">"}</span> : null}
-                  <button
-                    type="button"
-                    onClick={() => api.jump(index)}
-                    className={`h-10 max-w-[11rem] truncate rounded-full px-2 text-sm ${index === nav.at ? "bg-[#d6ff4a] font-semibold text-[#111]" : index > nav.at ? "text-white/35" : "text-white"}`}
-                  >
-                    {crumb.label}
-                  </button>
-                </span>
-              ))}
-            </div>
+      <div className="flex h-dvh max-h-dvh flex-col bg-[#f2f2f7] text-[#111]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif' }}>
+        <div className="z-50 flex shrink-0 items-center gap-1.5 border-b border-black/10 bg-white px-2 pt-[max(0.4rem,env(safe-area-inset-top))] pb-2">
+          <button type="button" onClick={api.back} className="h-10 shrink-0 rounded-full bg-[#f2f2f7] px-3 text-[15px] font-medium">
+            Back
+          </button>
+          <button type="button" onClick={() => move(homeAt)} disabled={nav.at === homeAt} className="h-10 shrink-0 rounded-full bg-[#f2f2f7] px-3 text-[15px] font-medium disabled:opacity-30">
+            Home
+          </button>
+          <button type="button" onClick={api.forward} disabled={nav.at >= nav.log.length - 1} className="h-10 shrink-0 rounded-full bg-[#f2f2f7] px-3 text-[15px] font-medium disabled:opacity-30">
+            Forward
+          </button>
+          <div className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto">
+            {nav.log.map((crumb, index) => (
+              <span key={`${crumb.id}-${index}`} className="flex shrink-0 items-center gap-1">
+                {index > 0 ? <span className="text-[15px] text-[#8e8e93]">{">"}</span> : null}
+                <button
+                  type="button"
+                  onClick={() => api.jump(index)}
+                  className={`h-10 max-w-[12rem] truncate rounded-full px-2 text-[15px] ${index === nav.at ? "font-semibold text-[#007aff]" : index > nav.at ? "text-[#c7c7cc]" : "text-[#111]"}`}
+                >
+                  {crumb.label}
+                </button>
+              </span>
+            ))}
           </div>
-        ) : null}
+        </div>
         <div className="history-slot min-h-0 flex-1">{children}</div>
       </div>
     </Ctx.Provider>

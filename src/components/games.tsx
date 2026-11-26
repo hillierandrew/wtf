@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import raw from "@/data/laptops.json";
 import { CopyList, buildNames, partLine } from "@/components/copy-list";
 import { RankBadge } from "@/components/rank";
+import { usePath } from "@/components/history";
 import { aiPicks, explainPart, machineScore, money, PARTS, shortName, spendOf, type AiPick, type Part } from "@/lib/catalog";
 import { ThemeToggle, usePane } from "@/lib/theme";
 
@@ -35,6 +36,7 @@ function sizeRank(pick: AiPick) {
 }
 
 export function Games({ onLeave, onUse }: { onLeave: () => void; onUse: (pick: AiPick) => void }) {
+  const path = usePath();
   const pane = usePane();
   const [kind, setKind] = useState<"game" | "program">("game");
   const [name, setName] = useState<string | null>(null);
@@ -77,7 +79,7 @@ export function Games({ onLeave, onUse }: { onLeave: () => void; onUse: (pick: A
         <ul className="min-h-0 flex-1 space-y-2 overflow-y-auto px-4 pb-4">
           {list.map(([title]) => (
             <li key={title}>
-              <button type="button" onClick={() => setName(title)} className={`press h-16 w-full rounded-2xl border px-4 text-left text-xl ${name === title ? "border-accent bg-subtle" : "border-line bg-elevated"}`}>
+              <button type="button" onClick={() => { setName(title); path?.note(`played:${title}`, title); }} className={`press h-16 w-full rounded-2xl border px-4 text-left text-xl ${name === title ? "border-accent bg-subtle" : "border-line bg-elevated"}`}>
                 {title}
               </button>
             </li>
@@ -92,7 +94,7 @@ export function Games({ onLeave, onUse }: { onLeave: () => void; onUse: (pick: A
                 <p className="mt-1 text-sm text-muted">{pick.why}</p>
                 <p className="mt-2 text-base font-medium">{money(spendOf(pick.build))}</p>
                 <CopyList title={pick.name} names={buildNames(pick.build)} />
-                <button type="button" onClick={() => onUse(pick)} className="mt-3 h-12 w-full rounded-xl bg-accent text-base text-accent-fg">
+                <button type="button" onClick={() => { path?.note("use-pc", "Use this computer"); onUse(pick); }} className="mt-3 h-12 w-full rounded-xl bg-accent text-base text-accent-fg">
                   Use this computer
                 </button>
               </article>

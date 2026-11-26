@@ -50,7 +50,7 @@ export function Gate({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!show) return;
-    const timer = window.setTimeout(() => setShow(false), 2300);
+    const timer = window.setTimeout(() => setShow(false), 900);
     return () => window.clearTimeout(timer);
   }, [show]);
 
@@ -86,7 +86,7 @@ export function Gate({ children }: { children: React.ReactNode }) {
   if (door === "glass") {
     return (
       <>
-        <Suspense fallback={<div className="min-h-dvh bg-black" />}>
+        <Suspense fallback={<div className="min-h-dvh bg-[#f2f2f7]" />}>
           <GlassStore onLock={lock} />
         </Suspense>
         {show ? <Pop /> : null}
@@ -123,26 +123,11 @@ function fromKey(event: KeyboardEvent): string | null {
   return null;
 }
 
-const POPS = [
-  { t: "Desktops", x: "-28vw", y: "-16vh" },
-  { t: "Laptops", x: "24vw", y: "-12vh" },
-  { t: "Graphics", x: "-20vw", y: "16vh" },
-  { t: "Screens", x: "22vw", y: "18vh" },
-  { t: "LIQUID", x: "0px", y: "0px" },
-];
-
 function Pop() {
   return (
-    <div className="fixed inset-0 z-50 bg-black" style={{ perspective: "900px" }}>
-      {POPS.map((item, index) => (
-        <div
-          key={item.t}
-          className="glass-rise absolute left-1/2 top-1/2 flex h-28 w-44 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-3xl border border-[#c084fc] bg-[#140818]/80 text-lg font-medium text-white shadow-[0_0_30px_rgba(168,85,247,0.45)] backdrop-blur-xl"
-          style={{ ["--x" as string]: item.x, ["--y" as string]: item.y, animationDelay: `${index * 0.08}s` }}
-        >
-          {item.t}
-        </div>
-      ))}
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#f2f2f7] text-[#1c1c1e]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif' }}>
+      <p className="text-[17px] font-medium text-[#8e8e93]">6767</p>
+      <p className="mt-1 text-[56px] font-semibold tracking-tight">Store</p>
     </div>
   );
 }

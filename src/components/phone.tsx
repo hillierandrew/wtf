@@ -77,7 +77,7 @@ function PhoneMarks({ item }: { item: PhoneItem }) {
 
 export function Phone({ onLock }: { onLock: () => void }) {
   return (
-    <HistoryRoot home="Phone">
+    <HistoryRoot home="5678" onLock={onLock}>
       <PhoneBody onLock={onLock} />
       <BagDock lift />
     </HistoryRoot>
@@ -407,7 +407,7 @@ function PhoneBody({ onLock }: { onLock: () => void }) {
                       </button>
                       <div className="flex shrink-0 flex-col items-end gap-1">
                         <span className="text-[16px] font-semibold" style={{ color: item.group === "laptops" ? dealFrom(item.price, phoneScore(item)).fg : undefined }}>{money(item.price)}</span>
-                        {item.group === "laptops" ? <span className="text-[12px] font-semibold" style={{ color: dealFrom(item.price, phoneScore(item)).fg }}>{money(item.price / Math.max(1, phoneScore(item)))}/pt · {releaseYear(item.name)}</span> : null}
+                        {item.group === "laptops" ? <span className="max-w-[9.5rem] text-right text-[12px] font-semibold leading-snug" style={{ color: dealFrom(item.price, phoneScore(item)).fg }}>{money(item.price / Math.max(1, phoneScore(item)))} per point of speed · {releaseYear(item.name)}</span> : <span className="text-[12px] text-[#8e8e93]">Pay this once</span>}
                         {item.was ? <span className="text-[12px] text-[#ff3b30] line-through">{money(item.was)}</span> : null}
                         <AddButton line={phoneLine(item)} className="h-8 rounded-full bg-[#f2f2f7] px-3 text-[13px]" />
                         <button type="button" aria-label={saved.has(item.id) ? "Unsave" : "Save"} onClick={() => toggleSave(item.id)} className="flex size-8 items-center justify-center">

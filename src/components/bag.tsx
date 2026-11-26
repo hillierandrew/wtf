@@ -56,6 +56,7 @@ export function ThreeSearch({ rows, who, lineFor }: { rows: Scored[]; who: strin
           <p className="text-xs font-semibold uppercase tracking-wide">{pick.kind}</p>
           <h3 className="mt-2 text-base font-medium leading-snug">{pick.item.name}</h3>
           <p className="mt-2 text-2xl font-semibold">{money(pick.item.price)}</p>
+          <p className="text-sm text-muted">Pay this once. Not monthly.</p>
           <RuleLine how={pick.kind} who={who} budget={money(pick.item.price)} score={String(Math.round(pick.item.score))} />
           <AddButton line={lineFor(pick.item, `${pick.kind}. For ${who}. Budget ${money(pick.item.price)}. Score ${Math.round(pick.item.score)}.`)} />
         </article>
@@ -93,7 +94,7 @@ export function BagDock({ lift = false }: { lift?: boolean }) {
 
   return (
     <div className={`bag-dock pointer-events-none fixed inset-x-0 z-30 flex justify-end px-3 ${lift ? "bottom-[calc(4.75rem+env(safe-area-inset-bottom))]" : "bottom-0 pb-[max(0.5rem,env(safe-area-inset-bottom))]"}`}>
-      <div className="pointer-events-auto w-full max-w-sm rounded-3xl bg-[#111] text-white shadow-2xl">
+      <div className={`pointer-events-auto rounded-3xl bg-[#111] text-white shadow-2xl ${open ? "w-full max-w-sm" : "w-max max-w-[16rem]"}`}>
         <button type="button" onClick={() => setOpen(!open)} className="flex h-14 w-full items-center justify-between px-4 text-left">
           <span>Cart · {lines.length}</span>
           <span>

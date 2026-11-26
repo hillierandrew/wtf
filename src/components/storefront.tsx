@@ -234,7 +234,7 @@ function sortCards(list: Card[], sort: Sort) {
 
 export function Storefront({ onLock }: { onLock: () => void }) {
   return (
-    <HistoryRoot home="AI Store">
+    <HistoryRoot home="7777" onLock={onLock}>
       <StoreBody onLock={onLock} />
       <BagDock />
     </HistoryRoot>
@@ -461,10 +461,11 @@ function StoreBody({ onLock }: { onLock: () => void }) {
                       <div className="mt-3 flex items-baseline gap-2">
                         <span className="text-2xl font-bold" style={{ color: item.where === "laptops" ? dealFrom(item.price, item.score).fg : undefined }}>{money(item.price)}</span>
                         {item.was ? <span className="text-sm text-neutral-400 line-through">{money(item.was)}</span> : null}
-                        {item.where === "laptops" ? <span className="text-sm font-semibold" style={{ color: dealFrom(item.price, item.score).fg }}>{money(ppp(item))} / point</span> : null}
+                        {item.where === "laptops" ? <span className="text-sm font-semibold" style={{ color: dealFrom(item.price, item.score).fg }}>{money(ppp(item))} per point of speed</span> : null}
                       </div>
+                      <p className="mt-1 text-xs text-neutral-500">Pay this once. Not a monthly price.</p>
                       <button type="button" onClick={() => setScoreId(item.id)} className="mt-2 text-left text-xs text-neutral-500">
-                        Score {Math.round(item.score)} · {money(value)} / point
+                        Score {Math.round(item.score)}. {money(value)} per point of speed. Lower is a better deal.
                       </button>
                       {item.tags.length > 0 ? (
                         <div className="mt-3 flex flex-wrap gap-1.5">
