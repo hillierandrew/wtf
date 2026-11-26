@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Lock } from "lucide-react";
 import rawLaptops from "@/data/laptops.json";
-import { PARTS, isJunk, laptopBits, machineParts, machineScore, money, partScore, type Part } from "@/lib/catalog";
+import { PARTS, dealFrom, explainLaptop, explainPart, isJunk, laptopBits, machineParts, machineScore, money, partScore, type Part } from "@/lib/catalog";
+import { laptopBlob, laptopFace, releaseYear, tagPaint } from "@/lib/facts";
+import { RankBadge } from "@/components/rank";
 import { KEYS } from "@/lib/keyboard";
 import { deskMarks, laptopMarks } from "@/components/marks";
 import { Counter } from "@/components/counter";
@@ -64,6 +66,7 @@ function Floor({ onLock }: { onLock: () => void }) {
   const [order, setOrder] = useState<Order>("low");
   const [shelf, setShelf] = useState<Shelf>("prebuilt");
   const [more, setMore] = useState(12);
+  const [seek, setSeek] = useState("");
   const [five, setFive] = useState(false);
 
   useEffect(() => {
@@ -99,8 +102,9 @@ function Floor({ onLock }: { onLock: () => void }) {
 
   const shelfRows = useMemo(() => {
     if (shelf === "laptop") {
+      const q = seek.trim().toLowerCase();
       return byMoney(
-        LAPS.filter((item) => !item.open && item.kind !== "tablet" && item.price > 0 && item.price <= budget).map((item) => ({ id: item.id, name: item.name, brand: item.brand, price: item.price, score: laptopBits(item).score, kind: "laptop" as const })),
+        LAPS.filter((item) => !item.open && item.kind !== "tablet" && item.price > 0 && item.price <= budget && (!q || laptopBlob(item).includes(q))).map((item) => ({ id: item.id, name: item.name, brand: item.brand, price: item.price, score: laptopBits(item).score, kind: "laptop" as const })),
         order,
       );
     }
@@ -116,7 +120,7 @@ function Floor({ onLock }: { onLock: () => void }) {
       })),
       order,
     );
-  }, [shelf, budget, order]);
+  }, [shelf, budget, order, seek]);
 
   function go(next: "home" | "build" | "keys" | "sim" | "deals", label: string) {
     path?.note(next, label);
@@ -171,7 +175,8 @@ function Floor({ onLock }: { onLock: () => void }) {
           {pick ? deskMarks(pick) : null}
           {pick ? <AddButton line={partBag(pick, `6666. For ${person.title}. Budget ${money(budget)}. Score ${machineScore(pick.name)}. Desktop.`)} className="mt-3 h-12 w-full rounded-full bg-[#161616] text-base font-semibold text-white" /> : null}
         </Offer>
-        <Offer kicker="Laptop" name={laptop?.name} price={laptop?.price} line={laptop ? `If they need to carry it. ${laptop.specs}` : "No laptop under that budget."}>
+        <Offer kicker="Laptop" ink={laptop ? dealFrom(laptop.price, laptopBits(laptop).score).fg : undefined} name={laptop?.name} price={laptop?.price} line={laptop ? `If they need to carry it. ${laptop.specs}` : "No laptop under that budget."}>
+          {laptop ? <p className="mt-1 text-sm font-semibold" style={{ color: dealFrom(laptop.price, laptopBits(laptop).score).fg }}>{money(laptop.price / Math.max(1, laptopBits(laptop).score))} / point · {releaseYear(laptop.name)}</p> : null}
           {laptop ? laptopMarks(laptop) : null}
           {laptop ? <AddButton line={lapBag(laptop, `6666. For ${person.title}. Budget ${money(budget)}. Laptop.`)} className="mt-3 h-12 w-full rounded-full bg-[#0f6b4c] text-base font-semibold text-white" /> : null}
         </Offer>
@@ -192,7 +197,9 @@ function Floor({ onLock }: { onLock: () => void }) {
 
       <section className="mx-4 mt-6">
         <h2 className="text-2xl font-semibold">The shelf, under {money(budget)}</h2>
-        <p className="mt-1 text-sm text-[#333]">Raise the budget to see the expensive ones. Sort is the same menu as above.</p>
+        {shelf === "laptop" ? (
+          <input value={seek} onChange={(event) => { setSeek(event.target.value); setMore(12); }} placeholder="OLED, 16 inch, 32GB, school, 2025" className="mt-3 h-12 w-full rounded-2xl border border-[#161616] bg-white px-3 text-base outline-none" />
+        ) : null}
         <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
           {SHELVES.map((item) => (
             <button key={item.id} type="button" onClick={() => { setShelf(item.id); setMore(12); path?.note(`shelf:${item.id}`, item.title); }} className={`h-11 shrink-0 rounded-full px-3 text-sm ${shelf === item.id ? "bg-[#161616] font-semibold text-white" : "bg-white"}`}>
@@ -202,23 +209,45 @@ function Floor({ onLock }: { onLock: () => void }) {
         </div>
         <p className="mt-3 text-sm text-[#333]">{shelfRows.length} shown, {order === "high" ? "dearest first" : order === "score" ? "best score first" : "cheapest first"}.</p>
         <ul className="mt-2 space-y-2">
-          {shelfRows.slice(0, more).map((row) => (
+          {shelfRows.slice(0, more).map((row) => {
+            const lap = row.kind === "laptop" ? LAPS.find((item) => item.id === row.id) : undefined;
+            const ink = dealFrom(row.price, Math.max(1, row.score)).fg;
+            const tags = lap ? laptopFace(lap.name, lap.specs, lap.kind).slice(0, 6) : [];
+            return (
             <li key={row.id} className="rounded-2xl bg-white px-4 py-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-xs uppercase tracking-wide text-[#0f6b4c]">{row.brand}</p>
                   <p className="text-base font-medium leading-snug">{row.name}</p>
-                  <p className="mt-1 text-sm text-[#333]">Score {Math.round(row.score)}</p>
+                  <div className="mt-2">
+                    <RankBadge score={row.score} lines={lap ? explainLaptop(lap) : row.kind === "part" ? explainPart(row.part) : [`Score ${Math.round(row.score)}.`]} />
+                  </div>
+                  {tags.length ? (
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {tags.map((tag) => {
+                        const paint = tagPaint(tag);
+                        return (
+                          <button key={tag} type="button" onClick={() => { setSeek(tag); setShelf("laptop"); setMore(12); }} className="rounded-full px-2 py-0.5 text-[11px] font-medium" style={{ background: paint.bg, color: paint.fg }}>
+                            {tag}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : null}
                 </div>
-                <p className="shrink-0 text-lg font-semibold tabular-nums">{money(row.price)}</p>
+                <div className="shrink-0 text-right">
+                  <p className="text-lg font-semibold tabular-nums" style={{ color: ink }}>{money(row.price)}</p>
+                  {lap ? <p className="text-xs font-semibold" style={{ color: ink }}>{money(row.price / Math.max(1, row.score))}/pt · {releaseYear(lap.name)}</p> : null}
+                </div>
               </div>
-              {row.kind === "laptop" ? (
-                <AddButton line={lapBag(LAPS.find((item) => item.id === row.id) ?? { id: row.id, name: row.name, price: row.price, brand: row.brand }, `6666 shelf. ${person.title}. ${money(row.price)}.`)} />
+              {lap ? (
+                <AddButton line={lapBag(lap, `6666 shelf. ${person.title}. ${money(row.price)}.`)} />
               ) : (
-                <AddButton line={partBag(row.part as Part, `6666 shelf. ${person.title}. ${money(row.price)}. Score ${Math.round(row.score)}.`)} />
+                <AddButton line={partBag(row.kind === "part" ? row.part : { id: row.id, name: row.name, price: row.price, brand: row.brand }, `6666 shelf. ${person.title}. ${money(row.price)}. Score ${Math.round(row.score)}.`)} />
               )}
             </li>
-          ))}
+            );
+          })}
         </ul>
         {shelfRows.length === 0 ? <p className="mt-3 rounded-2xl bg-white px-4 py-8 text-center">Nothing on this shelf under {money(budget)}.</p> : null}
         {more < shelfRows.length ? (
@@ -234,12 +263,12 @@ function Floor({ onLock }: { onLock: () => void }) {
   );
 }
 
-function Offer({ kicker, name, price, line, children }: { kicker: string; name?: string; price?: number; line: string; children?: React.ReactNode }) {
+function Offer({ kicker, name, price, line, ink, children }: { kicker: string; name?: string; price?: number; line: string; ink?: string; children?: React.ReactNode }) {
   return (
     <article className="rounded-3xl bg-white p-4 shadow-sm">
       <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#0f6b4c]">{kicker}</p>
       <h2 className="mt-2 text-xl font-semibold leading-snug">{name ?? "None under the budget"}</h2>
-      {price ? <p className="mt-2 text-3xl font-semibold tabular-nums">{money(price)}</p> : null}
+      {price ? <p className="mt-2 text-3xl font-semibold tabular-nums" style={{ color: ink }}>{money(price)}</p> : null}
       <p className="mt-2 text-sm leading-snug text-[#333]">{line}</p>
       {children}
     </article>

@@ -573,7 +573,6 @@ export function Builder({ onLeave, start = "play" }: { onLeave: () => void; star
                           </span>
                           <span className="mt-1 line-clamp-2 block text-base font-medium leading-snug">{shortName(part)}</span>
                           {reason ? <span className="mt-1 block text-sm text-danger">{reason}</span> : null}
-                          {!reason && part.cat === "prebuilt" ? <span className="mt-1 block text-sm text-muted">Score {machineScore(part.name)}/100</span> : null}
                           {!reason && part.cat === "gpu" && buildSpeed({ gpu: part }) ? (
                             <span className="mt-1 block text-sm text-muted">Roughly {buildSpeed({ gpu: part })}% of an RX 9070</span>
                           ) : null}

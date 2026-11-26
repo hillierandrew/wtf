@@ -10,7 +10,7 @@ export function releaseYear(name: string): number {
 
 export function laptopWeight(name: string, kind = ""): { lb: number; kg: number } {
   const blob = `${kind} ${name}`;
-  const inch = Number(name.match(/(\d{2}(?:\.\d)?)/)?.[1] ?? ( /tab/i.test(blob) ? 11 : 15.6));
+  const inch = Number(name.match(/(\d{2}(?:\.\d)?)/)?.[1] ?? (/tab/i.test(blob) ? 11 : 15.6));
   let lb = 3.6;
   if (/tablet|\btab\b/i.test(blob)) lb = inch >= 12 ? 1.3 : 1.0;
   else if (inch <= 13) lb = 2.6;
@@ -59,4 +59,53 @@ export function specTags(name: string, specs = ""): string[] {
   else if (/SSD|STORAGE/.test(n)) tags.push("SSD");
   if (/HDD|HARD DRIVE|\d+\s?RPM/.test(n)) tags.push("HDD");
   return tags;
+}
+
+export function laptopFace(name: string, specs = "", kind = ""): string[] {
+  const blob = `${name} ${specs}`;
+  const n = blob.toUpperCase();
+  const tags = [...specTags(name, specs)];
+  if (/OLED/.test(n)) tags.push("OLED");
+  else if (/\bIPS\b/.test(n)) tags.push("IPS");
+  else if (/\bVA\b/.test(n)) tags.push("VA");
+  if (/4K|UHD|3840/.test(n)) tags.push("4K");
+  else if (/QHD|1440|2560/.test(n)) tags.push("2K");
+  else if (/FHD|1080/.test(n)) tags.push("1080p");
+  const inch = name.match(/(\d{2}(?:\.\d)?)\s*"/);
+  if (inch) tags.push(`${inch[1]}"`, `${inch[1]} inch`);
+  const ram = blob.match(/(\d+)\s*GB(?!\s*SSD)/i);
+  if (ram) tags.push(`${ram[1]}GB`, `${ram[1]}GB RAM`);
+  const tb = blob.match(/(\d+(?:\.\d+)?)\s*TB/i);
+  if (tb) tags.push(`${tb[1]}TB`);
+  if (/RTX|GEFORCE/.test(n)) tags.push("RTX", "Gaming");
+  if (/RYZEN/.test(n)) tags.push("Ryzen");
+  if (/INTEL|CORE ULTRA|\bI[3579]-/.test(n)) tags.push("Intel");
+  if (/TOUCH/.test(n)) tags.push("Touch");
+  if (/BACK-?LIT|BACKLIGHT/.test(n)) tags.push("Backlit keyboard");
+  if (kind === "game") tags.push("Gaming", "Games");
+  if (kind === "work") tags.push("Work", "Business", "Office");
+  if (kind === "home") tags.push("Home", "School", "Student");
+  if (kind === "chrome") tags.push("Chromebook", "Chrome");
+  tags.push(String(releaseYear(name)));
+  const weight = laptopWeight(name, kind);
+  tags.push(`${weight.lb} lb`, `${weight.kg} kg`, "laptop");
+  return [...new Set(tags)];
+}
+
+export function laptopBlob(item: { name: string; brand?: string; specs?: string; kind?: string }): string {
+  return `${item.brand ?? ""} ${item.name} ${item.specs ?? ""} ${item.kind ?? ""} ${laptopFace(item.name, item.specs ?? "", item.kind ?? "").join(" ")}`.toLowerCase();
+}
+
+export function tagPaint(tag: string): { bg: string; fg: string } {
+  const t = tag.toUpperCase();
+  if (t === "OLED") return { bg: "#efe6ff", fg: "#5b21b6" };
+  if (t === "IPS" || t === "VA" || t === "4K" || t === "2K" || t === "1080P") return { bg: "#e0f2fe", fg: "#075985" };
+  if (t.includes("NVIDIA") || t === "RTX") return { bg: "#dcfce7", fg: "#166534" };
+  if (t.includes("AMD") || t === "RYZEN") return { bg: "#ffe4e6", fg: "#9f1239" };
+  if (t.includes("INTEL")) return { bg: "#dbeafe", fg: "#1e3a8a" };
+  if (/^\d{4}$/.test(tag)) return { bg: "#fef3c7", fg: "#92400e" };
+  if (t.includes("GAMING") || t === "GAMES") return { bg: "#161616", fg: "#ffffff" };
+  if (t.includes("SCHOOL") || t.includes("WORK") || t === "HOME" || t.includes("OFFICE")) return { bg: "#ecfdf5", fg: "#065f46" };
+  if (t.includes("LB") || t.includes("KG")) return { bg: "#f4f4f5", fg: "#3f3f46" };
+  return { bg: "#f4f4f5", fg: "#222" };
 }

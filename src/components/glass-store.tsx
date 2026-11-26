@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Lock, Search } from "lucide-react";
 import laptopsRaw from "@/data/laptops.json";
-import { CAT_LABEL, PARTS, byId, explainLaptop, explainPart, isJunk, laptopBits, money, partScore, tagsOf, type Category } from "@/lib/catalog";
+import { CAT_LABEL, PARTS, byId, dealFrom, explainLaptop, explainPart, isJunk, laptopBits, money, partScore, tagsOf, type Category } from "@/lib/catalog";
+import { laptopBlob, laptopFace, releaseYear, tagPaint } from "@/lib/facts";
 import { RankBadge } from "@/components/rank";
 import { Counter } from "@/components/counter";
 import { KeyboardShop } from "@/components/keyboard-shop";
@@ -111,7 +112,14 @@ function GlassBody({ onLock }: { onLock: () => void }) {
     if (!shelf) return [];
     const q = query.trim().toLowerCase();
     return cardsFor(shelf)
-      .filter((item) => !q || `${item.brand} ${item.name}`.toLowerCase().includes(q))
+      .filter((item) => {
+        if (!q) return true;
+        if (shelf === "laptop") {
+          const lap = LAPS.find((row) => row.id === item.id);
+          return lap ? laptopBlob(lap).includes(q) : `${item.brand} ${item.name}`.toLowerCase().includes(q);
+        }
+        return `${item.brand} ${item.name}`.toLowerCase().includes(q);
+      })
       .sort((a, b) => {
         if (sort === "high") return b.price - a.price;
         if (sort === "score") return scoreOf(b) - scoreOf(a);
@@ -145,7 +153,7 @@ function GlassBody({ onLock }: { onLock: () => void }) {
   if (panel === "deals") return <Bundles onLeave={() => setPanel("shop")} />;
 
   return (
-    <div className="relative min-h-dvh overflow-hidden bg-black text-white">
+    <div className="relative h-full overflow-y-auto bg-black text-white">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_-10%,rgba(168,85,247,0.55),transparent_42%),radial-gradient(circle_at_100%_100%,rgba(236,72,153,0.4),transparent_46%),radial-gradient(circle_at_50%_120%,rgba(56,189,248,0.18),transparent_40%)]" />
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.12]"
@@ -193,7 +201,7 @@ function GlassBody({ onLock }: { onLock: () => void }) {
             <h2 className="mt-1 text-3xl font-medium">{current?.title ?? CAT_LABEL.cpu}</h2>
             <label className="mt-3 flex h-12 items-center gap-2 rounded-2xl border border-white/30 bg-white/10 px-3 backdrop-blur-xl">
               <Search className="size-4 text-[#e9d5ff]" />
-              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search this shelf" className="h-full w-full bg-transparent text-base outline-none placeholder:text-white/40" />
+              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={shelf === "laptop" ? "OLED, 16 inch, 32GB, school, 2025" : "Search this shelf"} className="h-full w-full bg-transparent text-base outline-none placeholder:text-white/40" />
             </label>
             <div className="mt-3 flex flex-wrap gap-2">
               {(
@@ -221,33 +229,43 @@ function GlassBody({ onLock }: { onLock: () => void }) {
             ) : (
             <>
             <ul className={`mt-3 ${grid ? "grid grid-cols-2 gap-2" : "space-y-2"}`} style={{ perspective: "900px" }} onMouseLeave={() => setHot(null)}>
-              {rows.slice(0, limit).map((item) => (
-                <li key={item.id}>
+              {rows.slice(0, limit).map((item) => {
+                const lap = shelf === "laptop" ? LAPS.find((row) => row.id === item.id) : undefined;
+                const tags = lap ? laptopFace(lap.name, lap.specs, lap.kind).slice(0, 6) : (byId.get(item.id) ? tagsOf(byId.get(item.id)!).slice(0, 4) : []);
+                const score = scoreOf(item);
+                const ink = lap ? dealFrom(item.price, score).fg : "#ffffff";
+                return (
+                <li key={item.id} className="rounded-2xl border border-white/25 bg-white/10 backdrop-blur-xl">
                   <button
                     type="button"
                     onMouseEnter={() => setHot(item.id)}
                     onFocus={() => setHot(item.id)}
                     onClick={() => chooseItem(item)}
-                    className={`flex w-full items-start justify-between gap-3 rounded-2xl border border-white/25 bg-white/10 px-4 py-3 text-left backdrop-blur-xl transition duration-300 ${hot === item.id ? "z-10 -translate-y-1 scale-[1.03] shadow-[0_16px_40px_rgba(168,85,247,0.35)]" : hot ? "opacity-50" : ""}`}
+                    className={`flex w-full items-start justify-between gap-3 px-4 py-3 text-left transition duration-300 ${hot === item.id ? "z-10 -translate-y-1 scale-[1.03]" : hot ? "opacity-50" : ""}`}
                   >
                     <span className="min-w-0">
                       <span className="block text-[11px] uppercase tracking-[0.16em] text-[#e9d5ff]">{item.brand}</span>
                       <span className="mt-0.5 block text-base leading-snug">{item.name}</span>
                       <span className="mt-1 flex flex-wrap gap-1">
-                        {(byId.get(item.id) ? tagsOf(byId.get(item.id)!) : []).slice(0, 4).map((tag) => (
-                          <span key={tag} className="rounded-full bg-white/10 px-2 py-0.5 text-[11px] text-[#e9d5ff]">{tag}</span>
-                        ))}
+                        {tags.map((tag) => {
+                          const paint = tagPaint(tag);
+                          return (
+                            <span key={tag} role="presentation" onClick={(event) => { event.stopPropagation(); setQuery(tag); }} className="rounded-full px-2 py-0.5 text-[11px]" style={{ background: paint.bg, color: paint.fg }}>{tag}</span>
+                          );
+                        })}
                       </span>
                     </span>
                     <span className="shrink-0 text-right">
-                      <span className="block text-base font-medium">{money(item.price)}</span>
-                      <span className="mt-1 block">
-                        <RankBadge score={scoreOf(item)} lines={linesOf(item)} />
-                      </span>
+                      <span className="block text-base font-medium" style={{ color: ink }}>{money(item.price)}</span>
+                      {lap ? <span className="mt-1 block text-xs font-semibold" style={{ color: ink }}>{money(item.price / Math.max(1, score))}/pt · {releaseYear(lap.name)}</span> : null}
                     </span>
                   </button>
+                  <div className="px-4 pb-3">
+                    <RankBadge score={score} lines={lap ? explainLaptop(lap) : linesOf(item)} />
+                  </div>
                 </li>
-              ))}
+                );
+              })}
             </ul>
             {rows.length > limit ? (
               <button type="button" onClick={() => { blip(); setLimit((value) => value + 24); }} className="mt-3 h-12 w-full rounded-full border border-white/30 bg-white/10 text-base backdrop-blur-xl">

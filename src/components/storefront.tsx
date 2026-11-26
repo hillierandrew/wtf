@@ -11,7 +11,8 @@ import { HistoryRoot, latest, usePath } from "@/components/history";
 import { AddButton, BagDock, RuleLine, ThreeSearch } from "@/components/bag";
 import { Five } from "@/components/five";
 import { lapBag, partBag } from "@/lib/bag";
-import { CAT_LABEL, PARTS, explainPart, explainLaptop, laptopBits, isJunk, machineScore, money, partScore, rankFrom, tagsOf, type Category, type Part } from "@/lib/catalog";
+import { laptopBlob, laptopFace, tagPaint } from "@/lib/facts";
+import { CAT_LABEL, PARTS, explainPart, explainLaptop, laptopBits, isJunk, machineScore, money, partScore, rankFrom, tagsOf, dealFrom, type Category, type Part } from "@/lib/catalog";
 
 type View = "ai" | "desktops" | "laptops" | "parts";
 type Sort = "ppp" | "score" | "score-asc" | "price-asc" | "price-desc";
@@ -94,7 +95,6 @@ function fromPart(part: Part): Card {
 
 function fromLaptop(item: Laptop): Card {
   const score = hundred(item);
-  const kind = item.kind === "game" ? "Gaming" : item.kind === "work" ? "Work" : item.kind === "tablet" ? "Tablet" : item.kind === "chrome" ? "Chrome" : "Home";
   return {
     id: item.id,
     name: item.name,
@@ -102,7 +102,7 @@ function fromLaptop(item: Laptop): Card {
     price: item.price,
     was: item.was,
     score,
-    tags: [kind, item.specs].filter(Boolean).slice(0, 3),
+    tags: laptopFace(item.name, item.specs, item.kind).slice(0, 8),
     why: laptopWhy(item),
     open: item.open,
     shelf: "Laptop",
@@ -286,7 +286,15 @@ function StoreBody({ onLock }: { onLock: () => void }) {
     else if (view === "laptops") list = LAPTOPS.filter((item) => item.kind !== "tablet").map(fromLaptop);
     else if (view === "parts") list = stock.filter((part) => part.cat === partCat).map(fromPart);
     if (!openBox) list = list.filter((item) => !item.open);
-    if (q) list = list.filter((item) => `${item.brand} ${item.name} ${item.shelf}`.toLowerCase().includes(q));
+    if (q) {
+      list = list.filter((item) => {
+        if (item.where === "laptops") {
+          const lap = LAPTOPS.find((row) => row.id === item.id);
+          return lap ? laptopBlob(lap).includes(q) : `${item.brand} ${item.name}`.toLowerCase().includes(q);
+        }
+        return `${item.brand} ${item.name} ${item.shelf} ${item.tags.join(" ")}`.toLowerCase().includes(q);
+      });
+    }
     return sortCards(list, sort);
   }, [view, partCat, query, sort, openBox, desks, stock]);
 
@@ -309,7 +317,7 @@ function StoreBody({ onLock }: { onLock: () => void }) {
   if (panel === "deals") return <Bundles onLeave={() => setPanel("shop")} />;
 
   return (
-    <div className="min-h-dvh bg-[#fafafa] text-[#111] antialiased" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif' }}>
+    <div className="h-full overflow-y-auto bg-[#fafafa] text-[#111] antialiased" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif' }}>
       <header className="sticky top-0 z-20 border-b border-black/5 bg-white/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2">
@@ -406,7 +414,7 @@ function StoreBody({ onLock }: { onLock: () => void }) {
             <div className="flex flex-wrap items-center gap-3">
               <div className="relative min-w-[200px] flex-1">
                 <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-neutral-400" />
-                <input value={query} onChange={(event) => { setQuery(event.target.value); setMore(24); }} placeholder={view === "parts" ? `Search ${SHORT[partCat].toLowerCase()}` : "Search"} className="w-full rounded-2xl border border-black/10 bg-white py-2.5 pl-9 pr-4 text-sm outline-none ring-blue-500/20 focus:ring-2" />
+                <input value={query} onChange={(event) => { setQuery(event.target.value); setMore(24); }} placeholder={view === "laptops" ? "Try OLED, 16 inch, 32GB, school, 2025" : view === "parts" ? `Search ${SHORT[partCat].toLowerCase()}` : "Search"} className="w-full rounded-2xl border border-black/10 bg-white py-2.5 pl-9 pr-4 text-sm outline-none ring-blue-500/20 focus:ring-2" />
               </div>
               <select value={sort} onChange={(event) => setSort(event.target.value as Sort)} className="rounded-2xl border border-black/10 bg-white px-3 py-2.5 text-sm">
                 <option value="ppp">Best price / performance</option>
@@ -451,19 +459,23 @@ function StoreBody({ onLock }: { onLock: () => void }) {
                         </button>
                       </div>
                       <div className="mt-3 flex items-baseline gap-2">
-                        <span className="text-2xl font-bold">{money(item.price)}</span>
+                        <span className="text-2xl font-bold" style={{ color: item.where === "laptops" ? dealFrom(item.price, item.score).fg : undefined }}>{money(item.price)}</span>
                         {item.was ? <span className="text-sm text-neutral-400 line-through">{money(item.was)}</span> : null}
+                        {item.where === "laptops" ? <span className="text-sm font-semibold" style={{ color: dealFrom(item.price, item.score).fg }}>{money(ppp(item))} / point</span> : null}
                       </div>
                       <button type="button" onClick={() => setScoreId(item.id)} className="mt-2 text-left text-xs text-neutral-500">
                         Score {Math.round(item.score)} · {money(value)} / point
                       </button>
                       {item.tags.length > 0 ? (
                         <div className="mt-3 flex flex-wrap gap-1.5">
-                          {item.tags.map((tag) => (
-                            <span key={tag} className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${tag === "iGPU" ? "bg-blue-50 text-blue-700" : "bg-neutral-100 text-neutral-600"}`}>
-                              {tag}
-                            </span>
-                          ))}
+                          {item.tags.map((tag) => {
+                            const paint = tagPaint(tag);
+                            return (
+                              <button key={tag} type="button" onClick={() => { setQuery(tag); setMore(24); }} className="rounded-full px-2 py-0.5 text-[11px] font-medium" style={{ background: paint.bg, color: paint.fg }}>
+                                {tag}
+                              </button>
+                            );
+                          })}
                         </div>
                       ) : null}
                       {item.where === "laptops" && LAPTOPS.some((row) => row.id === item.id) ? laptopMarks(LAPTOPS.find((row) => row.id === item.id)!) : null}

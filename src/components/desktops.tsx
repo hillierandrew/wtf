@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Check, Search, X } from "lucide-react";
-import { PARTS, careerPicks, explainBuild, explainPart, machineScore, money, spendOf, tagsOf, aiScore, type AiPick, type Part, type ShelfSort } from "@/lib/catalog";
+import { PARTS, careerPicks, dealFrom, explainBuild, explainPart, machineScore, money, spendOf, tagsOf, aiScore, type AiPick, type Part, type ShelfSort } from "@/lib/catalog";
 import { CopyList, buildNames, partLine } from "@/components/copy-list";
 import { deskMarks } from "@/components/marks";
 import { RankBadge } from "@/components/rank";
@@ -179,22 +179,22 @@ export function Desktops({ onLeave, onUse }: { onLeave: () => void; onUse?: (pic
             const score = machineScore(part.name);
             return (
               <li key={part.id} className={`overflow-hidden rounded-2xl border ${selected ? "border-accent bg-subtle" : "border-line bg-elevated"}`}>
-                <button type="button" onClick={() => setPicked(part.id)} className="press flex w-full items-start justify-between gap-3 px-3 py-4 text-left">
-                  <span className="min-w-0">
+                <div className="flex items-start justify-between gap-3 px-3 py-4">
+                  <button type="button" onClick={() => setPicked(part.id)} className="press min-w-0 flex-1 text-left">
                     <span className="flex items-center gap-2 text-sm text-muted">
                       {part.brand}
                       {selected ? <Check className="size-4 text-accent" /> : null}
                     </span>
                     <span className="mt-1 block text-base font-medium leading-snug">{part.name.replace(/\(Open Box\)/i, "").trim()}</span>
                     <span className="mt-1 block text-sm text-muted">{tagsOf(part).join(" · ")}</span>
-                    <span className="mt-1 block text-sm text-muted">{money(part.price / score)} per point</span>
-                  </span>
+                  </button>
                   <span className="shrink-0 text-right">
-                    <span className="tabular block text-2xl font-medium">{score}</span>
-                    <span className="tabular block text-base font-medium">{money(part.price)}</span>
+                    <RankBadge score={score} lines={explainPart(part)} />
+                    <span className="tabular mt-1 block text-base font-medium" style={{ color: dealFrom(part.price, score).fg }}>{money(part.price)}</span>
+                    <span className="block text-sm" style={{ color: dealFrom(part.price, score).fg }}>{money(part.price / score)} / point</span>
                     {part.was ? <span className="block text-sm text-ok">Down {money(part.was - part.price)}</span> : null}
                   </span>
-                </button>
+                </div>
                 <div className="px-3 pb-3">
                   <AddButton line={partBag(part, `Desktop shelf. Budget ${money(part.price)}. Score ${score}.`)} />
                   {deskMarks(part)}

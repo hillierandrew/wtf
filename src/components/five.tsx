@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import raw from "@/data/laptops.json";
 import simRaw from "@/data/sim.json";
-import { PARTS, laptopBits, machineScore, money } from "@/lib/catalog";
+import { PARTS, explainLaptop, explainPart, laptopBits, machineScore, money } from "@/lib/catalog";
+import { RankBadge } from "@/components/rank";
 import { AddButton, AddPack, RuleLine } from "@/components/bag";
 import { keyBag, lapBag, partBag, simBag, type BagLine } from "@/lib/bag";
 import { KEYS } from "@/lib/keyboard";
@@ -75,8 +76,10 @@ export function Five({ onClose }: { onClose: () => void }) {
     const main = picked.lines.find((line) => line.kind === "pc" || line.kind === "lap");
     const lap = main?.kind === "lap" ? LAPS.find((item) => item.id === main.id) : undefined;
     const score = main?.kind === "pc" ? machineScore(main.name) : lap ? Math.round(laptopBits(lap).score) : 0;
+    const part = main?.kind === "pc" ? PARTS.find((item) => item.id === main.id || item.name === main.name) : undefined;
+    const scoreLines = part ? explainPart(part) : lap ? explainLaptop(lap) : [`Score ${score}.`];
     const rule = `${picked.why} Budget ${money(budget)}. Score ${score || "n/a"}.`;
-    return { ...picked, score, bags: picked.lines.map((line) => toBag(line, rule)) };
+    return { ...picked, score, scoreLines, bags: picked.lines.map((line) => toBag(line, rule)) };
   }, [done, job, game, budget, desk]);
 
   const step = !job ? "What do you want to do?" : askGame ? "Which games?" : askBudget ? "What can they spend?" : askDesk ? "The whole desk?" : result?.over ? "Nothing in that budget." : "This is the one.";
@@ -146,6 +149,7 @@ export function Five({ onClose }: { onClose: () => void }) {
             ))}
           </ol>
           <RuleLine how="Five-minute guide" who={JOBS.find((item) => item.id === job)?.label ?? ""} budget={money(budget!)} score={result.score ? String(result.score) : "n/a"} />
+          {result.score ? <RankBadge score={result.score} lines={result.scoreLines} /> : null}
           {result.bags.length === 1 && result.bags[0] ? <AddButton line={result.bags[0]} /> : <AddPack lines={result.bags} />}
         </div>
       ) : null}

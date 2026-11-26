@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Check, Search, X } from "lucide-react";
 import raw from "@/data/laptops.json";
-import { laptopBits, type ShelfSort } from "@/lib/catalog";
+import { laptopBits, dealFrom, type ShelfSort } from "@/lib/catalog";
 import { laptopMarks } from "@/components/marks";
 import { CopyList, partLine } from "@/components/copy-list";
 import { SortRow } from "@/components/sorts";
@@ -9,7 +9,7 @@ import { ThemeToggle, usePane } from "@/lib/theme";
 import { latest, usePath } from "@/components/history";
 import { AddButton, MoreDetail, ThreeSearch } from "@/components/bag";
 import { lapBag } from "@/lib/bag";
-import { laptopWeight, specTags, releaseYear } from "@/lib/facts";
+import { laptopWeight, releaseYear, laptopBlob, laptopFace, tagPaint } from "@/lib/facts";
 
 type Kind = "game" | "home" | "work" | "tablet" | "chrome";
 type Filter = "deal" | "games" | "work" | "school" | "grandma" | "create" | "tablet" | "chrome";
@@ -242,7 +242,7 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
       if (course && !studies(item, course)) return false;
       if (!openBox && item.open) return false;
       if (brand !== "all" && item.brand !== brand) return false;
-      if (q && !`${item.brand} ${item.name}`.toLowerCase().includes(q)) return false;
+      if (q && !laptopBlob(item).includes(q)) return false;
       return true;
     }).sort((a, b) => {
       const aScore = hundred(a);
@@ -348,7 +348,7 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
         <div className="flex gap-2">
           <label className="flex h-12 min-w-0 flex-1 items-center gap-2 rounded-2xl border border-line bg-elevated px-3">
             <Search className="size-4 shrink-0 text-muted" strokeWidth={1.75} />
-            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search" className="h-full w-full bg-transparent text-base outline-none" />
+            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="OLED, 16 inch, 32GB, school, 2025" className="h-full w-full bg-transparent text-base outline-none" />
           </label>
           <button type="button" onClick={() => setOpenBox((value) => !value)} className={`h-12 shrink-0 rounded-2xl border px-3 text-sm ${openBox ? "border-accent bg-subtle" : "border-line"}`}>
             Open box
@@ -383,14 +383,19 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
                     {game ? <span className="mt-1 block text-sm text-muted">{game.label} at {qualityLabel}</span> : null}
                     {course ? <span className="mt-1 block text-sm text-muted">Runs {course.program}</span> : null}
                     <span className="mt-1 flex flex-wrap gap-1">
-                      {specTags(item.name, item.specs).map((tag) => (
-                        <span key={tag} className="rounded-full bg-neutral-100 px-2 py-0.5 text-[11px]">{tag}</span>
-                      ))}
-                      <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[11px]">{laptopWeight(item.name, item.kind).lb} lb · {laptopWeight(item.name, item.kind).kg} kg · {releaseYear(item.name)}</span>
+                      {laptopFace(item.name, item.specs, item.kind).slice(0, 8).map((tag) => {
+                        const paint = tagPaint(tag);
+                        return (
+                          <span key={tag} role="presentation" onClick={(event) => { event.stopPropagation(); setQuery(tag); }} className="rounded-full px-2 py-0.5 text-[11px] font-medium" style={{ background: paint.bg, color: paint.fg }}>
+                            {tag}
+                          </span>
+                        );
+                      })}
                     </span>
                   </span>
                   <span className="shrink-0 text-right">
-                    <span className="tabular block text-base font-medium">{money(item.price)}</span>
+                    <span className="tabular block text-base font-medium" style={{ color: dealFrom(item.price, hundred(item)).fg }}>{money(item.price)}</span>
+                    <span className="block text-xs font-semibold" style={{ color: dealFrom(item.price, hundred(item)).fg }}>{money(item.price / hundred(item))} / point · {releaseYear(item.name)}</span>
                     {item.was ? <span className="block text-sm text-ok">Down {money(item.was - item.price)}</span> : null}
                   </span>
                 </button>

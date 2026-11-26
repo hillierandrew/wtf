@@ -174,8 +174,8 @@ export function Counter({ onClose }: { onClose: () => void }) {
           const score = partScore(part);
           const on = build[cat]?.id === part.id;
           return (
-            <li key={part.id}>
-              <button type="button" onClick={() => take(part)} className={`flex w-full items-start justify-between gap-3 rounded-2xl bg-[#241033] px-3 py-3 text-left ${glow(score)} ${on ? "outline outline-2 outline-[#ff7a1a]" : ""}`}>
+            <li key={part.id} className={`rounded-2xl bg-[#241033] ${glow(score)} ${on ? "outline outline-2 outline-[#ff7a1a]" : ""}`}>
+              <button type="button" onClick={() => take(part)} className="flex w-full items-start justify-between gap-3 px-3 py-3 text-left">
                 <span className="min-w-0">
                   <span className="block text-[11px] uppercase tracking-wide text-[#ffb070]">{part.brand}</span>
                   <span className="mt-0.5 block text-base leading-snug">{part.name}</span>
@@ -185,11 +185,11 @@ export function Counter({ onClose }: { onClose: () => void }) {
                     ))}
                   </span>
                 </span>
-                <span className="shrink-0 text-right">
-                  <RankBadge score={score} lines={explainPart(part)} />
-                  <span className="mt-1 block text-sm font-semibold">{money(part.price)}</span>
-                </span>
+                <span className="shrink-0 text-sm font-semibold">{money(part.price)}</span>
               </button>
+              <div className="px-3 pb-3">
+                <RankBadge score={score} lines={explainPart(part)} />
+              </div>
             </li>
           );
         })}

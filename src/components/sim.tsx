@@ -4,7 +4,8 @@ import raw from "@/data/sim.json";
 import monitors from "@/data/monitors.json";
 import { CopyList, listText, partLine } from "@/components/copy-list";
 import { ThemeToggle } from "@/lib/theme";
-import { PARTS, isJunk, machineScore, money as partMoney } from "@/lib/catalog";
+import { PARTS, explainPart, isJunk, machineScore, money as partMoney } from "@/lib/catalog";
+import { RankBadge } from "@/components/rank";
 import QRCode from "qrcode";
 import { latest, usePath } from "@/components/history";
 import { AddButton } from "@/components/bag";
@@ -414,7 +415,12 @@ export function Sim({ onLeave, look = "paper" }: { onLeave?: () => void; look?: 
           <div className={phone ? "space-y-3" : "min-h-0 flex-1 space-y-3 overflow-y-auto px-4 pb-4"}>
             {title ? <p className="text-base font-medium">{title}</p> : null}
             {blurb ? <p className="rounded-2xl border border-line bg-subtle px-4 py-3 text-base">{blurb}</p> : null}
-            {pc ? <p className="rounded-2xl border border-line bg-elevated px-4 py-3 text-base">Computer for this: {pc.name}. {partMoney(pc.price)}. Score {machineScore(pc.name)}.</p> : null}
+            {pc ? (
+              <div className="rounded-2xl border border-line bg-elevated px-4 py-3 text-base">
+                <p>Computer for this: {pc.name}. {partMoney(pc.price)}.</p>
+                <RankBadge score={machineScore(pc.name)} lines={explainPart(pc)} />
+              </div>
+            ) : null}
             <p className="text-base text-muted">{LEVELS.find((item) => item.id === level)?.line} {stepMeta?.line}</p>
             {notice ? <p className="rounded-2xl border border-line bg-elevated px-4 py-3 text-base">{notice}</p> : null}
             {blocked ? (

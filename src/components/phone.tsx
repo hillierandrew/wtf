@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, Cpu, Gamepad2, Heart, LayoutGrid, Lock, Search, Zap } from "lucide-react";
-import { CAT_LABEL, CATS, PARTS, byId, fitWhy, isJunk, laptopBits, machineScore, money, reconcile, shortName, spendOf, suggest, type Build, type Category, type Part } from "@/lib/catalog";
+import { CAT_LABEL, CATS, PARTS, byId, dealFrom, fitWhy, isJunk, laptopBits, machineScore, money, reconcile, shortName, spendOf, suggest, type Build, type Category, type Part } from "@/lib/catalog";
 import { PHONE_ITEMS, PHONE_SECTIONS, groupMeta, phoneItem, type PhoneItem } from "@/lib/phone-catalog";
 import { EasyPick, GpuPower } from "@/components/easy";
 import { KeyboardShop } from "@/components/keyboard-shop";
@@ -13,7 +13,7 @@ import { HistoryRoot, latest, usePath } from "@/components/history";
 import { AddButton, BagDock, ThreeSearch } from "@/components/bag";
 import { Five } from "@/components/five";
 import { keyBag, lapBag, partBag, simBag } from "@/lib/bag";
-import { laptopWeight, specTags } from "@/lib/facts";
+import { laptopBlob, laptopFace, laptopWeight, releaseYear, tagPaint } from "@/lib/facts";
 
 const LAPS = laptopsRaw as { id: string; name: string; price: number; gpu: number; specs: string; kind?: string }[];
 
@@ -172,7 +172,7 @@ function PhoneBody({ onLock }: { onLock: () => void }) {
     if (kind !== "all" && group) list = list.filter((item) => item.kind === kind);
     if (hideOpen) list = list.filter((item) => !item.open);
     if (q && (tab === "search" || group || tab === "deals" || tab === "saved")) {
-      list = list.filter((item) => `${item.brand} ${item.name} ${item.kind}`.toLowerCase().includes(q));
+      list = list.filter((item) => (item.group === "laptops" ? laptopBlob(item) : `${item.brand} ${item.name} ${item.kind}`).toLowerCase().includes(q));
     }
     return sortItems(list, sort);
   }, [tab, group, query, kind, sort, hideOpen, saved]);
@@ -395,16 +395,19 @@ function PhoneBody({ onLock }: { onLock: () => void }) {
                           {item.open ? " · Open box" : ""}
                         </span>
                         <span className="mt-1 flex flex-wrap gap-1">
-                          {specTags(item.name).map((tag) => (
-                            <span key={tag} className="rounded-full bg-[#f2f2f7] px-2 py-0.5 text-[11px] text-[#333]">{tag}</span>
-                          ))}
-                          {item.group === "laptops" || item.group === "tablets" ? (
-                            <span className="rounded-full bg-[#f2f2f7] px-2 py-0.5 text-[11px] text-[#333]">{laptopWeight(item.name, item.kind).lb} lb · {laptopWeight(item.name, item.kind).kg} kg</span>
-                          ) : null}
+                          {(item.group === "laptops" ? laptopFace(item.name, "", item.kind) : []).slice(0, 6).map((tag) => {
+                            const paint = tagPaint(tag);
+                            return (
+                              <span key={tag} role="presentation" onClick={(event) => { event.stopPropagation(); setQuery(tag); }} className="rounded-full px-2 py-0.5 text-[11px] font-medium" style={{ background: paint.bg, color: paint.fg }}>
+                                {tag}
+                              </span>
+                            );
+                          })}
                         </span>
                       </button>
                       <div className="flex shrink-0 flex-col items-end gap-1">
-                        <span className="text-[16px] font-semibold">{money(item.price)}</span>
+                        <span className="text-[16px] font-semibold" style={{ color: item.group === "laptops" ? dealFrom(item.price, phoneScore(item)).fg : undefined }}>{money(item.price)}</span>
+                        {item.group === "laptops" ? <span className="text-[12px] font-semibold" style={{ color: dealFrom(item.price, phoneScore(item)).fg }}>{money(item.price / Math.max(1, phoneScore(item)))}/pt · {releaseYear(item.name)}</span> : null}
                         {item.was ? <span className="text-[12px] text-[#ff3b30] line-through">{money(item.was)}</span> : null}
                         <AddButton line={phoneLine(item)} className="h-8 rounded-full bg-[#f2f2f7] px-3 text-[13px]" />
                         <button type="button" aria-label={saved.has(item.id) ? "Unsave" : "Save"} onClick={() => toggleSave(item.id)} className="flex size-8 items-center justify-center">
