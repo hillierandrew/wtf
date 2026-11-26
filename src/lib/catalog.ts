@@ -335,8 +335,14 @@ export function explainPart(part: Part): string[] {
     lines.push(`That total is ${score}.`);
     if (watts) lines.push(`${money(part.price)} ÷ ${watts} W = ${money(part.price / watts)} per watt.`);
   } else if (part.cat === "prebuilt") {
-    lines.push("The graphics card in the name is most of the score. Memory and the SSD add a little. A 3D-cache chip adds 6. The total stops at 100.");
-    lines.push(`${money(part.price)} ÷ ${score} = ${money(part.price / score)} per point.`);
+    const bits = machineParts(part.name);
+    lines.push("Formula: graphics + memory + drive + cache. Then the score stops at 100.");
+    lines.push(`Graphics = ${bits.gpu}. A 5090 is 88. A 5080 is 80. A 5070 Ti is 72. A 9070 XT is 70. A 5070 is 64. A 9070 is 62. A 5060 Ti is 56. A 9060 is 52. A 5060 is 50. A 3050 is 28. No known card is 8.`);
+    lines.push(`Memory = ${bits.ramPts}. ${bits.ram || 0} GB in the name. 64GB is 16, 32GB is 12, 16GB is 6, less is 0.`);
+    lines.push(`Drive = ${bits.diskPts}. ${bits.disk || 0} TB of SSD. 4TB is 8, 2TB is 6, 1TB is 4, 0.5TB is 2, less is 0.`);
+    lines.push(`Cache = ${bits.cpuPts}. An X3D chip is 6. Any other chip is 0.`);
+    lines.push(`${bits.gpu} + ${bits.ramPts} + ${bits.diskPts} + ${bits.cpuPts} = ${bits.raw}, which becomes ${bits.score}.`);
+    lines.push(`${money(part.price)} ÷ ${bits.score} = ${money(part.price / bits.score)} per point.`);
   } else if (part.cat === "monitor") {
     lines.push("1080p starts at 36, 1440p at 55, 4K at 70. 144Hz adds 16. 240Hz adds 25.");
   } else if (part.cat === "motherboard") {
@@ -486,7 +492,7 @@ export function gpuIndex(part: Part): number {
 }
 
 /** 0 to 100. A 5090 is the top. An old office PC is near the bottom. */
-export function machineScore(name: string): number {
+export function machineParts(name: string) {
   const n = name.toUpperCase();
   let gpu = 8;
   if (/5090/.test(n)) gpu = 88;
@@ -510,7 +516,39 @@ export function machineScore(name: string): number {
   const disk = tb ? Number(tb[1]) : gb ? Number(gb[1]) / 1000 : 0;
   const diskPts = disk >= 4 ? 8 : disk >= 2 ? 6 : disk >= 1 ? 4 : disk >= 0.5 ? 2 : 0;
   const cpuPts = /X3D/.test(n) ? 6 : 0;
-  return Math.max(1, Math.min(100, gpu + ramPts + diskPts + cpuPts));
+  const raw = gpu + ramPts + diskPts + cpuPts;
+  return { gpu, ram, ramPts, disk, diskPts, cpuPts, raw, score: Math.max(1, Math.min(100, raw)) };
+}
+
+export function machineScore(name: string): number {
+  return machineParts(name).score;
+}
+
+export function laptopBits(item: { gpu: number; specs: string; price?: number }) {
+  const ramMatch = item.specs.match(/(\d+)GB memory/i);
+  const ram = ramMatch ? Number(ramMatch[1]) : 0;
+  const disk = item.specs.match(/(\d+(?:\.\d+)?)(TB|GB) storage/i);
+  const diskTb = disk ? (disk[2].toUpperCase() === "TB" ? Number(disk[1]) : Number(disk[1]) / 1000) : 0;
+  const diskPts = diskTb >= 2 ? 6 : diskTb >= 1 ? 4 : diskTb >= 0.5 ? 2 : 0;
+  const ramPts = ram >= 64 ? 16 : ram >= 32 ? 12 : ram >= 16 ? 6 : 0;
+  const gpu = item.gpu >= 100 ? 88 : item.gpu >= 90 ? 80 : item.gpu >= 80 ? 72 : item.gpu >= 72 ? 64 : item.gpu >= 60 ? 52 : item.gpu >= 45 ? 40 : item.gpu >= 28 ? 30 : ram >= 16 ? 14 : 8;
+  const raw = gpu + ramPts + diskPts;
+  return { gpu, chip: item.gpu, ram, ramPts, diskTb, diskPts, raw, score: Math.max(1, Math.min(100, raw)) };
+}
+
+export function explainLaptop(item: { name?: string; price: number; gpu: number; specs: string }): string[] {
+  const bits = laptopBits(item);
+  const rank = rankFrom(bits.score);
+  return [
+    `${rank.name} ${rank.score}. ${BANDS}`,
+    "Formula: graphics + memory + drive. The result stops at 100.",
+    `Graphics = ${bits.gpu}. The chip power number is ${bits.chip}. 100 or more means 88. 90 means 80. 80 means 72. 72 means 64. 60 means 52. 45 means 40. 28 means 30. Otherwise 16GB of memory makes it 14, and less memory makes it 8.`,
+    `Memory = ${bits.ramPts}. ${bits.ram || 0} GB. 64GB is 16, 32GB is 12, 16GB is 6, less is 0.`,
+    `Drive = ${bits.diskPts}. ${bits.diskTb || 0} TB. 2TB is 6, 1TB is 4, 0.5TB is 2, smaller is 0.`,
+    `${bits.gpu} + ${bits.ramPts} + ${bits.diskPts} = ${bits.raw}, which becomes ${bits.score}.`,
+    `${money(item.price)} ÷ ${bits.score} = ${money(item.price / bits.score)} per point.`,
+    "Lower dollars per point means more laptop for the money.",
+  ];
 }
 
 export function aiScore(build: Build): number {

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Check, Search, X } from "lucide-react";
 import { PARTS, careerPicks, explainBuild, explainPart, machineScore, money, spendOf, tagsOf, aiScore, type AiPick, type Part, type ShelfSort } from "@/lib/catalog";
+import { CopyList, buildNames, partLine } from "@/components/copy-list";
 import { RankBadge } from "@/components/rank";
 import { SortRow } from "@/components/sorts";
 import { ThemeToggle, usePane } from "@/lib/theme";
@@ -145,6 +146,7 @@ export function Desktops({ onLeave, onUse }: { onLeave: () => void; onUse?: (pic
                 <button type="button" onClick={() => onUse?.(pick)} className="mt-3 h-12 w-full rounded-xl bg-accent text-base text-accent-fg">
                   Use this build
                 </button>
+                <CopyList title={pick.name} names={buildNames(pick.build)} />
               </div>
             ))}
           </div>
@@ -194,7 +196,10 @@ export function Desktops({ onLeave, onUse }: { onLeave: () => void; onUse?: (pic
       </div>
       </div>
       <aside className={`shrink-0 bg-elevated px-4 py-4 ${wide ? "flex w-80 flex-col border-l border-line" : "safe-bottom border-t border-line"}`}>
-        <p className="text-base font-medium">{choice ? `${money(choice.price)} · Score ${machineScore(choice.name)}/100` : "No PC yet"}</p>
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-base font-medium">{choice ? money(choice.price) : "No PC yet"}</p>
+          {choice ? <RankBadge score={machineScore(choice.name)} lines={explainPart(choice)} /> : null}
+        </div>
         <div className="mt-2 flex items-center gap-2">
           <span className="min-w-0 flex-1 truncate text-base">{choice ? choice.name.replace(/\(Open Box\)/i, "").trim() : "Tap one PC."}</span>
           {choice ? (
@@ -203,6 +208,7 @@ export function Desktops({ onLeave, onUse }: { onLeave: () => void; onUse?: (pic
             </button>
           ) : null}
         </div>
+        {choice ? <CopyList title="Desktop" names={[partLine(choice)]} /> : null}
       </aside>
     </div>
   );

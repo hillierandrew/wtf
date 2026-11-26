@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import raw from "@/data/laptops.json";
-import { aiPicks, machineScore, money, PARTS, shortName, spendOf, type AiPick, type Part } from "@/lib/catalog";
+import { CopyList, buildNames, partLine } from "@/components/copy-list";
+import { RankBadge } from "@/components/rank";
+import { aiPicks, explainPart, machineScore, money, PARTS, shortName, spendOf, type AiPick, type Part } from "@/lib/catalog";
 import { ThemeToggle, usePane } from "@/lib/theme";
 
 type Laptop = { id: string; name: string; price: number; brand: string; kind: string; gpu: number; specs: string; open: boolean };
@@ -89,6 +91,7 @@ export function Games({ onLeave, onUse }: { onLeave: () => void; onUse: (pick: A
                 <p className="text-lg font-medium">{pick.name}</p>
                 <p className="mt-1 text-sm text-muted">{pick.why}</p>
                 <p className="mt-2 text-base font-medium">{money(spendOf(pick.build))}</p>
+                <CopyList title={pick.name} names={buildNames(pick.build)} />
                 <button type="button" onClick={() => onUse(pick)} className="mt-3 h-12 w-full rounded-xl bg-accent text-base text-accent-fg">
                   Use this computer
                 </button>
@@ -132,7 +135,9 @@ function Ready({ part, onUse }: { part: Part; onUse: (pick: AiPick) => void }) {
   return (
     <article className="rounded-2xl border border-line p-3">
       <p className="text-base font-medium">{pick.name}</p>
-      <p className="mt-1 text-sm text-muted">Score {machineScore(part.name)} · {money(part.price)}</p>
+      <RankBadge score={machineScore(part.name)} lines={explainPart(part)} />
+      <p className="mt-1 text-sm text-muted">{money(part.price)}</p>
+      <CopyList title={part.name} names={[partLine(part)]} />
       <button type="button" onClick={() => onUse(pick)} className="mt-3 h-12 w-full rounded-xl border border-line text-base">
         Use this computer
       </button>

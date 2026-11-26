@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { CopyList, buildNames } from "@/components/copy-list";
 import { CAT_LABEL, CATS, ideaPicks, money, shortName, spendOf, type AiPick } from "@/lib/catalog";
 import { ThemeToggle, usePane } from "@/lib/theme";
 
@@ -73,6 +74,7 @@ export function Ideas({ onLeave, onUse }: { onLeave: () => void; onUse: (pick: A
               })}
             </ul>
             <p className="mt-4 text-3xl font-medium">Total {money(spendOf(current.build))}</p>
+            <CopyList title={current.name} names={buildNames(current.build)} />
             <button type="button" onClick={() => onUse(current)} className="mt-4 h-16 w-full rounded-2xl bg-accent text-xl text-accent-fg">
               Use this PC
             </button>

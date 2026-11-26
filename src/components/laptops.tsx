@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Check, Search, X } from "lucide-react";
 import raw from "@/data/laptops.json";
-import { rankFrom, type ShelfSort } from "@/lib/catalog";
+import { explainLaptop, laptopBits, type ShelfSort } from "@/lib/catalog";
 import { RankBadge } from "@/components/rank";
+import { CopyList, partLine } from "@/components/copy-list";
 import { SortRow } from "@/components/sorts";
 import { ThemeToggle, usePane } from "@/lib/theme";
 
@@ -140,16 +141,7 @@ function money(value: number) {
 }
 
 function hundred(item: Laptop) {
-  const ram = ramOf(item);
-  const disk = item.specs.match(/(\d+(?:\.\d+)?)(TB|GB) storage/i);
-  let diskPts = 0;
-  if (disk) {
-    const size = disk[2].toUpperCase() === "TB" ? Number(disk[1]) : Number(disk[1]) / 1000;
-    diskPts = size >= 2 ? 6 : size >= 1 ? 4 : size >= 0.5 ? 2 : 0;
-  }
-  const ramPts = ram >= 64 ? 16 : ram >= 32 ? 12 : ram >= 16 ? 6 : 0;
-  const gpu = item.gpu >= 100 ? 88 : item.gpu >= 90 ? 80 : item.gpu >= 80 ? 72 : item.gpu >= 72 ? 64 : item.gpu >= 60 ? 52 : item.gpu >= 45 ? 40 : item.gpu >= 28 ? 30 : ram >= 16 ? 14 : 8;
-  return Math.max(1, Math.min(100, gpu + ramPts + diskPts));
+  return laptopBits(item).score;
 }
 
 function ramOf(item: Laptop) {
@@ -174,16 +166,7 @@ function plays(item: Laptop, game: GameNeed, quality: Quality) {
 }
 
 function laptopMath(item: Laptop) {
-  const score = hundred(item);
-  const ram = ramOf(item);
-  const rank = rankFrom(score);
-  return [
-    `${rank.name} ${rank.score}. Crystal is 90 to 100. Gold is 75 to 89. Silver is 55 to 74. Bronze is 35 to 54. Brown is under 35.`,
-    `The graphics chip is most of the score. Memory is ${ram || "not listed"} GB and adds a few points. A bigger drive adds a little more.`,
-    `Those parts add up, then the score stops at 100. This one landed on ${score}.`,
-    `${money(item.price)} ÷ ${score} = ${money(item.price / score)} per point.`,
-    "Lower dollars per point means more laptop for the money.",
-  ];
+  return explainLaptop(item);
 }
 
 function studies(item: Laptop, course: Course) {
@@ -406,6 +389,7 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
             </button>
           ) : null}
         </div>
+        {choice ? <CopyList title="Laptop" names={[partLine(choice)]} /> : null}
       </aside>
     </div>
   );

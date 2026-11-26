@@ -46,6 +46,7 @@ import {
 } from "@/lib/catalog";
 import { extrasFromIds, partsFrom, useBench } from "@/lib/store";
 import { RankBadge } from "@/components/rank";
+import { partLine } from "@/components/copy-list";
 import { SortRow } from "@/components/sorts";
 import { ThemeToggle, usePane } from "@/lib/theme";
 
@@ -196,29 +197,21 @@ export function Builder({ onLeave, start = "play" }: { onLeave: () => void; star
 
   async function copy() {
     const covered = coveredByBundle(build);
-    const lines = build.prebuilt
-      ? [
-          "drew.wtf build",
-          `Prebuilt: ${build.prebuilt.brand} ${shortName(build.prebuilt)} (${money(build.prebuilt.price)})`,
-          build.monitor
-            ? `Monitor: ${build.monitor.brand} ${shortName(build.monitor)} (${money(build.monitor.price)})`
-            : "Monitor: —",
-          ...extras.monitor.map((part, index) => `Extra screen ${index + 1}: ${part.brand} ${shortName(part)} (${money(part.price)})`),
-          `Total: ${money(total)} CAD`,
-        ]
-      : [
-          "drew.wtf build",
-          ...CATS.map((item) => {
-            const part = build[item];
-            if (!part) return `${CAT_LABEL[item]}: —`;
-            if (item !== "bundle" && covered.has(item)) return `${CAT_LABEL[item]}: ${part.brand} ${shortName(part)} (included)`;
-            return `${CAT_LABEL[item]}: ${part.brand} ${shortName(part)} (${money(part.price)})`;
-          }),
-          ...extras.memory.map((part, index) => `Extra memory ${index + 1}: ${part.brand} ${shortName(part)} (${money(part.price)})`),
-          ...extras.storage.map((part, index) => `Extra drive ${index + 1}: ${part.brand} ${shortName(part)} (${money(part.price)})`),
-          ...extras.monitor.map((part, index) => `Extra screen ${index + 1}: ${part.brand} ${shortName(part)} (${money(part.price)})`),
-          `Total: ${money(total)} CAD`,
-        ];
+    const parts: { brand: string; name: string }[] = [];
+    if (build.prebuilt) {
+      parts.push(build.prebuilt);
+      if (build.monitor) parts.push(build.monitor);
+      parts.push(...extras.monitor);
+    } else {
+      for (const item of CATS) {
+        const part = build[item];
+        if (!part) continue;
+        if (item !== "bundle" && covered.has(item)) continue;
+        parts.push(part);
+      }
+      parts.push(...extras.memory, ...extras.storage, ...extras.monitor);
+    }
+    const lines = ["Build", ...parts.map((part, index) => `${index + 1}. ${partLine(part)}`)];
     try {
       await navigator.clipboard.writeText(lines.join("\n"));
       setCopied(true);
@@ -1384,7 +1377,10 @@ function Review({
         <div className="rounded-xl border border-line bg-elevated p-4">
           <p className="text-xs text-faint">Total</p>
           <p className="tabular text-lg font-medium">{money(total)}</p>
-          <p className="mt-2 text-sm text-muted">Score {machineScore(build.prebuilt!.name)}/100. {tagsOf(build.prebuilt!).join(" · ") || "Finished PC."}</p>
+          <div className="mt-2">
+            <RankBadge score={machineScore(build.prebuilt!.name)} lines={explainPart(build.prebuilt!)} />
+            <p className="mt-2 text-sm text-muted">{tagsOf(build.prebuilt!).join(" · ") || "Finished PC."}</p>
+          </div>
         </div>
       ) : (
       <dl className="grid grid-cols-2 gap-3 rounded-xl border border-line bg-elevated p-4 text-sm">

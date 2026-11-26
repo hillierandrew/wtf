@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { CopyList, buildNames } from "@/components/copy-list";
 import { CAT_LABEL, PARTS, isJunk, money, psuForGpu, shortName, spendOf, type Build, type Part } from "@/lib/catalog";
 import { JOBS, LOOKS, childFor, laptopsFor, needsOf, prebuildsFor, type Look, type UseKind, type UseNeed } from "@/lib/phone-use";
 
@@ -216,6 +217,7 @@ function Result({
           {made.gpu ? "This graphics card" : "No graphics card"}. Minimum power supply {power.min}W. Comfortable is {power.comfortable}W.
         </p>
         <p className="mt-2 text-3xl font-semibold tracking-tight">{money(spendOf(made))}</p>
+        <CopyList title={need.label} names={buildNames(made)} className={`mt-3 h-11 w-full rounded-xl text-base font-medium ${phone ? "bg-[#1c1c1e] text-white" : "border border-line"}`} />
         <button type="button" onClick={onUse} className={go}>
           Use this computer
         </button>

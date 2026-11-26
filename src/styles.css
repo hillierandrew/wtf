@@ -85,6 +85,10 @@
   padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
 }
 
+.safe-top {
+  padding-top: max(0.75rem, env(safe-area-inset-top));
+}
+
 .tabular {
   font-variant-numeric: tabular-nums;
 }
@@ -127,9 +131,45 @@
   animation: lock-pulse 1.4s ease-in-out infinite;
 }
 
+@keyframes glass-rise {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 48px, -240px) scale(0.7) rotateX(18deg);
+  }
+  58% {
+    opacity: 1;
+    transform: translate3d(var(--x), var(--y), 90px) scale(1.06) rotateX(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--x), var(--y), 240px) scale(1.2);
+  }
+}
+
+.glass-rise {
+  animation: glass-rise 2.2s cubic-bezier(0.16, 0.84, 0.32, 1) both;
+}
+
+@keyframes glass-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.glass-in {
+  animation: glass-in 0.45s ease both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .lock-shake,
-  .lock-pulse {
+  .lock-pulse,
+  .glass-rise,
+  .glass-in {
     animation: none;
   }
 }

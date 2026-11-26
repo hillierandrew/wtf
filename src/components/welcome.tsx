@@ -1,4 +1,8 @@
+import { useState } from "react";
+import { Lock } from "lucide-react";
 import { ThemeToggle } from "@/lib/theme";
+import { useDoorLock } from "@/components/lock";
+import { Counter } from "@/components/counter";
 import { JOBS, type UseKind } from "@/lib/phone-use";
 
 type ColourPick = "white" | "black" | "all";
@@ -29,21 +33,30 @@ export function Welcome({
   onJob: (kind: UseKind) => void;
   onPower: () => void;
 }) {
+  const lock = useDoorLock();
+  const [walk, setWalk] = useState(false);
+  if (walk) return <Counter onClose={() => setWalk(false)} />;
   const more = [
+    { label: "Walk the shelf", line: "Start with a chip or a graphics card. I hide what does not fit.", onClick: () => setWalk(true) },
     { label: "Build each part", line: "The long way. One part at a time.", onClick: onEnter },
     { label: "Basic questions", line: "A few taps. I pick the parts.", onClick: onGuide },
     { label: "Finished PCs", line: "Already built. Sorted by the deal.", onClick: onDesktop },
     { label: "Laptops", line: "The same jobs, in a laptop.", onClick: onLaptop },
     { label: "Games list", line: "Pick a game and see what runs it.", onClick: onGames },
     { label: "AI builds", line: "Ready-made computers.", onClick: onIdeas },
-    { label: "Keyboards", line: "Keyboard, mouse, and a headset.", onClick: onDesk },
+    { label: "Keyboards", line: "Layout, sound, switches, and keycaps.", onClick: onDesk },
     { label: "White or black", line: "Only the colour.", onClick: () => onColour("all") },
   ];
   return (
     <div className="relative min-h-dvh w-full overflow-y-auto bg-bg text-fg">
       <header className="safe-top mx-auto flex w-full max-w-3xl items-center justify-between px-4 py-3">
         <p className="font-display text-sm tracking-tight">drew.wtf</p>
-        <ThemeToggle />
+        <div className="flex items-center gap-2">
+          <button type="button" onClick={lock} aria-label="Lock" className="flex size-11 items-center justify-center rounded-full border border-line">
+            <Lock className="size-4" />
+          </button>
+          <ThemeToggle />
+        </div>
       </header>
       <section className="mx-auto w-full max-w-3xl px-4 pb-6">
         <h1 className="font-display text-4xl font-medium leading-none tracking-tight">What is it for?</h1>

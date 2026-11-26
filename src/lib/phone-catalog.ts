@@ -190,10 +190,10 @@ export const PHONE_GROUPS: { id: string; title: string; line: string }[] = [
   { id: "case-parts", title: "Case parts", line: "Lights, panels, brackets." },
   { id: "monitor", title: "Monitors", line: "The screen." },
   { id: "mount", title: "Mounts", line: "Arms and stands." },
-  { id: "keys", title: "Keyboards and mice", line: "Desk gear." },
+  { id: "keys", title: "Keyboards", line: "Shape, sound, switches, keycaps." },
   { id: "sound", title: "Sound cards", line: "Audio." },
   { id: "controller", title: "Controller cards", line: "Extra ports." },
-  { id: "sim", title: "Simulators", line: "Wheels and cockpits." },
+  { id: "sim", title: "Simulators", line: "Racing, pilot, and farm." },
   { id: "bundle", title: "Bundles", line: "More than one part." },
 ];
 

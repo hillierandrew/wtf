@@ -3,6 +3,10 @@ import { ChevronLeft, Cpu, Gamepad2, Heart, LayoutGrid, Lock, Search, Zap } from
 import { CAT_LABEL, CATS, PARTS, byId, fitWhy, isJunk, money, reconcile, shortName, spendOf, suggest, type Build, type Category, type Part } from "@/lib/catalog";
 import { PHONE_ITEMS, PHONE_SECTIONS, groupMeta, phoneItem, type PhoneItem } from "@/lib/phone-catalog";
 import { EasyPick, GpuPower } from "@/components/easy";
+import { KeyboardShop } from "@/components/keyboard-shop";
+import { Counter } from "@/components/counter";
+import { CopyList, named } from "@/components/copy-list";
+import { Sim } from "@/components/sim";
 
 type Tab = "use" | "power" | "build" | "shop" | "deals" | "search" | "saved";
 type Sort = "low" | "high" | "name" | "sale";
@@ -44,6 +48,7 @@ export function Phone({ onLock }: { onLock: () => void }) {
   const [saved, setSaved] = useState<Set<string>>(loadSaved);
   const [limit, setLimit] = useState(48);
   const [pc, setPc] = useState<Build>({});
+  const [walk, setWalk] = useState(false);
 
   useEffect(() => {
     try {
@@ -131,18 +136,21 @@ export function Phone({ onLock }: { onLock: () => void }) {
   }
 
   const shown = listed.slice(0, limit);
+  const night = group === "keys";
   const title = open ? "Details" : meta?.title ?? (tab === "use" ? "Use" : tab === "power" ? "Power" : tab === "build" ? "Build" : tab === "deals" ? "Deals" : tab === "saved" ? "Saved" : tab === "search" ? "Search" : "Store");
 
+  if (walk) return <Counter onClose={() => setWalk(false)} />;
+
   return (
-    <div className="flex h-dvh w-full flex-col overflow-hidden bg-[#f2f2f7] text-[#1c1c1e]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif' }}>
+    <div className={`flex h-dvh w-full flex-col overflow-hidden ${night ? "bg-black text-[#f6edff]" : "bg-[#f2f2f7] text-[#1c1c1e]"}`} style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif' }}>
       <div className="mx-auto flex h-full w-full max-w-3xl flex-col">
-        <header className="shrink-0 bg-[#f2f2f7]/90 px-4 pt-[max(0.75rem,env(safe-area-inset-top))] backdrop-blur">
+        <header className={`shrink-0 px-4 pt-[max(0.75rem,env(safe-area-inset-top))] backdrop-blur ${night ? "bg-black/90" : "bg-[#f2f2f7]/90"}`}>
           <div className="flex h-11 items-center gap-2">
             {open || group ? (
               <button
                 type="button"
                 onClick={() => (open ? setOpenId(null) : setGroup(null))}
-                className="flex h-9 items-center gap-0.5 rounded-full pr-2 text-[17px] text-[#007aff]"
+                className={`flex h-9 items-center gap-0.5 rounded-full pr-2 text-[17px] ${night ? "text-[#c4b5fd]" : "text-[#007aff]"}`}
               >
                 <ChevronLeft className="size-5" strokeWidth={2.25} />
                 Back
@@ -199,13 +207,35 @@ export function Phone({ onLock }: { onLock: () => void }) {
             />
           ) : null}
           {!open && tab === "power" ? <GpuPower look="phone" /> : null}
-          {!open && tab === "build" ? <PhoneBuild build={pc} onChange={setPc} /> : null}
+          {!open && tab === "build" ? (
+            <div className="space-y-3">
+              <button type="button" onClick={() => setWalk(true)} className="h-14 w-full rounded-2xl bg-[#1c1c1e] text-left px-4 text-[17px] font-semibold text-white">
+                Walk the shelf
+                <span className="mt-0.5 block text-[13px] font-normal text-white/70">Start with a chip or a graphics card.</span>
+              </button>
+              <PhoneBuild build={pc} onChange={setPc} />
+            </div>
+          ) : null}
 
           {!open && !group && tab === "shop" ? (
             <div className="space-y-6">
               <button type="button" onClick={() => goTab("search")} className="flex h-11 w-full items-center gap-2 rounded-xl bg-[#e3e3e8] px-3 text-left text-[17px] text-[#8e8e93]">
                 <Search className="size-4" />
                 Search
+              </button>
+              <button type="button" onClick={() => openGroup("keys")} className="flex min-h-16 w-full items-center justify-between rounded-2xl bg-white px-4 text-left shadow-sm">
+                <span>
+                  <span className="block text-[17px] font-medium">Keyboards</span>
+                  <span className="mt-0.5 block text-[13px] text-[#8e8e93]">Quiet, soft, or loud.</span>
+                </span>
+                <ChevronLeft className="size-4 rotate-180 text-[#c7c7cc]" />
+              </button>
+              <button type="button" onClick={() => openGroup("sim")} className="flex min-h-16 w-full items-center justify-between rounded-2xl bg-white px-4 text-left shadow-sm">
+                <span>
+                  <span className="block text-[17px] font-medium">Racing rig</span>
+                  <span className="mt-0.5 block text-[13px] text-[#8e8e93]">Forza, iRacing, three screens, a stand.</span>
+                </span>
+                <ChevronLeft className="size-4 rotate-180 text-[#c7c7cc]" />
               </button>
               <button type="button" onClick={() => goTab("deals")} className="flex h-12 w-full items-center justify-between rounded-2xl bg-white px-4 text-left shadow-sm">
                 <span className="text-[17px] font-medium">Deals</span>
@@ -242,7 +272,10 @@ export function Phone({ onLock }: { onLock: () => void }) {
             </div>
           ) : null}
 
-          {!open && tab !== "use" && tab !== "build" && tab !== "power" && (group || tab !== "shop") ? (
+          {!open && group === "keys" ? <KeyboardShop look="phone" /> : null}
+          {!open && group === "sim" ? <Sim look="phone" /> : null}
+
+          {!open && group !== "keys" && group !== "sim" && tab !== "use" && tab !== "build" && tab !== "power" && (group || tab !== "shop") ? (
             <div>
               <div className="sticky top-0 z-10 -mx-4 mb-3 grid grid-cols-2 gap-2 bg-[#f2f2f7]/95 px-4 py-2 backdrop-blur">
                 <label className="flex h-10 items-center rounded-xl bg-[#e3e3e8] px-3">
@@ -406,6 +439,7 @@ function PhoneBuild({ build, onChange }: { build: Build; onChange: (next: Build)
           <p className="text-[13px] text-[#8e8e93]">{missing.length ? `Still need ${missing.map((cat) => CAT_LABEL[cat].toLowerCase()).join(", ")}` : "This computer can turn on."}</p>
           <p className="text-[20px] font-semibold">{money(spendOf(build))}</p>
         </div>
+        <CopyList title="Computer" names={named(SLOTS.map((cat) => build[cat]))} className="mt-3 h-11 w-full rounded-xl bg-[#1c1c1e] text-[16px] font-medium text-white" />
         {chosen ? (
           <button
             type="button"

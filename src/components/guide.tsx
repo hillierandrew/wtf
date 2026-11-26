@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { CopyList, buildNames } from "@/components/copy-list";
 import { CAT_LABEL, CATS, guidePick, money, shortName, spendOf, warnings, type GuideAnswers } from "@/lib/catalog";
 import { ThemeToggle, usePane } from "@/lib/theme";
 
@@ -135,6 +136,7 @@ export function Guide({ onLeave, onUse }: { onLeave: () => void; onUse: (name: s
               </p>
             ))}
             <p className="mt-4 text-3xl font-medium">Total {money(spendOf(pick.build))}</p>
+            <CopyList title={pick.name} names={buildNames(pick.build)} />
             <button type="button" onClick={() => onUse(pick.name, pick.build)} className="mt-4 h-16 w-full rounded-2xl bg-accent text-xl text-accent-fg">
               Use this PC
             </button>

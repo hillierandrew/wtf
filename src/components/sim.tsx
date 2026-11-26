@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { Check, Search, X } from "lucide-react";
 import raw from "@/data/sim.json";
+import monitors from "@/data/monitors.json";
+import { CopyList, partLine } from "@/components/copy-list";
 import { ThemeToggle } from "@/lib/theme";
 
 type Game = "racing" | "flight" | "farm" | "pads" | "consoles" | "extras";
 type Level = "all" | "entry" | "novice" | "mid" | "pro" | "real";
-type Slot = "seat" | "wheel" | "rim" | "pedals" | "shifter" | "brake" | "controls" | "throttle" | "rudder" | "farm" | "pad" | "console" | "headset" | "extra";
+type Slot = "seat" | "wheel" | "rim" | "pedals" | "shifter" | "brake" | "controls" | "throttle" | "rudder" | "farm" | "pad" | "console" | "headset" | "extra" | "screen";
 
 type SimItem = {
   id: string;
@@ -21,8 +23,36 @@ type SimItem = {
 };
 
 const ITEMS = raw as SimItem[];
+
+type ShelfMon = { id: string; name: string; price: number; was?: number | null; brand?: string; kind?: string; open?: boolean };
+
+const SCREENS: SimItem[] = (monitors as ShelfMon[])
+  .filter((item) => item.kind === "gaming" && /27"/.test(item.name) && item.price >= 180 && item.price <= 600 && !item.open)
+  .slice(0, 8)
+  .map((item) => ({
+    id: `screen-mon-${item.id}`,
+    name: `Three of these: ${item.name}`,
+    price: Math.round(item.price * 300) / 100,
+    was: item.was ? Math.round(item.was * 300) / 100 : null,
+    brand: item.brand || "Monitor",
+    game: "racing" as const,
+    slot: "screen" as const,
+    also: [] as Slot[],
+    base: false,
+    open: false,
+  }));
+
+const MOUNTS: SimItem[] = ITEMS.filter((item) => /triple monitor|monitor stand/i.test(item.name)).map((item) => ({
+  ...item,
+  id: `screen-${item.id}`,
+  slot: "screen" as const,
+  game: "racing" as const,
+  also: [] as Slot[],
+}));
+
+const STOCK = [...ITEMS, ...MOUNTS, ...SCREENS];
 const KEY = "drew-sim";
-const byId = Object.fromEntries(ITEMS.map((item) => [item.id, item]));
+const byId = Object.fromEntries(STOCK.map((item) => [item.id, item]));
 
 const LEVELS: { id: Level; label: string; line: string; target: number }[] = [
   { id: "all", label: "All", line: "Every part for this step.", target: 0.5 },
@@ -34,7 +64,7 @@ const LEVELS: { id: Level; label: string; line: string; target: number }[] = [
 ];
 
 const peersOf = new Map<string, number[]>();
-for (const item of ITEMS) {
+for (const item of STOCK) {
   const key = `${item.game}:${item.slot}`;
   const list = peersOf.get(key) ?? [];
   list.push(item.price);
@@ -70,12 +100,29 @@ function fitsLevel(item: SimItem, level: Level) {
 }
 
 const GAMES: { id: Game; label: string; line: string }[] = [
-  { id: "racing", label: "Racing", line: "A seat, a wheel, and pedals. A shifter is optional." },
-  { id: "flight", label: "Flying", line: "A stick or a yoke. A throttle and rudder pedals if you want them." },
-  { id: "farm", label: "Farming", line: "A farm stick. Add a wheel if the game also drives a tractor." },
+  { id: "racing", label: "Racing gear", line: "A seat or a stand, a wheel, and pedals." },
+  { id: "flight", label: "Pilot gear", line: "A stick or a yoke for Flight Simulator." },
+  { id: "farm", label: "Farm gear", line: "A farm stick, plus a wheel if you drive the tractor." },
   { id: "pads", label: "Controllers", line: "One gamepad. Xbox, PlayStation, Switch, or PC." },
   { id: "consoles", label: "Consoles", line: "A Switch, a handheld, or a PlayStation Portal." },
-  { id: "extras", label: "Extras", line: "A headset, a mount, a clutch add-on, or a button box." },
+  { id: "extras", label: "Extras", line: "A headset, a mount, or a button box." },
+];
+
+const TITLES: { id: string; label: string; rig: Game; triple: boolean; pc: string }[] = [
+  { id: "forza", label: "Forza Horizon 5", rig: "racing", triple: true, pc: "One screen: 16GB and a mid graphics card. Three screens: 32GB and a stronger card, about an RTX 4070." },
+  { id: "iracing", label: "iRacing", rig: "racing", triple: true, pc: "iRacing likes a fast processor. One screen: 16GB and a mid card. Three screens: 32GB and an RTX 4070 class card or better." },
+  { id: "acc", label: "Assetto Corsa", rig: "racing", triple: true, pc: "One screen: 16GB and a mid card. Three screens: 32GB and a stronger card." },
+  { id: "f1", label: "F1", rig: "racing", triple: true, pc: "One screen: 16GB and a mid card. Three screens: 32GB and a stronger card." },
+  { id: "flight", label: "Flight Simulator", rig: "flight", triple: false, pc: "32GB and a strong card. This one is heavy even on a single screen." },
+  { id: "farm", label: "Farming Simulator 25", rig: "farm", triple: false, pc: "16GB and a mid card. Use a wheel, then add the farm stick." },
+];
+
+const TRIPLE: { id: Slot; label: string; line: string }[] = [
+  { id: "seat", label: "Stand", line: "A wheel stand or a cockpit. The screens sit with this." },
+  { id: "screen", label: "Three screens", line: "A triple mount, or three of the same 27 inch monitor. The monitor price is for three." },
+  { id: "wheel", label: "Wheel", line: "A wheel kit, or a wheel base." },
+  { id: "pedals", label: "Pedals", line: "Skip this if the kit already has pedals." },
+  { id: "shifter", label: "Shifter", line: "Optional." },
 ];
 
 const STEPS: Record<Game, { id: Slot; label: string; line: string }[]> = {
@@ -110,8 +157,11 @@ function money(value: number) {
   return value.toLocaleString("en-CA", { style: "currency", currency: "CAD" });
 }
 
-export function Sim({ onLeave }: { onLeave: () => void }) {
+export function Sim({ onLeave, look = "paper" }: { onLeave?: () => void; look?: "paper" | "phone" }) {
   const [game, setGame] = useState<Game | null>(null);
+  const [triple, setTriple] = useState(false);
+  const [blurb, setBlurb] = useState("");
+  const [title, setTitle] = useState("");
   const [step, setStep] = useState<Slot>("seat");
   const [ids, setIds] = useState<Partial<Record<Slot, string>>>({});
   const [query, setQuery] = useState("");
@@ -152,15 +202,16 @@ export function Sim({ onLeave }: { onLeave: () => void }) {
 
   const brands = useMemo(() => {
     if (!game) return [];
-    const names = new Set(ITEMS.filter((item) => item.slot === step && (item.game === game || game === "farm")).map((item) => item.brand));
+    const names = new Set(STOCK.filter((item) => item.slot === step && (item.game === game || game === "farm" || item.slot === "screen")).map((item) => item.brand));
     return [...names].sort((a, b) => a.localeCompare(b));
   }, [game, step]);
 
   const shown = useMemo(() => {
     if (!game) return [];
     const q = query.trim().toLowerCase();
-    return ITEMS.filter((item) => {
+    return STOCK.filter((item) => {
       if (item.slot !== step) return false;
+      if (step === "screen") return true;
       if (game === "farm") {
         if (item.game !== "farm" && item.game !== "racing") return false;
         if (step === "farm" && item.game !== "farm") return false;
@@ -212,24 +263,30 @@ export function Sim({ onLeave }: { onLeave: () => void }) {
     });
   }
 
-  function pickGame(nextGame: Game) {
-    if (nextGame === game) return;
+  function pickGame(nextGame: Game, next?: { triple?: boolean; blurb?: string; title?: string }) {
     setGame(nextGame);
-    setStep(STEPS[nextGame][0].id);
+    setTriple(Boolean(next?.triple));
+    setBlurb(next?.blurb ?? "");
+    setTitle(next?.title ?? "");
+    setStep(next?.triple ? TRIPLE[0].id : STEPS[nextGame][0].id);
     setIds({});
     setQuery("");
     setBrand("all");
     setNotice("");
   }
 
-  const steps = game ? STEPS[game] : [];
+  const steps = game ? (triple ? TRIPLE : STEPS[game]) : [];
   const stepMeta = steps.find((item) => item.id === step) ?? steps[0];
   const included = stepMeta ? covers(stepMeta.id) : undefined;
   const blocked = Boolean(included && included.slot !== stepMeta?.id);
   const total = picked.reduce((sum, item) => sum + item.price, 0);
 
+  const phone = look === "phone";
   return (
-    <div className="mx-auto flex h-dvh w-full max-w-xl flex-col overflow-hidden bg-bg text-fg">
+    <div className={phone ? "text-[#1c1c1e]" : "mx-auto flex h-dvh w-full max-w-xl flex-col overflow-hidden bg-bg text-fg"}>
+      {phone ? (
+        <p className="mb-3 text-[15px] leading-snug text-[#8e8e93]">Forza, iRacing, a pilot seat, or a farm. Then the gear.</p>
+      ) : (
       <header className="safe-top shrink-0 border-b border-line px-4 py-3">
         <div className="flex items-center justify-between">
           <button type="button" onClick={onLeave} className="text-base text-muted">
@@ -238,10 +295,19 @@ export function Sim({ onLeave }: { onLeave: () => void }) {
           <ThemeToggle />
         </div>
         <h1 className="font-display mt-3 text-4xl font-medium leading-none tracking-tight">Build a sim</h1>
-        <p className="mt-2 text-base text-muted">Racing, flying, or farming. Pick a level.</p>
+        <p className="mt-2 text-base text-muted">Forza, iRacing, a pilot seat, or a farm. Then the gear.</p>
       </header>
+      )}
       {!game ? (
-        <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-4">
+        <div className={phone ? "flex flex-col gap-3" : "flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-4"}>
+          <p className="text-sm text-muted">Games</p>
+          {TITLES.map((item) => (
+            <button key={item.id} type="button" onClick={() => pickGame(item.rig, { triple: item.triple, blurb: item.pc, title: item.label })} className="press flex min-h-24 flex-col items-start justify-center rounded-3xl border border-line bg-elevated px-5 py-4 text-left">
+              <span className="font-display text-3xl font-medium tracking-tight">{item.label}</span>
+              <span className="mt-2 text-base text-muted">{item.triple ? "Triple screens, a stand, and a wheel." : item.pc}</span>
+            </button>
+          ))}
+          <p className="pt-2 text-sm text-muted">Or just the gear</p>
           {GAMES.map((item) => (
             <button key={item.id} type="button" onClick={() => pickGame(item.id)} className="press flex min-h-28 flex-col items-start justify-center rounded-3xl border border-line bg-elevated px-5 py-4 text-left">
               <span className="font-display text-3xl font-medium tracking-tight">{item.label}</span>
@@ -282,7 +348,9 @@ export function Sim({ onLeave }: { onLeave: () => void }) {
               </select>
             </label>
           </div>
-          <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 pb-4">
+          <div className={phone ? "space-y-3" : "min-h-0 flex-1 space-y-3 overflow-y-auto px-4 pb-4"}>
+            {title ? <p className="text-base font-medium">{title}</p> : null}
+            {blurb ? <p className="rounded-2xl border border-line bg-subtle px-4 py-3 text-base">{blurb}</p> : null}
             <p className="text-base text-muted">{LEVELS.find((item) => item.id === level)?.line} {stepMeta?.line}</p>
             {notice ? <p className="rounded-2xl border border-line bg-elevated px-4 py-3 text-base">{notice}</p> : null}
             {blocked ? (
@@ -356,6 +424,7 @@ export function Sim({ onLeave }: { onLeave: () => void }) {
             </li>
           ))}
         </ul>
+        <CopyList title={title || "Sim"} names={picked.map((item) => partLine(item))} />
       </aside>
     </div>
   );

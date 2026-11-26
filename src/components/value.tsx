@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { PARTS, CAT_LABEL, compareShelf, explainPart, fitWhy, isJunk, money, partRank, shortName, spendOf, unitCost, type Category, type Part, type ShelfSort } from "@/lib/catalog";
 import { extrasFromIds, partsFrom, useBench } from "@/lib/store";
 import { RankBadge } from "@/components/rank";
+import { CopyList, buildNames, partLine } from "@/components/copy-list";
 import { SortRow } from "@/components/sorts";
 import { ThemeToggle } from "@/lib/theme";
 
@@ -122,6 +123,7 @@ export function Value({ onLeave, onBuild }: { onLeave: () => void; onBuild: () =
             ))}
           </select>
         </label>
+        <CopyList title="Build" names={[...buildNames(build), ...extras.memory.map(partLine), ...extras.storage.map(partLine), ...extras.monitor.map(partLine)]} />
       </div>
 
       <label className="mx-4 mb-3 flex h-12 shrink-0 items-center rounded-xl border border-line bg-elevated px-3">

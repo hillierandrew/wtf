@@ -1,5 +1,8 @@
 export type Screen = "pc" | "desk" | "sim" | "laptop" | "desktop" | "value" | "steam" | "games" | "guide" | "colour" | "ideas" | "pick" | "power";
 
+import { Lock } from "lucide-react";
+import { useDoorLock } from "@/components/lock";
+
 const LINKS: { id: Screen; label: string }[] = [
   { id: "pick", label: "For" },
   { id: "power", label: "Power" },
@@ -44,6 +47,7 @@ export function ScreenBar({
   onJump: (index: number) => void;
   onGo: (next: Screen) => void;
 }) {
+  const lock = useDoorLock();
   const prevIndex = trail.length >= 2 ? trail.length - 2 : -1;
   const previous = prevIndex >= 0 ? trail[prevIndex] : null;
   return (
@@ -77,6 +81,9 @@ export function ScreenBar({
             ))}
           </select>
         </label>
+        <button type="button" onClick={lock} aria-label="Lock" className="flex size-11 shrink-0 items-center justify-center rounded-full border border-line">
+          <Lock className="size-4" />
+        </button>
       </div>
     </div>
   );

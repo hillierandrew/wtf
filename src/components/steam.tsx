@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { aiScore, explainBuild, machineScore, microPicks, money, spendOf, steamPicks, type AiPick } from "@/lib/catalog";
+import { CopyList, buildNames } from "@/components/copy-list";
 import { RankBadge } from "@/components/rank";
 import { ThemeToggle } from "@/lib/theme";
 
@@ -40,6 +41,7 @@ export function Steam({ onLeave, onUse }: { onLeave: () => void; onUse: (pick: A
                 <p className="tabular text-lg font-medium">{money(spendOf(pick.build))}</p>
               </div>
               <p className="mt-2 text-sm text-muted">{pick.why}</p>
+              <CopyList title={pick.name} names={buildNames(pick.build)} />
               <button type="button" onClick={() => onUse(pick)} className="mt-3 h-12 w-full rounded-xl bg-accent text-base font-medium text-accent-fg">
                 Use this machine
               </button>
