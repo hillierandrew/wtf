@@ -6,6 +6,7 @@ import { CopyList, listText, partLine } from "@/components/copy-list";
 import { ThemeToggle } from "@/lib/theme";
 import { PARTS, isJunk, machineScore, money as partMoney } from "@/lib/catalog";
 import QRCode from "qrcode";
+import { latest, usePath } from "@/components/history";
 
 type Game = "racing" | "flight" | "farm" | "pads" | "consoles" | "extras";
 type Level = "all" | "entry" | "novice" | "mid" | "pro" | "real";
@@ -177,6 +178,34 @@ export function Sim({ onLeave, look = "paper" }: { onLeave?: () => void; look?: 
   const [grid, setGrid] = useState(false);
   const [cart, setCart] = useState(false);
   const [qr, setQr] = useState("");
+  const path = usePath();
+
+  useEffect(() => {
+    if (!path) return;
+    const id = latest(path.log, path.at, (item) => item.startsWith("played-") || item === "sim" || item === "home");
+    if (!id || id === "sim" || id === "home") {
+      setGame(null);
+      return;
+    }
+    const key = id.slice(7);
+    const titled = TITLES.find((item) => item.id === key);
+    if (titled) {
+      setGame(titled.rig);
+      setTriple(titled.triple);
+      setBlurb(titled.pc);
+      setTitle(titled.label);
+      setStep(titled.triple ? TRIPLE[0].id : STEPS[titled.rig][0].id);
+      return;
+    }
+    const gear = GAMES.find((item) => item.id === key);
+    if (gear) {
+      setGame(gear.id);
+      setTriple(false);
+      setBlurb("");
+      setTitle("");
+      setStep(STEPS[gear.id][0].id);
+    }
+  }, [path?.at]);
 
   useEffect(() => {
     try {
@@ -332,14 +361,14 @@ export function Sim({ onLeave, look = "paper" }: { onLeave?: () => void; look?: 
         <div className={phone ? "flex flex-col gap-3" : "flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-4"}>
           <p className="text-sm text-muted">Games</p>
           {TITLES.map((item) => (
-            <button key={item.id} type="button" onClick={() => pickGame(item.rig, { triple: item.triple, blurb: item.pc, title: item.label })} className="press flex min-h-24 flex-col items-start justify-center rounded-3xl border border-line bg-elevated px-5 py-4 text-left">
+            <button key={item.id} type="button" onClick={() => { path?.note(`played-${item.id}`, item.label); pickGame(item.rig, { triple: item.triple, blurb: item.pc, title: item.label }); }} className="press flex min-h-24 flex-col items-start justify-center rounded-3xl border border-line bg-elevated px-5 py-4 text-left">
               <span className="font-display text-3xl font-medium tracking-tight">{item.label}</span>
               <span className="mt-2 text-base text-muted">{item.triple ? "Triple screens, a stand, and a wheel." : item.pc}</span>
             </button>
           ))}
           <p className="pt-2 text-sm text-muted">Or just the gear</p>
           {GAMES.map((item) => (
-            <button key={item.id} type="button" onClick={() => pickGame(item.id)} className="press flex min-h-28 flex-col items-start justify-center rounded-3xl border border-line bg-elevated px-5 py-4 text-left">
+            <button key={item.id} type="button" onClick={() => { path?.note(`played-${item.id}`, item.label); pickGame(item.id); }} className="press flex min-h-28 flex-col items-start justify-center rounded-3xl border border-line bg-elevated px-5 py-4 text-left">
               <span className="font-display text-3xl font-medium tracking-tight">{item.label}</span>
               <span className="mt-2 text-base text-muted">{item.line}</span>
             </button>

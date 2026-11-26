@@ -4,6 +4,7 @@ import QRCode from "qrcode";
 import { CAT_LABEL, PARTS, explainPart, fitWhy, isJunk, money, partScore, rankFrom, reconcile, spendOf, tagsOf, type Build, type Category, type Part } from "@/lib/catalog";
 import { listText, partLine } from "@/components/copy-list";
 import { RankBadge } from "@/components/rank";
+import { usePath } from "@/components/history";
 
 const FROM_CPU: Category[] = ["cpu", "motherboard", "memory", "gpu", "storage", "cooler", "psu", "case", "monitor"];
 const FROM_GPU: Category[] = ["gpu", "cpu", "motherboard", "memory", "storage", "cooler", "psu", "case", "monitor"];
@@ -37,6 +38,7 @@ export function Counter({ onClose }: { onClose: () => void }) {
   const [openCart, setOpenCart] = useState(false);
   const [sort, setSort] = useState<"score-desc" | "score-asc" | "price-asc" | "price-desc">("score-desc");
   const [grid, setGrid] = useState(false);
+  const path = usePath();
 
   const order = from === "gpu" ? FROM_GPU : FROM_CPU;
   const cat = order[Math.min(step, order.length - 1)];
@@ -79,8 +81,10 @@ export function Counter({ onClose }: { onClose: () => void }) {
 
   function take(part: Part) {
     setBuild(reconcile(part.cat, { ...build, [part.cat]: part }));
-    setStep((value) => Math.min(order.length - 1, value + 1));
+    const next = Math.min(order.length - 1, step + 1);
+    setStep(next);
     setOpenCart(true);
+    path?.note(`step-${order[next]}`, CAT_LABEL[order[next]]);
   }
 
   function drop(part: Part) {
@@ -113,11 +117,11 @@ export function Counter({ onClose }: { onClose: () => void }) {
         </button>
         <h1 className="font-display mt-4 text-4xl font-medium leading-none">Where do we start?</h1>
         <p className="mt-3 text-base text-[#ffd7b0]">One choice. Then only parts that fit stay on the screen.</p>
-        <button type="button" onClick={() => { setFrom("cpu"); setStep(0); }} className="mt-6 min-h-24 rounded-3xl bg-[#ff7a1a] px-5 py-4 text-left text-[#2a0a12]">
+        <button type="button" onClick={() => { path?.note("start-cpu", "Chip"); setFrom("cpu"); setStep(0); }} className="mt-6 min-h-24 rounded-3xl bg-[#ff7a1a] px-5 py-4 text-left text-[#2a0a12]">
           <span className="block text-2xl font-semibold">Start with the chip</span>
           <span className="mt-1 block text-base">Then the board, the memory, and the graphics card.</span>
         </button>
-        <button type="button" onClick={() => { setFrom("gpu"); setStep(0); }} className="mt-3 min-h-24 rounded-3xl border border-[#ff7a1a] bg-[#2a1038] px-5 py-4 text-left">
+        <button type="button" onClick={() => { path?.note("start-gpu", "Graphics card"); setFrom("gpu"); setStep(0); }} className="mt-3 min-h-24 rounded-3xl border border-[#ff7a1a] bg-[#2a1038] px-5 py-4 text-left">
           <span className="block text-2xl font-semibold">Start with the graphics card</span>
           <span className="mt-1 block text-base text-[#ffd7b0]">Then I only show chips, boards, and power that can run it.</span>
         </button>
@@ -142,7 +146,7 @@ export function Counter({ onClose }: { onClose: () => void }) {
         </label>
         <div className="mt-2 flex gap-2 overflow-x-auto pb-2">
           {order.map((item, index) => (
-            <button key={item} type="button" onClick={() => jump(index)} className={`h-10 shrink-0 rounded-full px-3 text-sm ${index === step ? "bg-[#ff7a1a] text-[#2a0a12]" : build[item] ? "bg-[#3b1760] text-white" : "bg-[#241033] text-[#ffd7b0]"}`}>
+            <button key={item} type="button" onClick={() => { path?.note(`step-${item}`, CAT_LABEL[item]); jump(index); }} className={`h-10 shrink-0 rounded-full px-3 text-sm ${index === step ? "bg-[#ff7a1a] text-[#2a0a12]" : build[item] ? "bg-[#3b1760] text-white" : "bg-[#241033] text-[#ffd7b0]"}`}>
               {CAT_LABEL[item]}
             </button>
           ))}

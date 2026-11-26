@@ -6,7 +6,8 @@ import { Laptops } from "@/components/laptops";
 import { Sim } from "@/components/sim";
 import { Desk } from "@/components/desk";
 import { Gate } from "@/components/lock";
-import { ScreenBar, type Screen } from "@/components/nav";
+import { ScreenBar, type Screen, NAMES } from "@/components/nav";
+import { HistoryRoot, latest, usePath } from "@/components/history";
 import { Games } from "@/components/games";
 import { Guide } from "@/components/guide";
 import { Steam } from "@/components/steam";
@@ -23,28 +24,50 @@ export const Route = createFileRoute("/")({ component: Home });
 function Home() {
   const hydrated = useBench((state) => state.hydrated);
   const hydrate = useBench((state) => state.hydrate);
-  const [stack, setStack] = useState<Array<Screen | null>>([null]);
-  const [boot, setBoot] = useState<"play" | "review">("play");
-  const [colour, setColour] = useState<"white" | "black" | "all">("white");
-  const [job, setJob] = useState<UseKind | null>(null);
-  const mode = stack[stack.length - 1] ?? null;
-
-  function go(next: Screen) {
-    if (next === "pc") setBoot("play");
-    setStack((current) => (current[current.length - 1] === next ? current : [...current, next]));
-  }
-
-  function back() {
-    setStack((current) => (current.length > 1 ? current.slice(0, -1) : [null]));
-  }
-
-  function home() {
-    setStack([null]);
-  }
 
   useEffect(() => {
     hydrate();
   }, [hydrate]);
+
+  return (
+    <Gate>
+      <HistoryRoot home="Shop">
+        <Site hydrated={hydrated} />
+      </HistoryRoot>
+    </Gate>
+  );
+}
+
+const PAGES = new Set(["pc", "desk", "sim", "laptop", "desktop", "value", "steam", "games", "guide", "colour", "ideas", "pick", "power"]);
+
+function Site({ hydrated }: { hydrated: boolean }) {
+  const path = usePath();
+  const [boot, setBoot] = useState<"play" | "review">("play");
+  const [colour, setColour] = useState<"white" | "black" | "all">("white");
+  const [job, setJob] = useState<UseKind | null>(null);
+  const pageId = path ? pageOf(path.log, path.at) : "home";
+  const mode = pageId === "home" ? null : (pageId as Screen);
+
+  function go(next: Screen) {
+    if (next === "pc") setBoot("play");
+    path?.note(next, NAMES[next] ?? next);
+  }
+
+  function back() {
+    path?.back();
+  }
+
+  function home() {
+    path?.jump(0);
+  }
+
+  useEffect(() => {
+    if (!path) return;
+    const picked = latest(path.log, path.at, (id) => id.startsWith("pick:"));
+    if (picked) setJob(picked.slice(5) as UseKind);
+    const tone = latest(path.log, path.at, (id) => id.startsWith("colour:"));
+    if (tone) setColour(tone.slice(7) as "white" | "black" | "all");
+  }, [path?.at, path?.log, path]);
 
   let screen = (
     <Welcome
@@ -60,12 +83,12 @@ function Home() {
       onIdeas={() => go("ideas")}
       onJob={(kind) => {
         setJob(kind);
-        go("pick");
+        path?.note(`pick:${kind}`, "For");
       }}
       onPower={() => go("power")}
       onColour={(pick) => {
         setColour(pick);
-        go("colour");
+        path?.note(`colour:${pick}`, "Colour");
       }}
     />
   );
@@ -77,7 +100,7 @@ function Home() {
           onUse={(pick) => {
             useBench.getState().apply(pick.build, `${pick.name}. Change a part if you want.`);
             setBoot("review");
-            setStack((current) => [...current, "pc"]);
+            path?.note("pc", "Build");
           }}
         />
       ) : mode === "guide" ? (
@@ -86,7 +109,7 @@ function Home() {
           onUse={(name, build) => {
             useBench.getState().apply(build, `${name}. The questions picked these parts.`);
             setBoot("review");
-            setStack((current) => [...current, "pc"]);
+            path?.note("pc", "Build");
           }}
         />
       ) : mode === "steam" ? (
@@ -95,7 +118,7 @@ function Home() {
           onUse={(pick) => {
             useBench.getState().apply(pick.build, `${pick.name}. A tiny PC. Change a part if you want.`);
             setBoot("review");
-            setStack((current) => [...current, "pc"]);
+            path?.note("pc", "Build");
           }}
         />
       ) : mode === "value" ? (
@@ -112,7 +135,7 @@ function Home() {
           onUse={(pick) => {
             useBench.getState().apply(pick.build, `${pick.name}. Change a part if you want.`);
             setBoot("review");
-            setStack((current) => [...current, "pc"]);
+            path?.note("pc", "Build");
           }}
         />
       ) : mode === "colour" ? (
@@ -123,7 +146,7 @@ function Home() {
           onUse={(pick) => {
             useBench.getState().apply(pick.build, `${pick.name}. Change a part if you want.`);
             setBoot("review");
-            setStack((current) => [...current, "pc"]);
+            path?.note("pc", "Build");
           }}
         />
       ) : mode === "pick" ? (
@@ -133,7 +156,7 @@ function Home() {
           onUse={(build, name) => {
             useBench.getState().apply(build, `${name}. Change a part if you want.`);
             setBoot("review");
-            setStack((current) => [...current, "pc"]);
+            path?.note("pc", "Build");
           }}
         />
       ) : mode === "power" ? (
@@ -143,10 +166,47 @@ function Home() {
       );
     screen = (
       <div className="flex h-dvh flex-col bg-bg">
-        <ScreenBar mode={mode} trail={stack} onBack={back} onFull={home} onJump={(index) => setStack((current) => current.slice(0, index + 1))} onGo={go} />
+        <ScreenBar mode={mode} trail={trailOf(path?.log ?? [], path?.at ?? 0)} onBack={back} onFull={home} onJump={(index) => jumpScreen(path, index)} onGo={go} />
         <div className="screen-slot min-h-0 flex-1">{page}</div>
       </div>
     );
   }
-  return <Gate>{screen}</Gate>;
+  return screen;
+}
+
+function pageOf(log: { id: string }[], at: number) {
+  for (let index = at; index >= 0; index -= 1) {
+    const id = log[index].id;
+    if (id.startsWith("pick:")) return "pick";
+    if (id.startsWith("colour:")) return "colour";
+    if (id === "home") return "home";
+    if (PAGES.has(id)) return id;
+  }
+  return "home";
+}
+
+function trailOf(log: { id: string }[], at: number) {
+  const trail: Array<Screen | null> = [];
+  for (let index = 0; index <= at && index < log.length; index += 1) {
+    const page = pageOf(log, index);
+    const next = page === "home" ? null : (page as Screen);
+    if (trail[trail.length - 1] !== next) trail.push(next);
+  }
+  return trail.length ? trail : [null];
+}
+
+function jumpScreen(path: ReturnType<typeof usePath>, index: number) {
+  if (!path) return;
+  let seen = -1;
+  for (let cursor = 0; cursor < path.log.length; cursor += 1) {
+    const page = pageOf(path.log, cursor);
+    const prev = cursor === 0 ? "" : pageOf(path.log, cursor - 1);
+    if (page !== prev) {
+      seen += 1;
+      if (seen === index) {
+        path.jump(cursor);
+        return;
+      }
+    }
+  }
 }

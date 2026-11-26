@@ -6,6 +6,7 @@ import { laptopMarks } from "@/components/marks";
 import { CopyList, partLine } from "@/components/copy-list";
 import { SortRow } from "@/components/sorts";
 import { ThemeToggle, usePane } from "@/lib/theme";
+import { latest, usePath } from "@/components/history";
 
 type Kind = "game" | "home" | "work" | "tablet" | "chrome";
 type Filter = "deal" | "games" | "work" | "school" | "grandma" | "create" | "tablet" | "chrome";
@@ -195,6 +196,13 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
   const [quality, setQuality] = useState<Quality>("normal");
   const [courseId, setCourseId] = useState("any");
   const [sort, setSort] = useState<ShelfSort>("deal-asc");
+  const path = usePath();
+
+  useEffect(() => {
+    if (!path) return;
+    const id = latest(path.log, path.at, (item) => item.startsWith("for:"));
+    setFilter(id ? (id.slice(4) as Filter) : "deal");
+  }, [path?.at, path?.log]);
 
   useEffect(() => {
     try {
@@ -287,6 +295,7 @@ export function Laptops({ onLeave }: { onLeave: () => void }) {
           value={filter}
           onChange={(id) => {
             setFilter(id as Filter);
+            path?.note(`for:${id}`, FILTERS.find((item) => item.id === id)?.label ?? id);
             setBrand("all");
             setQuery("");
           }}

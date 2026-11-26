@@ -16,7 +16,7 @@ const LINKS: { id: Screen; label: string }[] = [
   { id: "desk", label: "Keys" },
 ];
 
-const NAMES: Record<string, string> = {
+export const NAMES: Record<string, string> = {
   pick: "For",
   power: "Power",
   ideas: "AI",

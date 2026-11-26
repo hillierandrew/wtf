@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Lock, Search, Sparkles, X } from "lucide-react";
 import laptopsRaw from "@/data/laptops.json";
 import { CopyList, partLine } from "@/components/copy-list";
@@ -6,6 +6,7 @@ import { laptopMarks, deskMarks } from "@/components/marks";
 import { Counter } from "@/components/counter";
 import { KeyboardShop } from "@/components/keyboard-shop";
 import { Sim } from "@/components/sim";
+import { HistoryRoot, latest, usePath } from "@/components/history";
 import { CAT_LABEL, PARTS, explainPart, explainLaptop, laptopBits, isJunk, machineScore, money, partScore, rankFrom, tagsOf, type Category, type Part } from "@/lib/catalog";
 
 type View = "ai" | "desktops" | "laptops" | "parts";
@@ -227,6 +228,14 @@ function sortCards(list: Card[], sort: Sort) {
 }
 
 export function Storefront({ onLock }: { onLock: () => void }) {
+  return (
+    <HistoryRoot home="AI Store">
+      <StoreBody onLock={onLock} />
+    </HistoryRoot>
+  );
+}
+
+function StoreBody({ onLock }: { onLock: () => void }) {
   const [view, setView] = useState<View>("ai");
   const [partCat, setPartCat] = useState<Category>("cpu");
   const [query, setQuery] = useState("");
@@ -237,6 +246,17 @@ export function Storefront({ onLock }: { onLock: () => void }) {
   const [panel, setPanel] = useState<"shop" | "build" | "keys" | "sim">("shop");
   const [grid, setGrid] = useState(true);
   const [spot, setSpot] = useState<string | null>(null);
+  const path = usePath();
+
+  useEffect(() => {
+    if (!path) return;
+    const panelId = latest(path.log, path.at, (id) => id === "build" || id === "keys" || id === "sim" || id === "home");
+    setPanel(panelId === "build" || panelId === "keys" || panelId === "sim" ? panelId : "shop");
+    const viewId = latest(path.log, path.at, (id) => id.startsWith("view:"));
+    if (viewId) setView(viewId.slice(5) as View);
+    const catId = latest(path.log, path.at, (id) => id.startsWith("cat:"));
+    if (catId) setPartCat(catId.slice(4) as Category);
+  }, [path?.at]);
 
   const stock = useMemo(() => PARTS.filter((part) => !isJunk(part, true)), []);
   const desks = useMemo(() => stock.filter((part) => part.cat === "prebuilt"), [stock]);
@@ -272,6 +292,7 @@ export function Storefront({ onLock }: { onLock: () => void }) {
     setMore(24);
     setQuery("");
     setSpot(null);
+    path?.note(`view:${next}`, next === "ai" ? "AI Builds" : next === "desktops" ? "Desktops" : next === "laptops" ? "Laptops" : "Parts");
   }
 
   if (panel === "build") return <Counter onClose={() => setPanel("shop")} />;
@@ -291,9 +312,9 @@ export function Storefront({ onLock }: { onLock: () => void }) {
           </button>
         </div>
         <div className="mx-auto flex max-w-6xl gap-2 px-4 pb-3">
-          <button type="button" onClick={() => setPanel("build")} className="h-11 rounded-full bg-black px-4 text-sm font-medium text-white">Build with them</button>
-          <button type="button" onClick={() => setPanel("keys")} className="h-11 rounded-full bg-neutral-100 px-4 text-sm font-medium">Keyboards</button>
-          <button type="button" onClick={() => setPanel("sim")} className="h-11 rounded-full bg-neutral-100 px-4 text-sm font-medium">Sims</button>
+          <button type="button" onClick={() => { path?.note("build", "Build"); setPanel("build"); }} className="h-11 rounded-full bg-black px-4 text-sm font-medium text-white">Build with them</button>
+          <button type="button" onClick={() => { path?.note("keys", "Keyboards"); setPanel("keys"); }} className="h-11 rounded-full bg-neutral-100 px-4 text-sm font-medium">Keyboards</button>
+          <button type="button" onClick={() => { path?.note("sim", "Sims"); setPanel("sim"); }} className="h-11 rounded-full bg-neutral-100 px-4 text-sm font-medium">Sims</button>
         </div>
       </header>
 
@@ -321,6 +342,7 @@ export function Storefront({ onLock }: { onLock: () => void }) {
                 onClick={() => {
                   setPartCat(cat);
                   setMore(24);
+                  path?.note(`cat:${cat}`, SHORT[cat]);
                 }}
                 className={`shrink-0 rounded-full px-3 py-2 text-sm font-medium ${partCat === cat ? "bg-neutral-900 text-white" : "bg-neutral-100 text-neutral-700"}`}
               >

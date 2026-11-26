@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Lock, Search } from "lucide-react";
 import laptopsRaw from "@/data/laptops.json";
 import { CAT_LABEL, PARTS, byId, explainLaptop, explainPart, isJunk, laptopBits, money, partScore, tagsOf, type Category } from "@/lib/catalog";
@@ -6,6 +6,7 @@ import { RankBadge } from "@/components/rank";
 import { Counter } from "@/components/counter";
 import { KeyboardShop } from "@/components/keyboard-shop";
 import { Sim } from "@/components/sim";
+import { HistoryRoot, latest, usePath } from "@/components/history";
 
 type Card = { id: string; name: string; brand: string; price: number };
 type Shelf = { id: string; title: string; line: string };
@@ -73,6 +74,14 @@ function cardsFor(id: string): Card[] {
 }
 
 export function GlassStore({ onLock }: { onLock: () => void }) {
+  return (
+    <HistoryRoot home="Liquid">
+      <GlassBody onLock={onLock} />
+    </HistoryRoot>
+  );
+}
+
+function GlassBody({ onLock }: { onLock: () => void }) {
   const [shelf, setShelf] = useState<string | null>(null);
   const [hot, setHot] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -81,9 +90,15 @@ export function GlassStore({ onLock }: { onLock: () => void }) {
   const [panel, setPanel] = useState<"shop" | "build" | "keys" | "sim">("shop");
   const [sort, setSort] = useState<"low" | "high" | "score" | "score-low">("low");
   const [grid, setGrid] = useState(false);
-  if (panel === "build") return <Counter onClose={() => setPanel("shop")} />;
-  if (panel === "keys") return <KeyboardShop onLeave={() => setPanel("shop")} />;
-  if (panel === "sim") return <Sim onLeave={() => setPanel("shop")} />;
+  const path = usePath();
+
+  useEffect(() => {
+    if (!path) return;
+    const panelId = latest(path.log, path.at, (id) => id === "build" || id === "keys" || id === "sim" || id === "home");
+    setPanel(panelId === "build" || panelId === "keys" || panelId === "sim" ? panelId : "shop");
+    const shelfId = latest(path.log, path.at, (id) => id.startsWith("shelf-"));
+    setShelf(shelfId ? shelfId.slice(6) : null);
+  }, [path?.at]);
 
   const rows = useMemo(() => {
     if (!shelf) return [];
@@ -107,12 +122,18 @@ export function GlassStore({ onLock }: { onLock: () => void }) {
     setPicked(null);
     setHot(null);
     setLimit(24);
+    path?.note(`shelf-${id}`, SHELVES.find((item) => item.id === id)?.title ?? id);
   }
 
   function chooseItem(item: Card) {
     blip();
     setPicked(item);
+    path?.note(`pick:${item.id}`, item.name.slice(0, 22));
   }
+
+  if (panel === "build") return <Counter onClose={() => setPanel("shop")} />;
+  if (panel === "keys") return <KeyboardShop onLeave={() => setPanel("shop")} />;
+  if (panel === "sim") return <Sim onLeave={() => setPanel("shop")} />;
 
   return (
     <div className="relative min-h-dvh overflow-hidden bg-black text-white">
@@ -132,9 +153,9 @@ export function GlassStore({ onLock }: { onLock: () => void }) {
           </button>
         </header>
         <div className="mt-3 flex gap-2">
-          <button type="button" onClick={() => { blip(); setPanel("build"); }} className="h-11 rounded-full bg-white/15 px-4 text-sm">Build with them</button>
-          <button type="button" onClick={() => { blip(); setPanel("keys"); }} className="h-11 rounded-full bg-white/15 px-4 text-sm">Keyboards</button>
-          <button type="button" onClick={() => { blip(); setPanel("sim"); }} className="h-11 rounded-full bg-white/15 px-4 text-sm">Sims</button>
+          <button type="button" onClick={() => { blip(); path?.note("build", "Build"); setPanel("build"); }} className="h-11 rounded-full bg-white/15 px-4 text-sm">Build with them</button>
+          <button type="button" onClick={() => { blip(); path?.note("keys", "Keyboards"); setPanel("keys"); }} className="h-11 rounded-full bg-white/15 px-4 text-sm">Keyboards</button>
+          <button type="button" onClick={() => { blip(); path?.note("sim", "Sims"); setPanel("sim"); }} className="h-11 rounded-full bg-white/15 px-4 text-sm">Sims</button>
         </div>
 
         {!shelf ? (

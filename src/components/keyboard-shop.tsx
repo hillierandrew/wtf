@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, Search } from "lucide-react";
 import { FEEL_LABEL, KEYS, LAYOUT_LABEL, LIGHT_LABEL, money, type Feel, type FnRow, type KeyItem, type Layout, type Light, type Numpad, type Shelf } from "@/lib/keyboard";
+import { latest, usePath } from "@/components/history";
 
 type Look = "paper" | "phone";
 type Sort = "quiet" | "loud" | "low" | "high";
@@ -168,6 +169,18 @@ export function KeyboardShop({ onLeave }: { look?: Look; onLeave?: () => void })
   const [openBox, setOpenBox] = useState(true);
   const [limit, setLimit] = useState(24);
   const [openId, setOpenId] = useState<string | null>(null);
+  const path = usePath();
+
+  useEffect(() => {
+    if (!path) return;
+    const id = latest(path.log, path.at, (item) => item.startsWith("key-"));
+    if (!id) {
+      setView("home");
+      return;
+    }
+    const found = [...DOORS, ...ENTHUSIAST.flatMap((group) => group.items)].find((item) => `key-${item.id}` === id);
+    if (found) openPreset(found);
+  }, [path?.at]);
 
   function openPreset(next: Preset) {
     setPreset(next);
@@ -181,6 +194,7 @@ export function KeyboardShop({ onLeave }: { look?: Look; onLeave?: () => void })
     setLimit(24);
     setOpenId(null);
     setView("list");
+    path?.note(`key-${next.id}`, next.title);
   }
 
   const counts = useMemo(() => {

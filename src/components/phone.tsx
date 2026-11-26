@@ -9,6 +9,7 @@ import { laptopMarks, deskMarks } from "@/components/marks";
 import laptopsRaw from "@/data/laptops.json";
 import { CopyList, named } from "@/components/copy-list";
 import { Sim } from "@/components/sim";
+import { HistoryRoot, latest, usePath } from "@/components/history";
 
 const LAPS = laptopsRaw as { id: string; name: string; price: number; gpu: number; specs: string; kind?: string }[];
 
@@ -52,6 +53,14 @@ function PhoneMarks({ item }: { item: PhoneItem }) {
 }
 
 export function Phone({ onLock }: { onLock: () => void }) {
+  return (
+    <HistoryRoot home="Phone">
+      <PhoneBody onLock={onLock} />
+    </HistoryRoot>
+  );
+}
+
+function PhoneBody({ onLock }: { onLock: () => void }) {
   const [tab, setTab] = useState<Tab>("use");
   const [group, setGroup] = useState<string | null>(null);
   const [openId, setOpenId] = useState<string | null>(null);
@@ -63,6 +72,17 @@ export function Phone({ onLock }: { onLock: () => void }) {
   const [limit, setLimit] = useState(48);
   const [pc, setPc] = useState<Build>({});
   const [walk, setWalk] = useState(false);
+  const path = usePath();
+
+  useEffect(() => {
+    if (!path) return;
+    const tab = latest(path.log, path.at, (id) => id.startsWith("tab:"));
+    if (tab) goTab(tab.slice(4) as Tab, true);
+    const groupId = latest(path.log, path.at, (id) => id.startsWith("group:"));
+    setGroup(groupId ? groupId.slice(6) : null);
+    const item = latest(path.log, path.at, (id) => id.startsWith("item:"));
+    setOpenId(item ? item.slice(5) : null);
+  }, [path?.at]);
 
   useEffect(() => {
     try {
@@ -132,13 +152,14 @@ export function Phone({ onLock }: { onLock: () => void }) {
     return sortItems(list, sort);
   }, [tab, group, query, kind, sort, hideOpen, saved]);
 
-  function goTab(next: Tab) {
+  function goTab(next: Tab, quiet = false) {
     setTab(next);
     setGroup(null);
     setOpenId(null);
     setKind("all");
     setQuery("");
     setSort(next === "deals" ? "sale" : "low");
+    if (!quiet) path?.note(`tab:${next}`, next === "use" ? "Use" : next === "power" ? "Power" : next === "build" ? "Build" : next === "deals" ? "Deals" : next === "saved" ? "Saved" : next === "search" ? "Search" : "Store");
   }
 
   function openGroup(id: string) {
@@ -147,6 +168,7 @@ export function Phone({ onLock }: { onLock: () => void }) {
     setKind("all");
     setQuery("");
     setSort("low");
+    path?.note(`group:${id}`, groupMeta(id)?.title ?? id);
   }
 
   const shown = listed.slice(0, limit);
@@ -324,7 +346,7 @@ export function Phone({ onLock }: { onLock: () => void }) {
                 {shown.map((item, index) => (
                   <li key={item.id} className={index ? "border-t border-[#e5e5ea]" : ""}>
                     <div className="flex items-start gap-2 px-3 py-3">
-                      <button type="button" onClick={() => setOpenId(item.id)} className="min-w-0 flex-1 text-left">
+                      <button type="button" onClick={() => { setOpenId(item.id); path?.note(`item:${item.id}`, item.name.slice(0, 22)); }} className="min-w-0 flex-1 text-left">
                         <span className="block text-[12px] font-medium uppercase tracking-wide text-[#8e8e93]">{item.brand}</span>
                         <span className="mt-0.5 block text-[16px] font-medium leading-snug">{item.name.replace(/\(open box\)/i, "").trim()}</span>
                         <span className="mt-1 block text-[13px] text-[#8e8e93]">
