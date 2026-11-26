@@ -10,6 +10,26 @@ import { JOBS, type UseKind } from "@/lib/phone-use";
 
 type ColourPick = "white" | "black" | "all";
 
+function stillOpen(log: { id: string }[], at: number, root: string) {
+  for (let index = at; index >= 0; index -= 1) {
+    const id = log[index]?.id ?? "";
+    if (id === "home") return false;
+    if (id === root || id.startsWith(`${root}:`)) return true;
+  }
+  return false;
+}
+
+function leaveRoot(path: { log: { id: string }[]; at: number; jump: (index: number) => void; back: () => void } | null, root: string) {
+  if (!path) return;
+  for (let index = path.at; index >= 0; index -= 1) {
+    if (path.log[index]?.id === root) {
+      path.jump(Math.max(0, index - 1));
+      return;
+    }
+  }
+  path.back();
+}
+
 export function Welcome({
   onEnter,
   onDesk,
@@ -44,12 +64,11 @@ export function Welcome({
   const [five, setFive] = useState(false);
   useEffect(() => {
     if (!path) return;
-    const id = path.log[path.at]?.id;
-    setFive(id === "five");
-    setWalk(id === "walk");
+    setFive(stillOpen(path.log, path.at, "five"));
+    setWalk(stillOpen(path.log, path.at, "walk"));
   }, [path?.at, path]);
-  if (walk) return <Counter onClose={() => path?.back()} />;
-  if (five) return <Five onClose={() => path?.back()} />;
+  if (walk) return <Counter onClose={() => leaveRoot(path, "walk")} />;
+  if (five) return <Five onClose={() => leaveRoot(path, "five")} />;
   const more = [
     { label: "Walk the shelf", line: "Start with a chip or a graphics card. I hide what does not fit.", onClick: () => { path?.note("walk", "Walk the shelf"); setWalk(true); } },
     { label: "Build each part", line: "The long way. One part at a time.", onClick: onEnter },
