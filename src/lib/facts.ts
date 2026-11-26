@@ -1,3 +1,5 @@
+import { gameTags } from "@/lib/games";
+
 export function releaseYear(name: string): number {
   const n = name.toUpperCase();
   if (/5090|5080|5070|5060|RYZEN AI|CORE ULTRA|ULTRA [579]/.test(n)) return 2025;
@@ -81,6 +83,10 @@ export function laptopFace(name: string, specs = "", kind = ""): string[] {
   if (/RYZEN/.test(n)) tags.push("Ryzen");
   if (/INTEL|CORE ULTRA|\bI[3579]-/.test(n)) tags.push("Intel");
   if (/TOUCH/.test(n)) tags.push("Touch");
+  if (/2-IN-1|YOGA|X360/.test(n)) tags.push("2-in-1");
+  if (/SNAPDRAGON/.test(n)) tags.push("Snapdragon");
+  const hz = n.match(/(\d{2,3})\s*HZ/);
+  if (hz) tags.push(`${hz[1]}Hz`);
   if (/BACK-?LIT|BACKLIGHT/.test(n)) tags.push("Backlit keyboard");
   if (kind === "game") tags.push("Gaming", "Games");
   if (kind === "work") tags.push("Work", "Business", "Office");
@@ -93,7 +99,7 @@ export function laptopFace(name: string, specs = "", kind = ""): string[] {
 }
 
 export function laptopBlob(item: { name: string; brand?: string; specs?: string; kind?: string }): string {
-  return `${item.brand ?? ""} ${item.name} ${item.specs ?? ""} ${item.kind ?? ""} ${laptopFace(item.name, item.specs ?? "", item.kind ?? "").join(" ")}`.toLowerCase();
+  return `${item.brand ?? ""} ${item.name} ${item.specs ?? ""} ${item.kind ?? ""} ${laptopFace(item.name, item.specs ?? "", item.kind ?? "").join(" ")} ${gameTags(item.name, item.specs ?? "", item.kind ?? "").join(" ")}`.toLowerCase();
 }
 
 export function tagPaint(tag: string): { bg: string; fg: string } {

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import { dealFrom, dealLines, explainLaptop, explainPart, faceTags, laptopBits, machineParts, money, rankFrom, type Part } from "@/lib/catalog";
 import { laptopWeight, releaseYear, specTags } from "@/lib/facts";
+import { chipPower, gameSplit, memoryGb, type GameCall } from "@/lib/games";
 
 const RING: Record<string, string> = {
   Crystal: "#0891b2",
@@ -10,22 +11,6 @@ const RING: Record<string, string> = {
   Bronze: "#c2410c",
   Brown: "#78350f",
 };
-
-const GAMES = [
-  { name: "Valorant", need: 28, ram: 8 },
-  { name: "League of Legends", need: 16, ram: 8 },
-  { name: "Minecraft", need: 12, ram: 8 },
-  { name: "Fortnite", need: 40, ram: 8 },
-  { name: "Overwatch 2", need: 45, ram: 8 },
-  { name: "Counter-Strike 2", need: 45, ram: 8 },
-  { name: "Call of Duty", need: 60, ram: 16 },
-  { name: "Red Dead Redemption 2", need: 55, ram: 12 },
-  { name: "GTA V", need: 40, ram: 8 },
-  { name: "Elden Ring", need: 55, ram: 12 },
-  { name: "Baldur's Gate 3", need: 55, ram: 16 },
-  { name: "Cyberpunk 2077", need: 70, ram: 16 },
-  { name: "Helldivers 2", need: 60, ram: 16 },
-];
 
 const APPS = [
   { name: "Zoom", need: 0, ram: 8 },
@@ -37,35 +22,6 @@ const APPS = [
   { name: "Short videos", need: 45, ram: 16 },
   { name: "A small AI chat on the machine", need: 40, ram: 32 },
 ];
-
-function chipPower(name: string, gpu?: number) {
-  if (gpu && gpu > 0) return gpu;
-  const n = name.toUpperCase();
-  if (/5090|5080/.test(n)) return 100;
-  if (/5070\s?TI|9070\s?XT/.test(n)) return 90;
-  if (/\b5070\b|\b9070\b/.test(n)) return 75;
-  if (/5060\s?TI|9060/.test(n)) return 68;
-  if (/5060|4060|7600/.test(n)) return 60;
-  if (/3050|4050/.test(n)) return 40;
-  if (/780M|890M|RYZEN\s?AI|ULTRA\s?9/.test(n)) return 24;
-  return 12;
-}
-
-function setting(chip: number, ram: number, need: number, needRam: number) {
-  if (chip >= need && ram >= needRam) return "Ultra";
-  if (chip >= need * 0.75 && ram >= Math.max(8, needRam - 8)) return "Normal";
-  if (chip >= need * 0.55) return "Medium";
-  if (chip >= Math.max(8, need * 0.35)) return "Basic";
-  return "No";
-}
-
-function ramOf(name: string, specs?: string) {
-  const blob = `${specs ?? ""} ${name}`;
-  const spec = blob.match(/(\d+)\s*GB memory/i);
-  if (spec) return Number(spec[1]);
-  const plain = name.match(/(\d+)\s*GB(?!\s*SSD)/i);
-  return plain ? Number(plain[1]) : 8;
-}
 
 function Sheet({ title, lines, onClose }: { title: string; lines: string[]; onClose: () => void }) {
   const note = lines.filter((line) => line.startsWith("TLDR:"));
@@ -90,6 +46,21 @@ function Sheet({ title, lines, onClose }: { title: string; lines: string[]; onCl
   );
 }
 
+export function GameSummary({ name, specs, kind, gpu }: { name: string; specs?: string; kind?: string; gpu?: number }) {
+  const split = gameSplit({ name, specs, kind, gpu });
+  if (split.blocked && !split.yes.length && !split.low.length) return <p className="mt-2 text-sm leading-snug text-[#333]">{split.blocked}</p>;
+  return (
+    <div className="mt-2 text-sm leading-snug">
+      {split.blocked ? <p className="text-[#333]">{split.blocked}</p> : null}
+      <p><span className="font-semibold text-[#145214]">Yes.</span> {split.yes.join(", ") || "None."}</p>
+      {split.low.length ? <p><span className="font-semibold text-[#5a3b00]">Low.</span> {split.low.join(", ")}.</p> : null}
+      {split.no.length ? <p><span className="font-semibold text-[#6b1420]">No.</span> {split.no.join(", ")}.</p> : null}
+    </div>
+  );
+}
+
+const CALL_COLOR: Record<GameCall, string> = { Yes: "text-[#145214]", Low: "text-[#5a3b00]", No: "text-[#6b1420]" };
+
 export function Marks({
   name,
   price,
@@ -98,6 +69,7 @@ export function Marks({
   room,
   gpu,
   specs,
+  kind,
 }: {
   name: string;
   price: number;
@@ -106,13 +78,15 @@ export function Marks({
   room: number;
   gpu?: number;
   specs?: string;
+  kind?: string;
 }) {
   const [which, setWhich] = useState<"" | "power" | "deal" | "games" | "apps">("");
   const power = rankFrom(score);
   const deal = dealFrom(price, score);
-  const chip = chipPower(name, gpu);
-  const ram = ramOf(name, specs);
-  const tags = [...faceTags(`${name} ${specs ?? ""}`), ...specTags(name, specs)];
+  const chip = chipPower(`${name} ${specs ?? ""}`, gpu);
+  const ram = memoryGb(name, specs ?? "");
+  const games = gameSplit({ name, specs, kind, gpu });
+  const tags = [...faceTags(`${name} ${specs ?? ""}`), ...specTags(name, specs), ...games.yes.slice(0, 4)];
   const carry = Boolean(specs?.match(/memory/i) || /\d{2}(\.\d)?\s*"/.test(name));
   if (carry) {
     const weight = laptopWeight(name, specs);
@@ -134,6 +108,7 @@ export function Marks({
           Apps
         </button>
       </div>
+      <GameSummary name={name} specs={specs} kind={kind} gpu={gpu} />
       {tags.length ? (
         <div className="mt-2 flex flex-wrap gap-1">
           {tags.map((tag) => (
@@ -143,23 +118,20 @@ export function Marks({
       ) : null}
       {which === "games" ? (
         <div className="mt-2">
-          <p className="text-sm">Estimate only. Ultra, Normal, Medium, or Basic. Not a promised frame rate.</p>
+          <p className="text-sm">1080p estimate for games people are playing now. Low means turn it down. Not a promised frame rate. Phantom Blade Zero is a new one, so that line is a guess.</p>
           <ul className="mt-1 space-y-1 text-sm">
-          {GAMES.map((game) => {
-            const how = setting(chip, ram, game.need, game.ram);
-            return (
-              <li key={game.name} className={how === "No" ? "text-[#6b1420]" : "text-[#145214]"}>
-                {how} · {game.name}
-              </li>
-            );
-          })}
+          {games.rows.map((game) => (
+            <li key={game.name} className={CALL_COLOR[game.how]}>
+              {game.how} · {game.name}
+            </li>
+          ))}
           </ul>
         </div>
       ) : null}
       {which === "apps" ? (
         <ul className="mt-2 space-y-1 text-sm">
           {APPS.map((app) => {
-            const ok = chip >= app.need && ram >= app.ram;
+            const ok = chip >= app.need && (ram <= 0 || ram >= app.ram);
             return (
               <li key={app.name} className={ok ? "text-[#145214]" : "text-[#6b1420]"}>
                 {ok ? "Fine" : "Tight"} · {app.name}
@@ -176,7 +148,7 @@ export function Marks({
 
 export function laptopMarks(item: { name: string; price: number; gpu: number; specs: string; kind?: string }) {
   const bits = laptopBits(item);
-  return <Marks name={item.name} price={item.price} score={bits.score} room={bits.room} gpu={item.gpu} specs={item.specs} lines={explainLaptop(item)} />;
+  return <Marks name={item.name} price={item.price} score={bits.score} room={bits.room} gpu={item.gpu} specs={item.specs} kind={item.kind} lines={explainLaptop(item)} />;
 }
 
 export function deskMarks(part: Part) {

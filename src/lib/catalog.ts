@@ -615,18 +615,78 @@ export function machineScore(name: string): number {
   return machineParts(name).score;
 }
 
+function laptopCard(name: string, field: number): { pts: number; label: string } {
+  const n = name.toUpperCase();
+  const table: [RegExp, number, string][] = [
+    [/5090/, 64, "RTX 5090"],
+    [/5080/, 58, "RTX 5080"],
+    [/5070\s?TI/, 54, "RTX 5070 Ti"],
+    [/9070\s?XT/, 54, "RX 9070 XT"],
+    [/\b5070\b/, 48, "RTX 5070"],
+    [/\b9070\b/, 48, "RX 9070"],
+    [/5060\s?TI/, 44, "RTX 5060 Ti"],
+    [/9060/, 42, "RX 9060"],
+    [/5060/, 40, "RTX 5060"],
+    [/4090/, 60, "RTX 4090"],
+    [/4080/, 54, "RTX 4080"],
+    [/4070\s?TI/, 48, "RTX 4070 Ti"],
+    [/4070/, 42, "RTX 4070"],
+    [/4060/, 36, "RTX 4060"],
+    [/4050/, 30, "RTX 4050"],
+    [/3060/, 26, "RTX 3060"],
+    [/3050/, 22, "RTX 3050"],
+    [/\bARC\b/, 18, "Intel Arc"],
+  ];
+  for (const [re, pts, label] of table) if (re.test(n)) return { pts, label };
+  if (field >= 100) return { pts: 64, label: "Top card" };
+  if (field >= 90) return { pts: 58, label: "High card" };
+  if (field >= 80) return { pts: 54, label: "High card" };
+  if (field >= 72) return { pts: 48, label: "Current card" };
+  if (field >= 60) return { pts: 40, label: "Current card" };
+  if (field >= 45) return { pts: 30, label: "Entry card" };
+  if (field >= 28) return { pts: 22, label: "Entry card" };
+  if (/780M|890M|860M|760M/.test(n)) return { pts: 14, label: "Strong graphics in the chip" };
+  if (/RYZEN AI|ULTRA|IRIS/.test(n)) return { pts: 10, label: "Graphics in the chip" };
+  return { pts: 8, label: "Basic graphics in the chip" };
+}
+
+function laptopCpu(name: string): { pts: number; label: string } {
+  const n = name.toUpperCase();
+  if (/9955HX3D|HX3D/.test(n)) return { pts: 14, label: "A 3D-cache laptop chip" };
+  if (/ULTRA\s?9|RYZEN AI\s?9|RYZEN\s?9|I9-/.test(n)) return { pts: 12, label: "A top laptop chip" };
+  if (/ULTRA\s?7|RYZEN AI\s?7|RYZEN\s?7|I7-/.test(n)) return { pts: 9, label: "A strong laptop chip" };
+  if (/ULTRA\s?5|RYZEN AI\s?5|RYZEN\s?5|I5-|CORE\s?7|CORE\s?5/.test(n)) return { pts: 6, label: "A mid laptop chip" };
+  if (/RYZEN\s?3|I3-|CORE\s?3|N150|N350|N50|SNAPDRAGON|MEDIATEK/.test(n)) return { pts: 3, label: "A small chip" };
+  return { pts: 4, label: "The chip" };
+}
+
 export function laptopBits(item: { gpu: number; specs: string; price?: number; name?: string; kind?: string }) {
+  const name = item.name ?? "";
   const ramMatch = item.specs.match(/(\d+)GB memory/i);
   const ram = ramMatch ? Number(ramMatch[1]) : 0;
   const disk = item.specs.match(/(\d+(?:\.\d+)?)(TB|GB) storage/i);
   const diskTb = disk ? (disk[2].toUpperCase() === "TB" ? Number(disk[1]) : Number(disk[1]) / 1000) : 0;
   const diskPts = diskTb >= 2 ? 6 : diskTb >= 1 ? 4 : diskTb >= 0.5 ? 2 : 0;
-  const ramPts = ram >= 64 ? 16 : ram >= 32 ? 12 : ram >= 16 ? 6 : 0;
-  const gpu = item.gpu >= 100 ? 88 : item.gpu >= 90 ? 80 : item.gpu >= 80 ? 72 : item.gpu >= 72 ? 64 : item.gpu >= 60 ? 52 : item.gpu >= 45 ? 40 : item.gpu >= 28 ? 30 : ram >= 16 ? 14 : 8;
-  const blob = `${item.name ?? ""} ${item.specs} ${item.kind ?? ""}`.toUpperCase();
-  const room = /TABLET|CHROME|SOLDER|NOT UPGRAD/.test(blob) ? 0 : item.gpu >= 45 ? 4 : 2;
-  const raw = gpu + ramPts + diskPts + room;
-  return { gpu, chip: item.gpu, ram, ramPts, diskTb, diskPts, room, raw, score: Math.max(1, Math.min(100, raw)) };
+  const ramPts = ram >= 64 ? 12 : ram >= 32 ? 10 : ram >= 24 ? 8 : ram >= 16 ? 6 : ram >= 12 ? 4 : ram >= 8 ? 2 : 0;
+  const card = laptopCard(name, item.gpu);
+  const cpu = laptopCpu(name);
+  const blob = `${name} ${item.specs} ${item.kind ?? ""}`.toUpperCase();
+  const room = /TABLET|CHROME|SOLDER|NOT UPGRAD|SNAPDRAGON|MEDIATEK/.test(blob) ? 0 : card.pts >= 18 ? 4 : 2;
+  const raw = card.pts + cpu.pts + ramPts + diskPts + room;
+  return {
+    gpu: card.pts,
+    card: card.label,
+    cpuPts: cpu.pts,
+    cpu: cpu.label,
+    chip: item.gpu,
+    ram,
+    ramPts,
+    diskTb,
+    diskPts,
+    room,
+    raw,
+    score: Math.max(1, Math.min(100, raw)),
+  };
 }
 
 export function explainLaptop(item: { name?: string; price: number; gpu: number; specs: string }): string[] {
@@ -634,14 +694,15 @@ export function explainLaptop(item: { name?: string; price: number; gpu: number;
   const rank = rankFrom(bits.score);
   return [
     `${rank.name} ${rank.score}. ${BANDS}`,
-    "Formula: graphics + memory + drive + upgrade. The result stops at 100.",
-    `Graphics = ${bits.gpu}. The chip power number is ${bits.chip}. 100 or more means 88. 90 means 80. 80 means 72. 72 means 64. 60 means 52. 45 means 40. 28 means 30. Otherwise 16GB of memory makes it 14, and less memory makes it 8.`,
-    `Memory = ${bits.ramPts}. ${bits.ram || 0} GB. 64GB is 16, 32GB is 12, 16GB is 6, less is 0.`,
-    `Drive = ${bits.diskPts}. ${bits.diskTb || 0} TB. 2TB is 6, 1TB is 4, 0.5TB is 2, smaller is 0.`,
-    `Upgrade = ${bits.room}. A gaming laptop is 4, because the drive and often the memory can be changed. A home laptop is 2. A Chromebook or tablet is 0. Buy the memory you need today if it is 0.`,
-    `${bits.gpu} + ${bits.ramPts} + ${bits.diskPts} + ${bits.room} = ${bits.raw}, which becomes ${bits.score}.`,
+    "Formula: graphics card + chip + memory + drive + upgrade. The result stops at 100.",
+    `Graphics = ${bits.gpu}. ${bits.card}. A 5090 laptop card is 64. A 5080 is 58. A 5070 Ti is 54. A 5070 is 48. A 5060 is 40. A 4050 is 30. A 3050 is 22. Graphics in the chip is 8 to 14.`,
+    `Chip = ${bits.cpuPts}. ${bits.cpu}. A top chip is 12. A strong chip is 9. A mid chip is 6. A small chip is 3. A 3D-cache laptop chip is 14.`,
+    `Memory = ${bits.ramPts}. ${bits.ram || 0} GB. 64GB is 12, 32GB is 10, 24GB is 8, 16GB is 6, 12GB is 4, 8GB is 2, less is 0.`,
+    `Drive = ${bits.diskPts}. ${bits.diskTb || 0} TB. 2TB is 6, 1TB is 4, 512GB is 2, smaller is 0.`,
+    `Upgrade = ${bits.room}. A gaming laptop is 4, because the drive and often the memory can be changed. A home laptop is 2. A Chromebook, tablet, or Snapdragon is 0.`,
+    `${bits.gpu} + ${bits.cpuPts} + ${bits.ramPts} + ${bits.diskPts} + ${bits.room} = ${bits.raw}, which becomes ${bits.score}.`,
     `${money(item.price)} ÷ ${bits.score} = ${money(item.price / bits.score)} per point.`,
-    `TLDR: ${rank.name} ${bits.score}. Graphics ${bits.gpu}, ${bits.ram || 0} GB is ${bits.ramPts}, the drive is ${bits.diskPts}, upgrade room is ${bits.room}. ${money(item.price / bits.score)} per point.`,
+    `TLDR: ${rank.name} ${bits.score}. ${bits.card} is ${bits.gpu}. ${bits.cpu} is ${bits.cpuPts}. ${bits.ram || 0} GB is ${bits.ramPts}. The drive is ${bits.diskPts}. Upgrade room is ${bits.room}. ${money(item.price / bits.score)} per point.`,
   ];
 }
 

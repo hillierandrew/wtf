@@ -17,6 +17,7 @@ import { keyBag, lapBag, partBag, threeOf } from "@/lib/bag";
 import { Packs } from "@/components/packs";
 import { Prices } from "@/components/prices";
 import { designFloor, machineRows, type FloorMachine } from "@/lib/floor-builds";
+import { GameSummary } from "@/components/marks";
 
 const WHO = [
   { id: "grandma", title: "Grandma", say: "Email, photos, a video call. Nothing she has to learn." },
@@ -332,6 +333,7 @@ function Designed({ budget, onBudget }: { budget: number; onBudget: (next: numbe
         </ol>
         <div className="border-t border-[#161616] px-4 py-4">
           <p className="text-sm text-[#333]">{machine.note} {machine.screen ? `With the screen, ${money(machine.withScreen)}.` : ""}</p>
+          <GameSummary name={[machine.build.cpu?.name, machine.build.gpu?.name, machine.build.memory?.name].filter(Boolean).join(" + ")} />
           <AddPack lines={tower} label="Add the tower" className="mt-3 h-12 w-full rounded-full bg-[#0f6b4c] text-base font-semibold text-white" />
           {machine.screen ? <AddPack lines={withScreen} label={`Add tower and screen · ${money(machine.withScreen)}`} className="mt-2 min-h-12 w-full rounded-full border border-[#161616] bg-white px-3 py-3 text-base font-semibold leading-snug text-[#161616]" /> : null}
           <p className="mt-2 text-center text-xs text-[#333]">{tower.length} boxes into the cart. Not a mystery prebuilt.</p>

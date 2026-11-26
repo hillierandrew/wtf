@@ -4,6 +4,7 @@ import { dealFrom, money, scoreBundleText } from "@/lib/catalog";
 import { specTags } from "@/lib/facts";
 import { AddButton } from "@/components/bag";
 import { RankBadge } from "@/components/rank";
+import { GameSummary } from "@/components/marks";
 import type { BagLine } from "@/lib/bag";
 
 type Sort = "score" | "score-low" | "deal" | "low" | "high";
@@ -68,6 +69,9 @@ export function Bundles({ onLeave }: { onLeave: () => void }) {
                 </div>
                 {dealRank ? <p className="text-sm font-medium" style={{ color: dealRank.fg }}>{dealRank.name}. {money(dealRank.per)} per point.</p> : <p className="text-sm text-muted">No computer score.</p>}
                 {deal.save > 0 ? <p className="text-sm text-ok">Save {money(deal.save)}</p> : null}
+                {deal.kind === "CPU kit" || deal.kind === "GPU kit" || /RX|RTX/i.test(deal.name) ? (
+                  <GameSummary name={`${deal.name} + ${deal.parts.join(" + ")}`} />
+                ) : null}
                 <ol className="mt-2 space-y-1 text-sm text-muted">
                   {deal.parts.map((part) => (
                     <li key={part}>{part}</li>
