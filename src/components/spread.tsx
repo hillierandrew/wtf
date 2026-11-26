@@ -4,7 +4,7 @@ import rawLaptops from "@/data/laptops.json";
 import { PARTS, dealFrom, explainLaptop, explainPart, isJunk, laptopBits, machineParts, machineScore, money, partScore, type Part } from "@/lib/catalog";
 import { laptopBlob, laptopFace, releaseYear, tagPaint } from "@/lib/facts";
 import { RankBadge } from "@/components/rank";
-import { KEYS } from "@/lib/keyboard";
+import { KEYS, FEEL_LABEL, type KeyItem } from "@/lib/keyboard";
 import { deskMarks, laptopMarks } from "@/components/marks";
 import { Counter } from "@/components/counter";
 import { KeyboardShop } from "@/components/keyboard-shop";
@@ -13,7 +13,7 @@ import { Bundles } from "@/components/bundles";
 import { HistoryRoot, latest, usePath } from "@/components/history";
 import { AddButton, BagDock } from "@/components/bag";
 import { Five } from "@/components/five";
-import { keyBag, lapBag, partBag } from "@/lib/bag";
+import { keyBag, lapBag, partBag, threeOf } from "@/lib/bag";
 import { Packs } from "@/components/packs";
 
 const WHO = [
@@ -68,6 +68,8 @@ function Floor({ onLock }: { onLock: () => void }) {
   const [more, setMore] = useState(12);
   const [seek, setSeek] = useState("");
   const [five, setFive] = useState(false);
+  const [ask, setAsk] = useState<null | "laptop" | "desktop" | "keys" | "sim">(null);
+  const [shelfOpen, setShelfOpen] = useState(false);
 
   useEffect(() => {
     if (!path) return;
@@ -79,26 +81,19 @@ function Floor({ onLock }: { onLock: () => void }) {
 
   const person = WHO.find((item) => item.id === who) ?? WHO[1];
 
-  const pick = useMemo(() => {
-    const desks = PARTS.filter((part) => part.cat === "prebuilt" && !isJunk(part, true) && part.price > 0 && part.price <= budget).map((part) => ({ part, price: part.price, score: machineScore(part.name) }));
+  const deskRows = useMemo(() => {
+    const desks = PARTS.filter((part) => part.cat === "prebuilt" && !isJunk(part, true) && part.price > 0 && part.price <= budget).map((part) => ({ id: part.id, name: part.name, brand: part.brand, price: part.price, score: machineScore(part.name), part }));
     const narrow =
       who === "grandma" ? desks.filter((row) => row.score < 40) : who === "school" ? desks.filter((row) => row.score < 58) : who === "work" ? desks.filter((row) => machineParts(row.part.name).ram >= 16) : who === "think" ? desks.filter((row) => machineParts(row.part.name).ram >= 32) : desks;
-    return byMoney(narrow.length ? narrow : desks, order)[0]?.part;
-  }, [budget, who, order]);
+    return narrow.length ? narrow : desks;
+  }, [budget, who]);
 
-  const laptop = useMemo(() => {
-    const rows = LAPS.filter((item) => !item.open && item.price > 0 && item.price <= budget && item.kind !== "tablet").map((item) => ({ item, price: item.price, score: laptopBits(item).score }));
+  const lapRows = useMemo(() => {
+    const rows = LAPS.filter((item) => !item.open && item.price > 0 && item.price <= budget && item.kind !== "tablet").map((item) => ({ id: item.id, name: item.name, brand: item.brand, price: item.price, score: laptopBits(item).score, item }));
     const narrow =
       who === "grandma" ? rows.filter((row) => row.item.gpu < 28) : who === "work" ? rows.filter((row) => row.item.kind === "work") : who === "games" ? rows.filter((row) => row.item.kind === "game") : who === "think" ? rows.filter((row) => /32GB|64GB/.test(row.item.specs)) : rows.filter((row) => row.item.kind === "home" || row.item.kind === "chrome");
-    return byMoney(narrow.length ? narrow : rows, order)[0]?.item;
-  }, [budget, who, order]);
-
-  const board = useMemo(() => {
-    const rows = KEYS.filter((item) => item.shelf === "board" && !item.open && item.price > 0 && item.price <= Math.min(budget, who === "grandma" ? 80 : 180));
-    const quiet = rows.filter((item) => item.feel === "silent" || item.feel === "membrane" || (item.estimated ?? 99) < 50);
-    const pool = who === "grandma" || who === "school" ? (quiet.length ? quiet : rows) : rows;
-    return pool.slice().sort((a, b) => (order === "high" ? b.price - a.price : order === "score" ? (a.estimated ?? 99) - (b.estimated ?? 99) : a.price - b.price))[0];
-  }, [budget, who, order]);
+    return narrow.length ? narrow : rows;
+  }, [budget, who]);
 
   const shelfRows = useMemo(() => {
     if (shelf === "laptop") {
@@ -134,72 +129,81 @@ function Floor({ onLock }: { onLock: () => void }) {
   if (panel === "deals") return <Bundles onLeave={() => setPanel("home")} />;
 
   return (
-    <div className="min-h-full overflow-y-auto bg-[#f4f1ea] pb-28 text-[#161616]">
+    <div className="h-full overflow-y-auto bg-[#f4f1ea] pb-28 text-[#161616]">
       <header className="flex items-start justify-between gap-4 px-4 pt-4">
         <div>
           <p className="text-[12px] font-semibold uppercase tracking-[0.22em] text-[#0f6b4c]">6666</p>
-          <h1 className="mt-1 max-w-3xl text-4xl font-semibold leading-none tracking-tight sm:text-5xl">One person. One budget. One machine.</h1>
+          <h1 className="mt-1 max-w-3xl text-4xl font-semibold leading-none tracking-tight sm:text-5xl">What did they ask for?</h1>
         </div>
         <button type="button" onClick={onLock} aria-label="Lock" className="flex size-11 shrink-0 items-center justify-center rounded-full border border-[#161616]">
           <Lock className="size-4" />
         </button>
       </header>
-      <p className="mx-4 mt-3 max-w-2xl text-lg leading-snug text-[#333]">{person.say} Say the name, then the price.</p>
-
-      <div className="mt-4 flex gap-2 overflow-x-auto px-4">
-        {WHO.map((item) => (
-          <button key={item.id} type="button" onClick={() => { setWho(item.id); path?.note(`who:${item.id}`, item.title); }} className={`h-12 shrink-0 rounded-full px-4 text-base ${who === item.id ? "bg-[#161616] font-semibold text-white" : "border border-[#161616] bg-white"}`}>
-            {item.title}
+      <p className="mx-4 mt-3 max-w-2xl text-lg leading-snug text-[#333]">Pick the thing they said. Then read the line under the price out loud.</p>
+      <div className="mt-4 grid gap-2 px-4 sm:grid-cols-4">
+        {(
+          [
+            ["laptop", "A laptop"],
+            ["desktop", "A desktop"],
+            ["keys", "A keyboard"],
+            ["sim", "A sim"],
+          ] as const
+        ).map(([id, label]) => (
+          <button key={id} type="button" onClick={() => { setAsk(id); path?.note(`ask:${id}`, label); }} className={`min-h-16 rounded-2xl px-4 text-left text-lg font-semibold ${ask === id ? "bg-[#161616] text-white" : "bg-white"}`}>
+            {label}
           </button>
         ))}
       </div>
+      {ask === "laptop" || ask === "desktop" ? (
+        <div className="mt-4">
+          <div className="flex gap-2 overflow-x-auto px-4">
+            {WHO.map((item) => (
+              <button key={item.id} type="button" onClick={() => { setWho(item.id); path?.note(`who:${item.id}`, item.title); }} className={`h-12 shrink-0 rounded-full px-4 text-base ${who === item.id ? "bg-[#161616] font-semibold text-white" : "border border-[#161616] bg-white"}`}>
+                {item.title}
+              </button>
+            ))}
+          </div>
+          <label className="mx-4 mt-4 block rounded-3xl bg-white p-4">
+            <span className="text-sm text-[#333]">Their budget</span>
+            <span className="mt-1 block text-4xl font-semibold tabular-nums">{money(budget)}</span>
+            <div className="mt-3 flex gap-2">
+              <button type="button" onClick={() => setBudget((value) => Math.max(400, value - 100))} className="h-12 flex-1 rounded-full border border-[#161616] text-base font-semibold">− $100</button>
+              <button type="button" onClick={() => setBudget((value) => Math.min(4500, value + 100))} className="h-12 flex-1 rounded-full border border-[#161616] text-base font-semibold">+ $100</button>
+            </div>
+            <input type="range" min={400} max={4500} step={50} value={budget} onChange={(event) => setBudget(Number(event.target.value))} className="mt-3 h-8 w-full accent-[#0f6b4c]" />
+          </label>
+        </div>
+      ) : null}
+      {ask === "desktop" ? <Offers rows={threeOf(deskRows)} empty={`Nothing under ${money(budget)}. Move the budget up.`} say={(kind) => scriptLine(kind, person.say)} add={(row) => partBag(row.part, `6666. ${scriptLine(row.kind, person.title)} Budget ${money(budget)}. Score ${row.score}. Desktop.`)} marks={(row) => deskMarks(row.part)} /> : null}
+      {ask === "laptop" ? <Offers rows={threeOf(lapRows)} empty={`No laptop under ${money(budget)}. Move the budget up.`} say={(kind) => scriptLine(kind, person.say)} add={(row) => lapBag(row.item, `6666. ${scriptLine(row.kind, person.title)} Budget ${money(budget)}. Laptop.`)} marks={(row) => laptopMarks(row.item)} priceNote={(row) => `${money(row.price / Math.max(1, row.score))} / point · ${releaseYear(row.item.name)}`} /> : null}
+      {ask === "keys" ? <KeyScript onAll={() => go("keys", "Keyboards")} /> : null}
+      {ask === "sim" ? <div className="mx-4 mt-4"><Packs /></div> : null}
 
-      <div className="mx-4 mt-4 grid gap-3 rounded-3xl bg-white p-4 shadow-sm sm:grid-cols-[1fr_16rem]">
-        <label className="block">
-          <span className="text-sm text-[#333]">Budget</span>
-          <span className="mt-1 block text-4xl font-semibold tabular-nums">{money(budget)}</span>
-          <input type="range" min={400} max={4500} step={50} value={budget} onChange={(event) => { setBudget(Number(event.target.value)); setMore(12); }} className="mt-3 h-8 w-full accent-[#0f6b4c]" />
-        </label>
-        <label className="flex h-14 items-center gap-3 self-end rounded-2xl border border-[#161616] bg-[#f4f1ea] px-3">
-          <span className="shrink-0 text-base font-semibold">Sort</span>
-          <select value={order} onChange={(event) => setOrder(event.target.value as Order)} className="h-full w-full bg-transparent text-base outline-none">
+      <div className="mx-4 mt-4 flex flex-wrap gap-2">
+        <button type="button" onClick={() => { path?.note("five", "Five minutes"); setFive(true); }} className="h-12 rounded-full bg-[#0f6b4c] px-4 text-base font-semibold text-white">Five minutes</button>
+        <button type="button" onClick={() => go("build", "Build")} className="h-12 rounded-full border border-[#161616] bg-white px-4 text-base">Build from a bundle</button>
+        <button type="button" onClick={() => go("sim", "Sims")} className="h-12 rounded-full border border-[#161616] bg-white px-4 text-base">Full sim builder</button>
+        <button type="button" onClick={() => go("deals", "Bundles")} className="h-12 rounded-full border border-[#161616] bg-white px-4 text-base">Bundle list</button>
+      </div>
+
+      <section className="mx-4 mt-6">
+        <button type="button" onClick={() => setShelfOpen((value) => !value)} className="flex h-14 w-full items-center justify-between rounded-2xl border border-[#161616] bg-white px-4 text-left text-lg font-semibold">
+          The shelf, under {money(budget)}
+          <span className="text-sm font-medium">{shelfOpen ? "Hide" : "Open"}</span>
+        </button>
+        {shelfOpen ? (
+          <>
+        {shelf === "laptop" ? (
+          <input value={seek} onChange={(event) => { setSeek(event.target.value); setMore(12); }} placeholder="OLED, 16 inch, 32GB, school, 2025" className="mt-3 h-12 w-full rounded-2xl border border-[#161616] bg-white px-3 text-base outline-none" />
+        ) : null}
+        <label className="mt-3 flex h-12 items-center gap-3 rounded-2xl border border-[#161616] bg-white px-3">
+          <span className="shrink-0 text-sm font-semibold">Sort</span>
+          <select value={order} onChange={(event) => { setOrder(event.target.value as Order); setMore(12); }} className="h-full w-full bg-white text-base outline-none">
             <option value="low">Price, low to high</option>
             <option value="high">Price, high to low</option>
             <option value="score">Best score first</option>
           </select>
         </label>
-      </div>
-
-      <div className="mt-4 grid gap-3 px-4 lg:grid-cols-3">
-        <Offer kicker="Desktop" name={pick?.name} price={pick?.price} line={pick ? `${person.title}. ${money(pick.price)}. ${person.say}` : "Nothing finished is under that. Raise the budget, or build it."}>
-          {pick ? deskMarks(pick) : null}
-          {pick ? <AddButton line={partBag(pick, `6666. For ${person.title}. Budget ${money(budget)}. Score ${machineScore(pick.name)}. Desktop.`)} className="mt-3 h-12 w-full rounded-full bg-[#161616] text-base font-semibold text-white" /> : null}
-        </Offer>
-        <Offer kicker="Laptop" ink={laptop ? dealFrom(laptop.price, laptopBits(laptop).score).fg : undefined} name={laptop?.name} price={laptop?.price} line={laptop ? `If they need to carry it. ${laptop.specs}` : "No laptop under that budget."}>
-          {laptop ? <p className="mt-1 text-sm font-semibold" style={{ color: dealFrom(laptop.price, laptopBits(laptop).score).fg }}>{money(laptop.price / Math.max(1, laptopBits(laptop).score))} / point · {releaseYear(laptop.name)}</p> : null}
-          {laptop ? laptopMarks(laptop) : null}
-          {laptop ? <AddButton line={lapBag(laptop, `6666. For ${person.title}. Budget ${money(budget)}. Laptop.`)} className="mt-3 h-12 w-full rounded-full bg-[#0f6b4c] text-base font-semibold text-white" /> : null}
-        </Offer>
-        <Offer kicker="Keyboard" name={board?.name} price={board?.price} line={board ? `${board.feel}. About ${board.estimated ?? "—"} dB. ${board.layout}.` : "No finished board under that."}>
-          {board ? <AddButton line={keyBag(board, `6666. Keyboard for ${person.title}. ${money(board.price)}. About ${board.estimated ?? "—"} dB.`)} className="mt-3 h-12 w-full rounded-full bg-[#161616] text-base font-semibold text-white" /> : null}
-          <button type="button" onClick={() => go("keys", "Keyboards")} className="mt-2 h-11 w-full rounded-full border border-[#161616] text-sm">
-            All keyboards
-          </button>
-        </Offer>
-      </div>
-
-      <div className="mx-4 mt-4 flex flex-wrap gap-2">
-        <button type="button" onClick={() => { path?.note("five", "Five minutes"); setFive(true); }} className="h-12 rounded-full bg-[#0f6b4c] px-4 text-base font-semibold text-white">Five minutes</button>
-        <button type="button" onClick={() => go("build", "From scratch")} className="h-12 rounded-full border border-[#161616] bg-white px-4 text-base">Build from a chip</button>
-        <button type="button" onClick={() => go("sim", "Sims")} className="h-12 rounded-full border border-[#161616] bg-white px-4 text-base">Sims</button>
-        <button type="button" onClick={() => go("deals", "Bundles")} className="h-12 rounded-full border border-[#161616] bg-white px-4 text-base">Bundles</button>
-      </div>
-
-      <section className="mx-4 mt-6">
-        <h2 className="text-2xl font-semibold">The shelf, under {money(budget)}</h2>
-        {shelf === "laptop" ? (
-          <input value={seek} onChange={(event) => { setSeek(event.target.value); setMore(12); }} placeholder="OLED, 16 inch, 32GB, school, 2025" className="mt-3 h-12 w-full rounded-2xl border border-[#161616] bg-white px-3 text-base outline-none" />
-        ) : null}
         <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
           {SHELVES.map((item) => (
             <button key={item.id} type="button" onClick={() => { setShelf(item.id); setMore(12); path?.note(`shelf:${item.id}`, item.title); }} className={`h-11 shrink-0 rounded-full px-3 text-sm ${shelf === item.id ? "bg-[#161616] font-semibold text-white" : "bg-white"}`}>
@@ -255,22 +259,105 @@ function Floor({ onLock }: { onLock: () => void }) {
             Show more
           </button>
         ) : null}
-      </section>
-      <section className="mx-4 mt-6">
-        <Packs />
+          </>
+        ) : null}
       </section>
     </div>
   );
 }
 
-function Offer({ kicker, name, price, line, ink, children }: { kicker: string; name?: string; price?: number; line: string; ink?: string; children?: React.ReactNode }) {
+function scriptLine(kind: string, extra: string) {
+  if (kind.startsWith("Cheap")) return `If they say it costs too much. ${extra}`;
+  if (kind.startsWith("Premium")) return `If they want it nicer and the money is there. ${extra}`;
+  return `Hand them this one first. ${extra}`;
+}
+
+function Offers<T extends { id: string; name: string; price: number; score: number }>({
+  rows,
+  empty,
+  say,
+  add,
+  marks,
+  priceNote,
+}: {
+  rows: { kind: string; item: T }[];
+  empty: string;
+  say: (kind: string) => string;
+  add: (row: T & { kind: string }) => ReturnType<typeof partBag>;
+  marks: (row: T) => React.ReactNode;
+  priceNote?: (row: T) => string;
+}) {
+  if (!rows.length) return <p className="mx-4 mt-4 rounded-3xl bg-white px-4 py-6 text-base">{empty}</p>;
+  const rank = ["Best value", "Cheapest that matches", "Premium"];
+  const shown = rows.slice().sort((a, b) => rank.indexOf(a.kind) - rank.indexOf(b.kind));
   return (
-    <article className="rounded-3xl bg-white p-4 shadow-sm">
-      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#0f6b4c]">{kicker}</p>
-      <h2 className="mt-2 text-xl font-semibold leading-snug">{name ?? "None under the budget"}</h2>
-      {price ? <p className="mt-2 text-3xl font-semibold tabular-nums" style={{ color: ink }}>{money(price)}</p> : null}
-      <p className="mt-2 text-sm leading-snug text-[#333]">{line}</p>
-      {children}
-    </article>
+    <div className="mx-4 mt-4 space-y-3">
+      {shown.map((row) => {
+        const first = row.kind === "Best value" || (shown.length === 1 && row === shown[0]);
+        const ink = dealFrom(row.item.price, Math.max(1, row.item.score)).fg;
+        return (
+          <article key={row.item.id} className={`rounded-3xl p-5 ${first ? "bg-[#161616] text-white" : "bg-white"}`}>
+            <p className={`text-xs font-semibold uppercase tracking-[0.16em] ${first ? "text-[#b7f7c8]" : "text-[#0f6b4c]"}`}>{first && row.kind === "Best value" ? "Say this first" : row.kind}</p>
+            <p className="mt-2 text-4xl font-semibold tabular-nums" style={first ? undefined : { color: ink }}>{money(row.item.price)}</p>
+            <p className="mt-2 text-lg font-medium leading-snug">{say(row.kind)}</p>
+            <p className={`mt-2 text-sm leading-snug ${first ? "text-white/80" : "text-[#333]"}`}>{row.item.name}</p>
+            {priceNote ? <p className="mt-2 text-sm font-semibold" style={{ color: first ? "#b7f7c8" : ink }}>{priceNote(row.item)}</p> : null}
+            <div className={first ? "mt-3 text-[#161616]" : "mt-3"}>{marks(row.item)}</div>
+            <AddButton line={add({ ...row.item, kind: row.kind })} className={`mt-3 h-12 w-full rounded-full text-base font-semibold ${first ? "bg-white text-[#161616]" : "bg-[#0f6b4c] text-white"}`} />
+          </article>
+        );
+      })}
+    </div>
+  );
+}
+
+function KeyScript({ onAll }: { onAll: () => void }) {
+  const boards: { title: string; say: string; item?: KeyItem }[] = [
+    ["Touch typing", "Quiet. A bump, or a silent pad. For someone who writes.", (item: KeyItem) => item.shelf === "board" && !item.open && ["tactile", "silent"].includes(item.feel)],
+    ["League", "Fast, and quiet enough for a call.", (item: KeyItem) => item.shelf === "board" && !item.open && ["linear", "magnetic"].includes(item.feel) && (item.estimated ?? 99) <= 56],
+    ["Games", "The finger gets there fast.", (item: KeyItem) => item.shelf === "board" && !item.open && ["linear", "clicky", "magnetic"].includes(item.feel)],
+  ].map(([title, say, test]) => {
+    const item = KEYS.filter(test as (item: KeyItem) => boolean).sort((a, b) => (title === "Touch typing" ? (a.estimated ?? 99) - (b.estimated ?? 99) : a.price - b.price))[0];
+    return { title: title as string, say: say as string, item };
+  });
+  const switches = KEYS.filter((item) => item.shelf === "switch" && !item.open).sort((a, b) => (a.estimated ?? 99) - (b.estimated ?? 99) || a.price - b.price).slice(0, 8);
+  return (
+    <div className="mx-4 mt-4 space-y-3">
+      <p className="text-base text-[#333]">Ask what they do with it. Then say the line. Switches are loose. A finished keyboard already has switches in it.</p>
+      {boards.map((job) => (
+        <article key={job.title} className="rounded-3xl bg-white p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#0f6b4c]">{job.title}</p>
+          <p className="mt-2 text-lg font-medium leading-snug">{job.say}</p>
+          {job.item ? (
+            <>
+              <p className="mt-2 text-sm leading-snug text-[#333]">{job.item.name}</p>
+              <p className="mt-1 text-sm font-semibold">{FEEL_LABEL[job.item.feel]}{job.item.estimated ? ` · about ${job.item.estimated} dB` : ""} · {money(job.item.price)}</p>
+              <AddButton line={keyBag(job.item, `6666 keyboard. ${job.title}. ${job.item.feel}. ${job.item.estimated ? `${job.item.estimated} dB.` : ""}`)} className="mt-3 h-12 w-full rounded-full bg-[#161616] text-base font-semibold text-white" />
+            </>
+          ) : (
+            <p className="mt-2 text-sm">Nothing on that shelf.</p>
+          )}
+        </article>
+      ))}
+      <section className="rounded-3xl bg-white p-4">
+        <h2 className="text-xl font-semibold">Loose switches</h2>
+        <p className="mt-1 text-sm text-[#333]">No board in the box. Quietest first. They still need a hot-swap keyboard if they want to put these in.</p>
+        <ul className="mt-3 space-y-2">
+          {switches.map((item) => (
+            <li key={item.id} className="flex items-start justify-between gap-3 border-t border-[#eee] pt-2">
+              <div className="min-w-0">
+                <p className="text-sm font-medium leading-snug">{item.name}</p>
+                <p className="text-xs text-[#333]">{FEEL_LABEL[item.feel]}{item.estimated ? ` · about ${item.estimated} dB` : ""}</p>
+                <AddButton line={keyBag(item, `6666 switch. ${item.feel}. ${item.estimated ? `${item.estimated} dB.` : ""}`)} className="mt-2 h-10 rounded-full border border-[#161616] px-3 text-sm" />
+              </div>
+              <p className="shrink-0 font-semibold">{money(item.price)}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+      <button type="button" onClick={onAll} className="h-12 w-full rounded-full border border-[#161616] bg-white text-base font-semibold">
+        All keyboards and switches
+      </button>
+    </div>
   );
 }

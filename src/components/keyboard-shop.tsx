@@ -22,15 +22,19 @@ type Preset = {
   band?: "soft";
   sort?: Sort;
   name?: RegExp;
-  who?: "feel" | "grandma";
+  who?: "feel" | "grandma" | "type" | "league" | "games";
   max?: number;
 };
 
 const DOORS: Preset[] = [
-  { id: "feel-board", title: "Best mechanical", line: "A real switch, not a rubber dome. Quiet enough to live with. For someone who feels every key.", shelf: "board", who: "feel", sort: "quiet" },
-  { id: "grandma-board", title: "Grandma's board", line: "Cheap, quiet, and already finished. Full size if we have it.", shelf: "board", who: "grandma", sort: "low", max: 80 },
+  { id: "type", title: "Touch typing", line: "Quiet. A bump or a silent pad. For someone who writes.", shelf: "board", who: "type", sort: "quiet" },
+  { id: "league", title: "League", line: "Fast and quiet enough for a call. Linear or magnetic.", shelf: "board", who: "league", sort: "quiet" },
+  { id: "games", title: "Games", line: "Linear, magnetic, or clicky. The finger gets there fast.", shelf: "board", who: "games", sort: "low" },
+  { id: "switches", title: "Switches only", line: "Loose switches. No board in the box. Red, brown, silent, and the rest.", shelf: "switch", sort: "quiet" },
+  { id: "feel-board", title: "Best mechanical", line: "A real switch, not a rubber dome. Quiet enough to live with.", shelf: "board", who: "feel", sort: "quiet" },
+  { id: "grandma-board", title: "Grandma's board", line: "Cheap, quiet, and already finished.", shelf: "board", who: "grandma", sort: "low", max: 80 },
   { id: "boards", title: "Finished keyboards", line: "A board that is already built. Switches are in it.", shelf: "board", sort: "low" },
-  { id: "switches", title: "Switches only", line: "Loose switches. No board in the box.", shelf: "switch", sort: "quiet" },
+  { id: "mice", title: "Mice", line: "The mouse that sits next to the keyboard. Sort by price.", shelf: "mouse", sort: "low" },
   { id: "keycaps", title: "Keycaps only", line: "The caps. Not the board, not the switches.", shelf: "keycap" },
 ];
 
@@ -94,6 +98,16 @@ function matches(item: KeyItem, preset: Preset) {
   }
   if (preset.who === "grandma") {
     if (item.feel !== "membrane" && item.feel !== "silent" && item.feel !== "low") return false;
+  }
+  if (preset.who === "type") {
+    if (!["tactile", "silent"].includes(item.feel)) return false;
+  }
+  if (preset.who === "league") {
+    if (!["linear", "magnetic", "low"].includes(item.feel)) return false;
+    if ((item.estimated ?? 99) > 56) return false;
+  }
+  if (preset.who === "games") {
+    if (!["linear", "magnetic", "clicky"].includes(item.feel)) return false;
   }
   return true;
 }
@@ -395,7 +409,7 @@ export function KeyboardShop({ onLeave }: { look?: Look; onLeave?: () => void })
   );
 
   return (
-    <div className="flex h-dvh w-full flex-col bg-[#f6f3ee] text-[#161616]">
+    <div className="flex h-full min-h-0 w-full flex-col bg-[#f6f3ee] text-[#161616]">
       <header className="shrink-0 border-b border-black/10 bg-[#f6f3ee] px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3">
         <div className="flex items-center justify-between gap-3">
           <button

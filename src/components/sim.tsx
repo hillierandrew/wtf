@@ -346,7 +346,7 @@ export function Sim({ onLeave, look = "paper" }: { onLeave?: () => void; look?: 
 
   const phone = look === "phone";
   return (
-    <div className={phone ? "text-[#1c1c1e]" : "mx-auto flex h-dvh w-full max-w-xl flex-col overflow-hidden bg-bg text-fg"}>
+    <div className={phone ? "text-[#1c1c1e]" : "mx-auto flex h-full min-h-0 w-full max-w-xl flex-col overflow-hidden bg-bg text-fg"}>
       {phone ? (
         <p className="mb-3 text-[15px] leading-snug text-[#8e8e93]">Forza, iRacing, a pilot seat, or a farm. Then the gear.</p>
       ) : (
