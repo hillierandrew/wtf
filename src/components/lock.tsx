@@ -1,4 +1,5 @@
 import { createContext, lazy, Suspense, useContext, useEffect, useRef, useState } from "react";
+import { Mushrooms } from "@/components/mushrooms";
 
 const CODE = "1234";
 const PHONE = "5678";
@@ -227,29 +228,27 @@ function Lock({ onOpen }: { onOpen: (next: "site" | "phone" | "store" | "glass" 
     return () => window.removeEventListener("keydown", onKey);
   });
 
-  const lamp = state === "open" ? "bg-[#c084fc]" : state === "denied" ? "bg-[#fb7185]" : "bg-[#a855f7]";
   const label = state === "open" ? "OPEN" : state === "denied" ? "WRONG CODE" : "ARMED";
 
+  const host = useRef<HTMLDivElement>(null);
+  const ink = "hsl(var(--mush, 280) 95% 72%)";
+  const edge = "hsl(var(--mush, 280) 88% 58%)";
+  const fill = "hsl(var(--mush, 280) 42% 14% / 0.82)";
+
   return (
-    <div className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-[#1a0530] px-4 py-8 text-white">
-      <div className="pointer-events-none absolute inset-0 z-0 text-[#c4a574]" aria-hidden="true">
-        {["8%", "22%", "70%", "84%", "12%", "78%"].map((left, index) => (
-          <pre key={left + index} className="mush absolute font-mono text-[11px] leading-none" style={{ left, top: index > 3 ? "68%" : "8%", animationDelay: `${index * 0.4}s` }}>
-{index % 2 === 0 ? "   _\n  ( )\n _|_|_\n(_____)\n  | |" : "    _\n   ( )\n  _|_|_\n (_____)\n   | |\n   | |"}
-          </pre>
-        ))}
-      </div>
-      <div className={`relative z-10 w-full max-w-sm rounded-[2rem] border-2 border-[#ff7a1a] bg-[#14061f] p-5 shadow-[0_0_36px_rgba(255,122,26,0.45)] ${state === "denied" ? "lock-shake" : ""}`}>
+    <div ref={host} className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-black px-4 py-8 text-white" style={{ ["--mush" as string]: "280" }}>
+      <Mushrooms host={host} />
+      <div className={`relative z-10 w-full max-w-sm rounded-[2rem] border-2 p-5 backdrop-blur-md ${state === "denied" ? "lock-shake" : ""}`} style={{ borderColor: edge, background: "hsl(var(--mush, 280) 40% 8% / 0.55)", boxShadow: "0 0 36px hsl(var(--mush, 280) 90% 50% / 0.45)" }}>
         <div className="flex items-center justify-between px-1">
-          <p className="text-sm font-medium tracking-[0.28em] text-[#ffb070]">DOOR</p>
-          <p className="flex items-center gap-2 text-xs tracking-[0.22em] text-[#e9d5ff]">
-            <span className={`size-2.5 rounded-full ${lamp} ${state === "armed" ? "lock-pulse" : ""}`} />
+          <p className="text-sm font-medium tracking-[0.28em]" style={{ color: ink }}>DOOR</p>
+          <p className="flex items-center gap-2 text-xs tracking-[0.22em]" style={{ color: ink }}>
+            <span className={`size-2.5 rounded-full ${state === "armed" ? "lock-pulse" : ""}`} style={{ background: state === "denied" ? "#fb7185" : edge }} />
             {label}
           </p>
         </div>
         <div className="mt-5 flex justify-center gap-3" aria-label="Code">
           {[0, 1, 2, 3].map((index) => (
-            <span key={index} className={`size-3 rounded-full ${index < digits.length ? "bg-[#b6ff3b]" : "border-2 border-[#ff7a1a] bg-transparent"}`} />
+            <span key={index} className="size-3 rounded-full border-2" style={{ borderColor: edge, background: index < digits.length ? ink : "transparent" }} />
           ))}
         </div>
         <div className="mt-6 grid grid-cols-3 gap-3">
@@ -259,13 +258,14 @@ function Lock({ onOpen }: { onOpen: (next: "site" | "phone" | "store" | "glass" 
               type="button"
               onClick={() => press(key)}
               aria-label={key === "C" ? "Clear" : key === "OK" ? "OK" : key}
-              className="press flex h-16 items-center justify-center rounded-full border-2 border-[#ff7a1a] bg-[#4c1d95] text-2xl font-semibold text-[#b6ff3b] shadow-[0_0_0_3px_#2a0a4a] active:translate-y-0.5"
+              className="press flex h-16 items-center justify-center rounded-full border-2 text-2xl font-semibold active:translate-y-0.5"
+              style={{ borderColor: edge, background: fill, color: ink, boxShadow: "0 0 0 3px hsl(var(--mush, 280) 30% 6%)" }}
             >
               {key}
             </button>
           ))}
         </div>
-        <p className="mt-5 text-center text-sm text-[#e9d5ff]">Enter the code. It opens on its own, or press OK.</p>
+        <p className="mt-5 text-center text-sm" style={{ color: ink }}>Enter the code. It opens on its own, or press OK.</p>
         <input
           ref={field}
           autoFocus
