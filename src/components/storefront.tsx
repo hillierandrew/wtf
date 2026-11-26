@@ -43,7 +43,7 @@ type Card = {
   where: "desktops" | "laptops" | "parts";
 };
 
-const PART_CATS: Category[] = ["cpu", "motherboard", "memory", "gpu", "storage", "case", "cooler", "psu", "monitor", "bundle"];
+const PART_CATS: Category[] = ["cpu", "motherboard", "memory", "gpu", "storage", "case", "cooler", "psu", "monitor", "mount", "bundle"];
 
 const SHORT: Record<Category, string> = {
   prebuilt: "Desktops",
@@ -57,6 +57,7 @@ const SHORT: Record<Category, string> = {
   cooler: "Coolers",
   psu: "Power",
   monitor: "Monitors",
+  mount: "Mounts",
 };
 
 const LAPTOPS = laptopsRaw as Laptop[];

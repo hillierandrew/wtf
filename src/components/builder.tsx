@@ -675,6 +675,7 @@ const LESSON: Record<Category, string> = {
   cooler: "Keeps the brain cool. Skip it if one came in the processor box.",
   psu: "Power for the whole PC. Too small and it will not turn on.",
   monitor: "The screen. The computer still works if you skip this.",
+  mount: "An arm or stand. Skip it if the screen already stands up.",
 };
 
 const GAME_LIST: { kicker: string; title: string; year: string }[] = [

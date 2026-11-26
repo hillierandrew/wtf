@@ -12,6 +12,7 @@ export const CATS = [
   "cooler",
   "psu",
   "monitor",
+  "mount",
 ] as const;
 
 export type Category = (typeof CATS)[number];
@@ -44,6 +45,7 @@ export const CAT_LABEL: Record<Category, string> = {
   cooler: "Cooler",
   psu: "Power",
   monitor: "Monitor",
+  mount: "Mount",
 };
 
 export const CAT_TAB: Record<Category, string> = {
@@ -58,6 +60,7 @@ export const CAT_TAB: Record<Category, string> = {
   cooler: "Cool",
   psu: "Power",
   monitor: "Screen",
+  mount: "Mount",
 };
 
 export const PARTS: Part[] = raw as Part[];
@@ -77,7 +80,7 @@ export function partImage(part: Part): string {
   else if (part.cat === "case") file = "case.jpg";
   else if (part.cat === "cooler") file = /LIQUID|AIO|240|280|360|420/.test(n) ? "aio.jpg" : "air.jpg";
   else if (part.cat === "psu") file = "psu.jpg";
-  else if (part.cat === "monitor") file = "monitor.jpg";
+  else if (part.cat === "monitor" || part.cat === "mount") file = "monitor.jpg";
   else if (part.cat === "prebuilt") file = "tower.jpg";
   else if (part.cat === "bundle") file = /RX|RTX|GEFORCE|RADEON/.test(n) ? "gpu.jpg" : /CASE|D32|4000D|DY460/.test(n) ? "case.jpg" : "cpu.jpg";
   return `${base}parts/${file}`;
@@ -660,11 +663,11 @@ function coolerSockets(part: Part): string[] {
 /** Empty string means the part fits the rest of the build. */
 export function fitWhy(part: Part, others: Build): string {
   if (part.cat === "prebuilt") {
-    const mixed = CATS.some((cat) => cat !== "prebuilt" && cat !== "monitor" && others[cat]);
+    const mixed = CATS.some((cat) => cat !== "prebuilt" && cat !== "monitor" && cat !== "mount" && others[cat]);
     if (mixed) return "A finished PC replaces a custom build.";
     return "";
   }
-  if (part.cat === "bundle" || part.cat === "monitor") return "";
+  if (part.cat === "bundle" || part.cat === "monitor" || part.cat === "mount") return "";
   if (others.prebuilt) return "Clear the finished PC before picking parts.";
   if (part.cat === "cpu" && others.motherboard?.socket && part.socket && part.socket !== others.motherboard.socket) {
     return `${part.socket} processor, ${others.motherboard.socket} motherboard.`;

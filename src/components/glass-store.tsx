@@ -27,6 +27,7 @@ const SHELVES: Shelf[] = [
   { id: "cooler", title: "Coolers", line: "Keeps it quiet" },
   { id: "psu", title: "Power", line: "The supply" },
   { id: "monitor", title: "Screens", line: "The glass you look at" },
+  { id: "mount", title: "Mounts", line: "Arms and stands" },
 ];
 
 const LAPS = laptopsRaw as { id: string; name: string; price: number; brand: string; kind?: string; gpu: number; specs: string }[];
