@@ -1,9 +1,11 @@
 import { useMemo, useState } from "react";
 import raw from "@/data/laptops.json";
-import { PARTS, isJunk, laptopBits, machineScore, money } from "@/lib/catalog";
+import simRaw from "@/data/sim.json";
+import { PARTS, laptopBits, machineScore, money } from "@/lib/catalog";
 import { AddButton, AddPack, RuleLine } from "@/components/bag";
-import { lapBag, partBag } from "@/lib/bag";
-import { deskPack, farmingPack, flightPack, racingPack } from "@/lib/packs";
+import { keyBag, lapBag, partBag, simBag, type BagLine } from "@/lib/bag";
+import { KEYS } from "@/lib/keyboard";
+import { guide, type GuideLine } from "@/lib/five-pick";
 
 const JOBS = [
   { id: "games", label: "Games", line: "Playing is the main thing." },
@@ -28,8 +30,28 @@ const BUDGETS = [700, 1100, 1600, 2500, 4000];
 
 type Job = (typeof JOBS)[number]["id"];
 type Game = (typeof GAMES)[number]["id"];
-type Lap = { id: string; name: string; price: number; brand: string; kind: string; gpu: number; specs: string; open?: boolean };
+type Lap = { id: string; name: string; price: number; brand: string; kind: string; gpu: number; specs: string; open?: boolean; renewed?: boolean };
 const LAPS = raw as Lap[];
+type Gear = { id: string; name: string; price: number; brand: string; game: string; slot: string; also?: string[]; open?: boolean };
+
+function resetTo(set: {
+  job: (value: Job | null) => void;
+  game: (value: Game | null) => void;
+  budget: (value: number | null) => void;
+  desk: (value: boolean | null) => void;
+}) {
+  set.job(null);
+  set.game(null);
+  set.budget(null);
+  set.desk(null);
+}
+
+function toBag(line: GuideLine, rule: string): BagLine {
+  if (line.kind === "lap") return lapBag(line, rule);
+  if (line.kind === "key" || line.kind === "mouse") return keyBag(line, rule);
+  if (line.kind === "gear") return simBag(line, rule);
+  return partBag(line, rule);
+}
 
 export function Five({ onClose }: { onClose: () => void }) {
   const [job, setJob] = useState<Job | null>(null);
@@ -39,54 +61,36 @@ export function Five({ onClose }: { onClose: () => void }) {
   const askGame = job === "games" && !game;
   const askBudget = job && !askGame && budget == null;
   const askDesk = budget != null && desk == null;
-  const done = job && budget != null && desk != null && (!askGame || game);
+  const done = job && budget != null && desk != null && (job !== "games" || game);
 
   const result = useMemo(() => {
     if (!done || !job || budget == null || desk == null) return null;
-    const who = JOBS.find((item) => item.id === job)?.label ?? job;
-    const gameName = GAMES.find((item) => item.id === game)?.label;
-    const person = gameName && game !== "any" ? `${who}, ${gameName}` : who;
-    if (game === "racing" || game === "farming" || game === "flight") {
-      const pack = game === "racing" ? racingPack() : game === "farming" ? farmingPack() : flightPack();
-      const extra = desk ? deskPack().slice(1) : [];
-      return { person, pack: [...pack, ...extra.filter((line) => !pack.some((item) => item.id === line.id))], one: null as null | { name: string; price: number; score: number; line: ReturnType<typeof partBag> } };
-    }
-    const desks = PARTS.filter((part) => part.cat === "prebuilt" && !isJunk(part, false) && part.price > 0 && part.price <= budget);
-    const laps = LAPS.filter((item) => !item.open && item.price > 0 && item.price <= budget && item.kind !== "tablet");
-    const wantDesk = desk || job === "games" || job === "think";
-    if (wantDesk) {
-      const pool = desks.length ? desks : PARTS.filter((part) => part.cat === "prebuilt" && !isJunk(part, false) && part.price > 0);
-      const ranked = [...pool].sort((a, b) => {
-        if (job === "grandma" || job === "zoom") return a.price - b.price;
-        if (job === "think") return machineScore(b.name) - machineScore(a.name);
-        return a.price / Math.max(1, machineScore(a.name)) - b.price / Math.max(1, machineScore(b.name));
-      });
-      const pick = ranked[0];
-      if (!pick) return { person, pack: [] as ReturnType<typeof deskPack>, one: null };
-      const score = machineScore(pick.name);
-      const rule = `Five-minute guide. For ${person}. Budget ${money(budget)}. Score ${score}.`;
-      const line = partBag(pick, rule);
-      return { person, pack: desk ? deskPack(pick).map((item, index) => (index === 0 ? line : item)) : [], one: desk ? null : { name: pick.name, price: pick.price, score, line } };
-    }
-    const pool = laps.length ? laps : LAPS.filter((item) => !item.open && item.price > 0);
-    const ranked = [...pool].sort((a, b) => {
-      if (job === "grandma" || job === "zoom") return a.price - b.price;
-      return a.price / Math.max(1, laptopBits(a).score) - b.price / Math.max(1, laptopBits(b).score);
+    const picked = guide(job, job === "games" ? game : null, budget, desk, {
+      towers: PARTS.filter((part) => part.cat === "prebuilt"),
+      laptops: LAPS,
+      monitors: PARTS.filter((part) => part.cat === "monitor"),
+      keys: KEYS,
+      gear: simRaw as Gear[],
     });
-    const pick = ranked[0];
-    if (!pick) return { person, pack: [], one: null };
-    const score = Math.round(laptopBits(pick).score);
-    const rule = `Five-minute guide. For ${person}. Budget ${money(budget)}. Score ${score}.`;
-    return { person, pack: [], one: { name: pick.name, price: pick.price, score, line: lapBag(pick, rule) } };
+    const main = picked.lines.find((line) => line.kind === "pc" || line.kind === "lap");
+    const lap = main?.kind === "lap" ? LAPS.find((item) => item.id === main.id) : undefined;
+    const score = main?.kind === "pc" ? machineScore(main.name) : lap ? Math.round(laptopBits(lap).score) : 0;
+    const rule = `${picked.why} Budget ${money(budget)}. Score ${score || "n/a"}.`;
+    return { ...picked, score, bags: picked.lines.map((line) => toBag(line, rule)) };
   }, [done, job, game, budget, desk]);
 
-  const step = !job ? "What do you want to do?" : askGame ? "Which games?" : askBudget ? "What can they spend?" : askDesk ? "The whole desk?" : "This is the one.";
+  const step = !job ? "What do you want to do?" : askGame ? "Which games?" : askBudget ? "What can they spend?" : askDesk ? "The whole desk?" : result?.over ? "Nothing in that budget." : "This is the one.";
 
   return (
     <div className="min-h-full overflow-y-auto bg-bg px-4 py-4 pb-28 text-fg">
       <button type="button" onClick={onClose} className="text-base text-muted">
         Close
       </button>
+      {job ? (
+        <button type="button" onClick={() => resetTo({ job: setJob, game: setGame, budget: setBudget, desk: setDesk })} className="ml-4 text-base text-muted">
+          Start over
+        </button>
+      ) : null}
       <h1 className="font-display mt-3 text-4xl font-medium leading-none">{step}</h1>
       <p className="mt-2 text-base text-muted">Big buttons. One tap each.</p>
       {!job ? (
@@ -131,27 +135,18 @@ export function Five({ onClose }: { onClose: () => void }) {
       ) : null}
       {done && result ? (
         <div className="mt-4 rounded-3xl border border-line bg-elevated p-4">
-          {result.one ? (
-            <>
-              <h2 className="text-xl font-medium leading-snug">{result.one.name}</h2>
-              <p className="mt-2 text-3xl font-semibold">{money(result.one.price)}</p>
-              <RuleLine how="Five-minute guide" who={result.person} budget={money(budget!)} score={String(result.one.score)} />
-              <AddButton line={result.one.line} />
-            </>
-          ) : (
-            <>
-              <h2 className="text-xl font-medium">The list</h2>
-              <ol className="mt-3 space-y-2 text-base">
-                {result.pack.map((line, index) => (
-                  <li key={line.id}>
-                    {index + 1}. {line.name} · {money(line.price)}
-                  </li>
-                ))}
-              </ol>
-              <RuleLine how={result.pack[0]?.rule.split(".")[0] ?? "Package"} who={result.person} budget={money(budget!)} score={result.pack[0]?.rule.match(/Score (\d+)/)?.[1] ?? "on the computer"} />
-              <AddPack lines={result.pack} />
-            </>
-          )}
+          <p className="text-2xl font-medium leading-snug">{result.why}</p>
+          {result.over ? <p className="mt-3 rounded-2xl bg-[#fff1cc] px-4 py-3 text-base text-[#5a3b00]">{result.over}</p> : null}
+          <p className="mt-3 text-3xl font-semibold">{money(result.lines.reduce((sum, line) => sum + line.price, 0))}</p>
+          <ol className="mt-3 space-y-2 text-base">
+            {result.lines.map((line, index) => (
+              <li key={`${line.kind}-${line.id}`}>
+                {index + 1}. {line.name} · {money(line.price)}
+              </li>
+            ))}
+          </ol>
+          <RuleLine how="Five-minute guide" who={JOBS.find((item) => item.id === job)?.label ?? ""} budget={money(budget!)} score={result.score ? String(result.score) : "n/a"} />
+          {result.bags.length === 1 && result.bags[0] ? <AddButton line={result.bags[0]} /> : <AddPack lines={result.bags} />}
         </div>
       ) : null}
     </div>
