@@ -64,7 +64,7 @@ export function ThreeSearch({ rows, who, lineFor }: { rows: Scored[]; who: strin
   );
 }
 
-export function BagDock() {
+export function BagDock({ lift = false }: { lift?: boolean }) {
   const lines = useBag((state) => state.lines);
   const open = useBag((state) => state.open);
   const setOpen = useBag((state) => state.setOpen);
@@ -92,7 +92,7 @@ export function BagDock() {
   }, [open, text, lines.length]);
 
   return (
-    <div className="bag-dock pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+    <div className={`bag-dock pointer-events-none fixed inset-x-0 z-40 flex justify-center px-3 ${lift ? "bottom-[calc(4.75rem+env(safe-area-inset-bottom))]" : "bottom-0 pb-[max(0.5rem,env(safe-area-inset-bottom))]"}`}>
       <div className="pointer-events-auto w-full max-w-xl rounded-3xl bg-[#111] text-white shadow-2xl">
         <button type="button" onClick={() => setOpen(!open)} className="flex h-14 w-full items-center justify-between px-4 text-left">
           <span>Cart · {lines.length}</span>

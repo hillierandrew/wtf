@@ -75,7 +75,7 @@ export function Phone({ onLock }: { onLock: () => void }) {
   return (
     <HistoryRoot home="Phone">
       <PhoneBody onLock={onLock} />
-      <BagDock />
+      <BagDock lift />
     </HistoryRoot>
   );
 }
@@ -226,7 +226,7 @@ function PhoneBody({ onLock }: { onLock: () => void }) {
           {!open ? <h1 className="pb-2 text-[34px] font-bold leading-none tracking-tight">{title}</h1> : null}
         </header>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-24">
           {open ? (
             <article className="pt-2">
               <p className="text-[13px] font-semibold uppercase tracking-[0.14em] text-[#8e8e93]">{open.brand}</p>
@@ -410,7 +410,7 @@ function PhoneBody({ onLock }: { onLock: () => void }) {
           ) : null}
         </div>
 
-        <nav className="grid shrink-0 grid-cols-5 border-t border-[#d1d1d6] bg-[#f8f8f8]/95 px-1 pt-1 pb-[max(0.4rem,env(safe-area-inset-bottom))] backdrop-blur">
+        <nav className="relative z-50 grid shrink-0 grid-cols-5 border-t border-[#d1d1d6] bg-[#f8f8f8]/95 px-1 pt-1 pb-[max(0.4rem,env(safe-area-inset-bottom))] backdrop-blur">
           {(
             [
               ["use", "Use", Gamepad2],
