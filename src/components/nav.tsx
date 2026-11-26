@@ -1,20 +1,21 @@
-export type Screen = "pc" | "desk" | "sim" | "laptop" | "desktop" | "value" | "steam" | "games" | "guide" | "colour" | "ideas";
+export type Screen = "pc" | "desk" | "sim" | "laptop" | "desktop" | "value" | "steam" | "games" | "guide" | "colour" | "ideas" | "pick" | "power";
 
 const LINKS: { id: Screen; label: string }[] = [
-  { id: "ideas", label: "AI" },
+  { id: "pick", label: "For" },
+  { id: "power", label: "Power" },
   { id: "guide", label: "Guide" },
+  { id: "ideas", label: "AI" },
   { id: "games", label: "Games" },
   { id: "pc", label: "PC" },
-  { id: "steam", label: "Steam" },
-  { id: "value", label: "Price" },
   { id: "desktop", label: "Prebuilds" },
   { id: "laptop", label: "Laptops" },
   { id: "colour", label: "Colour" },
-  { id: "sim", label: "Sims" },
   { id: "desk", label: "Keys" },
 ];
 
 const NAMES: Record<string, string> = {
+  pick: "For",
+  power: "Power",
   ideas: "AI",
   guide: "Guide",
   games: "Games",

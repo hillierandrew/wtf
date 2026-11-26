@@ -14,7 +14,9 @@ import { Value } from "@/components/value";
 import { Colour } from "@/components/colour";
 import { Ideas } from "@/components/ideas";
 import { Welcome } from "@/components/welcome";
+import { EasyPick, GpuPower } from "@/components/easy";
 import { useBench } from "@/lib/store";
+import type { UseKind } from "@/lib/phone-use";
 import "./styles.css";
 
 function Home() {
@@ -23,6 +25,7 @@ function Home() {
   const [stack, setStack] = useState<Array<Screen | null>>([null]);
   const [boot, setBoot] = useState<"play" | "review">("play");
   const [colour, setColour] = useState<"white" | "black" | "all">("white");
+  const [job, setJob] = useState<UseKind | null>(null);
   const mode = stack[stack.length - 1] ?? null;
 
   function go(next: Screen) {
@@ -55,6 +58,11 @@ function Home() {
         onGames={() => go("games")}
         onGuide={() => go("guide")}
         onIdeas={() => go("ideas")}
+        onJob={(kind) => {
+          setJob(kind);
+          go("pick");
+        }}
+        onPower={() => go("power")}
         onColour={(pick) => {
           setColour(pick);
           go("colour");
@@ -118,6 +126,18 @@ function Home() {
           setStack((current) => [...current, "pc"]);
         }}
       />
+    ) : mode === "pick" ? (
+      <EasyPick
+        look="site"
+        start={job}
+        onUse={(build, name) => {
+          useBench.getState().apply(build, `${name}. Change a part if you want.`);
+          setBoot("review");
+          setStack((current) => [...current, "pc"]);
+        }}
+      />
+    ) : mode === "power" ? (
+      <GpuPower look="site" />
     ) : (
       <Builder onLeave={home} start={boot} />
     );

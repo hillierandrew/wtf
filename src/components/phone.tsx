@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { ChevronLeft, Cpu, Gamepad2, Heart, LayoutGrid, Lock, Search } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ChevronLeft, Cpu, Gamepad2, Heart, LayoutGrid, Lock, Search, Zap } from "lucide-react";
 import { CAT_LABEL, CATS, PARTS, byId, fitWhy, isJunk, money, reconcile, shortName, spendOf, suggest, type Build, type Category, type Part } from "@/lib/catalog";
 import { PHONE_ITEMS, PHONE_SECTIONS, groupMeta, phoneItem, type PhoneItem } from "@/lib/phone-catalog";
-import { LOOKS, childFor, laptopsFor, needsOf, prebuildsFor, type Look, type UseKind, type UseNeed } from "@/lib/phone-use";
+import { EasyPick, GpuPower } from "@/components/easy";
 
-type Tab = "use" | "build" | "shop" | "deals" | "search" | "saved";
+type Tab = "use" | "power" | "build" | "shop" | "deals" | "search" | "saved";
 type Sort = "low" | "high" | "name" | "sale";
 
 const SAVED = "drew-phone-saved";
@@ -131,11 +131,11 @@ export function Phone({ onLock }: { onLock: () => void }) {
   }
 
   const shown = listed.slice(0, limit);
-  const title = open ? "Details" : meta?.title ?? (tab === "use" ? "Use" : tab === "build" ? "Build" : tab === "deals" ? "Deals" : tab === "saved" ? "Saved" : tab === "search" ? "Search" : "Store");
+  const title = open ? "Details" : meta?.title ?? (tab === "use" ? "Use" : tab === "power" ? "Power" : tab === "build" ? "Build" : tab === "deals" ? "Deals" : tab === "saved" ? "Saved" : tab === "search" ? "Search" : "Store");
 
   return (
-    <div className="min-h-dvh bg-[#f2f2f7] text-[#1c1c1e] sm:bg-[#1d1d1f] sm:flex sm:items-center sm:justify-center sm:p-6" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif' }}>
-      <div className="mx-auto flex h-dvh w-full flex-col overflow-hidden bg-[#f2f2f7] sm:max-w-[430px] sm:h-[min(100dvh-3rem,920px)] sm:rounded-[2.6rem] sm:shadow-[0_40px_90px_rgba(0,0,0,0.45)] sm:ring-8 sm:ring-[#0e0e10]">
+    <div className="flex h-dvh w-full flex-col overflow-hidden bg-[#f2f2f7] text-[#1c1c1e]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif' }}>
+      <div className="mx-auto flex h-full w-full max-w-3xl flex-col">
         <header className="shrink-0 bg-[#f2f2f7]/90 px-4 pt-[max(0.75rem,env(safe-area-inset-top))] backdrop-blur">
           <div className="flex h-11 items-center gap-2">
             {open || group ? (
@@ -190,13 +190,15 @@ export function Phone({ onLock }: { onLock: () => void }) {
           ) : null}
 
           {!open && tab === "use" ? (
-            <PhoneUse
-              onTake={(next) => {
+            <EasyPick
+              look="phone"
+              onUse={(next) => {
                 setPc(next);
                 setTab("build");
               }}
             />
           ) : null}
+          {!open && tab === "power" ? <GpuPower look="phone" /> : null}
           {!open && tab === "build" ? <PhoneBuild build={pc} onChange={setPc} /> : null}
 
           {!open && !group && tab === "shop" ? (
@@ -240,7 +242,7 @@ export function Phone({ onLock }: { onLock: () => void }) {
             </div>
           ) : null}
 
-          {!open && tab !== "use" && tab !== "build" && (group || tab !== "shop") ? (
+          {!open && tab !== "use" && tab !== "build" && tab !== "power" && (group || tab !== "shop") ? (
             <div>
               <div className="sticky top-0 z-10 -mx-4 mb-3 grid grid-cols-2 gap-2 bg-[#f2f2f7]/95 px-4 py-2 backdrop-blur">
                 <label className="flex h-10 items-center rounded-xl bg-[#e3e3e8] px-3">
@@ -302,10 +304,11 @@ export function Phone({ onLock }: { onLock: () => void }) {
           ) : null}
         </div>
 
-        <nav className="grid shrink-0 grid-cols-4 border-t border-[#d1d1d6] bg-[#f8f8f8]/95 px-2 pt-1.5 pb-[max(0.4rem,env(safe-area-inset-bottom))] backdrop-blur">
+        <nav className="grid shrink-0 grid-cols-5 border-t border-[#d1d1d6] bg-[#f8f8f8]/95 px-1 pt-1 pb-[max(0.4rem,env(safe-area-inset-bottom))] backdrop-blur">
           {(
             [
               ["use", "Use", Gamepad2],
+              ["power", "Power", Zap],
               ["build", "Build", Cpu],
               ["shop", "Shop", LayoutGrid],
               ["saved", "Saved", Heart],
@@ -313,7 +316,7 @@ export function Phone({ onLock }: { onLock: () => void }) {
           ).map(([id, label, Icon]) => {
             const on = tab === id && !group && !open;
             return (
-              <button key={id} type="button" onClick={() => goTab(id)} className={`flex flex-col items-center gap-0.5 py-1 text-[10px] font-medium ${on ? "text-[#007aff]" : "text-[#8e8e93]"}`}>
+              <button key={id} type="button" onClick={() => goTab(id)} className={`flex min-h-12 flex-col items-center justify-center gap-0.5 py-1 text-[11px] font-medium ${on ? "text-[#007aff]" : "text-[#8e8e93]"}`}>
                 <Icon className={`size-5 ${id === "saved" && saved.size ? "fill-current" : ""}`} strokeWidth={1.75} />
                 {label}
               </button>
@@ -325,133 +328,14 @@ export function Phone({ onLock }: { onLock: () => void }) {
   );
 }
 
-function PhoneUse({ onTake }: { onTake: (build: Build) => void }) {
-  const [kind, setKind] = useState<UseKind>("game");
-  const [look, setLook] = useState<Look>("normal");
-  const options = useMemo(() => needsOf(kind, look), [kind, look]);
-  const [id, setId] = useState(options[0]?.id ?? "");
-  useEffect(() => {
-    if (!options.some((item) => item.id === id)) setId(options[0]?.id ?? "");
-  }, [options, id]);
-  const need = options.find((item) => item.id === id) ?? options[0];
-  const made = useMemo(() => (need ? childFor(need) : {}), [need]);
-  const boxes = useMemo(() => (need ? prebuildsFor(need) : []), [need]);
-  const laps = useMemo(() => (need ? laptopsFor(need) : []), [need]);
-  const parts = CATS.map((cat) => made[cat]).filter((part): part is Part => Boolean(part));
-
+function Menu({ label, value, onChange, children }: { label: string; value: string; onChange: (value: string) => void; children: React.ReactNode }) {
   return (
-    <div className="space-y-4">
-      <p className="px-1 text-[15px] leading-snug text-[#8e8e93]">Pick what the computer is for. I will put one together from the shelf.</p>
-      <div className="grid grid-cols-2 gap-2">
-        <Menu label="For" value={kind} onChange={(value) => setKind(value as UseKind)}>
-          <option value="game">Games</option>
-          <option value="app">Apps</option>
-          <option value="course">Courses</option>
-        </Menu>
-        <Menu label={kind === "game" ? "Look" : "List"} value={kind === "game" ? look : id} onChange={(value) => (kind === "game" ? setLook(value as Look) : setId(value))}>
-          {kind === "game"
-            ? LOOKS.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.label}
-                </option>
-              ))
-            : options.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.label}
-                </option>
-              ))}
-        </Menu>
-      </div>
-      {kind === "game" ? (
-        <Menu label="Game" value={id} onChange={setId}>
-          {options.map((item) => (
-            <option key={item.id} value={item.id}>
-              {item.label}
-            </option>
-          ))}
-        </Menu>
-      ) : null}
-      {need ? <NeedCard need={need} parts={parts} total={spendOf(made)} onTake={() => onTake(made)} boxes={boxes} laps={laps} /> : null}
-    </div>
-  );
-}
-
-function Menu({ label, value, onChange, children }: { label: string; value: string; onChange: (value: string) => void; children: ReactNode }) {
-  return (
-    <label className="flex h-11 min-w-0 items-center gap-2 rounded-xl bg-[#e3e3e8] px-3">
+    <label className="flex h-12 min-w-0 items-center gap-2 rounded-xl bg-[#e3e3e8] px-3">
       <span className="shrink-0 text-[13px] text-[#8e8e93]">{label}</span>
       <select value={value} onChange={(event) => onChange(event.target.value)} className="h-full min-w-0 flex-1 truncate bg-transparent text-[16px] outline-none">
         {children}
       </select>
     </label>
-  );
-}
-
-function NeedCard({
-  need,
-  parts,
-  total,
-  onTake,
-  boxes,
-  laps,
-}: {
-  need: UseNeed;
-  parts: Part[];
-  total: number;
-  onTake: () => void;
-  boxes: Part[];
-  laps: { id: string; name: string; brand: string; price: number }[];
-}) {
-  return (
-    <div className="space-y-4">
-      <section className="rounded-2xl bg-white p-4 shadow-sm">
-        <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-[#8e8e93]">A PC I made</p>
-        <h2 className="mt-1 text-[22px] font-semibold leading-tight">{need.label}</h2>
-        <p className="mt-1 text-[15px] text-[#8e8e93]">{need.line}</p>
-        <ul className="mt-3">
-          {parts.map((part) => (
-            <li key={part.id} className="flex items-start justify-between gap-3 border-t border-[#e5e5ea] py-2 text-[15px]">
-              <span className="min-w-0">
-                <span className="block text-[12px] text-[#8e8e93]">{CAT_LABEL[part.cat]}</span>
-                <span className="block leading-snug">{shortName(part)}</span>
-              </span>
-              <span className="shrink-0 font-medium">{money(part.price)}</span>
-            </li>
-          ))}
-        </ul>
-        <p className="mt-2 text-[28px] font-semibold tracking-tight">{money(total)}</p>
-        <button type="button" onClick={onTake} className="mt-3 h-12 w-full rounded-2xl bg-[#007aff] text-[17px] font-semibold text-white active:opacity-80">
-          Open in the builder
-        </button>
-      </section>
-      <section>
-        <h3 className="mb-2 px-1 text-[13px] font-semibold uppercase tracking-[0.08em] text-[#8e8e93]">Already built</h3>
-        <ul className="overflow-hidden rounded-2xl bg-white shadow-sm">
-          {boxes.length === 0 ? <li className="px-4 py-4 text-[15px] text-[#8e8e93]">No finished PC on the shelf is strong enough.</li> : null}
-          {boxes.map((part, index) => (
-            <li key={part.id} className={`flex items-start justify-between gap-3 px-4 py-3 ${index ? "border-t border-[#e5e5ea]" : ""}`}>
-              <span className="min-w-0 text-[16px] leading-snug">{part.name}</span>
-              <span className="shrink-0 font-semibold">{money(part.price)}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-      <section>
-        <h3 className="mb-2 px-1 text-[13px] font-semibold uppercase tracking-[0.08em] text-[#8e8e93]">Laptops</h3>
-        <ul className="overflow-hidden rounded-2xl bg-white shadow-sm">
-          {laps.length === 0 ? <li className="px-4 py-4 text-[15px] text-[#8e8e93]">No laptop on the shelf runs that.</li> : null}
-          {laps.map((item, index) => (
-            <li key={item.id} className={`flex items-start justify-between gap-3 px-4 py-3 ${index ? "border-t border-[#e5e5ea]" : ""}`}>
-              <span className="min-w-0">
-                <span className="block text-[12px] text-[#8e8e93]">{item.brand}</span>
-                <span className="block text-[16px] leading-snug">{item.name.replace(" (Open box)", "")}</span>
-              </span>
-              <span className="shrink-0 font-semibold">{money(item.price)}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-    </div>
   );
 }
 

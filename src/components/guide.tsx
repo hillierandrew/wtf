@@ -9,8 +9,12 @@ const STEPS: { key: keyof GuideAnswers; ask: string; help: string; options: { id
     help: "Tap one box. That is the whole question.",
     options: [
       { id: "games", label: "Games", line: "Playing games is the main thing." },
-      { id: "work", label: "School and work", line: "Class, email, and programs." },
-      { id: "both", label: "Both", line: "Not sure? Tap this." },
+      { id: "school", label: "High school", line: "Class, notes, and a few games. Stops here." },
+      { id: "work", label: "College or work", line: "Essays, Excel, and a browser." },
+      { id: "senior", label: "Seniors", line: "Email, news, and video calls. Stops here." },
+      { id: "zoom", label: "Zoom", line: "Meetings and class. Stops here." },
+      { id: "ai", label: "Local AI", line: "Runs models on this computer. Stops here." },
+      { id: "both", label: "Not sure", line: "Tap this. I will keep asking." },
     ],
   },
   {
@@ -49,11 +53,30 @@ export function Guide({ onLeave, onUse }: { onLeave: () => void; onUse: (name: s
   const [answers, setAnswers] = useState<Partial<GuideAnswers>>({});
   const current = STEPS[step];
   const done = step >= STEPS.length;
-  const pick = done ? guidePick({ ...(answers as GuideAnswers), cpu: "any", gpu: answers.job === "work" && answers.power === "easy" ? "none" : "any" }) : null;
+  const pick = done
+    ? guidePick({
+        job: (answers.job ?? "both") as GuideAnswers["job"],
+        power: answers.power ?? "normal",
+        size: answers.size ?? "normal",
+        screen: answers.screen ?? "no",
+        cpu: "any",
+        gpu: answers.job === "ai" ? "nvidia" : answers.job === "senior" || answers.job === "zoom" || (answers.job === "work" && answers.power === "easy") ? "none" : "any",
+      })
+    : null;
   const notes = pick ? warnings(pick.build) : [];
 
   function choose(id: string) {
     if (!current) return;
+    if (current.key === "job" && (id === "senior" || id === "zoom" || id === "school" || id === "ai")) {
+      setAnswers({
+        job: id as GuideAnswers["job"],
+        power: id === "ai" ? "strong" : "easy",
+        size: "normal",
+        screen: "no",
+      });
+      setStep(STEPS.length);
+      return;
+    }
     setAnswers((prev) => ({ ...prev, [current.key]: id }));
     setStep((value) => value + 1);
   }

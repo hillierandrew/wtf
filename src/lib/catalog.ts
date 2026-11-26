@@ -193,8 +193,6 @@ export function partScore(part: Part): number {
     const speed = gpuIndex(part);
     return speed ? Math.min(100, Math.round((speed / 180) * 100)) : 8;
   }
-  if (part.cat === "cpu" && hasIGPULogic(part)) tags.unshift("iGPU");
-
   if (part.cat === "cpu") {
     const points = cpuPoints(part.name);
     return points ? Math.min(100, Math.round((points / 96) * 100)) : 20;
@@ -311,8 +309,6 @@ export function explainPart(part: Part): string[] {
     lines.push(`Speed points are ${speed}. An RX 9070 is 100. A 5090 is 180.`);
     lines.push(`Score is ${speed} ÷ 180 × 100 = ${speed ? Math.min(100, Math.round((speed / 180) * 100)) : 8}.`);
     if (speed) lines.push(`${money(part.price)} ÷ ${speed} speed points = ${money(part.price / speed)} per point.`);
-  if (part.cat === "cpu" && hasIGPULogic(part)) tags.unshift("iGPU");
-
   } else if (part.cat === "cpu") {
     const points = cpuPoints(part.name);
     lines.push(`Chip points are ${points || 0} out of 96. A 9800X3D is 96. An older chip is lower.`);
@@ -414,6 +410,59 @@ export function gpuTier(part: Part): number {
   if (/1030|1050|\b710\b|\b730\b/.test(n)) return 1;
   if (/RTX|RADEON|GEFORCE/.test(n)) return 3;
   return 0;
+}
+
+export type PsuNeed = { min: number; comfortable: number; card: number };
+
+/** Smallest supply that should run the card, and a comfortable one with room for the rest of the PC. */
+export function psuForGpu(part: Part): PsuNeed {
+  const n = part.name.toUpperCase();
+  const rows: [RegExp, number, number, number][] = [
+    [/5090/, 1000, 1200, 575],
+    [/5080/, 850, 1000, 360],
+    [/5070\s?TI/, 750, 850, 300],
+    [/\b5070\b/, 650, 750, 250],
+    [/5060\s?TI/, 550, 650, 180],
+    [/5060|5050/, 550, 650, 145],
+    [/4090/, 850, 1000, 450],
+    [/4080/, 750, 850, 320],
+    [/4070\s?TI/, 700, 850, 285],
+    [/\b4070\b/, 650, 750, 200],
+    [/4060\s?TI/, 550, 650, 165],
+    [/\b4060\b/, 450, 550, 115],
+    [/3090/, 750, 850, 350],
+    [/3080/, 750, 850, 320],
+    [/\b3070\b/, 650, 750, 220],
+    [/\b3060\b/, 550, 650, 170],
+    [/\b3050\b/, 450, 550, 130],
+    [/9070\s?XT/, 750, 850, 304],
+    [/\b9070\b/, 650, 750, 220],
+    [/9060/, 550, 650, 180],
+    [/7900\s?XTX/, 850, 1000, 355],
+    [/7900/, 750, 850, 315],
+    [/7800/, 700, 850, 263],
+    [/7700/, 650, 750, 245],
+    [/\b7600\b/, 550, 650, 165],
+    [/6800|6750/, 650, 750, 250],
+    [/6700|6650|6600/, 500, 650, 160],
+    [/B580/, 600, 650, 190],
+    [/A770/, 600, 750, 225],
+    [/A750/, 550, 650, 225],
+    [/1660|1650/, 450, 550, 120],
+    [/1050/, 300, 400, 75],
+    [/1030/, 300, 400, 30],
+  ];
+  for (const [re, min, comfortable, card] of rows) {
+    if (re.test(n)) return { min, comfortable, card };
+  }
+  const tier = gpuTier(part);
+  if (tier >= 6) return { min: 1000, comfortable: 1200, card: 450 };
+  if (tier >= 5) return { min: 850, comfortable: 1000, card: 320 };
+  if (tier >= 4) return { min: 750, comfortable: 850, card: 250 };
+  if (tier >= 3) return { min: 550, comfortable: 650, card: 160 };
+  if (tier >= 2) return { min: 500, comfortable: 600, card: 130 };
+  if (tier >= 1) return { min: 400, comfortable: 500, card: 75 };
+  return { min: 450, comfortable: 550, card: 75 };
 }
 
 /** Rough speed where an RX 9070 is 100. Not a lab benchmark. */
@@ -661,8 +710,11 @@ export function applyBundle(part: Part, current: Build): Build {
 function hasIGPU(part: Part): boolean {
   if (part.cat !== "cpu") return false;
   const n = part.name.toUpperCase();
-  // Most modern non-F Intel and all Ryzen have iGPU except some
-  return !(/\bF\b|KF\b|KS\b/.test(n)) && (/RYZEN|ULTRA|I[3579]-|CORE\s?(I|ULTRA)/.test(n));
+  if (/\dF\b|KF\b/.test(n)) return false;
+  if (/7800X3D|7900X3D|7950X3D/.test(n)) return false;
+  if (/ULTRA|CORE\s*I[3579]|I[3579]-/.test(n)) return true;
+  if (/RYZEN/.test(n) && (/[7-9]\d{3}/.test(n) || /\dG\b/.test(n) || /\bAI\b/.test(n))) return true;
+  return false;
 }
 
 export function tagsOf(part: Part): string[] {
@@ -1094,7 +1146,7 @@ function buildFrom(ids: string[]): Build {
 }
 
 export type GuideAnswers = {
-  job: "games" | "work" | "both";
+  job: "games" | "work" | "both" | "senior" | "zoom" | "school" | "ai";
   power: "easy" | "normal" | "strong";
   cpu: "amd" | "intel" | "any";
   gpu: "nvidia" | "amd" | "none" | "any";
@@ -1104,35 +1156,46 @@ export type GuideAnswers = {
 
 /** One plain computer from the answers. Every part is on the shelf. */
 export function guidePick(answers: GuideAnswers): AiPick {
+  const job = answers.job;
+  const ai = job === "ai";
+  const office = job === "senior" || job === "zoom";
+  const power = ai ? "strong" : office ? "easy" : answers.power;
   const box = answers.size === "small" ? CASE_SMALL : CASE;
   const intel = answers.cpu === "intel";
-  const skipCard = answers.gpu === "none" || (answers.gpu === "any" && answers.job === "work" && answers.power === "easy");
-  const nvidia = answers.gpu === "nvidia" || (answers.gpu !== "amd" && !skipCard);
-  const screen = answers.screen === "yes" ? (answers.power === "strong" ? SCREEN_1440 : SCREEN_1080) : "";
-  const card = skipCard ? "" : answers.power === "easy" ? (nvidia ? GPU_5060 : GPU_9060) : answers.power === "normal" ? (nvidia ? GPU_5070 : GPU_9070) : nvidia ? GPU_5070TI : GPU_9070XT;
+  const skipCard = office || answers.gpu === "none" || (answers.gpu === "any" && (job === "work" || office) && power === "easy");
+  const nvidia = ai || answers.gpu === "nvidia" || (answers.gpu !== "amd" && !skipCard);
+  const screen = answers.screen === "yes" ? (power === "strong" ? SCREEN_1440 : SCREEN_1080) : "";
+  const card = skipCard ? "" : power === "easy" ? (nvidia ? GPU_5060 : GPU_9060) : power === "normal" ? (nvidia ? GPU_5070 : GPU_9070) : nvidia ? GPU_5070TI : GPU_9070XT;
   const ids = intel
     ? skipCard
       ? ["bc01af734d", "40f139f263", DDR5_16, SSD1, box, PSU550, AIR, screen]
-      : answers.power === "strong"
+      : power === "strong"
         ? ["947a6322f8", "40f139f263", DDR5_32, card, SSD2, box, PSU850, AIR, screen]
-        : answers.power === "normal"
+        : power === "normal"
           ? ["5b8cc605f2", "cf7081ad5f", DDR4_32, card, SSD2, box, PSU750, AIR, screen]
           : ["5b8cc605f2", "cf7081ad5f", DDR4_16, card, SSD1, box, PSU650, AIR, screen]
     : skipCard
       ? ["12f0a4d78a", "5f5a90664b", DDR5_16, SSD1, box, PSU550, screen]
-      : answers.power === "strong"
+      : power === "strong"
         ? ["0abb21ae33", answers.size === "small" ? "5f5a90664b" : BOARD_B850, DDR5_32, answers.size === "small" ? (nvidia ? GPU_5070 : GPU_9070) : card, SSD2, box, PSU850, AIR, screen]
-        : answers.power === "normal"
+        : power === "normal"
           ? ["9ab94a8d13", "5f5a90664b", DDR5_32, card, SSD2, box, PSU750, AIR, screen]
           : ["7e2a9c25b9", "5f5a90664b", DDR5_16, card, SSD1, box, PSU650, screen];
-  const brand = intel ? "Intel" : "AMD";
-  const cardName = skipCard ? "No graphics card." : nvidia ? "An NVIDIA card." : "An AMD card.";
+  const why = ai
+    ? "A strong NVIDIA card and 32GB of memory. This is for running AI on the computer itself."
+    : job === "senior"
+      ? "No graphics card. Email, the news, and video calls. Simple and quiet."
+      : job === "zoom"
+        ? "No graphics card. Built for Zoom, class, and a browser."
+        : job === "school"
+          ? "A light graphics card for high school class and a few games."
+          : `${intel ? "Intel" : "AMD"}. ${skipCard ? "No graphics card." : nvidia ? "An NVIDIA card." : "An AMD card."} ${power === "easy" ? "The easy one." : power === "strong" ? "The strong one." : "The normal one."} ${answers.size === "small" ? "A small case." : "A normal case."}`;
   return {
     id: "guide",
-    name: "Your PC",
+    name: ai ? "Local AI PC" : job === "senior" ? "Seniors PC" : job === "zoom" ? "Zoom PC" : job === "school" ? "High school PC" : "Your PC",
     kicker: "Basic builder",
     tags: ["guide"],
-    why: `${brand}. ${cardName} ${answers.power === "easy" ? "The easy one." : answers.power === "strong" ? "The strong one." : "The normal one."} ${answers.size === "small" ? "A small case." : "A normal case."}`,
+    why,
     build: buildFrom(ids.filter(Boolean)),
   };
 }

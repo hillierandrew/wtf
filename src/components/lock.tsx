@@ -26,7 +26,7 @@ function tone(kind: "tap" | "no" | "yes") {
 }
 
 export function Gate({ children }: { children: React.ReactNode }) {
-  const [door, setDoor] = useState<"wait" | "closed" | "site" | "phone" | "store">("wait");
+  const [door, setDoor] = useState<"wait" | "closed" | "site" | "phone" | "store">("closed");
 
   useEffect(() => {
     try {
@@ -99,7 +99,7 @@ function Lock({ onOpen }: { onOpen: (next: "site" | "phone" | "store") => void }
   function decide(value: string) {
     if (busy.current) return;
     busy.current = true;
-    if (value === CODE || value === PHONE) {
+    if (value === CODE || value === PHONE || value === STORE) {
       setState("open");
       tone("yes");
       window.setTimeout(() => onOpen(value === STORE ? "store" : value === PHONE ? "phone" : "site"), 480);

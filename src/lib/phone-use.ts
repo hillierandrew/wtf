@@ -5,7 +5,7 @@ type Laptop = { id: string; name: string; price: number; brand: string; kind: st
 
 const LAPTOPS = raw as Laptop[];
 
-export type UseKind = "game" | "app" | "course";
+export type UseKind = "game" | "app" | "course" | "senior" | "school" | "zoom" | "ai";
 
 export type UseNeed = {
   id: string;
@@ -106,6 +106,23 @@ export const LOOKS = [
 
 export type Look = (typeof LOOKS)[number]["id"];
 
+export const JOBS: { id: UseKind; label: string; line: string }[] = [
+  { id: "game", label: "Games", line: "Tap the game. I pick the computer." },
+  { id: "school", label: "High school", line: "Notes, classroom, and a few games." },
+  { id: "course", label: "College", line: "Tap the course." },
+  { id: "app", label: "Everyday", line: "Web, Office, photos, or video." },
+  { id: "senior", label: "Seniors", line: "Email, news, and video calls." },
+  { id: "zoom", label: "Zoom", line: "Meetings and class. That is all." },
+  { id: "ai", label: "Local AI", line: "A strong card and lots of memory." },
+];
+
+const ONCE: Record<"senior" | "school" | "zoom" | "ai", UseNeed> = {
+  senior: { id: "senior", label: "Seniors", kind: "senior", line: "Big, quiet, and simple. Email, the news, and a video call.", gpu: 0, ram: 8, windows: true },
+  school: { id: "school", label: "High school", kind: "school", line: "Classroom, essays, and light games.", gpu: 28, ram: 16, windows: true },
+  zoom: { id: "zoom", label: "Zoom machine", kind: "zoom", line: "Meetings, a camera, and a browser.", gpu: 0, ram: 16, windows: true },
+  ai: { id: "ai", label: "Local AI server", kind: "ai", line: "Runs models on this computer. Wants a strong card and 32GB.", gpu: 90, ram: 32, windows: true },
+};
+
 export function needsOf(kind: UseKind, look: Look): UseNeed[] {
   if (kind === "game") {
     return GAMES.map((game) => ({
@@ -121,7 +138,10 @@ export function needsOf(kind: UseKind, look: Look): UseNeed[] {
   if (kind === "app") {
     return APPS.map((app) => ({ id: app.id, label: app.label, kind, line: app.line, gpu: app.gpu, ram: app.ram, windows: true }));
   }
-  return COURSES.map((course) => ({ id: course.id, label: course.label, kind, line: course.line, gpu: course.gpu, ram: course.ram, windows: course.windows }));
+  if (kind === "course") {
+    return COURSES.map((course) => ({ id: course.id, label: course.label, kind, line: course.line, gpu: course.gpu, ram: course.ram, windows: course.windows }));
+  }
+  return [ONCE[kind]];
 }
 
 function budgetFor(gpu: number, ram: number) {

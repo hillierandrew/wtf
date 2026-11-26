@@ -68,6 +68,11 @@
     background: color-mix(in oklab, var(--color-accent) 28%, transparent);
     color: var(--color-fg);
   }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
 }
 
 .screen-slot > * {
