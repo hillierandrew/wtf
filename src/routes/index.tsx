@@ -34,7 +34,6 @@ function Home() {
     <Gate>
       <HistoryRoot home="Shop">
         <Site hydrated={hydrated} />
-        <BagDock />
       </HistoryRoot>
     </Gate>
   );
@@ -167,13 +166,18 @@ function Site({ hydrated }: { hydrated: boolean }) {
         <Builder onLeave={home} start={boot} />
       );
     screen = (
-      <div className="flex h-dvh flex-col bg-bg">
+      <div className="flex h-full min-h-0 flex-col bg-bg">
         <ScreenBar mode={mode} trail={trailOf(path?.log ?? [], path?.at ?? 0)} onBack={back} onFull={home} onJump={(index) => jumpScreen(path, index)} onGo={go} />
         <div className="screen-slot min-h-0 flex-1">{page}</div>
       </div>
     );
   }
-  return screen;
+  return (
+    <>
+      {screen}
+      <BagDock />
+    </>
+  );
 }
 
 function pageOf(log: { id: string }[], at: number) {

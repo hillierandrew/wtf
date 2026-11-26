@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AlertTriangle, Check, Search, X } from "lucide-react";
 import {
   BUDGETS,
@@ -254,18 +254,14 @@ export function Builder({ onLeave, start = "play" }: { onLeave: () => void; star
           </p>
           )}
         </div>
-        <div className="mt-3">
-          <div className="flex items-center justify-between gap-3 text-xs">
-            <p className="font-medium">{score.rank}</p>
-            <p className="tabular text-faint">{score.points}/100</p>
+        <div className="mt-2">
+          <div className="flex items-baseline justify-between gap-3 text-sm">
+            <p className="min-w-0 font-medium leading-snug">{score.rank}. {score.next}</p>
+            <p className="tabular shrink-0 text-xs text-faint">{score.points}/100 · {level}</p>
           </div>
           <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-subtle">
             <div className="h-full bg-accent" style={{ width: `${score.points}%` }} />
           </div>
-          <p className="mt-1 text-xs text-muted">{score.next}</p>
-          <p className="mt-1 text-xs text-faint">
-            {level} · {xp} XP
-          </p>
         </div>
         <div className="mt-3 flex gap-1" aria-hidden>
           {CATS.map((item, index) => {
@@ -976,102 +972,25 @@ function Checkout({
   const count = rows.length + extraRows.length;
   const ready = Boolean(build.prebuilt) || NEED.every((item) => build[item]);
   const missing = build.prebuilt ? ORDER.filter((item) => item === "monitor" && !build.monitor) : ORDER.filter((item) => !build[item]);
-  const [open, setOpen] = useState(true);
-  const [height, setHeight] = useState(360);
-  const [width, setWidth] = useState(360);
-  const drag = useRef<{ axis: "x" | "y"; start: number; size: number } | null>(null);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const savedH = Number(localStorage.getItem("drew-checkout-h"));
-    const savedW = Number(localStorage.getItem("drew-checkout-w"));
-    if (savedH >= 120) setHeight(savedH);
-    else setHeight(Math.round(window.innerHeight * 0.42));
-    if (savedW >= 220) setWidth(savedW);
-    else if (window.innerWidth > window.innerHeight && window.innerHeight <= 520) setWidth(280);
+    if (localStorage.getItem("drew-checkout-open") === "1") setOpen(true);
   }, []);
 
-  const heightRef = useRef(height);
-  const widthRef = useRef(width);
-  heightRef.current = height;
-  widthRef.current = width;
-
-  function onPointerDown(event: PointerEvent<HTMLButtonElement>) {
-    const axis = wide ? "x" : "y";
-    drag.current = { axis, start: axis === "y" ? event.clientY : event.clientX, size: axis === "y" ? height : width };
-    event.currentTarget.setPointerCapture(event.pointerId);
-  }
-
-  function onPointerMove(event: PointerEvent<HTMLButtonElement>) {
-    if (!drag.current) return;
-    if (drag.current.axis === "y") {
-      const next = drag.current.size + (drag.current.start - event.clientY);
-      const max = Math.max(160, window.innerHeight - 88);
-      if (next < 96) {
-        setOpen(false);
-        return;
-      }
-      setOpen(true);
-      setHeight(Math.min(max, next));
-      heightRef.current = Math.min(max, next);
-    } else {
-      const next = drag.current.size + (drag.current.start - event.clientX);
-      const sized = Math.max(220, Math.min(window.innerWidth - 240, next));
-      setWidth(sized);
-      widthRef.current = sized;
-    }
-  }
-
-  function onPointerUp() {
-    if (!drag.current) return;
-    const axis = drag.current.axis;
-    drag.current = null;
-    if (axis === "y") localStorage.setItem("drew-checkout-h", String(heightRef.current));
-    else localStorage.setItem("drew-checkout-w", String(widthRef.current));
+  function toggle() {
+    setOpen((value) => {
+      const next = !value;
+      localStorage.setItem("drew-checkout-open", next ? "1" : "0");
+      return next;
+    });
   }
 
   const docked = wide;
   return (
-    <aside
-      className={`relative flex min-h-0 flex-col border-line bg-elevated ${docked ? "h-full shrink-0 border-l" : "shrink-0 border-t"}`}
-      style={docked ? { width } : { height: open ? height : 108 }}
-    >
-      <button
-        type="button"
-        aria-label="Drag to resize"
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        className={`flex h-11 w-full touch-none items-center justify-center gap-2 text-sm text-muted ${docked ? "md:hidden" : ""}`}
-      >
-        <span className="h-1 w-8 rounded-full bg-line" />
-        Drag
-      </button>
-      {docked ? (
-        <button
-          type="button"
-          aria-label="Drag to resize chosen parts"
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={onPointerUp}
-          className="absolute top-12 hidden -translate-x-1/2 cursor-ew-resize touch-none px-1 text-xs text-muted md:block"
-        >
-          Drag
-        </button>
-      ) : null}
-      <div className="flex items-center gap-2 px-3 pb-2">
-        <p className="min-w-0 flex-1">
-          <span className="block text-xs text-faint">Chosen parts</span>
-          <span className="tabular text-sm font-medium">
-            {count} {count === 1 ? "part" : "parts"} · {money(spendOf(build, extras))}
-          </span>
-          <span className="block text-xs text-muted">{ready ? "This computer can turn on." : "Add the blank rows to finish it."}</span>
-        </p>
-        <button type="button" onClick={() => setOpen((value) => !value)} className="h-8 rounded-full border border-line px-3 text-xs text-muted">
-          {open ? "Close" : "Open"}
-        </button>
-      </div>
+    <aside className={`flex min-h-0 flex-col border-line bg-elevated ${docked ? "h-full w-80 shrink-0 border-l" : open ? "h-[42%] shrink-0 border-t" : "shrink-0 border-t"}`}>
       {open ? (
-        <ul className="min-h-0 flex-1 space-y-2 overflow-y-auto px-3 pb-3">
+        <ul className="min-h-0 flex-1 space-y-2 overflow-y-auto px-3 pt-3 pb-3">
           {rows.map((cat) => {
             const part = build[cat];
             if (!part) return null;
@@ -1120,6 +1039,15 @@ function Checkout({
           ))}
         </ul>
       ) : null}
+      <button type="button" onClick={toggle} aria-expanded={open} className="flex h-14 w-full shrink-0 items-center gap-3 border-t border-line px-3 pr-[min(48%,12rem)] text-left">
+        <span className="shrink-0 rounded-full bg-fg px-3 py-1.5 text-sm font-medium text-bg">{open ? "Hide" : "Show"}</span>
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-sm font-medium">
+            Chosen parts · {count} · {money(spendOf(build, extras))}
+          </span>
+          <span className="block truncate text-xs text-muted">{ready ? "This computer can turn on." : count ? "Tap Show for the list." : "Nothing picked yet."}</span>
+        </span>
+      </button>
     </aside>
   );
 }
