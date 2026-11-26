@@ -12,6 +12,9 @@ const WHY: Record<string, string> = {
 
 export function RankBadge({ score, lines }: { score: number; lines: string[] }) {
   const [open, setOpen] = useState(false);
+  if (score < 1) {
+    return <span className="inline-flex items-center rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-700">No computer score</span>;
+  }
   const rank = rankFrom(score);
   return (
     <>

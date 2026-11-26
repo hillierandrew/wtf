@@ -159,6 +159,12 @@ export function unitCost(part: Part): { text: string; amount: number } | null {
     const amount = part.price / size;
     return { text: `${money(amount)}/GB`, amount };
   }
+  if (part.cat === "bundle") {
+    const scored = scoreBundleText(bundleBlob(part), part.price);
+    if (!scored.computer) return null;
+    const amount = part.price / scored.score;
+    return { text: `${money(amount)}/point`, amount };
+  }
   const points = part.cat === "gpu" ? gpuIndex(part) : part.cat === "cpu" ? cpuPoints(part.name) : part.cat === "prebuilt" ? machineScore(part.name) : part.cat === "psu" ? wattOf(part) : 0;
   if (!points) return null;
   const amount = part.price / points;
@@ -190,8 +196,61 @@ export function rankFrom(score: number): Rank {
   return { name: "Brown", score: n, bg: "#c4a07a", fg: "#2a160c" };
 }
 
+function bundleBlob(part: Part): string {
+  return [part.name, ...includedParts(part).map((item) => item.name)].join(" + ");
+}
+
+function namedPart(name: string, cat: Category): Part {
+  return { id: "", name, price: 0, was: null, cat, brand: "", socket: null, ram: null, watt: null, form: null };
+}
+
+function cardSpeed(text: string): number {
+  const chunk = text.split(/\s*\+\s*/).find((piece) => /\b(RTX|RX|GEFORCE)\b/i.test(piece));
+  if (!chunk) return 0;
+  const card = namedPart(chunk, "gpu");
+  return gpuKnown(card) || [0, 20, 40, 60, 85, 120, 170][gpuTier(card)] || 0;
+}
+
+function systemRamGb(text: string): number {
+  let best = 0;
+  for (const chunk of text.split(/\s*\+\s*|,\s*/)) {
+    if (!/DDR/i.test(chunk)) continue;
+    const size = chunk.match(/(\d+)\s*GB/i);
+    if (size) best = Math.max(best, Number(size[1]));
+  }
+  return best;
+}
+
+/** Computer bundles only. A wheel, a chair, or a cable stays at 0. */
+export function scoreBundleText(text: string, price = 0): { computer: boolean; score: number; lines: string[] } {
+  const chipPts = cpuPoints(text);
+  const chipScore = chipPts ? Math.min(100, Math.round((chipPts / 96) * 100)) : 0;
+  const speed = cardSpeed(text);
+  const cardScore = speed ? Math.min(100, Math.round((speed / 180) * 100)) : 0;
+  const ram = systemRamGb(text);
+  const ramPts = ram >= 64 ? 12 : ram >= 32 ? 8 : ram >= 16 ? 4 : 0;
+  const computer = chipScore > 0 || cardScore > 0;
+  const main = Math.max(chipScore, cardScore);
+  const side = Math.round(Math.min(chipScore, cardScore) * 0.15);
+  const score = computer ? Math.min(100, main + side + ramPts) : 0;
+  const rank = rankFrom(score);
+  const lines = computer
+    ? [
+        `${rank.name} ${rank.score}. ${BANDS}`,
+        `Chip points are ${chipPts} out of 96, which becomes ${chipScore}. A 9800X3D is 96. The same chip table as a loose processor.`,
+        `Card speed is ${speed} out of 180, which becomes ${cardScore}. An RX 9070 is 100 speed. A 5090 is 180. No card is 0.`,
+        `The higher of those two is kept. The lower one adds ${side}, which is 15 percent.`,
+        `Memory adds ${ramPts}. ${ram || 0} GB of DDR. 64GB is 12, 32GB is 8, 16GB is 4. Gigabytes on the graphics card do not count.`,
+        `${main} + ${side} + ${ramPts} = ${score}.`,
+      ]
+    : ["No computer score. This bundle is a wheel, a chair, a case, or a cable. It is not a chip or a card."];
+  if (computer && price > 0) lines.push(`${money(price)} ÷ ${score} = ${money(price / score)} per point.`);
+  return { computer, score, lines };
+}
+
 /** 0 to 100 for this part. Crystal is the top. Brown is the bottom. */
 export function partScore(part: Part): number {
+  if (part.cat === "bundle") return scoreBundleText(bundleBlob(part)).score;
   if (part.cat === "gpu") {
     const speed = gpuIndex(part);
     return speed ? Math.min(100, Math.round((speed / 180) * 100)) : 8;
@@ -357,6 +416,10 @@ export function explainPart(part: Part): string[] {
     lines.push("A 360mm liquid cooler is 88. A smaller liquid cooler is 72. An air cooler is 52.");
   } else if (part.cat === "case") {
     lines.push("This is a size rank, not a speed score. A bigger case scores higher because more boards fit.");
+  } else if (part.cat === "bundle") {
+    const scored = scoreBundleText(bundleBlob(part), part.price);
+    if (!scored.computer) return scored.lines;
+    lines.push(...scored.lines.slice(1));
   }
   lines.push("Lower dollars per point, or per gigabyte, is the better price.");
   return lines;
