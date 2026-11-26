@@ -30,7 +30,7 @@ const DOORS: Preset[] = [
   { id: "type", title: "Touch typing", line: "Quiet. A bump or a silent pad. For someone who writes.", shelf: "board", who: "type", sort: "quiet" },
   { id: "league", title: "League", line: "Fast and quiet enough for a call. Linear or magnetic.", shelf: "board", who: "league", sort: "quiet" },
   { id: "games", title: "Games", line: "Linear, magnetic, or clicky. The finger gets there fast.", shelf: "board", who: "games", sort: "low" },
-  { id: "switches", title: "Switches only", line: "Loose switches. No board in the box. Red, brown, silent, and the rest.", shelf: "switch", sort: "quiet" },
+  { id: "switches", title: "Switches only", line: "The loose packs. No board in the box. Quiet to loud.", shelf: "switch", sort: "quiet" },
   { id: "feel-board", title: "Best mechanical", line: "A real switch, not a rubber dome. Quiet enough to live with.", shelf: "board", who: "feel", sort: "quiet" },
   { id: "grandma-board", title: "Grandma's board", line: "Cheap, quiet, and already finished.", shelf: "board", who: "grandma", sort: "low", max: 80 },
   { id: "boards", title: "Finished keyboards", line: "A board that is already built. Switches are in it.", shelf: "board", sort: "low" },
@@ -81,6 +81,74 @@ const ENTHUSIAST: { title: string; items: Preset[] }[] = [
     ],
   },
 ];
+
+function volumeOf(item: KeyItem) {
+  const n = item.estimated;
+  if (n == null) return "Volume not listed";
+  const band = n < 45 ? "Quiet" : n < 52 ? "Soft" : n < 58 ? "Normal" : n < 64 ? "Loud" : "Very loud";
+  return `${band} · about ${n} dB`;
+}
+
+function bySound(rows: KeyItem[], sort: Sort) {
+  return rows.slice().sort((a, b) => {
+    if (sort === "high") return b.price - a.price;
+    if (sort === "low") return a.price - b.price;
+    const ae = a.estimated ?? (sort === "quiet" ? 99 : -1);
+    const be = b.estimated ?? (sort === "quiet" ? 99 : -1);
+    if (ae !== be) return sort === "quiet" ? ae - be : be - ae;
+    return a.price - b.price;
+  });
+}
+
+function SwitchShelf() {
+  const [sort, setSort] = useState<Sort>("quiet");
+  const [hideOpen, setHideOpen] = useState(false);
+  const rows = useMemo(() => bySound(KEYS.filter((item) => item.shelf === "switch" && (!hideOpen || !item.open)), sort), [sort, hideOpen]);
+  return (
+    <section>
+      <div className="flex items-end justify-between gap-3">
+        <div>
+          <h2 className="text-[22px] font-semibold leading-none">Loose switches</h2>
+          <p className="mt-1 text-[14px] text-[#333]">No keyboard in the box. Quietest first.</p>
+        </div>
+        <p className="shrink-0 text-[13px] text-[#333]">{rows.length}</p>
+      </div>
+      <label className="mt-3 flex h-12 items-center gap-3 rounded-xl border border-[#161616] bg-white px-3">
+        <span className="shrink-0 text-[15px] font-semibold">Sort</span>
+        <select value={sort} onChange={(event) => setSort(event.target.value as Sort)} className="h-full w-full bg-white text-[16px] outline-none">
+          <option value="quiet">Quiet to loud</option>
+          <option value="loud">Loud to quiet</option>
+          <option value="low">Price, low to high</option>
+          <option value="high">Price, high to low</option>
+        </select>
+      </label>
+      <button type="button" aria-pressed={hideOpen} onClick={() => setHideOpen((value) => !value)} className="mt-2 h-10 rounded-full border border-[#ccc] bg-white px-3 text-sm">
+        {hideOpen ? "Open box hidden" : "Hide open box"}
+      </button>
+      <ul className="mt-3 space-y-2">
+        {rows.map((item) => (
+          <li key={item.id} className="rounded-2xl border border-[#ddd] bg-white px-3 py-3">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[12px] font-medium uppercase tracking-wide text-[#555]">{item.brand}</p>
+                <p className="mt-0.5 text-[16px] font-medium leading-snug">{item.name}</p>
+                <p className="mt-1 text-[13px] text-[#333]">
+                  {FEEL_LABEL[item.feel]} · {volumeOf(item)}
+                  {item.open ? " · Open box" : ""}
+                </p>
+              </div>
+              <div className="shrink-0 text-right">
+                <p className="text-[16px] font-semibold">{money(item.price)}</p>
+                {item.was ? <p className="text-[12px] text-[#555] line-through">{money(item.was)}</p> : null}
+              </div>
+            </div>
+            <AddButton line={keyBag(item, `Loose switch. ${item.feel}. ${volumeOf(item)}. ${money(item.price)}.`)} className="mt-2 h-11 w-full rounded-full border border-[#161616] bg-white text-sm font-medium" />
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
 
 function matches(item: KeyItem, preset: Preset) {
   if (preset.shelf === "sound") {
@@ -232,15 +300,7 @@ export function KeyboardShop({ onLeave }: { look?: Look; onLeave?: () => void })
       if (q && !`${item.brand} ${item.name}`.toLowerCase().includes(q)) return false;
       return true;
     });
-    rows.sort((a, b) => {
-      if (sort === "high") return b.price - a.price;
-      if (sort === "low") return a.price - b.price;
-      const ae = a.estimated ?? (sort === "quiet" ? 99 : -1);
-      const be = b.estimated ?? (sort === "quiet" ? 99 : -1);
-      if (ae !== be) return sort === "quiet" ? ae - be : be - ae;
-      return a.price - b.price;
-    });
-    return rows;
+    return bySound(rows, sort);
   }, [preset, query, sort, layout, numpad, fn, light, feel, openBox]);
 
   const boards = preset.shelf === "board" || preset.shelf === "sound" || preset.shelf === "combo";
@@ -255,7 +315,8 @@ export function KeyboardShop({ onLeave }: { look?: Look; onLeave?: () => void })
 
   const home = (
     <div className="space-y-6 pb-8">
-      <p className="text-[16px] leading-snug text-[#333]">Three shelves. A finished keyboard, switches on their own, or keycaps on their own.</p>
+      <p className="text-[16px] leading-snug text-[#333]">The switches are on this page. A finished keyboard already has them inside.</p>
+      <SwitchShelf />
       <div className="grid gap-2">
         {DOORS.map((item) => (
           <button key={item.id} type="button" onClick={() => openPreset(item)} className="min-h-24 rounded-2xl border border-[#161616] bg-white px-4 py-3 text-left">
@@ -291,10 +352,10 @@ export function KeyboardShop({ onLeave }: { look?: Look; onLeave?: () => void })
       <label className="mt-3 flex h-12 items-center gap-3 rounded-xl border border-[#161616] bg-white px-3">
         <span className="shrink-0 text-[15px] font-semibold">Sort</span>
         <select value={sort} onChange={(event) => setSort(event.target.value as Sort)} className="h-full w-full bg-white text-[16px] text-[#161616] outline-none">
+          <option value="quiet">Quiet to loud</option>
+          <option value="loud">Loud to quiet</option>
           <option value="low">Price, low to high</option>
           <option value="high">Price, high to low</option>
-          <option value="quiet">Quiet first</option>
-          <option value="loud">Loud first</option>
         </select>
       </label>
       <button type="button" aria-pressed={!openBox} onClick={() => setOpenBox((value) => !value)} className={`mt-3 ${chip(!openBox)}`}>
@@ -365,7 +426,7 @@ export function KeyboardShop({ onLeave }: { look?: Look; onLeave?: () => void })
           </div>
         </div>
       ) : null}
-      <p className="mt-3 text-[13px] text-[#333]">{shown.length} shown, {sort === "high" ? "dearest first" : sort === "quiet" ? "quiet first" : sort === "loud" ? "loud first" : "cheapest first"}. Tap a filter again to turn it off.</p>
+      <p className="mt-3 text-[13px] text-[#333]">{shown.length} shown, {sort === "high" ? "dearest first" : sort === "quiet" ? "quiet to loud" : sort === "loud" ? "loud to quiet" : "cheapest first"}. Tap a filter again to turn it off.</p>
       {shown.length === 0 ? <p className="mt-3 rounded-2xl border border-[#ccc] bg-white px-4 py-8 text-center text-[17px]">Nothing matches. Turn a filter off.</p> : null}
       <ul className="mt-2 space-y-2">
         {shown.slice(0, limit).map((item) => {
@@ -379,11 +440,14 @@ export function KeyboardShop({ onLeave }: { look?: Look; onLeave?: () => void })
                     <span className="block text-[12px] font-medium uppercase tracking-wide text-[#555]">{item.brand}</span>
                     <span className="mt-0.5 block text-[16px] font-medium leading-snug text-[#161616]">{item.name}</span>
                   </span>
-                  <span className="shrink-0 text-right text-[16px] font-semibold text-[#161616]">{money(item.price)}</span>
+                  <span className="shrink-0 text-right text-[16px] font-semibold text-[#161616]">
+                    {money(item.price)}
+                    {item.was ? <span className="mt-0.5 block text-[12px] font-normal text-[#555] line-through">{money(item.was)}</span> : null}
+                  </span>
                 </span>
                 <span className="mt-2 block text-[13px] text-[#333]">
                   {item.shelf === "board" || item.shelf === "combo" ? `${LAYOUT_LABEL[item.layout]} · ${LIGHT_LABEL[item.light]} · ` : ""}
-                  {heard ? FEEL_LABEL[item.feel] : "Keycaps"}
+                  {heard ? `${FEEL_LABEL[item.feel]} · ${volumeOf(item)}` : "Keycaps"}
                   {item.light === "none" ? " · No backlight" : item.light === "rgb" || item.light === "backlight" ? " · Backlit" : ""}
                   {item.open ? " · Open box" : ""}
                 </span>
