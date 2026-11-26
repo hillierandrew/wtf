@@ -242,7 +242,7 @@ function Lock({ onOpen }: { onOpen: (next: "site" | "phone" | "store" | "glass" 
         </div>
         <div className="mt-5 flex justify-center gap-3" aria-label="Code">
           {[0, 1, 2, 3].map((index) => (
-            <span key={index} className={`size-3 rounded-full ${index < digits.length ? "bg-[#ff7a1a] shadow-[0_0_12px_#ff7a1a]" : "bg-[#2a1040]"}`} />
+            <span key={index} className={`size-3 rounded-full ${index < digits.length ? "bg-[#b6ff3b]" : "border-2 border-[#ff7a1a] bg-transparent"}`} />
           ))}
         </div>
         <div className="mt-6 grid grid-cols-3 gap-3">
@@ -252,7 +252,7 @@ function Lock({ onOpen }: { onOpen: (next: "site" | "phone" | "store" | "glass" 
               type="button"
               onClick={() => press(key)}
               aria-label={key === "C" ? "Clear" : key === "OK" ? "OK" : key}
-              className="press flex h-16 items-center justify-center rounded-full border border-[#c084fc] bg-[#ff7a1a] text-2xl font-medium text-[#2a0a12] shadow-[0_0_16px_rgba(255,122,26,0.45)] active:translate-y-0.5"
+              className="press flex h-16 items-center justify-center rounded-full border-2 border-[#ff7a1a] bg-[#4c1d95] text-2xl font-semibold text-[#b6ff3b] shadow-[0_0_0_3px_#2a0a4a] active:translate-y-0.5"
             >
               {key}
             </button>

@@ -79,7 +79,7 @@ export function GlassStore({ onLock }: { onLock: () => void }) {
   const [limit, setLimit] = useState(24);
   const [panel, setPanel] = useState<"shop" | "build" | "keys">("shop");
   if (panel === "build") return <Counter onClose={() => setPanel("shop")} />;
-  if (panel === "keys") return <KeyboardShop look="phone" onLeave={() => setPanel("shop")} />;
+  if (panel === "keys") return <KeyboardShop onLeave={() => setPanel("shop")} />;
 
   const rows = useMemo(() => {
     if (!shelf) return [];

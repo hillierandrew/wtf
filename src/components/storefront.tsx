@@ -271,7 +271,7 @@ export function Storefront({ onLock }: { onLock: () => void }) {
   }
 
   if (panel === "build") return <Counter onClose={() => setPanel("shop")} />;
-  if (panel === "keys") return <div className="min-h-dvh bg-black"><KeyboardShop look="phone" onLeave={() => setPanel("shop")} /></div>;
+  if (panel === "keys") return <KeyboardShop onLeave={() => setPanel("shop")} />;
 
   return (
     <div className="min-h-dvh bg-[#fafafa] text-[#111] antialiased" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif' }}>

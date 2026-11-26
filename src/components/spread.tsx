@@ -16,7 +16,7 @@ export function Spread({ onLock }: { onLock: () => void }) {
   const desks = useMemo(() => PARTS.filter((part) => part.cat === "prebuilt" && !isJunk(part, true) && part.price <= budget).sort((a, b) => machineScore(b.name) - machineScore(a.name) || a.price - b.price), [budget]);
 
   if (panel === "build") return <Counter onClose={() => setPanel("home")} />;
-  if (panel === "keys") return <div className="min-h-dvh bg-black"><KeyboardShop look="phone" onLeave={() => setPanel("home")} /></div>;
+  if (panel === "keys") return <KeyboardShop onLeave={() => setPanel("home")} />;
 
   return (
     <div className="min-h-dvh bg-[#07110c] px-4 pb-10 pt-[max(1rem,env(safe-area-inset-top))] text-[#e7ffe4]">

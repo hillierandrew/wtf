@@ -140,6 +140,7 @@ export function Phone({ onLock }: { onLock: () => void }) {
   const title = open ? "Details" : meta?.title ?? (tab === "use" ? "Use" : tab === "power" ? "Power" : tab === "build" ? "Build" : tab === "deals" ? "Deals" : tab === "saved" ? "Saved" : tab === "search" ? "Search" : "Store");
 
   if (walk) return <Counter onClose={() => setWalk(false)} />;
+  if (group === "keys") return <KeyboardShop onLeave={() => setGroup(null)} />;
 
   return (
     <div className={`flex h-dvh w-full flex-col overflow-hidden ${night ? "bg-black text-[#f6edff]" : "bg-[#f2f2f7] text-[#1c1c1e]"}`} style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif' }}>
@@ -272,7 +273,6 @@ export function Phone({ onLock }: { onLock: () => void }) {
             </div>
           ) : null}
 
-          {!open && group === "keys" ? <KeyboardShop look="phone" /> : null}
           {!open && group === "sim" ? <Sim look="phone" /> : null}
 
           {!open && group !== "keys" && group !== "sim" && tab !== "use" && tab !== "build" && tab !== "power" && (group || tab !== "shop") ? (

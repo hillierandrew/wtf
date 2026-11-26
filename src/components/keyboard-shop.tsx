@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { ChevronLeft, Search } from "lucide-react";
 import { FEEL_LABEL, KEYS, LAYOUT_LABEL, LIGHT_LABEL, money, type Feel, type FnRow, type KeyItem, type Layout, type Light, type Numpad, type Shelf } from "@/lib/keyboard";
-import { ThemeToggle } from "@/lib/theme";
 
 type Look = "paper" | "phone";
 type Sort = "quiet" | "loud" | "low" | "high";
@@ -22,76 +21,60 @@ type Preset = {
   name?: RegExp;
 };
 
-const SHAPE: Preset[] = [
-  { id: "boards", title: "All keyboards", line: "Every board on the shelf.", shelf: "board" },
-  { id: "full", title: "Numpad on the right", line: "Full size and 96%. Function keys stay.", shelf: "board", numpad: "right" },
-  { id: "no-numpad", title: "No number pad", line: "60, 65, 75, tenkeyless, and split.", shelf: "board", numpad: "none" },
-  { id: "no-fn", title: "No function keys", line: "60% and 65%. The number row is the top row.", shelf: "board", fn: "no" },
-  { id: "left", title: "Numpad on the left", line: "Southpaw. The pad sits on the left.", shelf: "board", numpad: "left" },
-  { id: "tkl", title: "Tenkeyless", line: "Function keys, no numpad.", shelf: "board", layout: "tkl" },
-  { id: "75", title: "75%", line: "Function keys, no numpad, shorter than tenkeyless.", shelf: "board", layout: "75" },
-  { id: "96", title: "96%", line: "A compact board with the numpad on the right.", shelf: "board", layout: "96" },
-  { id: "60", title: "60%", line: "No function keys. No numpad. No arrow cluster.", shelf: "board", layout: "60" },
-  { id: "65", title: "65%", line: "No function keys. Arrows stay. No numpad.", shelf: "board", layout: "65" },
-  { id: "split", title: "Split", line: "The board comes apart, or the halves are angled.", shelf: "board", layout: "split" },
+const DOORS: Preset[] = [
+  { id: "boards", title: "Finished keyboards", line: "A board that is already built. Switches are in it.", shelf: "board", sort: "quiet" },
+  { id: "switches", title: "Switches only", line: "Loose switches. No board in the box.", shelf: "switch", sort: "quiet" },
+  { id: "keycaps", title: "Keycaps only", line: "The caps. Not the board, not the switches.", shelf: "keycap" },
 ];
 
-const SOUND: Preset[] = [
-  { id: "sound", title: "Quiet to loud", line: "Measured dB, then an estimate that adds the case.", shelf: "sound", sort: "quiet" },
-  { id: "silent", title: "Silent switches", line: "The quiet end. A pad inside the stem.", shelf: "board", feel: "silent", sort: "quiet" },
-  { id: "linear", title: "Linear", line: "Smooth. No bump.", shelf: "board", feel: "linear", sort: "quiet" },
-  { id: "tactile", title: "Tactile", line: "A bump. A bit louder than linear.", shelf: "board", feel: "tactile", sort: "quiet" },
-  { id: "clicky", title: "Clicky", line: "The loud end. A click on the way down.", shelf: "board", feel: "clicky", sort: "loud" },
-  { id: "magnetic", title: "Magnetic", line: "Hall effect. Adjustable, close to a linear.", shelf: "board", feel: "magnetic", sort: "quiet" },
-  { id: "optical", title: "Optical", line: "A light beam, not a metal contact.", shelf: "board", feel: "optical", sort: "quiet" },
-  { id: "membrane", title: "Membrane", line: "Rubber dome. Office boards. Softer, not silent.", shelf: "board", feel: "membrane", sort: "quiet" },
-];
-
-const LIGHTS: Preset[] = [
-  { id: "rgb", title: "RGB", line: "More than one colour.", shelf: "board", light: "rgb" },
-  { id: "backlight", title: "Backlight, not RGB", line: "Lit, one colour.", shelf: "board", light: "backlight" },
-  { id: "dark", title: "No backlight", line: "Nothing under the keys.", shelf: "board", light: "none" },
-];
-
-const PARTS: Preset[] = [
-  { id: "switches", title: "Switches", line: "Loose packs, quiet to loud.", shelf: "switch", sort: "quiet" },
-  { id: "keycaps", title: "Keycaps", line: "Sets and single artisan caps.", shelf: "keycap" },
-  { id: "rests", title: "Wrist rests", line: "Sits in front of the board.", shelf: "rest" },
-  { id: "extras", title: "Small parts", line: "Testers, knobs, brushes.", shelf: "extra" },
-  { id: "combos", title: "Keyboard and mouse sets", line: "Both in one box.", shelf: "combo" },
-  { id: "mice", title: "Mice", line: "On their own.", shelf: "mouse" },
-  { id: "pads", title: "Mouse pads", line: "Under the mouse.", shelf: "pad" },
-];
-
-const CAPS: Preset[] = [
-  { id: "pudding", title: "Pudding", line: "Clear sides, solid top. The light shows through the walls.", shelf: "keycap", name: /PUDDING/i },
-  { id: "clearcaps", title: "Clear", line: "Transparent or crystal caps.", shelf: "keycap", name: /CLEAR|TRANSPARENT|CRYSTAL/i },
-  { id: "shine", title: "Shine-through", line: "The legend lets the light out.", shelf: "keycap", name: /SHINE/i },
-  { id: "pbt", title: "PBT", line: "The harder plastic. It stays less shiny.", shelf: "keycap", name: /\bPBT\b/i },
-  { id: "abs", title: "ABS", line: "The smoother plastic.", shelf: "keycap", name: /\bABS\b/i },
-];
-
-const LOUD: Preset[] = [
-  { id: "quiet", title: "Quiet", line: "Silent switches. The room stays quiet.", shelf: "board", feel: "silent", sort: "quiet" },
-  { id: "soft", title: "Soft", line: "Smooth and light. Linear or a rubber dome. No click.", shelf: "board", band: "soft", sort: "quiet" },
-  { id: "loud", title: "Loud", line: "Clicky. You hear every key.", shelf: "board", feel: "clicky", sort: "loud" },
-];
-
-const GROUPS: { title: string; items: Preset[] }[] = [
-  { title: "Sound", items: SOUND },
-  { title: "Shape", items: SHAPE },
-  { title: "Light", items: LIGHTS },
-  { title: "Parts", items: PARTS },
-  { title: "Keycaps", items: CAPS },
+const ENTHUSIAST: { title: string; items: Preset[] }[] = [
+  {
+    title: "Sound",
+    items: [
+      { id: "sound", title: "Quiet to loud", line: "Every board and switch, sorted by decibels.", shelf: "sound", sort: "quiet" },
+      { id: "silent", title: "Silent", line: "A pad in the stem. The quiet end.", shelf: "sound", feel: "silent", sort: "quiet" },
+      { id: "linear", title: "Linear", line: "Smooth. No bump. No click.", shelf: "sound", feel: "linear", sort: "quiet" },
+      { id: "tactile", title: "Tactile", line: "A bump. No click.", shelf: "sound", feel: "tactile", sort: "quiet" },
+      { id: "clicky", title: "Clicky", line: "A click you can hear.", shelf: "sound", feel: "clicky", sort: "loud" },
+    ],
+  },
+  {
+    title: "Size",
+    items: [
+      { id: "60", title: "Tiny, 60%", line: "No function keys. No number pad.", shelf: "board", layout: "60" },
+      { id: "65", title: "65%", line: "No function keys. Arrows stay.", shelf: "board", layout: "65" },
+      { id: "75", title: "75%", line: "Function keys. No number pad.", shelf: "board", layout: "75" },
+      { id: "tkl", title: "Tenkeyless", line: "Function keys. No number pad.", shelf: "board", layout: "tkl" },
+      { id: "no-numpad", title: "No number pad", line: "Any small board without a pad.", shelf: "board", numpad: "none" },
+      { id: "full", title: "Big, numpad right", line: "Full size. The pad is on the right.", shelf: "board", numpad: "right" },
+      { id: "left", title: "Numpad on the left", line: "Southpaw.", shelf: "board", numpad: "left" },
+      { id: "no-fn", title: "No function keys", line: "The number row is the top row.", shelf: "board", fn: "no" },
+    ],
+  },
+  {
+    title: "Light",
+    items: [
+      { id: "rgb", title: "RGB", line: "More than one colour.", shelf: "board", light: "rgb" },
+      { id: "backlight", title: "Backlight", line: "Lit, one colour.", shelf: "board", light: "backlight" },
+      { id: "dark", title: "No backlight", line: "Nothing under the keys.", shelf: "board", light: "none" },
+    ],
+  },
+  {
+    title: "Keycaps",
+    items: [
+      { id: "pudding", title: "Pudding", line: "Clear sides. Solid top.", shelf: "keycap", name: /PUDDING/i },
+      { id: "clearcaps", title: "Clear", line: "Transparent or crystal.", shelf: "keycap", name: /CLEAR|TRANSPARENT|CRYSTAL/i },
+      { id: "shine", title: "Shine-through", line: "The letter lets the light out.", shelf: "keycap", name: /SHINE/i },
+      { id: "pbt", title: "PBT", line: "Harder plastic. Stays less shiny.", shelf: "keycap", name: /\bPBT\b/i },
+      { id: "abs", title: "ABS", line: "Smoother plastic.", shelf: "keycap", name: /\bABS\b/i },
+    ],
+  },
 ];
 
 function matches(item: KeyItem, preset: Preset) {
-  if (preset.band === "soft") {
+  if (preset.shelf === "sound") {
     if (item.shelf !== "board" && item.shelf !== "switch") return false;
-    return item.feel === "linear" || item.feel === "membrane" || item.feel === "low" || item.feel === "silent";
-  }
-  if (preset.shelf === "sound") return item.shelf === "board" || item.shelf === "switch";
-  if (item.shelf !== preset.shelf) return false;
+  } else if (item.shelf !== preset.shelf) return false;
   if (preset.layout && item.layout !== preset.layout) return false;
   if (preset.numpad && item.numpad !== preset.numpad) return false;
   if (preset.fn && item.fn !== preset.fn) return false;
@@ -101,39 +84,56 @@ function matches(item: KeyItem, preset: Preset) {
   return true;
 }
 
-function meta(item: KeyItem) {
-  const bits: string[] = [];
-  if (item.shelf === "board" || item.shelf === "combo") {
-    bits.push(LAYOUT_LABEL[item.layout]);
-    bits.push(LIGHT_LABEL[item.light]);
-  }
-  if (item.shelf === "board" || item.shelf === "combo" || item.shelf === "switch") bits.push(FEEL_LABEL[item.feel]);
-  if (item.french) bits.push("French");
-  if (item.open) bits.push("Open box");
-  return bits.filter(Boolean).join(" · ");
+function bars(db: number | null, loud: boolean) {
+  if (db == null) return 0;
+  const quiet = db < 45 ? 5 : db < 52 ? 4 : db < 58 ? 3 : db < 64 ? 2 : 1;
+  return loud ? 6 - quiet : quiet;
 }
 
-function SoundMeter({ item, phone }: { item: KeyItem; phone: boolean }) {
-  if (item.measured == null && item.estimated == null) return null;
-  const value = item.estimated ?? item.measured ?? 50;
-  const width = Math.min(100, Math.max(8, ((value - 35) / 37) * 100));
+function touchOf(feel: Feel) {
+  if (feel === "linear" || feel === "silent" || feel === "magnetic" || feel === "optical") return "Smooth. No bump.";
+  if (feel === "tactile") return "A bump under the finger.";
+  if (feel === "clicky") return "A bump, then a hard bottom.";
+  if (feel === "membrane") return "Soft rubber. The whole key gives.";
+  if (feel === "low") return "Short travel. The finger does not go far.";
+  if (feel === "bare") return "No switch in the box.";
+  return "Touch is not listed.";
+}
+
+function clickOf(feel: Feel) {
+  if (feel === "clicky") return "Sharp click. You hear it.";
+  if (feel === "tactile") return "Bump only. No click.";
+  if (feel === "silent") return "No click. A pad kills the sound.";
+  if (feel === "membrane") return "A soft thud, not a click.";
+  if (feel === "bare") return "No click yet.";
+  if (feel === "unknown") return "Click is not listed.";
+  return "No click.";
+}
+
+function dbLine(item: KeyItem) {
+  if (item.shelf === "keycap") return "Keycaps do not make the sound. The switch under them does.";
+  if (item.measured == null && item.estimated == null) return "No decibel number for this one.";
+  const where = item.shelf === "switch" ? "This is a loose switch." : "This is a finished keyboard.";
+  const measured = item.measured != null ? `Measured ${item.measured} dB at the switch.` : "No measured number for this switch.";
+  const estimated = item.estimated != null ? `About ${item.estimated} dB once it is in a case.` : "";
+  const band = item.estimated == null ? "" : item.estimated < 45 ? "That is quiet, near a library." : item.estimated < 55 ? "That is a normal room." : item.estimated < 64 ? "That is loud enough to notice." : "That is very loud. A conversation is about 60 dB.";
+  return [where, measured, estimated, band].filter(Boolean).join(" ");
+}
+
+function Dots({ n, label }: { n: number; label: string }) {
   return (
-    <span className="mt-2 block">
-      <span className="block text-sm text-[#c4b5fd]">
-        {item.measured != null ? `Measured ${item.measured} dB` : "No measured dB"}
-        {item.estimated != null ? ` · Estimated ${item.estimated} dB` : ""}
-      </span>
-      <span className="mt-1 block h-1.5 overflow-hidden rounded-full bg-[#2a1240]">
-        <span className="block h-full rounded-full bg-[#a855f7]" style={{ width: `${width}%` }} />
-      </span>
+    <span className="inline-flex items-center gap-1 text-[13px] text-[#333]">
+      <span className="w-14">{label}</span>
+      {[1, 2, 3, 4, 5].map((dot) => (
+        <span key={dot} className={`size-2.5 rounded-full ${dot <= n ? "bg-[#161616]" : "bg-[#ddd]"}`} />
+      ))}
     </span>
   );
 }
 
-export function KeyboardShop({ look, onLeave }: { look: Look; onLeave?: () => void }) {
-  const phone = look === "phone";
+export function KeyboardShop({ onLeave }: { look?: Look; onLeave?: () => void }) {
   const [view, setView] = useState<View>("home");
-  const [preset, setPreset] = useState<Preset>(SHAPE[0]);
+  const [preset, setPreset] = useState<Preset>(DOORS[0]);
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<Sort>("quiet");
   const [layout, setLayout] = useState<Layout | "any">("any");
@@ -148,7 +148,7 @@ export function KeyboardShop({ look, onLeave }: { look: Look; onLeave?: () => vo
   function openPreset(next: Preset) {
     setPreset(next);
     setQuery("");
-    setSort(next.sort ?? (next.shelf === "sound" || next.shelf === "switch" ? "quiet" : "low"));
+    setSort(next.sort ?? "low");
     setLayout(next.layout ?? "any");
     setNumpad(next.numpad ?? "any");
     setFn(next.fn ?? "any");
@@ -161,9 +161,7 @@ export function KeyboardShop({ look, onLeave }: { look: Look; onLeave?: () => vo
 
   const counts = useMemo(() => {
     const out: Record<string, number> = {};
-    for (const group of GROUPS) {
-      for (const item of group.items) out[item.id] = KEYS.filter((row) => matches(row, item)).length;
-    }
+    for (const item of [...DOORS, ...ENTHUSIAST.flatMap((group) => group.items)]) out[item.id] = KEYS.filter((row) => matches(row, item)).length;
     return out;
   }, []);
 
@@ -191,43 +189,35 @@ export function KeyboardShop({ look, onLeave }: { look: Look; onLeave?: () => vo
     return rows;
   }, [preset, query, sort, layout, numpad, fn, light, feel, openBox]);
 
-  const tunable = preset.shelf === "board" || preset.shelf === "sound" || preset.shelf === "combo";
-  const card = "rounded-2xl border border-[#5b21b6] bg-[#140818] text-[#f6edff]";
-  const chip = (on: boolean) => `h-11 rounded-full px-3 text-sm ${on ? "bg-[#7c3aed] text-white" : "bg-[#241033] text-[#f3e8ff]"}`;
+  const boards = preset.shelf === "board" || preset.shelf === "sound" || preset.shelf === "combo";
+
+  function chip(on: boolean) {
+    return `min-h-11 rounded-full border px-3 text-sm ${on ? "border-[#161616] bg-[#161616] text-white" : "border-[#ccc] bg-white text-[#161616]"}`;
+  }
+
+  function pick<T extends string>(current: T, value: T, empty: T, set: (next: T) => void) {
+    set(current === value ? empty : value);
+  }
 
   const home = (
-    <div className="space-y-6">
-      <p className="px-1 text-[15px] leading-snug text-[#c4b5fd]">
-        Pick how it sounds first. Quiet is silent. Soft is smooth, with no click. Loud is clicky. Measured is a typical decibel number for that switch. Estimated adds the case.
-      </p>
+    <div className="space-y-6 pb-8">
+      <p className="text-[16px] leading-snug text-[#333]">Three shelves. A finished keyboard, switches on their own, or keycaps on their own.</p>
       <div className="grid gap-2">
-        {LOUD.map((item) => (
-          <button key={item.id} type="button" onClick={() => openPreset(item)} className={`press flex min-h-20 flex-col items-start justify-center px-4 py-3 text-left ${card}`}>
-            <span className="text-[22px] font-medium leading-none">{item.title}</span>
-            <span className="mt-2 block text-[14px] text-[#c4b5fd]">
-              {counts[item.id] ?? KEYS.filter((row) => matches(row, item)).length} · {item.line}
-            </span>
+        {DOORS.map((item) => (
+          <button key={item.id} type="button" onClick={() => openPreset(item)} className="min-h-24 rounded-2xl border border-[#161616] bg-white px-4 py-3 text-left">
+            <span className="block text-[24px] font-medium leading-none">{item.title}</span>
+            <span className="mt-2 block text-[15px] text-[#333]">{counts[item.id]} on the shelf. {item.line}</span>
           </button>
         ))}
       </div>
-      {GROUPS.map((group) => (
+      {ENTHUSIAST.map((group) => (
         <section key={group.title}>
-          <h2 className="mb-2 px-1 text-[13px] font-semibold uppercase tracking-[0.08em] text-[#c4b5fd]">{group.title}</h2>
-          <div className="overflow-hidden rounded-2xl border border-[#5b21b6] bg-[#140818]">
-            {group.items.map((item, index) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => openPreset(item)}
-                className={`flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-[#241033] ${index ? "border-t border-[#3b1760]" : ""}`}
-              >
-                <span className="min-w-0 flex-1">
-                  <span className="block text-[17px] font-medium">{item.title}</span>
-                  <span className="mt-0.5 block text-[13px] text-[#c4b5fd]">
-                    {counts[item.id]} · {item.line}
-                  </span>
-                </span>
-                <ChevronLeft className="size-4 rotate-180 text-[#a78bfa]" />
+          <h2 className="mb-2 text-[13px] font-semibold uppercase tracking-[0.14em] text-[#333]">Enthusiast · {group.title}</h2>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {group.items.map((item) => (
+              <button key={item.id} type="button" onClick={() => openPreset(item)} className="min-h-16 rounded-2xl border border-[#ddd] bg-white px-3 py-3 text-left">
+                <span className="block text-[17px] font-medium">{item.title}</span>
+                <span className="mt-1 block text-[13px] text-[#333]">{counts[item.id]} · {item.line}</span>
               </button>
             ))}
           </div>
@@ -237,46 +227,41 @@ export function KeyboardShop({ look, onLeave }: { look: Look; onLeave?: () => vo
   );
 
   const list = (
-    <div>
-      <button type="button" onClick={() => setView("home")} className="mb-3 flex items-center gap-1 text-[17px] text-[#c4b5fd]">
-        <ChevronLeft className="size-5" strokeWidth={2.25} />
-        Keyboards
-      </button>
-      <h2 className={phone ? "text-[28px] font-bold leading-none tracking-tight" : "font-display text-3xl font-medium leading-none tracking-tight"}>{preset.title}</h2>
-      <p className="mt-2 text-[15px] leading-snug text-[#c4b5fd]">{preset.line}</p>
-      <label className="mt-3 flex h-11 items-center gap-2 rounded-xl bg-[#241033] px-3">
-        <Search className="size-4 text-[#c4b5fd]" />
-        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search" className="h-full w-full bg-transparent text-[16px] outline-none" />
+    <div className="pb-10">
+      <h2 className="text-[28px] font-semibold leading-none">{preset.title}</h2>
+      <p className="mt-2 text-[15px] leading-snug text-[#333]">{preset.line}</p>
+      <label className="mt-3 flex h-12 items-center gap-2 rounded-xl border border-[#ccc] bg-white px-3">
+        <Search className="size-4 text-[#333]" />
+        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search this shelf" className="h-full w-full bg-white text-[16px] text-[#161616] outline-none" />
       </label>
       <div className="mt-3 flex flex-wrap gap-2">
         {(
           [
-            ["quiet", "Quiet to loud"],
-            ["loud", "Loud to quiet"],
-            ["low", "Price, low"],
-            ["high", "Price, high"],
+            ["quiet", "Quiet first"],
+            ["loud", "Loud first"],
+            ["low", "Cheapest"],
+            ["high", "Dearest"],
           ] as const
         ).map(([id, label]) => (
-          <button key={id} type="button" onClick={() => setSort(id)} className={chip(sort === id)}>
+          <button key={id} type="button" aria-pressed={sort === id} onClick={() => setSort(sort === id ? "low" : id)} className={chip(sort === id)}>
             {label}
           </button>
         ))}
-        <button type="button" onClick={() => setOpenBox((value) => !value)} className={chip(!openBox)}>
-          {openBox ? "Open box shown" : "Open box hidden"}
+        <button type="button" aria-pressed={!openBox} onClick={() => setOpenBox((value) => !value)} className={chip(!openBox)}>
+          {openBox ? "Hide open box" : "Open box hidden"}
         </button>
       </div>
-      {tunable ? (
+      {boards ? (
         <div className="mt-3 space-y-2">
           <div className="flex flex-wrap gap-2">
             {(
               [
-                ["any", "Any numpad"],
                 ["right", "Numpad right"],
                 ["none", "No numpad"],
                 ["left", "Numpad left"],
               ] as const
             ).map(([id, label]) => (
-              <button key={id} type="button" onClick={() => setNumpad(id)} className={chip(numpad === id)}>
+              <button key={id} type="button" aria-pressed={numpad === id} onClick={() => pick(numpad, id, "any", setNumpad)} className={chip(numpad === id)}>
                 {label}
               </button>
             ))}
@@ -284,12 +269,11 @@ export function KeyboardShop({ look, onLeave }: { look: Look; onLeave?: () => vo
           <div className="flex flex-wrap gap-2">
             {(
               [
-                ["any", "Any function keys"],
                 ["yes", "Function keys"],
                 ["no", "No function keys"],
               ] as const
             ).map(([id, label]) => (
-              <button key={id} type="button" onClick={() => setFn(id)} className={chip(fn === id)}>
+              <button key={id} type="button" aria-pressed={fn === id} onClick={() => pick(fn, id, "any", setFn)} className={chip(fn === id)}>
                 {label}
               </button>
             ))}
@@ -297,13 +281,12 @@ export function KeyboardShop({ look, onLeave }: { look: Look; onLeave?: () => vo
           <div className="flex flex-wrap gap-2">
             {(
               [
-                ["any", "Any light"],
                 ["rgb", "RGB"],
                 ["backlight", "Backlight"],
-                ["none", "No backlight"],
+                ["none", "No light"],
               ] as const
             ).map(([id, label]) => (
-              <button key={id} type="button" onClick={() => setLight(id)} className={chip(light === id)}>
+              <button key={id} type="button" aria-pressed={light === id} onClick={() => pick(light, id, "any", setLight)} className={chip(light === id)}>
                 {label}
               </button>
             ))}
@@ -311,7 +294,6 @@ export function KeyboardShop({ look, onLeave }: { look: Look; onLeave?: () => vo
           <div className="flex flex-wrap gap-2">
             {(
               [
-                ["any", "Any switch"],
                 ["silent", "Silent"],
                 ["linear", "Linear"],
                 ["tactile", "Tactile"],
@@ -320,69 +302,80 @@ export function KeyboardShop({ look, onLeave }: { look: Look; onLeave?: () => vo
                 ["membrane", "Membrane"],
               ] as const
             ).map(([id, label]) => (
-              <button key={id} type="button" onClick={() => setFeel(id)} className={chip(feel === id)}>
+              <button key={id} type="button" aria-pressed={feel === id} onClick={() => pick(feel, id, "any", setFeel)} className={chip(feel === id)}>
                 {label}
               </button>
             ))}
           </div>
-          <label className="flex h-11 items-center gap-2 rounded-xl bg-[#241033] px-3">
-            <span className="shrink-0 text-[13px] text-[#c4b5fd]">Size</span>
-            <select value={layout} onChange={(event) => setLayout(event.target.value as Layout | "any")} className="h-full min-w-0 flex-1 bg-transparent text-[16px] outline-none">
-              <option value="any">Any size</option>
-              {(Object.keys(LAYOUT_LABEL) as Layout[]).map((id) => (
-                <option key={id} value={id}>
-                  {LAYOUT_LABEL[id]}
-                </option>
-              ))}
-            </select>
-          </label>
+          <div className="flex flex-wrap gap-2">
+            {(["60", "65", "75", "tkl", "96", "full", "split", "numpad-left"] as Layout[]).map((id) => (
+              <button key={id} type="button" aria-pressed={layout === id} onClick={() => pick(layout, id, "any", setLayout)} className={chip(layout === id)}>
+                {LAYOUT_LABEL[id].split("·")[0].trim()}
+              </button>
+            ))}
+          </div>
         </div>
       ) : null}
-      <p className="mt-3 text-[13px] text-[#c4b5fd]">{shown.length} shown</p>
-      {shown.length === 0 ? <p className={`mt-3 px-4 py-8 text-center text-[17px] text-[#c4b5fd] ${card}`}>Nothing in this list.</p> : null}
-      <ul className={`mt-2 overflow-hidden ${card}`}>
-        {shown.slice(0, limit).map((item, index) => {
+      <p className="mt-3 text-[13px] text-[#333]">{shown.length} shown. Tap a filter again to turn it off.</p>
+      {shown.length === 0 ? <p className="mt-3 rounded-2xl border border-[#ccc] bg-white px-4 py-8 text-center text-[17px]">Nothing matches. Turn a filter off.</p> : null}
+      <ul className="mt-2 space-y-2">
+        {shown.slice(0, limit).map((item) => {
           const open = openId === item.id;
+          const heard = item.shelf === "board" || item.shelf === "switch" || item.shelf === "combo";
           return (
-            <li key={item.id} className={index ? "border-t border-[#3b1760]" : ""}>
-              <button type="button" onClick={() => setOpenId(open ? null : item.id)} className="flex w-full items-start gap-3 px-3 py-3 text-left">
-                <span className="min-w-0 flex-1">
-                  <span className="block text-[12px] font-medium uppercase tracking-wide text-[#c4b5fd]">{item.brand}</span>
-                  <span className="mt-0.5 block text-[16px] font-medium leading-snug">{item.name}</span>
-                  <span className="mt-1 block text-[13px] text-[#c4b5fd]">{meta(item)}</span>
-                  <SoundMeter item={item} phone={phone} />
-                  {open ? <span className="mt-2 block text-[14px] leading-snug text-[#f6edff]">{item.sound}</span> : null}
+            <li key={item.id}>
+              <button type="button" aria-expanded={open} onClick={() => setOpenId(open ? null : item.id)} className="w-full rounded-2xl border border-[#ddd] bg-white px-3 py-3 text-left">
+                <span className="flex items-start justify-between gap-3">
+                  <span className="min-w-0">
+                    <span className="block text-[12px] font-medium uppercase tracking-wide text-[#555]">{item.brand}</span>
+                    <span className="mt-0.5 block text-[16px] font-medium leading-snug text-[#161616]">{item.name}</span>
+                  </span>
+                  <span className="shrink-0 text-right text-[16px] font-semibold text-[#161616]">{money(item.price)}</span>
                 </span>
-                <span className="shrink-0 text-right">
-                  <span className="block text-[16px] font-semibold">{money(item.price)}</span>
-                  {item.was ? <span className="block text-[12px] text-[#ff3b30] line-through">{money(item.was)}</span> : null}
+                <span className="mt-2 block text-[13px] text-[#333]">
+                  {item.shelf === "board" || item.shelf === "combo" ? `${LAYOUT_LABEL[item.layout]} · ${LIGHT_LABEL[item.light]} · ` : ""}
+                  {heard ? FEEL_LABEL[item.feel] : "Keycaps"}
+                  {item.open ? " · Open box" : ""}
                 </span>
+                {heard ? (
+                  <span className="mt-2 flex flex-col gap-1">
+                    <Dots n={bars(item.estimated, false)} label="Quiet" />
+                    <Dots n={bars(item.estimated, true)} label="Loud" />
+                    <span className="block text-[14px] text-[#161616]">Touch: {touchOf(item.feel)}</span>
+                    <span className="block text-[14px] text-[#161616]">Click: {clickOf(item.feel)}</span>
+                    <span className="block text-[14px] leading-snug text-[#333]">{dbLine(item)}</span>
+                  </span>
+                ) : (
+                  <span className="mt-2 block text-[14px] text-[#333]">{dbLine(item)}</span>
+                )}
+                {open ? <span className="mt-2 block text-[14px] leading-snug text-[#161616]">{item.sound || "That is the whole note on this one."}</span> : null}
               </button>
             </li>
           );
         })}
       </ul>
       {shown.length > limit ? (
-        <button type="button" onClick={() => setLimit((value) => value + 24)} className={`mt-3 h-11 w-full text-[17px] font-medium text-[#c4b5fd] ${card}`}>
+        <button type="button" onClick={() => setLimit((value) => value + 24)} className="mt-3 h-12 w-full rounded-2xl border border-[#161616] bg-white text-[16px] font-medium">
           Show more
         </button>
       ) : null}
     </div>
   );
 
-  if (phone) return view === "home" ? home : list;
-
   return (
-    <div className="mx-auto flex h-dvh w-full max-w-xl flex-col overflow-hidden bg-black text-[#f6edff]">
-      <header className="safe-top shrink-0 border-b border-[#3b1760] px-4 py-3">
-        <div className="flex items-center justify-between">
-          <button type="button" onClick={onLeave} className="text-base text-[#c4b5fd]">
-            Welcome
+    <div className="flex h-dvh w-full flex-col bg-[#f6f3ee] text-[#161616]">
+      <header className="shrink-0 border-b border-black/10 bg-[#f6f3ee] px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3">
+        <div className="flex items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={() => (view === "list" ? setView("home") : onLeave?.())}
+            className="flex h-11 items-center gap-1 rounded-full border border-[#161616] bg-white px-3 text-[16px] text-[#161616]"
+          >
+            <ChevronLeft className="size-5" />
+            {view === "list" ? "Shelves" : "Back"}
           </button>
-          <ThemeToggle />
+          <p className="text-[15px] font-medium">Keyboard store</p>
         </div>
-        <h1 className="font-display mt-3 text-4xl font-medium leading-none tracking-tight">Keyboards</h1>
-        <p className="mt-2 text-base text-[#c4b5fd]">Shape, sound, switches, and keycaps.</p>
       </header>
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">{view === "home" ? home : list}</div>
     </div>
