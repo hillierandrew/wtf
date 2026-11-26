@@ -19,6 +19,7 @@ export function Welcome({
   onGuide,
   onColour,
   onIdeas,
+  onPrices,
   onJob,
   onPower,
 }: {
@@ -33,6 +34,7 @@ export function Welcome({
   onGuide: () => void;
   onColour: (pick: ColourPick) => void;
   onIdeas: () => void;
+  onPrices: () => void;
   onJob: (kind: UseKind) => void;
   onPower: () => void;
 }) {
@@ -76,6 +78,10 @@ export function Welcome({
         <button type="button" onClick={() => { path?.note("five", "Five minutes"); setFive(true); }} className="press mt-4 flex min-h-24 w-full flex-col items-start justify-center rounded-3xl bg-accent px-5 py-4 text-left text-accent-fg">
           <span className="font-display text-3xl font-medium leading-none">Start</span>
           <span className="mt-2 text-sm">Big buttons. One answer each.</span>
+        </button>
+        <button type="button" onClick={onPrices} className="press mt-3 flex min-h-20 w-full flex-col items-start justify-center rounded-3xl border border-line bg-elevated px-5 py-4 text-left">
+          <span className="font-display text-3xl font-medium leading-none">Prices</span>
+          <span className="mt-2 text-sm text-muted">Search every category at once. Sort a hard drive by price per TB, or a card by speed per dollar.</span>
         </button>
         <h2 className="font-display mt-8 text-3xl font-medium leading-none">Or pick the job</h2>
         <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">

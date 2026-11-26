@@ -13,6 +13,7 @@ import { HistoryRoot, latest, usePath } from "@/components/history";
 import { AddButton, BagDock, ThreeSearch } from "@/components/bag";
 import { Five } from "@/components/five";
 import { keyBag, lapBag, partBag, simBag } from "@/lib/bag";
+import { Prices } from "@/components/prices";
 import { laptopBlob, laptopFace, laptopWeight, releaseYear, tagPaint } from "@/lib/facts";
 
 const LAPS = laptopsRaw as { id: string; name: string; price: number; gpu: number; specs: string; kind?: string }[];
@@ -97,6 +98,7 @@ function PhoneBody({ onLock }: { onLock: () => void }) {
   const [pc, setPc] = useState<Build>({});
   const [walk, setWalk] = useState(false);
   const [five, setFive] = useState(false);
+  const [prices, setPrices] = useState(false);
   const path = usePath();
 
   useEffect(() => {
@@ -107,6 +109,7 @@ function PhoneBody({ onLock }: { onLock: () => void }) {
     setGroup(groupId ? groupId.slice(6) : null);
     const item = latest(path.log, path.at, (id) => id.startsWith("item:"));
     setOpenId(item ? item.slice(5) : null);
+    setPrices(path.log[path.at]?.id === "prices");
   }, [path?.at]);
 
   useEffect(() => {
@@ -200,6 +203,7 @@ function PhoneBody({ onLock }: { onLock: () => void }) {
   const night = group === "keys";
   const title = open ? "Details" : meta?.title ?? (tab === "use" ? "Use" : tab === "power" ? "Power" : tab === "build" ? "Build" : tab === "deals" ? "Deals" : tab === "saved" ? "Saved" : tab === "search" ? "Search" : "Store");
 
+  if (prices) return <Prices onClose={() => { if (path?.log[path.at]?.id === "prices") path.back(); else setPrices(false); }} />;
   if (five) return <Five onClose={() => setFive(false)} />;
   if (walk) return <Counter onClose={() => setWalk(false)} />;
   if (group === "keys") return <KeyboardShop onLeave={() => setGroup(null)} />;
@@ -266,6 +270,10 @@ function PhoneBody({ onLock }: { onLock: () => void }) {
               <button type="button" onClick={() => setFive(true)} className="min-h-20 w-full rounded-2xl bg-[#1c1c1e] px-4 py-4 text-left text-white">
                 <span className="block text-[22px] font-semibold">Five minutes</span>
                 <span className="mt-1 block text-[15px] text-white/70">What it is for, the games, the budget, and the desk.</span>
+              </button>
+              <button type="button" onClick={() => { path?.note("prices", "Prices"); setPrices(true); }} className="min-h-16 w-full rounded-2xl bg-white px-4 py-3 text-left shadow-sm">
+                <span className="block text-[22px] font-semibold">Prices</span>
+                <span className="mt-1 block text-[15px] text-[#8e8e93]">Every category in one search.</span>
               </button>
               <EasyPick
                 look="phone"

@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { CopyList, buildNames } from "@/components/copy-list";
-import { CAT_LABEL, CATS, ideaPicks, money, shortName, spendOf, type AiPick } from "@/lib/catalog";
+import { CAT_LABEL, CATS, aiScore, buildCheck, dealFrom, ideaPicks, money, rankFrom, shortName, spendOf, type AiPick } from "@/lib/catalog";
 import { usePath } from "@/components/history";
 import { ThemeToggle, usePane } from "@/lib/theme";
 
@@ -61,9 +61,13 @@ export function Ideas({ onLeave, onUse }: { onLeave: () => void; onUse: (pick: A
               All builds
             </button>
             <h2 className="font-display mt-4 text-3xl font-medium leading-tight">{current.name}</h2>
-            <p className="mt-2 text-lg text-muted">{current.why}</p>
+            <p className="mt-1 text-xs tracking-wide text-neutral-500">CUSTOM BUILD — PARTS LIST</p>
+            <p className="text-xs text-neutral-500">Assembled by {current.by ?? "Grok"}</p>
+            <p className="mt-2 text-sm text-muted">Why this computer was assembled</p>
+            <p className="text-lg text-muted">{current.why}</p>
             <p className="mt-4 text-4xl font-semibold">{money(spendOf(current.build))}</p>
-            <p className="text-sm text-muted">That is the parts together. Not a monthly price.</p>
+            <p className="text-sm text-muted">Parts together. Pay this once. Not a store-assembled computer.</p>
+            <BuildMarks pick={current} />
             <ul className="mt-4 space-y-2">
               {CATS.map((cat) => {
                 const part = current.build[cat];
@@ -88,6 +92,7 @@ export function Ideas({ onLeave, onUse }: { onLeave: () => void; onUse: (pick: A
               <button key={pick.id} type="button" onClick={() => { setOpen(pick.id); path?.note(`idea:${pick.id}`, pick.name); }} className="flex h-auto min-h-0 w-full min-w-0 flex-col items-start overflow-hidden rounded-3xl border border-line bg-elevated p-5 text-left">
                 <span className="text-sm text-muted">{pick.kicker}</span>
                 <span className="mt-1 text-2xl font-semibold leading-snug">{pick.name}</span>
+                <span className="mt-1 text-xs text-neutral-500">Assembled by {pick.by ?? "Grok"}</span>
                 <span className="mt-2 text-base leading-snug text-muted">{pick.why}</span>
                 <span className="mt-4 text-2xl font-semibold tabular-nums">{money(spendOf(pick.build))}</span>
                 <span className="mt-1 text-sm text-muted">Parts together. Pay this once.</span>
@@ -96,6 +101,32 @@ export function Ideas({ onLeave, onUse }: { onLeave: () => void; onUse: (pick: A
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function BuildMarks({ pick }: { pick: AiPick }) {
+  const score = aiScore(pick.build);
+  const rank = rankFrom(score);
+  const spend = spendOf(pick.build);
+  const deal = dealFrom(spend, score);
+  const fit = buildCheck(pick.build);
+  return (
+    <div className="mt-3">
+      <div className="flex flex-wrap gap-2 text-sm">
+        <span className="rounded-full px-3 py-1 font-semibold" style={{ background: rank.bg, color: rank.fg }}>
+          {rank.name} {rank.score}
+        </span>
+        <span className="rounded-full px-3 py-1 font-semibold" style={{ background: deal.bg, color: deal.fg }}>
+          {deal.name} {money(deal.per)}/pt
+        </span>
+        <span className="rounded-full border border-line px-3 py-1">{fit.status}</span>
+      </div>
+      <ul className="mt-2 space-y-1 text-sm text-muted">
+        {fit.lines.map((line) => (
+          <li key={line}>{line}</li>
+        ))}
+      </ul>
     </div>
   );
 }

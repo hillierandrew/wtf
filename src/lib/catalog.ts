@@ -300,7 +300,7 @@ export function compareShelf(a: Part, b: Part, sort: ShelfSort): number {
   return a.price - b.price;
 }
 
-const BANDS = "Crystal is 90 to 100. Gold is 75 to 89. Silver is 55 to 74. Bronze is 35 to 54. Brown is under 35.";
+const BANDS = "Crystal is 90 to 100. Gold is 75 to 89. Silver is 55 to 74. Bronze is 35 to 54. Brown is under 35. Scoring v2. This number is an estimate from the product name, not a lab test.";
 
 export function explainPart(part: Part): string[] {
   const score = partScore(part);
@@ -312,6 +312,7 @@ export function explainPart(part: Part): string[] {
     lines.push(`Speed points are ${speed}. An RX 9070 is 100. A 5090 is 180.`);
     lines.push(`Score is ${speed} ÷ 180 × 100 = ${speed ? Math.min(100, Math.round((speed / 180) * 100)) : 8}.`);
     if (speed) lines.push(`${money(part.price)} ÷ ${speed} speed points = ${money(part.price / speed)} per point.`);
+    else lines.push("This card is not in the estimate table, so it is not given a speed score here.");
   } else if (part.cat === "cpu") {
     const points = cpuPoints(part.name);
     lines.push(`Chip points are ${points || 0} out of 96. A 9800X3D is 96. An older chip is lower.`);
@@ -476,14 +477,14 @@ export function psuForGpu(part: Part): PsuNeed {
   return { min: 450, comfortable: 550, card: 75 };
 }
 
-/** Rough speed where an RX 9070 is 100. Not a lab benchmark. */
-export function gpuIndex(part: Part): number {
+/** Rough speed where an RX 9070 is 100. Not a lab benchmark. 0 means the card is not in the table. */
+export function gpuKnown(part: Part): number {
   const n = part.name.toUpperCase();
   if (/5090/.test(n)) return 180;
   if (/5080/.test(n)) return 148;
   if (/5070\s?TI/.test(n)) return 122;
   if (/9070\s?XT/.test(n)) return 116;
-  if (/\b9070\b/.test(n)) return 100;
+  if (/\b9070\b/.test(n) && !/GRE/.test(n)) return 100;
   if (/\b5070\b/.test(n)) return 90;
   if (/5060\s?TI/.test(n) && /16\s?G/.test(n)) return 78;
   if (/5060\s?TI/.test(n)) return 72;
@@ -492,6 +493,27 @@ export function gpuIndex(part: Part): number {
   if (/\b5060\b/.test(n)) return 62;
   if (/\b7600\b/.test(n)) return 55;
   if (/3050/.test(n)) return 32;
+  if (/4090/.test(n)) return 170;
+  if (/4080/.test(n)) return 140;
+  if (/4070\s?TI/.test(n)) return 110;
+  if (/\b4070\b/.test(n)) return 88;
+  if (/4060\s?TI/.test(n)) return 70;
+  if (/\b4060\b/.test(n)) return 58;
+  if (/3090/.test(n)) return 130;
+  if (/3080/.test(n)) return 115;
+  if (/\b3070\b/.test(n)) return 80;
+  if (/\b3060\b/.test(n)) return 48;
+  if (/7900\s?XTX/.test(n)) return 150;
+  if (/7900/.test(n)) return 125;
+  if (/7800\s?XT/.test(n)) return 105;
+  if (/7700/.test(n)) return 78;
+  return 0;
+}
+
+/** Rough speed where an RX 9070 is 100. Not a lab benchmark. */
+export function gpuIndex(part: Part): number {
+  const known = gpuKnown(part);
+  if (known) return known;
   const tier = gpuTier(part);
   return [0, 20, 40, 60, 85, 120, 170][tier] ?? 0;
 }
@@ -574,6 +596,7 @@ export function dealLines(price: number, score: number, room: number): string[] 
   return [
     `${deal.name}. ${money(price)} ÷ ${score} = ${money(deal.per)} per point.`,
     "Steal is $14 or less per point. Fair is $22 or less. Full is $32 or less. Stretch is above that.",
+    "This is this store's rule for a whole computer. It is not a Canada-wide price survey.",
     `Upgrade room on the power score is ${room}. ${roomLine}`,
     `TLDR: ${deal.say} ${money(deal.per)} per point. Power is a different rank. This one is only the price.`,
   ];
@@ -736,6 +759,59 @@ export function fitWhy(part: Part, others: Build): string {
     if (w && w < need) return `Supply is ${w}W. This card wants about ${need}W.`;
   }
   return "";
+}
+
+/** Compatibility is separate from Power and Deal. UNKNOWN is not a pass. */
+export function buildCheck(build: Build): { status: "PASS" | "WARNING" | "FAIL" | "UNKNOWN"; lines: string[] } {
+  const lines: string[] = [];
+  let fail = false;
+  let warn = false;
+  let unknown = false;
+  const slots: Category[] = ["cpu", "motherboard", "memory", "gpu", "storage", "cooler", "case", "psu"];
+  for (const cat of slots) {
+    const part = build[cat];
+    if (!part) continue;
+    const rest: Build = { ...build };
+    delete rest[cat];
+    const why = fitWhy(part, rest);
+    if (why) {
+      fail = true;
+      lines.push(`FAIL. ${CAT_LABEL[cat]}: ${why}`);
+    }
+  }
+  if (build.cpu && !build.cpu.socket) {
+    unknown = true;
+    lines.push("UNKNOWN. The processor socket is not on the record.");
+  }
+  if (build.motherboard && !build.motherboard.socket) {
+    unknown = true;
+    lines.push("UNKNOWN. The motherboard socket is not on the record.");
+  }
+  if (build.gpu && build.psu) {
+    const need = needWatts(build);
+    const have = wattOf(build.psu);
+    if (!have) {
+      unknown = true;
+      lines.push("UNKNOWN. The power supply wattage is not on the record.");
+    } else if (have < need + 100) {
+      warn = true;
+      lines.push(`WARNING. ${have}W is close to the ${need}W estimate for this card. Comfortable is higher.`);
+    }
+  }
+  if (build.cooler && build.cpu) {
+    const listed = coolerSockets(build.cooler);
+    if (!listed.length) {
+      unknown = true;
+      lines.push("UNKNOWN. The cooler name does not list a socket, so fit was not measured.");
+    }
+  } else if (build.cpu && !/with cooler|wraith/i.test(build.cpu.name) && !build.cooler) {
+    warn = true;
+    lines.push("WARNING. No cooler is in this list, and the processor name does not say a cooler is included.");
+  }
+  if (!fail && !warn && !unknown) lines.push("PASS. Socket, memory type, case size, and power supply match the checks this store can do.");
+  lines.push("Not checked: BIOS version, exact GPU length, cooler height, and front-panel USB. Those stay UNKNOWN.");
+  const status = fail ? "FAIL" : unknown ? "UNKNOWN" : warn ? "WARNING" : "PASS";
+  return { status, lines };
 }
 
 export function reconcile(priority: Category, map: Build): Build {
@@ -1188,6 +1264,7 @@ export type AiPick = {
   why: string;
   tags: string[];
   best?: boolean;
+  by?: string;
   build: Build;
 };
 
@@ -1596,6 +1673,42 @@ export function ideaPicks(): AiPick[] {
       tags: ["games", "strong"],
       why: "32GB, a 16GB card, and a 2TB drive. PC specs are not out. This is a guess, not a promise.",
       build: buildFrom(["84d819ea71", BOARD_AM5, DDR5_32, GPU_9070, SSD2, CASE, PSU750, AIR]),
+    },
+    {
+      id: "idea-flight",
+      name: "Flight simulator",
+      kicker: "Strong",
+      tags: ["strong", "games"],
+      by: "Grok",
+      why: "Flight sims care about the processor and the card together. Ryzen 7 9800X3D, an RTX 5070 Ti, 32GB, and a 2TB drive. The stick and throttle are not in this list.",
+      build: buildFrom(["0abb21ae33", BOARD_B850, DDR5_32, GPU_5070TI, SSD2, CASE, PSU850, AIR]),
+    },
+    {
+      id: "idea-race",
+      name: "Racing simulator",
+      kicker: "Games",
+      tags: ["games", "strong"],
+      by: "Grok",
+      why: "A 1440p racing PC. Ryzen 5 9600X, an RX 9070, 32GB, and a screen. The wheel and pedals are sold on the sim shelf, not in this parts list.",
+      build: buildFrom(["9ab94a8d13", BOARD_B850, DDR5_32, GPU_9070, SSD2, CASE, PSU850, AIR, SCREEN_1440]),
+    },
+    {
+      id: "idea-edit",
+      name: "Video editing",
+      kicker: "Strong",
+      tags: ["strong"],
+      by: "Grok",
+      why: "Ryzen 9 9950X3D, 64GB, a fast drive, and an RTX 5070 Ti. Built for a timeline, not only for games.",
+      build: buildFrom(["0e1b30db1f", BOARD_B850, "d96159d6eb", GPU_5070TI, "3075226767", CASE, "0d6e4a6a3a", AIR]),
+    },
+    {
+      id: "idea-workstation",
+      name: "CAD workstation",
+      kicker: "Strong",
+      tags: ["strong", "school"],
+      by: "Grok",
+      why: "Intel, 32GB, and an RTX 5070 Ti. For drawings and class work. This is a parts list, not a certified workstation.",
+      build: buildFrom(["947a6322f8", "40f139f263", DDR5_32, GPU_5070TI, SSD2, CASE, PSU850, AIR]),
     },
   ];
 }

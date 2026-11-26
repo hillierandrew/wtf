@@ -14,11 +14,12 @@ import { Value } from "@/components/value";
 import { Welcome } from "@/components/welcome";
 import { Colour } from "@/components/colour";
 import { Ideas } from "@/components/ideas";
+import { Prices } from "@/components/prices";
 import { EasyPick, GpuPower } from "@/components/easy";
 import { useBench } from "@/lib/store";
 import { JOBS, type UseKind } from "@/lib/phone-use";
 
-const PAGES = new Set(["pc", "desk", "sim", "laptop", "desktop", "value", "steam", "games", "guide", "colour", "ideas", "pick", "power"]);
+const PAGES = new Set(["pc", "desk", "sim", "laptop", "desktop", "value", "steam", "games", "guide", "colour", "ideas", "pick", "power", "prices"]);
 
 export function Floor({ hydrated }: { hydrated: boolean }) {
   const path = usePath();
@@ -58,6 +59,7 @@ export function Floor({ hydrated }: { hydrated: boolean }) {
       onGames={() => go("games")}
       onGuide={() => go("guide")}
       onIdeas={() => go("ideas")}
+      onPrices={() => go("prices")}
       onJob={(kind) => {
         setJob(kind);
         path?.note(`pick:${kind}`, JOBS.find((job) => job.id === kind)?.label ?? "For");
@@ -126,6 +128,8 @@ export function Floor({ hydrated }: { hydrated: boolean }) {
             path?.note("pc", "Build");
           }}
         />
+      ) : mode === "prices" ? (
+        <Prices onClose={home} />
       ) : mode === "pick" ? (
         <EasyPick
           look="site"

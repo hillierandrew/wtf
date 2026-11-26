@@ -1,4 +1,4 @@
-export type Screen = "pc" | "desk" | "sim" | "laptop" | "desktop" | "value" | "steam" | "games" | "guide" | "colour" | "ideas" | "pick" | "power";
+export type Screen = "pc" | "desk" | "sim" | "laptop" | "desktop" | "value" | "steam" | "games" | "guide" | "colour" | "ideas" | "pick" | "power" | "prices";
 
 import { Lock } from "lucide-react";
 import { useDoorLock } from "@/components/lock";
@@ -25,6 +25,7 @@ export const NAMES: Record<string, string> = {
   pc: "Build",
   steam: "Steam",
   value: "Price",
+  prices: "Prices",
   desktop: "Prebuilds",
   laptop: "Laptops",
   colour: "Colour",

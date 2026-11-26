@@ -15,6 +15,7 @@ import { AddButton, BagDock } from "@/components/bag";
 import { Five } from "@/components/five";
 import { keyBag, lapBag, partBag, threeOf } from "@/lib/bag";
 import { Packs } from "@/components/packs";
+import { Prices } from "@/components/prices";
 
 const WHO = [
   { id: "grandma", title: "Grandma", say: "Email, photos, a video call. Nothing she has to learn." },
@@ -60,7 +61,7 @@ export function Spread({ onLock }: { onLock: () => void }) {
 
 function Floor({ onLock }: { onLock: () => void }) {
   const path = usePath();
-  const [panel, setPanel] = useState<"home" | "build" | "keys" | "sim" | "deals">("home");
+  const [panel, setPanel] = useState<"home" | "build" | "keys" | "sim" | "deals" | "prices">("home");
   const [who, setWho] = useState<Who>("school");
   const [budget, setBudget] = useState(1400);
   const [order, setOrder] = useState<Order>("low");
@@ -73,8 +74,8 @@ function Floor({ onLock }: { onLock: () => void }) {
 
   useEffect(() => {
     if (!path) return;
-    const panelId = latest(path.log, path.at, (id) => id === "build" || id === "keys" || id === "sim" || id === "deals" || id === "home");
-    setPanel(panelId === "build" || panelId === "keys" || panelId === "sim" || panelId === "deals" ? panelId : "home");
+    const panelId = latest(path.log, path.at, (id) => id === "build" || id === "keys" || id === "sim" || id === "deals" || id === "prices" || id === "home");
+    setPanel(panelId === "build" || panelId === "keys" || panelId === "sim" || panelId === "deals" || panelId === "prices" ? panelId : "home");
     const whoId = latest(path.log, path.at, (id) => id.startsWith("who:"));
     if (whoId) setWho(whoId.slice(4) as Who);
   }, [path?.at]);
@@ -117,7 +118,7 @@ function Floor({ onLock }: { onLock: () => void }) {
     );
   }, [shelf, budget, order, seek]);
 
-  function go(next: "home" | "build" | "keys" | "sim" | "deals", label: string) {
+  function go(next: "home" | "build" | "keys" | "sim" | "deals" | "prices", label: string) {
     path?.note(next, label);
     setPanel(next);
   }
@@ -127,6 +128,7 @@ function Floor({ onLock }: { onLock: () => void }) {
   if (panel === "keys") return <KeyboardShop onLeave={() => setPanel("home")} />;
   if (panel === "sim") return <Sim onLeave={() => setPanel("home")} />;
   if (panel === "deals") return <Bundles onLeave={() => setPanel("home")} />;
+  if (panel === "prices") return <Prices onClose={() => { if (path?.log[path.at]?.id === "prices") path.back(); else setPanel("home"); }} />;
 
   return (
     <div className="h-full overflow-y-auto bg-[#f4f1ea] pb-28 text-[#161616]">
@@ -140,6 +142,11 @@ function Floor({ onLock }: { onLock: () => void }) {
         </button>
       </header>
       <p className="mx-4 mt-3 max-w-2xl text-lg leading-snug text-[#333]">Pick the thing they said. Then read the line under the price out loud.</p>
+      <div className="mx-4 mt-3">
+        <button type="button" onClick={() => go("prices", "Prices")} className="h-12 rounded-full bg-[#161616] px-4 text-base font-semibold text-white">
+          Prices
+        </button>
+      </div>
       <div className="mt-4 grid gap-2 px-4 sm:grid-cols-4">
         {(
           [
