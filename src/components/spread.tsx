@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Lock } from "lucide-react";
 import rawLaptops from "@/data/laptops.json";
-import { PARTS, dealFrom, explainLaptop, explainPart, isJunk, laptopBits, machineParts, machineScore, money, partScore, type Part } from "@/lib/catalog";
+import { PARTS, dealFrom, explainLaptop, explainPart, gbOf, isJunk, laptopBits, machineParts, machineScore, money, partScore, type Part } from "@/lib/catalog";
 import { laptopBlob, laptopFace, releaseYear, tagPaint } from "@/lib/facts";
 import { RankBadge } from "@/components/rank";
 import { KEYS, FEEL_LABEL, type KeyItem } from "@/lib/keyboard";
@@ -11,11 +11,12 @@ import { KeyboardShop } from "@/components/keyboard-shop";
 import { Sim } from "@/components/sim";
 import { Bundles } from "@/components/bundles";
 import { HistoryRoot, latest, usePath } from "@/components/history";
-import { AddButton, BagDock } from "@/components/bag";
+import { AddButton, AddPack, BagDock } from "@/components/bag";
 import { Five } from "@/components/five";
 import { keyBag, lapBag, partBag, threeOf } from "@/lib/bag";
 import { Packs } from "@/components/packs";
 import { Prices } from "@/components/prices";
+import { designFloor, machineRows, type FloorMachine } from "@/lib/floor-builds";
 
 const WHO = [
   { id: "grandma", title: "Grandma", say: "Email, photos, a video call. Nothing she has to learn." },
@@ -135,19 +136,16 @@ function Floor({ onLock }: { onLock: () => void }) {
       <header className="flex items-start justify-between gap-4 px-4 pt-4">
         <div>
           <p className="text-[12px] font-semibold uppercase tracking-[0.22em] text-[#0f6b4c]">6666</p>
-          <h1 className="mt-1 max-w-3xl text-4xl font-semibold leading-none tracking-tight sm:text-5xl">What did they ask for?</h1>
+          <h1 className="mt-1 max-w-3xl font-display text-4xl font-medium leading-none tracking-tight sm:text-6xl">Built from what is on the shelf.</h1>
         </div>
         <button type="button" onClick={onLock} aria-label="Lock" className="flex size-11 shrink-0 items-center justify-center rounded-full border border-[#161616]">
           <Lock className="size-4" />
         </button>
       </header>
-      <p className="mx-4 mt-3 max-w-2xl text-lg leading-snug text-[#333]">Pick the thing they said. Then read the line under the price out loud.</p>
-      <div className="mx-4 mt-3">
-        <button type="button" onClick={() => go("prices", "Prices")} className="h-12 rounded-full bg-[#161616] px-4 text-base font-semibold text-white">
-          Prices
-        </button>
-      </div>
-      <div className="mt-4 grid gap-2 px-4 sm:grid-cols-4">
+      <p className="mx-4 mt-3 max-w-2xl text-lg leading-snug text-[#333]">Six computers from boxes on the shelf. Read the line, then the price. Nothing here is a finished PC with a mystery inside.</p>
+      <Designed budget={budget} onBudget={setBudget} />
+      <p className="mx-4 mt-8 text-sm font-semibold uppercase tracking-[0.16em] text-[#333]">Or they named the thing</p>
+      <div className="mt-2 grid gap-2 px-4 sm:grid-cols-4">
         {(
           [
             ["laptop", "A laptop"],
@@ -187,6 +185,7 @@ function Floor({ onLock }: { onLock: () => void }) {
       {ask === "sim" ? <div className="mx-4 mt-4"><Packs /></div> : null}
 
       <div className="mx-4 mt-4 flex flex-wrap gap-2">
+        <button type="button" onClick={() => go("prices", "Prices")} className="h-12 rounded-full bg-[#161616] px-4 text-base font-semibold text-white">Prices</button>
         <button type="button" onClick={() => { path?.note("five", "Five minutes"); setFive(true); }} className="h-12 rounded-full bg-[#0f6b4c] px-4 text-base font-semibold text-white">Five minutes</button>
         <button type="button" onClick={() => go("build", "Build")} className="h-12 rounded-full border border-[#161616] bg-white px-4 text-base">Build from a bundle</button>
         <button type="button" onClick={() => go("sim", "Sims")} className="h-12 rounded-full border border-[#161616] bg-white px-4 text-base">Full sim builder</button>
@@ -271,6 +270,94 @@ function Floor({ onLock }: { onLock: () => void }) {
       </section>
     </div>
   );
+}
+
+function Designed({ budget, onBudget }: { budget: number; onBudget: (next: number) => void }) {
+  const machines = useMemo(() => designFloor(), []);
+  const [id, setId] = useState(machines[3]?.id ?? machines[0]?.id ?? "");
+  const machine = machines.find((item) => item.id === id) ?? machines[0];
+  if (!machine) return <p className="mx-4 mt-4 rounded-3xl bg-white px-4 py-6">No complete computer could be built from the shelf.</p>;
+  const index = Math.max(0, machines.findIndex((item) => item.id === machine.id));
+  const over = machine.total > budget;
+  const rows = machineRows(machine);
+  const tower = ORDER_PARTS(machine).map((part) => partBag(part, `6666 ${machine.name}. Tower. ${money(machine.total)}.`));
+  const withScreen = machine.screen ? [...tower, partBag(machine.screen, `6666 ${machine.name}. Screen.`)] : tower;
+  const stamp = machine.status !== "PASS" ? "Check" : over ? "Over" : "Fits";
+  return (
+    <section className="mt-4">
+      <div className="sticky top-0 z-10 border-y border-[#161616] bg-[#f4f1ea]/95 px-4 py-3 backdrop-blur">
+        <div className="flex items-end justify-between gap-3">
+          <p className="text-sm text-[#333]">They can spend</p>
+          <p className="font-display text-3xl font-medium tabular-nums leading-none">{money(budget)}</p>
+        </div>
+        <input aria-label="Their budget" type="range" min={500} max={4500} step={50} value={budget} onChange={(event) => onBudget(Number(event.target.value))} className="mt-2 h-8 w-full accent-[#0f6b4c]" />
+      </div>
+      <div className="mt-3 grid grid-cols-2 gap-2 px-4">
+        {machines.map((item, itemIndex) => {
+          const on = item.id === machine.id;
+          const high = item.total > budget;
+          return (
+            <button key={item.id} type="button" onClick={() => setId(item.id)} className={`min-h-24 rounded-2xl px-3 py-2 text-left ${on ? "bg-[#161616] text-white" : "border border-[#161616] bg-white"}`}>
+              <span className={`block text-[11px] font-semibold uppercase tracking-wide ${on ? "text-[#b7f7c8]" : high ? "text-[#9b3a32]" : "text-[#0f6b4c]"}`}>{String(itemIndex + 1).padStart(2, "0")} {high ? "Over" : "Fits"}</span>
+              <span className="mt-1 block font-display text-3xl font-medium leading-none tabular-nums">{money(item.total)}</span>
+              <span className="mt-1 block text-sm leading-tight">{item.name}</span>
+            </button>
+          );
+        })}
+      </div>
+      <article className="relative mx-4 mt-4 overflow-hidden rounded-[1.75rem] border-2 border-[#161616] bg-white shadow-[0_6px_0_#161616]">
+        <div className="relative bg-[#161616] px-5 pb-5 pt-5 text-white">
+          <p className={`pointer-events-none absolute right-4 top-4 grid size-16 rotate-[-12deg] place-items-center rounded-full border-2 text-[11px] font-semibold uppercase tracking-wide ${stamp === "Fits" ? "border-[#b7f7c8] text-[#b7f7c8]" : "border-[#f0b4a8] text-[#f0b4a8]"}`}>{stamp}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#b7f7c8]">Say this first · {String(index + 1).padStart(2, "0")}</p>
+          <p className="mt-2 pr-16 text-xl font-semibold leading-snug sm:text-2xl">{machine.say}</p>
+          <p className="mt-4 font-display text-[clamp(2.6rem,12vw,4.25rem)] font-medium leading-none tabular-nums tracking-tight">{money(machine.total)}</p>
+          <p className="mt-2 text-sm text-white/75">{over ? `${money(machine.total - budget)} over what they said. The parts are still on the shelf.` : "Inside what they said. Tower only, before the screen."} {stepUp(machines[index - 1], machine)}</p>
+        </div>
+        <div aria-hidden className="h-4 bg-[radial-gradient(circle_at_12px_0,#f4f1ea_8px,transparent_8.5px)] bg-[length:24px_16px]" />
+        <ol className="divide-y divide-dashed divide-[#d8d0c4]">
+          {rows.map((row) => (
+            <li key={row.key} className="grid grid-cols-[4.75rem_1fr_auto] items-start gap-2 px-4 py-3">
+              <span className="pt-0.5 text-[11px] font-semibold uppercase tracking-wide text-[#0f6b4c]">{row.label}</span>
+              <span className="text-sm leading-snug">{row.name}</span>
+              <span className="text-sm font-semibold tabular-nums">{row.price == null ? "—" : money(row.price)}</span>
+            </li>
+          ))}
+          {machine.screen ? (
+            <li className="grid grid-cols-[4.75rem_1fr_auto] items-start gap-2 bg-[#f6f3ec] px-4 py-3">
+              <span className="pt-0.5 text-[11px] font-semibold uppercase tracking-wide text-[#0f6b4c]">Screen</span>
+              <span className="text-sm leading-snug">{shortScreen(machine.screen)}</span>
+              <span className="text-sm font-semibold tabular-nums">{money(machine.screen.price)}</span>
+            </li>
+          ) : null}
+        </ol>
+        <div className="border-t border-[#161616] px-4 py-4">
+          <p className="text-sm text-[#333]">{machine.note} {machine.screen ? `With the screen, ${money(machine.withScreen)}.` : ""}</p>
+          <AddPack lines={tower} label="Add the tower" className="mt-3 h-12 w-full rounded-full bg-[#0f6b4c] text-base font-semibold text-white" />
+          {machine.screen ? <AddPack lines={withScreen} label={`Add tower and screen · ${money(machine.withScreen)}`} className="mt-2 min-h-12 w-full rounded-full border border-[#161616] bg-white px-3 py-3 text-base font-semibold leading-snug text-[#161616]" /> : null}
+          <p className="mt-2 text-center text-xs text-[#333]">{tower.length} boxes into the cart. Not a mystery prebuilt.</p>
+        </div>
+      </article>
+    </section>
+  );
+}
+
+function shortScreen(part: Part) {
+  return part.name.replace(/\s+/g, " ").replace(new RegExp(`^${part.brand}\\s+`, "i"), "").trim();
+}
+
+function stepUp(prev: FloorMachine | undefined, cur: FloorMachine) {
+  if (!prev) return "Start here if they only need a desk.";
+  if (!prev.build.gpu && cur.build.gpu) return "This is the first one with a graphics card.";
+  if (prev.build.gpu && cur.build.gpu && prev.build.gpu.id !== cur.build.gpu.id) return "The card steps up from the one before.";
+  const prevRam = prev.build.memory ? gbOf(prev.build.memory) : 0;
+  const ram = cur.build.memory ? gbOf(cur.build.memory) : 0;
+  if (ram > prevRam) return `Memory steps up from ${prevRam}GB to ${ram}GB.`;
+  return "A stronger chip than the one before it.";
+}
+
+function ORDER_PARTS(machine: FloorMachine): Part[] {
+  const order = ["cpu", "motherboard", "memory", "gpu", "storage", "cooler", "case", "psu"] as const;
+  return order.map((cat) => machine.build[cat]).filter((part): part is Part => Boolean(part));
 }
 
 function scriptLine(kind: string, extra: string) {

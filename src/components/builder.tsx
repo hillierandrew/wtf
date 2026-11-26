@@ -403,7 +403,7 @@ export function Builder({ onLeave, start = "play" }: { onLeave: () => void; star
             ) : build[cat] ? (
               <p className="rounded-2xl border border-line bg-elevated p-4 text-base text-muted">{slotLine(cat, build, extras)}</p>
             ) : null}
-            {cat === "cooler" && build.cpu && /with cooler|wraith/i.test(build.cpu.name) ? (
+            {cat === "cooler" && build.cpu && /cooler|wraith/i.test(build.cpu.name) ? (
               <div className="rounded-xl border border-line bg-elevated p-3 text-sm">
                 <p className="font-medium">Skip the cooler.</p>
                 <p className="mt-1 text-muted">This processor already includes one. Another cooler is an extra part.</p>

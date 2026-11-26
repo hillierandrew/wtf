@@ -15,12 +15,12 @@ export function AddButton({ line, className }: { line: BagLine; className?: stri
   );
 }
 
-export function AddPack({ lines, className }: { lines: BagLine[]; className?: string }) {
+export function AddPack({ lines, className, label }: { lines: BagLine[]; className?: string; label?: string }) {
   const addMany = useBag((state) => state.addMany);
   if (!lines.length) return null;
   return (
     <button type="button" onClick={() => addMany(lines)} className={className ?? "mt-2 h-11 w-full rounded-full bg-[#161616] text-sm font-medium text-white"}>
-      Add the whole list
+      {label ?? "Add the whole list"}
     </button>
   );
 }

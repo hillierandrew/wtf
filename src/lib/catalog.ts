@@ -727,7 +727,7 @@ export function fitWhy(part: Part, others: Build): string {
     const kind = driveKind(part);
     if (kind === "2230") return "2230 is a tiny laptop drive. A desktop board takes a 2280 NVMe. Do not buy this.";
   }
-  if (part.cat === "cooler" && others.cpu && /with cooler|wraith/i.test(others.cpu.name)) {
+  if (part.cat === "cooler" && others.cpu && /cooler|wraith/i.test(others.cpu.name)) {
     return "This processor already includes a cooler. A second one is an extra part.";
   }
   if (part.cat === "case" && others.motherboard && formOf(part) && formOf(others.motherboard) && !fitsCase(part, others.motherboard)) {
@@ -804,7 +804,7 @@ export function buildCheck(build: Build): { status: "PASS" | "WARNING" | "FAIL" 
       unknown = true;
       lines.push("UNKNOWN. The cooler name does not list a socket, so fit was not measured.");
     }
-  } else if (build.cpu && !/with cooler|wraith/i.test(build.cpu.name) && !build.cooler) {
+  } else if (build.cpu && !/cooler|wraith/i.test(build.cpu.name) && !build.cooler) {
     warn = true;
     lines.push("WARNING. No cooler is in this list, and the processor name does not say a cooler is included.");
   }
@@ -994,7 +994,7 @@ export function shelfNote(cat: Category, build: Build): string {
   if (cat === "psu" && build.gpu) bits.push(`${needWatts(build)}W and up`);
   if (cat === "gpu" && build.psu && wattOf(build.psu)) bits.push(`within ${wattOf(build.psu)}W`);
   if (cat === "cooler" && build.cpu?.socket) bits.push(build.cpu.socket);
-  if (cat === "cooler" && build.cpu && /with cooler|wraith/i.test(build.cpu.name)) {
+  if (cat === "cooler" && build.cpu && /cooler|wraith/i.test(build.cpu.name)) {
     bits.push("Skip this. A cooler is already in the processor box");
   }
   if (cat === "storage") {
@@ -1029,7 +1029,7 @@ export function warnings(build: Build): string[] {
     const rad = build.cooler.name.toUpperCase().match(/\b(240|280|360|420)\s?MM\b/);
     if (rad) notes.push(`A ${rad[1]}mm cooler may not fit an ITX case.`);
   }
-  if (cpu && build.cooler && /with cooler|wraith/i.test(cpu.name)) {
+  if (cpu && build.cooler && /cooler|wraith/i.test(cpu.name)) {
     notes.push("This processor already includes a cooler.");
   }
   if (build.psu && wattOf(build.psu) && wattOf(build.psu) < needWatts(build) && !coveredByBundle(build).has("psu")) {
@@ -1067,7 +1067,7 @@ export function scoreBuild(build: Build): {
       badges: [{ name: "Finished", detail: "One price for the whole PC." }],
     };
   }
-  const stock = Boolean(build.cpu && /with cooler|wraith/i.test(build.cpu.name));
+  const stock = Boolean(build.cpu && /cooler|wraith/i.test(build.cpu.name));
   const graphics = Boolean(
     build.gpu || (build.cpu && /RADEON|GRAPHICS|GT\b/i.test(build.cpu.name) && !/\dF\b|KF\b/i.test(build.cpu.name)),
   );

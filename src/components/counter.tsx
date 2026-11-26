@@ -129,7 +129,7 @@ export function Counter({ onClose }: { onClose: () => void }) {
   const room = shelf.room;
   const splitBudget = shelf.split;
   const shown = cat === "bundle" ? parts : parts.slice(0, limit);
-  const stockCooler = cat === "cooler" && Boolean(build.cpu && /with cooler|wraith/i.test(build.cpu.name));
+  const stockCooler = cat === "cooler" && Boolean(build.cpu && /cooler|wraith/i.test(build.cpu.name));
 
   const chosen = (["cpu", "motherboard", "memory", "gpu", "storage", "cooler", "psu", "case", "monitor"] as const)
     .map((item) => build[item])
