@@ -2,8 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import { Check, Search, X } from "lucide-react";
 import raw from "@/data/sim.json";
 import monitors from "@/data/monitors.json";
-import { CopyList, partLine } from "@/components/copy-list";
+import { CopyList, listText, partLine } from "@/components/copy-list";
 import { ThemeToggle } from "@/lib/theme";
+import { PARTS, isJunk, machineScore, money as partMoney } from "@/lib/catalog";
+import QRCode from "qrcode";
 
 type Game = "racing" | "flight" | "farm" | "pads" | "consoles" | "extras";
 type Level = "all" | "entry" | "novice" | "mid" | "pro" | "real";
@@ -109,12 +111,14 @@ const GAMES: { id: Game; label: string; line: string }[] = [
 ];
 
 const TITLES: { id: string; label: string; rig: Game; triple: boolean; pc: string }[] = [
-  { id: "forza", label: "Forza Horizon 5", rig: "racing", triple: true, pc: "One screen: 16GB and a mid graphics card. Three screens: 32GB and a stronger card, about an RTX 4070." },
-  { id: "iracing", label: "iRacing", rig: "racing", triple: true, pc: "iRacing likes a fast processor. One screen: 16GB and a mid card. Three screens: 32GB and an RTX 4070 class card or better." },
+  { id: "forza", label: "Forza Horizon 5", rig: "racing", triple: true, pc: "One screen: 16GB and a mid graphics card. Three screens: 32GB and a stronger card." },
+  { id: "nfs", label: "Need for Speed", rig: "racing", triple: false, pc: "One screen. 16GB and a mid card. A wheel is optional. A pad is fine." },
+  { id: "iracing", label: "iRacing", rig: "racing", triple: true, pc: "iRacing likes a fast processor. One screen: 16GB and a mid card. Three screens: 32GB and a stronger card." },
   { id: "acc", label: "Assetto Corsa", rig: "racing", triple: true, pc: "One screen: 16GB and a mid card. Three screens: 32GB and a stronger card." },
   { id: "f1", label: "F1", rig: "racing", triple: true, pc: "One screen: 16GB and a mid card. Three screens: 32GB and a stronger card." },
   { id: "flight", label: "Flight Simulator", rig: "flight", triple: false, pc: "32GB and a strong card. This one is heavy even on a single screen." },
   { id: "farm", label: "Farming Simulator 25", rig: "farm", triple: false, pc: "16GB and a mid card. Use a wheel, then add the farm stick." },
+  { id: "truck", label: "Euro Truck Simulator 2", rig: "racing", triple: false, pc: "16GB and a mid card. A wheel and pedals. One screen is enough." },
 ];
 
 const TRIPLE: { id: Slot; label: string; line: string }[] = [
@@ -169,6 +173,10 @@ export function Sim({ onLeave, look = "paper" }: { onLeave?: () => void; look?: 
   const [openBox, setOpenBox] = useState(false);
   const [level, setLevel] = useState<Level>("all");
   const [notice, setNotice] = useState("");
+  const [sort, setSort] = useState<"low" | "high" | "rank">("low");
+  const [grid, setGrid] = useState(false);
+  const [cart, setCart] = useState(false);
+  const [qr, setQr] = useState("");
 
   useEffect(() => {
     try {
@@ -221,8 +229,12 @@ export function Sim({ onLeave, look = "paper" }: { onLeave?: () => void; look?: 
       if (brand !== "all" && item.brand !== brand) return false;
       if (q && !`${item.brand} ${item.name}`.toLowerCase().includes(q)) return false;
       return true;
-    }).sort((a, b) => a.price - b.price);
-  }, [game, step, query, brand, openBox, level]);
+    }).sort((a, b) => {
+      if (sort === "high") return b.price - a.price;
+      if (sort === "rank") return rankOf(b) - rankOf(a);
+      return a.price - b.price;
+    });
+  }, [game, step, query, brand, openBox, level, sort]);
 
   function choose(item: SimItem) {
     if (item.base === false && item.slot === "rim") {
@@ -280,6 +292,24 @@ export function Sim({ onLeave, look = "paper" }: { onLeave?: () => void; look?: 
   const included = stepMeta ? covers(stepMeta.id) : undefined;
   const blocked = Boolean(included && included.slot !== stepMeta?.id);
   const total = picked.reduce((sum, item) => sum + item.price, 0);
+  const shelfText = listText(title || "Sim", picked.map((item) => partLine(item)));
+  const pc = useMemo(() => {
+    const floor = /Flight/.test(title) || triple ? 55 : 40;
+    return PARTS.filter((part) => part.cat === "prebuilt" && !isJunk(part, true) && machineScore(part.name) >= floor).sort((a, b) => a.price - b.price)[0];
+  }, [title, triple]);
+
+  useEffect(() => {
+    if (!cart || !picked.length) return;
+    let stop = false;
+    QRCode.toDataURL(shelfText, { margin: 1, width: 220 })
+      .then((url) => {
+        if (!stop) setQr(url);
+      })
+      .catch(() => setQr(""));
+    return () => {
+      stop = true;
+    };
+  }, [cart, shelfText, picked.length]);
 
   const phone = look === "phone";
   return (
@@ -351,6 +381,7 @@ export function Sim({ onLeave, look = "paper" }: { onLeave?: () => void; look?: 
           <div className={phone ? "space-y-3" : "min-h-0 flex-1 space-y-3 overflow-y-auto px-4 pb-4"}>
             {title ? <p className="text-base font-medium">{title}</p> : null}
             {blurb ? <p className="rounded-2xl border border-line bg-subtle px-4 py-3 text-base">{blurb}</p> : null}
+            {pc ? <p className="rounded-2xl border border-line bg-elevated px-4 py-3 text-base">Computer for this: {pc.name}. {partMoney(pc.price)}. Score {machineScore(pc.name)}.</p> : null}
             <p className="text-base text-muted">{LEVELS.find((item) => item.id === level)?.line} {stepMeta?.line}</p>
             {notice ? <p className="rounded-2xl border border-line bg-elevated px-4 py-3 text-base">{notice}</p> : null}
             {blocked ? (
@@ -370,6 +401,10 @@ export function Sim({ onLeave, look = "paper" }: { onLeave?: () => void; look?: 
                   <button type="button" onClick={() => setOpenBox((value) => !value)} className={`h-11 rounded-full border px-4 text-base ${openBox ? "border-accent bg-subtle" : "border-line"}`}>
                     {openBox ? "Open box on" : "Open box off"}
                   </button>
+                  <button type="button" onClick={() => setSort("low")} className={`h-11 rounded-full border px-4 text-base ${sort === "low" ? "border-accent bg-subtle" : "border-line"}`}>Price low</button>
+                  <button type="button" onClick={() => setSort("high")} className={`h-11 rounded-full border px-4 text-base ${sort === "high" ? "border-accent bg-subtle" : "border-line"}`}>Price high</button>
+                  <button type="button" onClick={() => setSort("rank")} className={`h-11 rounded-full border px-4 text-base ${sort === "rank" ? "border-accent bg-subtle" : "border-line"}`}>Rating high</button>
+                  <button type="button" onClick={() => setGrid((value) => !value)} className="h-11 rounded-full border border-line px-4 text-base">{grid ? "List" : "Grid"}</button>
                 </div>
                 <select value={brand} onChange={(event) => setBrand(event.target.value)} className="h-12 w-full rounded-2xl border border-line bg-elevated px-3 text-base">
                   <option value="all">Every brand</option>
@@ -379,7 +414,7 @@ export function Sim({ onLeave, look = "paper" }: { onLeave?: () => void; look?: 
                     </option>
                   ))}
                 </select>
-                <ul className="flex flex-col gap-2">
+                <ul className={grid ? "grid grid-cols-2 gap-2" : "flex flex-col gap-2"}>
                   {shown.length === 0 ? <li className="rounded-2xl border border-line px-4 py-4 text-base">Nothing at this level. Try All.</li> : null}
                   {shown.map((item) => {
                     const selected = ids[item.slot] === item.id;
@@ -410,21 +445,27 @@ export function Sim({ onLeave, look = "paper" }: { onLeave?: () => void; look?: 
         </>
       )}
       <aside className="safe-bottom shrink-0 border-t border-line bg-elevated px-4 py-3">
-        <p className="text-base font-medium">
-          {picked.length} {picked.length === 1 ? "thing" : "things"} · {money(total)}
-        </p>
-        <ul className="mt-2 max-h-36 space-y-2 overflow-y-auto">
-          {picked.length === 0 ? <li className="text-base text-muted">Nothing yet. Pick a game.</li> : null}
-          {picked.map((item) => (
-            <li key={item.id} className="flex items-center gap-2">
-              <span className="min-w-0 flex-1 truncate text-base">{item.name}</span>
-              <button type="button" onClick={() => remove(item.slot)} aria-label="Remove" className="flex size-11 items-center justify-center rounded-full border border-line">
-                <X className="size-4" />
-              </button>
-            </li>
-          ))}
-        </ul>
-        <CopyList title={title || "Sim"} names={picked.map((item) => partLine(item))} />
+        <button type="button" onClick={() => setCart((value) => !value)} className="flex w-full items-center justify-between text-left">
+          <span className="text-base font-medium">{picked.length} {picked.length === 1 ? "thing" : "things"} · {money(total)}</span>
+          <span className="text-sm">{cart ? "Close cart" : "Open cart"}</span>
+        </button>
+        {cart ? (
+          <>
+            <ul className="mt-2 max-h-36 space-y-2 overflow-y-auto">
+              {picked.length === 0 ? <li className="text-base text-muted">Nothing yet. Pick a game.</li> : null}
+              {picked.map((item) => (
+                <li key={item.id} className="flex items-center gap-2">
+                  <span className="min-w-0 flex-1 truncate text-base">{item.name}</span>
+                  <button type="button" onClick={() => remove(item.slot)} aria-label="Remove" className="flex size-11 items-center justify-center rounded-full border border-line">
+                    <X className="size-4" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+            {qr ? <img src={qr} alt="QR code for this sim list" className="mx-auto mt-2 size-36 rounded-xl bg-white p-2" /> : null}
+            <CopyList title={title || "Sim"} names={picked.map((item) => partLine(item))} />
+          </>
+        ) : null}
       </aside>
     </div>
   );

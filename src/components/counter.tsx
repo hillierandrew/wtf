@@ -35,6 +35,8 @@ export function Counter({ onClose }: { onClose: () => void }) {
   const [copied, setCopied] = useState(false);
   const [qr, setQr] = useState("");
   const [openCart, setOpenCart] = useState(false);
+  const [sort, setSort] = useState<"score-desc" | "score-asc" | "price-asc" | "price-desc">("score-desc");
+  const [grid, setGrid] = useState(false);
 
   const order = from === "gpu" ? FROM_GPU : FROM_CPU;
   const cat = order[Math.min(step, order.length - 1)];
@@ -46,9 +48,14 @@ export function Counter({ onClose }: { onClose: () => void }) {
     const fitting = PARTS.filter((part) => part.cat === cat && !isJunk(part, false) && !fitWhy(part, others));
     const priced = fitting.filter((part) => part.price <= room);
     const list = (priced.length ? priced : fitting).slice();
-    list.sort((a, b) => partScore(b) - partScore(a) || a.price - b.price);
+    list.sort((a, b) => {
+      if (sort === "price-desc") return b.price - a.price;
+      if (sort === "price-asc") return a.price - b.price;
+      if (sort === "score-asc") return partScore(a) - partScore(b) || a.price - b.price;
+      return partScore(b) - partScore(a) || a.price - b.price;
+    });
     return list.slice(0, 40);
-  }, [build, cat, budget]);
+  }, [build, cat, budget, sort]);
 
   const chosen = (["cpu", "motherboard", "memory", "gpu", "storage", "cooler", "psu", "case", "monitor"] as const)
     .map((item) => build[item])
@@ -74,6 +81,14 @@ export function Counter({ onClose }: { onClose: () => void }) {
     setBuild(reconcile(part.cat, { ...build, [part.cat]: part }));
     setStep((value) => Math.min(order.length - 1, value + 1));
     setOpenCart(true);
+  }
+
+  function drop(part: Part) {
+    setBuild((current) => {
+      const next = { ...current };
+      delete next[part.cat];
+      return next;
+    });
   }
 
   function jump(index: number) {
@@ -132,8 +147,25 @@ export function Counter({ onClose }: { onClose: () => void }) {
             </button>
           ))}
         </div>
+        <div className="mt-2 flex flex-wrap gap-2 pb-2">
+          {(
+            [
+              ["score-desc", "Score high"],
+              ["score-asc", "Score low"],
+              ["price-asc", "Price low"],
+              ["price-desc", "Price high"],
+            ] as const
+          ).map(([id, label]) => (
+            <button key={id} type="button" onClick={() => setSort(id)} className={`h-10 rounded-full px-3 text-sm ${sort === id ? "bg-[#ff7a1a] text-[#2a0a12]" : "bg-[#241033] text-[#ffd7b0]"}`}>
+              {label}
+            </button>
+          ))}
+          <button type="button" onClick={() => setGrid((value) => !value)} className="h-10 rounded-full bg-[#241033] px-3 text-sm text-[#ffd7b0]">
+            {grid ? "List" : "Grid"}
+          </button>
+        </div>
       </header>
-      <ul className="min-h-0 flex-1 space-y-2 overflow-y-auto px-4 pb-3">
+      <ul className={`min-h-0 flex-1 overflow-y-auto px-4 pb-3 ${grid ? "grid grid-cols-2 content-start gap-2" : "space-y-2"}`}>
         {parts.map((part) => {
           const score = partScore(part);
           const on = build[cat]?.id === part.id;
@@ -168,7 +200,12 @@ export function Counter({ onClose }: { onClose: () => void }) {
           <div className="mt-2 max-h-64 space-y-2 overflow-y-auto">
             <ol className="space-y-1 text-sm">
               {chosen.map((part, index) => (
-                <li key={part.id}>{index + 1}. {partLine(part)}</li>
+                <li key={part.id} className="flex items-start gap-2">
+                  <span className="min-w-0 flex-1">{index + 1}. {partLine(part)}</span>
+                  <button type="button" onClick={() => drop(part)} className="shrink-0 rounded-full border border-[#1c1612] px-2 py-1 text-xs">
+                    Remove
+                  </button>
+                </li>
               ))}
             </ol>
             {qr ? <img src={qr} alt="QR code for this parts list" className="mx-auto mt-2 size-40 rounded-xl bg-[#fff7ed] p-2" /> : null}

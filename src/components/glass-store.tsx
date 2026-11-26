@@ -5,6 +5,7 @@ import { CAT_LABEL, PARTS, byId, explainLaptop, explainPart, isJunk, laptopBits,
 import { RankBadge } from "@/components/rank";
 import { Counter } from "@/components/counter";
 import { KeyboardShop } from "@/components/keyboard-shop";
+import { Sim } from "@/components/sim";
 
 type Card = { id: string; name: string; brand: string; price: number };
 type Shelf = { id: string; title: string; line: string };
@@ -77,15 +78,25 @@ export function GlassStore({ onLock }: { onLock: () => void }) {
   const [query, setQuery] = useState("");
   const [picked, setPicked] = useState<Card | null>(null);
   const [limit, setLimit] = useState(24);
-  const [panel, setPanel] = useState<"shop" | "build" | "keys">("shop");
+  const [panel, setPanel] = useState<"shop" | "build" | "keys" | "sim">("shop");
+  const [sort, setSort] = useState<"low" | "high" | "score" | "score-low">("low");
+  const [grid, setGrid] = useState(false);
   if (panel === "build") return <Counter onClose={() => setPanel("shop")} />;
   if (panel === "keys") return <KeyboardShop onLeave={() => setPanel("shop")} />;
+  if (panel === "sim") return <Sim onLeave={() => setPanel("shop")} />;
 
   const rows = useMemo(() => {
     if (!shelf) return [];
     const q = query.trim().toLowerCase();
-    return cardsFor(shelf).filter((item) => !q || `${item.brand} ${item.name}`.toLowerCase().includes(q));
-  }, [shelf, query]);
+    return cardsFor(shelf)
+      .filter((item) => !q || `${item.brand} ${item.name}`.toLowerCase().includes(q))
+      .sort((a, b) => {
+        if (sort === "high") return b.price - a.price;
+        if (sort === "score") return scoreOf(b) - scoreOf(a);
+        if (sort === "score-low") return scoreOf(a) - scoreOf(b);
+        return a.price - b.price;
+      });
+  }, [shelf, query, sort]);
 
   const current = SHELVES.find((item) => item.id === shelf);
 
@@ -123,6 +134,7 @@ export function GlassStore({ onLock }: { onLock: () => void }) {
         <div className="mt-3 flex gap-2">
           <button type="button" onClick={() => { blip(); setPanel("build"); }} className="h-11 rounded-full bg-white/15 px-4 text-sm">Build with them</button>
           <button type="button" onClick={() => { blip(); setPanel("keys"); }} className="h-11 rounded-full bg-white/15 px-4 text-sm">Keyboards</button>
+          <button type="button" onClick={() => { blip(); setPanel("sim"); }} className="h-11 rounded-full bg-white/15 px-4 text-sm">Sims</button>
         </div>
 
         {!shelf ? (
@@ -151,7 +163,22 @@ export function GlassStore({ onLock }: { onLock: () => void }) {
               <Search className="size-4 text-[#e9d5ff]" />
               <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search this shelf" className="h-full w-full bg-transparent text-base outline-none placeholder:text-white/40" />
             </label>
-            <ul className="mt-3 space-y-2" style={{ perspective: "900px" }} onMouseLeave={() => setHot(null)}>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {(
+                [
+                  ["low", "Price low"],
+                  ["high", "Price high"],
+                  ["score", "Score high"],
+                  ["score-low", "Score low"],
+                ] as const
+              ).map(([id, label]) => (
+                <button key={id} type="button" onClick={() => { blip(); setSort(id); }} className={`h-10 rounded-full px-3 text-sm ${sort === id ? "bg-white text-black" : "bg-white/15 text-white"}`}>
+                  {label}
+                </button>
+              ))}
+              <button type="button" onClick={() => { blip(); setGrid((value) => !value); }} className="h-10 rounded-full bg-white/15 px-3 text-sm">{grid ? "List" : "Grid"}</button>
+            </div>
+            <ul className={`mt-3 ${grid ? "grid grid-cols-2 gap-2" : "space-y-2"}`} style={{ perspective: "900px" }} onMouseLeave={() => setHot(null)}>
               {rows.slice(0, limit).map((item) => (
                 <li key={item.id}>
                   <button

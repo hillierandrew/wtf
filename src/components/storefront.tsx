@@ -5,10 +5,11 @@ import { CopyList, partLine } from "@/components/copy-list";
 import { laptopMarks, deskMarks } from "@/components/marks";
 import { Counter } from "@/components/counter";
 import { KeyboardShop } from "@/components/keyboard-shop";
+import { Sim } from "@/components/sim";
 import { CAT_LABEL, PARTS, explainPart, explainLaptop, laptopBits, isJunk, machineScore, money, partScore, rankFrom, tagsOf, type Category, type Part } from "@/lib/catalog";
 
 type View = "ai" | "desktops" | "laptops" | "parts";
-type Sort = "ppp" | "score" | "price-asc" | "price-desc";
+type Sort = "ppp" | "score" | "score-asc" | "price-asc" | "price-desc";
 type Kind = "game" | "home" | "work" | "tablet" | "chrome";
 
 type Laptop = {
@@ -220,6 +221,7 @@ function sortCards(list: Card[], sort: Sort) {
     if (sort === "price-asc") return a.price - b.price;
     if (sort === "price-desc") return b.price - a.price;
     if (sort === "score") return b.score - a.score;
+    if (sort === "score-asc") return a.score - b.score;
     return ppp(a) - ppp(b);
   });
 }
@@ -232,7 +234,8 @@ export function Storefront({ onLock }: { onLock: () => void }) {
   const [openBox, setOpenBox] = useState(false);
   const [more, setMore] = useState(24);
   const [scoreId, setScoreId] = useState<string | null>(null);
-  const [panel, setPanel] = useState<"shop" | "build" | "keys">("shop");
+  const [panel, setPanel] = useState<"shop" | "build" | "keys" | "sim">("shop");
+  const [grid, setGrid] = useState(true);
   const [spot, setSpot] = useState<string | null>(null);
 
   const stock = useMemo(() => PARTS.filter((part) => !isJunk(part, true)), []);
@@ -273,6 +276,7 @@ export function Storefront({ onLock }: { onLock: () => void }) {
 
   if (panel === "build") return <Counter onClose={() => setPanel("shop")} />;
   if (panel === "keys") return <KeyboardShop onLeave={() => setPanel("shop")} />;
+  if (panel === "sim") return <Sim onLeave={() => setPanel("shop")} />;
 
   return (
     <div className="min-h-dvh bg-[#fafafa] text-[#111] antialiased" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif' }}>
@@ -289,6 +293,7 @@ export function Storefront({ onLock }: { onLock: () => void }) {
         <div className="mx-auto flex max-w-6xl gap-2 px-4 pb-3">
           <button type="button" onClick={() => setPanel("build")} className="h-11 rounded-full bg-black px-4 text-sm font-medium text-white">Build with them</button>
           <button type="button" onClick={() => setPanel("keys")} className="h-11 rounded-full bg-neutral-100 px-4 text-sm font-medium">Keyboards</button>
+          <button type="button" onClick={() => setPanel("sim")} className="h-11 rounded-full bg-neutral-100 px-4 text-sm font-medium">Sims</button>
         </div>
       </header>
 
@@ -371,10 +376,12 @@ export function Storefront({ onLock }: { onLock: () => void }) {
               </div>
               <select value={sort} onChange={(event) => setSort(event.target.value as Sort)} className="rounded-2xl border border-black/10 bg-white px-3 py-2.5 text-sm">
                 <option value="ppp">Best price / performance</option>
-                <option value="score">Highest score</option>
+                <option value="score">Score high</option>
+                <option value="score-asc">Score low</option>
                 <option value="price-asc">Price low to high</option>
                 <option value="price-desc">Price high to low</option>
               </select>
+              <button type="button" onClick={() => setGrid((value) => !value)} className="rounded-2xl border border-black/10 bg-white px-3 py-2.5 text-sm">{grid ? "List" : "Grid"}</button>
               <label className="flex items-center gap-2 text-sm">
                 <input type="checkbox" checked={openBox} onChange={(event) => setOpenBox(event.target.checked)} />
                 Open box
@@ -388,7 +395,7 @@ export function Storefront({ onLock }: { onLock: () => void }) {
             {page.length === 0 ? (
               <p className="py-20 text-center text-neutral-400">Nothing in this shelf matches.</p>
             ) : (
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className={grid ? "grid gap-4 sm:grid-cols-2 lg:grid-cols-3" : "flex flex-col gap-3"}>
                 {page.map((item) => {
                   const rank = rankFrom(item.score);
                   const value = ppp(item);

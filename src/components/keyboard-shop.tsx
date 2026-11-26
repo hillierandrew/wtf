@@ -19,9 +19,13 @@ type Preset = {
   band?: "soft";
   sort?: Sort;
   name?: RegExp;
+  who?: "feel" | "grandma";
+  max?: number;
 };
 
 const DOORS: Preset[] = [
+  { id: "feel-board", title: "Best mechanical", line: "A real switch, not a rubber dome. Quiet enough to live with. For someone who feels every key.", shelf: "board", who: "feel", sort: "quiet" },
+  { id: "grandma-board", title: "Grandma's board", line: "Cheap, quiet, and already finished. Full size if we have it.", shelf: "board", who: "grandma", sort: "low", max: 80 },
   { id: "boards", title: "Finished keyboards", line: "A board that is already built. Switches are in it.", shelf: "board", sort: "quiet" },
   { id: "switches", title: "Switches only", line: "Loose switches. No board in the box.", shelf: "switch", sort: "quiet" },
   { id: "keycaps", title: "Keycaps only", line: "The caps. Not the board, not the switches.", shelf: "keycap" },
@@ -81,13 +85,14 @@ function matches(item: KeyItem, preset: Preset) {
   if (preset.light && item.light !== preset.light) return false;
   if (preset.feel && item.feel !== preset.feel) return false;
   if (preset.name && !preset.name.test(`${item.brand} ${item.name}`)) return false;
+  if (preset.max && item.price > preset.max) return false;
+  if (preset.who === "feel") {
+    if (!["linear", "tactile", "silent", "magnetic"].includes(item.feel)) return false;
+  }
+  if (preset.who === "grandma") {
+    if (item.feel !== "membrane" && item.feel !== "silent" && item.feel !== "low") return false;
+  }
   return true;
-}
-
-function bars(db: number | null, loud: boolean) {
-  if (db == null) return 0;
-  const quiet = db < 45 ? 5 : db < 52 ? 4 : db < 58 ? 3 : db < 64 ? 2 : 1;
-  return loud ? 6 - quiet : quiet;
 }
 
 function touchOf(feel: Feel) {
@@ -120,15 +125,34 @@ function dbLine(item: KeyItem) {
   return [where, measured, estimated, band].filter(Boolean).join(" ");
 }
 
-function Dots({ n, label }: { n: number; label: string }) {
-  return (
-    <span className="inline-flex items-center gap-1 text-[13px] text-[#333]">
-      <span className="w-14">{label}</span>
-      {[1, 2, 3, 4, 5].map((dot) => (
-        <span key={dot} className={`size-2.5 rounded-full ${dot <= n ? "bg-[#161616]" : "bg-[#ddd]"}`} />
-      ))}
-    </span>
-  );
+function keyTags(item: KeyItem) {
+  const hot = /hot-?swap|hotswap/i.test(item.name);
+  const fixed = item.feel === "optical" || item.feel === "membrane" || item.feel === "magnetic" || /solder|proprietary|huntsman|omnipoint/i.test(item.name);
+  const tags: { label: string; className: string }[] = [];
+  if (item.feel === "linear") tags.push({ label: "Linear", className: "text-sky-800" });
+  if (item.feel === "tactile") tags.push({ label: "Tactile", className: "text-amber-900" });
+  if (item.feel === "clicky") tags.push({ label: "Clicky", className: "text-red-800" });
+  if (item.feel === "silent") tags.push({ label: "Silent", className: "text-emerald-800" });
+  if (item.feel === "magnetic") tags.push({ label: "Magnetic", className: "text-teal-800" });
+  if (item.feel === "optical") tags.push({ label: "Optical", className: "text-orange-800" });
+  if (item.feel === "membrane") tags.push({ label: "Membrane", className: "text-stone-600" });
+  if ((item.shelf === "board" || item.shelf === "switch") && item.feel !== "membrane" && item.feel !== "unknown" && item.feel !== "bare") tags.push({ label: "Mechanical", className: "text-sky-950" });
+  if (hot) tags.push({ label: "Hot-swap", className: "text-green-800" });
+  else if (fixed) tags.push({ label: "Fixed switches", className: "text-rose-900" });
+  if (item.light === "none") tags.push({ label: "No backlight", className: "text-stone-700" });
+  if (item.light === "rgb" || item.light === "backlight") tags.push({ label: "Backlit", className: "text-blue-800" });
+  return tags;
+}
+
+function story(item: KeyItem) {
+  const hot = /hot-?swap|hotswap/i.test(item.name);
+  const fixed = item.feel === "optical" || item.feel === "membrane" || /solder|proprietary|huntsman/i.test(item.name);
+  const swap = hot
+    ? "The switches pull out. You can change the feel later without a soldering iron."
+    : fixed
+      ? "The switches stay in. This feel is permanent. Do not promise a different switch later."
+      : "The box does not say if the switches come out. Ask before you promise a swap.";
+  return `${swap} Touch: ${touchOf(item.feel)} Click: ${clickOf(item.feel)} ${dbLine(item)}`;
 }
 
 export function KeyboardShop({ onLeave }: { look?: Look; onLeave?: () => void }) {
@@ -338,17 +362,12 @@ export function KeyboardShop({ onLeave }: { look?: Look; onLeave?: () => void })
                   {item.light === "none" ? " · No backlight" : item.light === "rgb" || item.light === "backlight" ? " · Backlit" : ""}
                   {item.open ? " · Open box" : ""}
                 </span>
-                {heard ? (
-                  <span className="mt-2 flex flex-col gap-1">
-                    <Dots n={bars(item.estimated, false)} label="Quiet" />
-                    <Dots n={bars(item.estimated, true)} label="Loud" />
-                    <span className="block text-[14px] text-[#161616]">Touch: {touchOf(item.feel)}</span>
-                    <span className="block text-[14px] text-[#161616]">Click: {clickOf(item.feel)}</span>
-                    <span className="block text-[14px] leading-snug text-[#333]">{dbLine(item)}</span>
-                  </span>
-                ) : (
-                  <span className="mt-2 block text-[14px] text-[#333]">{dbLine(item)}</span>
-                )}
+                <span className="mt-2 flex flex-wrap gap-x-2 gap-y-1">
+                  {keyTags(item).map((tag) => (
+                    <span key={tag.label} className={`text-[13px] font-semibold ${tag.className}`}>{tag.label}</span>
+                  ))}
+                </span>
+                <span className="mt-2 block text-[14px] leading-snug text-[#333]">{story(item)}</span>
                 {open ? <span className="mt-2 block text-[14px] leading-snug text-[#161616]">{item.sound || "That is the whole note on this one."}</span> : null}
               </button>
             </li>
